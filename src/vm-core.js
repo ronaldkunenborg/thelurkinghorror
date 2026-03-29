@@ -23,7 +23,7 @@ function write16(memory, address, value) {
   memory[address + 1] = value & 0xff;
 }
 
-const STORE_OPCODES = new Set([8, 9, 15, 16, 20, 21, 22, 23, 24, 25, 129, 130, 131, 132, 136, 142, 143, 224]);
+const STORE_OPCODES = new Set([8, 9, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 129, 130, 131, 132, 136, 142, 143, 224, 231]);
 const BRANCH_OPCODES = new Set([1, 2, 3, 4, 5, 6, 7, 10, 128, 129, 130]);
 const PRINTER_OPCODES = new Set([178, 179]);
 
@@ -39,6 +39,8 @@ class Z3VM {
     this.highMemoryBase = config.header.highMemoryBase;
     this.globalsAddress = config.header.globalsAddress;
     this.objectTableAddress = config.header.objectTableAddress || 0;
+    this.abbreviationsAddress = config.header.abbreviationsAddress || 0;
+    this.dictionaryAddress = config.header.dictionaryAddress || 0;
     this.propertyDefaultsAddress = this.objectTableAddress;
     this.objectsAddress = this.objectTableAddress ? (this.objectTableAddress + 62) : 0;
     this.addressMultiplier = 2;
@@ -55,6 +57,7 @@ class Z3VM {
     this.callStack = [];
     this.currentFrame = this._makeRootFrame();
     this.pendingInput = null;
+    this._dictionaryMeta = null;
   }
 
   _makeRootFrame() {
@@ -130,7 +133,132 @@ class Z3VM {
     return operand.type === 'variable' ? operand.raw : operand.value;
   }
 
-  _readZStringAt(address) {
+  _zsciiToText(code) {
+    if (code === 13) {
+      return '\n';
+    }
+    if (code >= 32 && code <= 126) {
+      return String.fromCharCode(code);
+    }
+    return '';
+  }
+
+  _decodeAbbreviation(abbrevIndex, depth) {
+    if (!this.abbreviationsAddress || depth > 4) {
+      return '';
+    }
+    const wordAddress = this.read16(this.abbreviationsAddress + abbrevIndex * 2);
+    const byteAddress = wordAddress * 2;
+    return this._readZStringAt(byteAddress, depth + 1).text;
+  }
+
+  _getDictionaryMeta() {
+    if (this._dictionaryMeta) {
+      return this._dictionaryMeta;
+    }
+    if (!this.dictionaryAddress) {
+      return null;
+    }
+    const base = this.dictionaryAddress;
+    const separatorCount = this.read8(base);
+    const separators = [];
+    for (let i = 0; i < separatorCount; i++) {
+      separators.push(this.read8(base + 1 + i));
+    }
+    const entryLength = this.read8(base + 1 + separatorCount);
+    const entryCount = this.read16(base + 2 + separatorCount);
+    const entriesAddress = base + 4 + separatorCount;
+    this._dictionaryMeta = {
+      separators,
+      entryLength,
+      entryCount,
+      entriesAddress,
+    };
+    return this._dictionaryMeta;
+  }
+
+  _encodeDictionaryWord(word) {
+    const a0 = 'abcdefghijklmnopqrstuvwxyz';
+    const a1 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const a2 = ' \n0123456789.,!?_#\'"/\\-:()';
+    const zchars = [];
+
+    const text = String(word || '');
+    for (let i = 0; i < text.length && zchars.length < 6; i++) {
+      const ch = text[i];
+      const c0 = a0.indexOf(ch);
+      if (c0 >= 0) {
+        zchars.push(c0 + 6);
+        continue;
+      }
+      const c1 = a1.indexOf(ch);
+      if (c1 >= 0) {
+        zchars.push(4, c1 + 6);
+        continue;
+      }
+      const c2 = a2.indexOf(ch);
+      if (c2 >= 0) {
+        zchars.push(5, c2 + 6);
+        continue;
+      }
+      const code = ch.charCodeAt(0) & 0x3ff;
+      zchars.push(5, 6, (code >> 5) & 0x1f, code & 0x1f);
+    }
+
+    while (zchars.length < 6) {
+      zchars.push(5);
+    }
+    zchars.length = 6;
+
+    const out = new Uint8Array(4);
+    out[0] = ((zchars[0] & 0x1f) << 2) | ((zchars[1] & 0x1f) >> 3);
+    out[1] = ((zchars[1] & 0x07) << 5) | (zchars[2] & 0x1f);
+    out[2] = ((zchars[3] & 0x1f) << 2) | ((zchars[4] & 0x1f) >> 3);
+    out[3] = ((zchars[4] & 0x07) << 5) | (zchars[5] & 0x1f);
+    out[2] |= 0x80;
+    return out;
+  }
+
+  _compareEncodedAt(address, encoded4) {
+    for (let i = 0; i < 4; i++) {
+      const a = this.read8(address + i);
+      const b = encoded4[i];
+      if (a < b) {
+        return -1;
+      }
+      if (a > b) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  _lookupDictionaryAddress(word) {
+    const meta = this._getDictionaryMeta();
+    if (!meta) {
+      return 0;
+    }
+    const encoded = this._encodeDictionaryWord(word);
+    let lo = 0;
+    let hi = meta.entryCount - 1;
+    while (lo <= hi) {
+      const mid = (lo + hi) >> 1;
+      const addr = meta.entriesAddress + mid * meta.entryLength;
+      const cmp = this._compareEncodedAt(addr, encoded);
+      if (cmp === 0) {
+        return addr;
+      }
+      if (cmp < 0) {
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    return 0;
+  }
+
+  _readZStringAt(address, depth) {
+    const decodeDepth = depth || 0;
     const zchars = [];
     let cursor = address;
     let stop = false;
@@ -154,12 +282,29 @@ class Z3VM {
         alphabet = 0;
         continue;
       }
+      if (z >= 1 && z <= 3) {
+        if (i + 1 < zchars.length) {
+          const abbrevIndex = 32 * (z - 1) + zchars[++i];
+          result += this._decodeAbbreviation(abbrevIndex, decodeDepth);
+        }
+        alphabet = 0;
+        continue;
+      }
       if (z === 4) {
         alphabet = 1;
         continue;
       }
       if (z === 5) {
         alphabet = 2;
+        continue;
+      }
+      if (alphabet === 2 && z === 6) {
+        if (i + 2 < zchars.length) {
+          const zscii = (zchars[i + 1] << 5) | zchars[i + 2];
+          result += this._zsciiToText(zscii);
+          i += 2;
+        }
+        alphabet = 0;
         continue;
       }
       if (z >= 6) {
@@ -501,7 +646,9 @@ class Z3VM {
   _tokenizeInput(command) {
     const words = [];
     const text = (command || '').toLowerCase();
-    const separatorSet = new Set(['.', ',', '"']);
+    const dict = this._getDictionaryMeta();
+    const separators = (dict ? dict.separators : [46, 44, 34]).map(code => String.fromCharCode(code));
+    const separatorSet = new Set(separators);
     let start = -1;
     for (let i = 0; i < text.length; i++) {
       const ch = text[i];
@@ -545,7 +692,8 @@ class Z3VM {
     this.write8(parseAddr + 1, count);
     for (let i = 0; i < count; i++) {
       const entryAddr = parseAddr + 2 + i * 4;
-      this.write16(entryAddr, 0);
+      const dictAddress = this._lookupDictionaryAddress(words[i].word);
+      this.write16(entryAddr, dictAddress);
       this.write8(entryAddr + 2, words[i].word.length & 0xff);
       this.write8(entryAddr + 3, words[i].pos & 0xff);
     }
@@ -828,7 +976,7 @@ class Z3VM {
   }
 }
 
-if (typeof module !== 'undefined' && module.exports) {
+  if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     Z3VM,
     s16,

@@ -22,6 +22,9 @@ class GameIoController {
         initialPc: parsed.header.initialPc,
         globalsAddress: parsed.header.globalsAddress,
         staticBase: parsed.header.staticBase,
+        objectTableAddress: parsed.header.objectTableAddress,
+        abbreviationsAddress: parsed.header.abbreviationsAddress,
+        dictionaryAddress: parsed.header.dictionaryAddress,
       },
       io: {
         onOutput: text => this._handleVmOutput(text),
