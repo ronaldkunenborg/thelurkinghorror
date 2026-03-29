@@ -51,34 +51,34 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added parser correctness tests in `tools/test-parser.js`
    - Verified tests pass against `The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`
 
+8. [done] Phase 1: Implement Z-machine VM core
+   - Added direct-interpreter VM core in `src/vm-core.js` with instruction decoding (`long`, `short`, `VAR`) and step/run loop
+   - Implemented baseline opcode handlers for arithmetic/logic, stack/variable access, memory load/store, calls/returns, and simple branching
+   - Implemented variable model (stack/local/global), call frame model, and routine call/return flow
+   - Added VM unit tests in `tools/test-vm-core.js` covering decoder, arithmetic/logic, stack/variables, memory ops, branching, and call/return
+   - Verified VM and parser tests pass (`node tools/test-vm-core.js`, `node tools/test-parser.js`)
+
+9. [done] Phase 1: Create HTML/CSS UI framework
+   - Added responsive single-page shell in `src/index.html` with output window, status line, and command input
+   - Added `src/ui-framework.js` for output rendering, status updates, command submission, and history navigation (arrow keys)
+   - Included mobile adjustments and accessible UI landmarks/labels for terminal interaction
+   - Added bootstrap wiring so UI framework is ready for VM I/O integration
+
+10. [done] Phase 1: Implement I/O system
+   - Added `src/io.js` game I/O controller to connect UI command flow with VM execution loop
+   - Extended VM core with I/O hooks, output emission, `sread` pause/resume flow, and command buffer/parse-buffer writes
+   - Added story load paths in UI (bundled fetch and local file input) and wired run-until-input behavior
+   - Added `tools/test-vm-io.js` to validate input request, command injection, parse-buffer writing, and resumed execution
+   - Verified test suite passes (`node tools/test-vm-core.js`, `node tools/test-vm-io.js`, `node tools/test-parser.js`)
+
+11. [done] Phase 1: Integration test
+   - Added real-story integration smoke test in `tools/test-integration.js`
+   - Verified startup path reaches input prompt using `The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`
+   - Verified command cycle (`look`) resumes execution and returns to input wait state
+   - Confirmed end-to-end parser + VM + I/O loop executes with current opcode subset
+   - Verified full current test set passes (`node tools/test-vm-core.js`, `node tools/test-vm-io.js`, `node tools/test-parser.js`, `node tools/test-integration.js`)
+
 ## Pending Tasks
-
-8. [pending] Phase 1: Implement Z-machine VM core
-   - Create instruction decoder
-   - Implement basic opcodes (arithmetic, logic, stack, memory)
-   - Build call stack and variable management
-   - Simple branching support
-   - Unit tests for each opcode category
-
-9. [pending] Phase 1: Create HTML/CSS UI framework
-   - Single-file or minimal modular structure
-   - Game text output window (scrollable)
-   - Command input field with history
-   - Status line display
-   - Responsive design
-
-10. [pending] Phase 1: Implement I/O system
-   - Connect VM to UI (text output)
-   - Command input and parsing
-   - Game loop (read-execute-output cycle)
-   - Buffer management
-
-11. [pending] Phase 1: Integration test
-   - Load The Lurking Horror Z3 file
-   - Execute startup sequence
-   - Display initial game state
-   - Test basic command processing
-   - Verify output matches expectations
 
 12. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
    - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`

@@ -205,7 +205,13 @@ function parseZ3Story(storyData, options) {
   };
 }
 
-module.exports = {
-  parseZ3Story,
-  computeChecksum,
-};
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    parseZ3Story,
+    computeChecksum,
+  };
+}
+
+if (typeof window !== 'undefined') {
+  window.parseZ3Story = parseZ3Story;
+}
