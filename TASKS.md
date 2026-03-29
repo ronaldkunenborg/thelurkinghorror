@@ -24,20 +24,27 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added V3 opcode/data-structure reference guide linked to The Lurking Horror `.z3` file mapping
    - Indexed new docs in `README.md`
 
+4. [done] Analyze ifvms.js architecture and core algorithms
+   - Studied parser/runtime/disassembler/opcode pipeline from `ifvms.js` source
+   - Documented opcode handler and VM execution patterns in `docs/IFVMS_ARCHITECTURE_ANALYSIS.md`
+   - Identified patterns suitable for single-file Z3 implementation and explicitly scoped out JIT/Glk-heavy parts
+   - Kept approach as reference-driven, not direct port
+
+5. [done] Design Phase 1 implementation (Foundation)
+   - Finalized parser, VM, text, I/O module boundaries for development-time structure
+   - Defined Phase 1 opcode baseline grouped by execution concerns
+   - Locked memory strategy (`storyImage` + guarded dynamic `ram`) and core helper APIs
+   - Added architecture diagram and implementation sequence in `docs/PHASE1_FOUNDATION_DESIGN.md`
+   - Indexed design doc in `README.md`
+
+6. [done] Add local Quetzal persistence module (serverless save/load foundation)
+   - Added `src/quetzal-storage.js` with IndexedDB slot storage (`storyId + slot`)
+   - Added save listing/get/delete/clear operations and metadata handling
+   - Added `.sav` export helper (download) and import helper (file upload to slot)
+   - Documented integration workflow in `docs/QUETZAL_LOCAL_STORAGE.md`
+   - Indexed new documentation in `README.md`
+
 ## Pending Tasks
-
-4. [pending] Analyze ifvms.js architecture and core algorithms
-   - Study file parser implementation
-   - Document opcode handlers and VM instruction execution
-   - Identify patterns suitable for our single-file implementation
-   - Note: Use as reference, not direct port
-
-5. [pending] Design Phase 1 implementation (Foundation)
-   - Based on standards and ifvms.js patterns
-   - Finalize file parser design
-   - Opcode set to implement in phase 1
-   - Memory management strategy
-   - Create updated architecture diagram
 
 6. [pending] Phase 1: Build Z3 file parser
    - Parse header and extract metadata
@@ -72,6 +79,11 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Display initial game state
    - Test basic command processing
    - Verify output matches expectations
+
+11. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
+   - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`
+   - Add save slot UI actions (save/load/delete/export/import)
+   - Add compatibility checks (story id/release/serial/checksum) before restore
 
 ## Refinements
 

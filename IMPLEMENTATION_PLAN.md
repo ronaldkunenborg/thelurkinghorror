@@ -6,9 +6,11 @@ Convert "The Lurking Horror" Infocom Z3 text adventure into a single-page web ap
 ## Architecture Overview
 
 ### 1. Z-Machine Virtual Machine (Core)
+
 The Z-machine is a stack-based virtual machine. Key components:
 
 #### 1.1 File Format Parser (Z3)
+
 - **Input**: Z3 binary file (The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3)
 - **Tasks**:
   - Parse Z3 file header (version, memory size, etc.)
@@ -17,13 +19,16 @@ The Z-machine is a stack-based virtual machine. Key components:
   - Parse instruction stream
 
 #### 1.2 Memory Management
+
 - **Static Memory**: Read-only game data (strings, objects, routines)
 - **Dynamic Memory**: Game state that changes (object positions, variables, flags)
 - **Stack**: Call stack for routine execution and operand stack
 - **Implementation**: JavaScript typed arrays (Uint8Array, Uint16Array) for efficient binary data handling
 
 #### 1.3 Game State
+
 Objects to track:
+
 - Global variables (16 16-bit variables)
 - Object tree (parent/child/sibling relationships)
 - Object properties
@@ -31,7 +36,9 @@ Objects to track:
 - Game flags and counters
 
 #### 1.4 Instruction Set
+
 Execute Z-machine instruction opcodes:
+
 - Arithmetic (add, sub, mul, div, mod)
 - Logic (and, or, not)
 - Stack operations (push, pop)
@@ -43,6 +50,7 @@ Execute Z-machine instruction opcodes:
 - Object manipulation (move, remove, test properties)
 
 #### 1.5 Dictionary & Text Processing
+
 - **Dictionary**: Parse game's dictionary for word lookup
 - **Encoding**: Handle Z-machine text encoding (compressed strings)
 - **Abbreviations**: Support Infocom abbreviation tables
@@ -51,23 +59,28 @@ Execute Z-machine instruction opcodes:
 ### 2. User Interface
 
 #### 2.1 Display Window
+
 - **Main Output Area**: Scrollable text display
+
   - Show game text (descriptions, responses)
   - Preserve formatting and spacing
   - Auto-scroll on new text
   - Optional: Support basic styling (bold, emphasis)
 
 #### 2.2 Input Window
+
 - **Command Input**: Single-line text input field
 - **Command History**: Ability to recall previous commands (arrow keys)
 - **Suggestions**: Optional word completion based on dictionary
 - **Submit**: Enter button or Ctrl+Enter
 
 #### 2.3 Status Bar
+
 - Status line (if game uses it): location, health, inventory count, etc.
 - Optional: Debug info toggle
 
 #### 2.4 Responsive Design
+
 - Mobile-friendly layout
 - Touch-friendly controls
 - Desktop and tablet optimization
@@ -75,6 +88,7 @@ Execute Z-machine instruction opcodes:
 ### 3. Implementation Phases
 
 #### Phase 1: Foundation (MVP)
+
 **Goal**: Minimal playable game
 
 1. **Parser Module**
@@ -102,6 +116,7 @@ Execute Z-machine instruction opcodes:
 **Deliverable**: Game boots, shows initial text, accepts basic commands
 
 #### Phase 2: Text & Parsing
+
 **Goal**: Full text rendering and command parsing
 
 1. **Text Processing**
@@ -121,6 +136,7 @@ Execute Z-machine instruction opcodes:
 **Deliverable**: Game text displays correctly, player can interact with basic commands
 
 #### Phase 3: Game Logic
+
 **Goal**: Full Z-machine compatibility
 
 1. **Object System**
@@ -148,6 +164,7 @@ Execute Z-machine instruction opcodes:
 **Deliverable**: Game fully playable, all core mechanics work
 
 #### Phase 4: Polish & Optimization
+
 **Goal**: Production-ready
 
 1. **Performance**
@@ -176,6 +193,7 @@ Execute Z-machine instruction opcodes:
 ## Technical Stack
 
 ### Frontend
+
 - **HTML5**: Single file layout
 - **CSS3**: Responsive styling, terminal-like aesthetics
 - **Vanilla JavaScript (ES6+)**: No framework dependencies
@@ -183,6 +201,7 @@ Execute Z-machine instruction opcodes:
   - TypeScript (optional, for type safety)
 
 ### Deployment
+
 - Single `.html` file for maximum portability
 - Alternative: HTML + CSS + JS bundled together
 - Can be served from any web server or local filesystem
@@ -211,22 +230,27 @@ thelurkinghorror/
 ## Key Technical Challenges & Solutions
 
 ### Challenge 1: Binary Data Handling
+
 - **Solution**: Use JavaScript typed arrays (Uint8Array, Uint16Array) for efficient binary access
 - Reference: [Z3 File Format](resources/z3-format.md) (to be researched)
 
 ### Challenge 2: Text Compression
+
 - **Solution**: Implement Z-compression algorithm (Huffman-like compression)
 - Z-strings are variable-length packed numbers with abbreviation support
 
 ### Challenge 3: Instruction Decoding
+
 - **Solution**: Create instruction lookup table mapping opcodes to handler functions
 - Use performant switch/case or Map structure
 
 ### Challenge 4: Stack Management
+
 - **Solution**: Use JavaScript arrays with push/pop for stack operations
 - Maintain separate stacks for call stack and evaluation stack
 
 ### Challenge 5: User Input Parsing
+
 - **Solution**: Implement Z-machine word parser
 - Match player input against game dictionary
 - Handle multiple word formats (verbs, nouns, pronouns)
@@ -234,22 +258,26 @@ thelurkinghorror/
 ## Testing Strategy
 
 ### Unit Tests
+
 - Parser: Verify Z3 file parsing correctness
 - VM Instructions: Test individual opcode implementations
 - Text Processing: Verify string decompression
 - Parsing: Verify word tokenization
 
 ### Integration Tests
+
 - Game state: Verify objects move correctly
 - Routines: Verify function calls work
 - Variables: Verify game variables update correctly
 
 ### Acceptance Tests
+
 - Play through game content
 - Verify playability matches original Infocom version
 - Test all game-specific commands
 
 ## Performance Metrics (Goals)
+
 - Game loads in < 2 seconds
 - Command response time < 100ms
 - Memory footprint < 10MB
@@ -265,6 +293,7 @@ thelurkinghorror/
 | Browser compatibility | Low | Low | Target modern browsers (ES6+) |
 
 ## Success Criteria
+
 1. ✓ Game boots and displays initial text
 2. ✓ Player input is accepted and processed
 3. ✓ Game logic executes correctly
@@ -274,6 +303,7 @@ thelurkinghorror/
 7. ✓ No external dependencies
 
 ## Dependencies
+
 - **None** (vanilla JavaScript only)
 - Browser must support:
   - ES6 (or transpile for older browsers)
@@ -281,6 +311,7 @@ thelurkinghorror/
   - Canvas or DOM for rendering (use DOM for simplicity)
 
 ## Timeline Estimate
+
 - Phase 1 (Foundation): 4-6 weeks
 - Phase 2 (Text & Parsing): 2-3 weeks
 - Phase 3 (Game Logic): 4-6 weeks
@@ -288,6 +319,7 @@ thelurkinghorror/
 - **Total**: ~3-4 months (assuming part-time)
 
 ## Next Steps
+
 1. Research Z3 file format specification in detail
 2. Create initial parser prototype
 3. Build basic VM instruction executor

@@ -7,6 +7,7 @@
 - The intention for this project can be found in `INTENT.md` if present.
 - If you create a script that supports part of this project, put it in the `tools` folder. Any scripts you use should be placed there and all scripts that are there will be used if possible before building new ones.
 - documentation will be placed in the `docs` folder, indexed in the `README.md`
+- architecture decisions will be documented in ADR files under `docs`.
 
 ## Git commit message format
 - Always use real newlines in commit bodies.
