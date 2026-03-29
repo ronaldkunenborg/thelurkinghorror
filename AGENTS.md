@@ -8,6 +8,7 @@
 - If you create a script that supports part of this project, put it in the `tools` folder. Any scripts you use should be placed there and all scripts that are there will be used if possible before building new ones.
 - documentation will be placed in the `docs` folder, indexed in the `README.md`
 - architecture decisions will be documented in ADR files under `docs`.
+- When documents are added under `docs` and referenced from `README.md`, those references must be Markdown hyperlinks.
 
 ## Git commit message format
 - Always use real newlines in commit bodies.

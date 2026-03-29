@@ -44,43 +44,43 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Documented integration workflow in `docs/QUETZAL_LOCAL_STORAGE.md`
    - Indexed new documentation in `README.md`
 
+7. [done] Phase 1: Build Z3 file parser
+   - Implemented parser in `src/parser.js` for Z3 header metadata extraction and validation
+   - Added dictionary extraction/validation and bounds checks for core table regions
+   - Added initial memory model (`storyImage`, writable `ram`, dynamic/static/high slices)
+   - Added parser correctness tests in `tools/test-parser.js`
+   - Verified tests pass against `The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`
+
 ## Pending Tasks
 
-6. [pending] Phase 1: Build Z3 file parser
-   - Parse header and extract metadata
-   - Load memory sections from Z3 file
-   - Extract and validate dictionary
-   - Build initial memory model
-   - Unit tests for parser correctness
-
-7. [pending] Phase 1: Implement Z-machine VM core
+8. [pending] Phase 1: Implement Z-machine VM core
    - Create instruction decoder
    - Implement basic opcodes (arithmetic, logic, stack, memory)
    - Build call stack and variable management
    - Simple branching support
    - Unit tests for each opcode category
 
-8. [pending] Phase 1: Create HTML/CSS UI framework
+9. [pending] Phase 1: Create HTML/CSS UI framework
    - Single-file or minimal modular structure
    - Game text output window (scrollable)
    - Command input field with history
    - Status line display
    - Responsive design
 
-9. [pending] Phase 1: Implement I/O system
+10. [pending] Phase 1: Implement I/O system
    - Connect VM to UI (text output)
    - Command input and parsing
    - Game loop (read-execute-output cycle)
    - Buffer management
 
-10. [pending] Phase 1: Integration test
+11. [pending] Phase 1: Integration test
    - Load The Lurking Horror Z3 file
    - Execute startup sequence
    - Display initial game state
    - Test basic command processing
    - Verify output matches expectations
 
-11. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
+12. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
    - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`
    - Add save slot UI actions (save/load/delete/export/import)
    - Add compatibility checks (story id/release/serial/checksum) before restore

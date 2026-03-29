@@ -14,6 +14,12 @@ function read16(bytes, offset) {
   return (bytes[offset] << 8) | bytes[offset + 1];
 }
 
+function cloneBytes(bytes) {
+  const copy = new Uint8Array(bytes.length);
+  copy.set(bytes);
+  return copy;
+}
+
 function computeChecksum(bytes) {
   let sum = 0;
   for (let i = 0x40; i < bytes.length; i++) {
@@ -42,6 +48,19 @@ function parseDictionary(bytes, dictionaryAddress) {
     entryCount,
     entriesAddress,
     entriesEndAddress,
+  };
+}
+
+function buildMemoryModel(bytes, staticBase, highMemoryBase) {
+  const storyImage = cloneBytes(bytes);
+  const ram = cloneBytes(bytes);
+
+  return {
+    storyImage,
+    ram,
+    dynamic: ram.subarray(0, staticBase),
+    static: ram.subarray(staticBase),
+    high: ram.subarray(highMemoryBase),
   };
 }
 
@@ -106,10 +125,34 @@ function parseZ3Story(storyData, options) {
     );
   }
 
+  if (staticBase < 64 || staticBase > bytes.length) {
+    throw new Error('Invalid static memory base in header: ' + staticBase);
+  }
+  if (highMemoryBase < 64 || highMemoryBase > bytes.length) {
+    throw new Error('Invalid high memory base in header: ' + highMemoryBase);
+  }
+  if (dictionaryAddress >= bytes.length) {
+    throw new Error('Invalid dictionary address in header: ' + dictionaryAddress);
+  }
+  if (objectTableAddress >= bytes.length) {
+    throw new Error('Invalid object table address in header: ' + objectTableAddress);
+  }
+  if (globalsAddress + 240 > bytes.length) {
+    throw new Error('Globals table out of bounds: ' + globalsAddress);
+  }
+
   const dictionary = parseDictionary(bytes, dictionaryAddress);
+  if (dictionary.entriesEndAddress > bytes.length) {
+    throw new Error('Dictionary entries exceed story bounds');
+  }
   const propertyDefaultsAddress = objectTableAddress;
   const propertyDefaultsSizeBytes = 31 * 2;
   const firstObjectAddress = propertyDefaultsAddress + propertyDefaultsSizeBytes;
+  if (firstObjectAddress > bytes.length) {
+    throw new Error('Object table property defaults exceed story bounds');
+  }
+
+  const memoryModel = buildMemoryModel(bytes, staticBase, highMemoryBase);
 
   return {
     version,
@@ -129,11 +172,12 @@ function parseZ3Story(storyData, options) {
       headerChecksum,
     },
     memory: {
-      bytes,
+      bytes: memoryModel.ram,
       dynamicEnd: staticBase - 1,
       staticBase,
       highMemoryBase,
       eof: bytes.length,
+      model: memoryModel,
     },
     tables: {
       dictionary,
