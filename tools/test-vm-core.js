@@ -51,6 +51,7 @@ function createVm(programBytes, options) {
       initialPc: opts.initialPc,
       globalsAddress: opts.globalsAddress,
       staticBase: opts.staticBase,
+      objectTableAddress: 0x220,
     },
   });
 }
@@ -169,12 +170,77 @@ function testCallAndReturn() {
   assert.strictEqual(vm.read16(0x100), 1, 'call should store routine return value in g0');
 }
 
+function testObjectTableAddressing() {
+  const vm = createVm([0xba], { size: 0x500 });
+  const objectTableAddress = 0x220;
+  const objectsAddress = objectTableAddress + 62;
+
+  write16(vm.memory, objectsAddress + 7, 0x3456);
+
+  vm.memory[objectsAddress + 4] = 0x11;
+  vm.memory[objectsAddress + 5] = 0x22;
+  vm.memory[objectsAddress + 6] = 0x33;
+
+  vm.memory[objectsAddress + 9 + 4] = 0x44;
+
+  assert.strictEqual(vm._getObjectParent(1), 0x11, 'object 1 parent should come from first object entry');
+  assert.strictEqual(vm._getObjectSibling(1), 0x22, 'object 1 sibling should come from first object entry');
+  assert.strictEqual(vm._getObjectChild(1), 0x33, 'object 1 child should come from first object entry');
+  assert.strictEqual(vm._getObjectPropertyTableAddress(1), 0x3456, 'object 1 property table should come from first object entry');
+  assert.strictEqual(vm._getObjectParent(2), 0x44, 'object 2 should use the next object entry');
+}
+
+function testPrintObjectUsesShortName() {
+  let output = '';
+  const vm = createVm([0xba], { size: 0x500 });
+  vm.onOutput = text => {
+    output += text;
+  };
+  vm._readObjectShortName = objectId => {
+    assert.strictEqual(objectId, 1, 'print_obj should request the target object short name');
+    return 'foo';
+  };
+
+  vm.executeInstruction({
+    opcode: 138,
+    operands: [{ type: 'small', raw: 1, value: 1 }],
+    nextPc: vm.pc,
+    offset: vm.pc,
+  });
+
+  assert.strictEqual(output, 'foo', 'print_obj should emit the object short name');
+}
+
+function testPrintAddrUsesByteAddress() {
+  let output = '';
+  const vm = createVm([0xba], { size: 0x500 });
+  vm.onOutput = text => {
+    output += text;
+  };
+  vm._readZStringAt = address => {
+    assert.strictEqual(address, 0x345, 'print_addr should decode from the supplied byte address');
+    return { text: 'bar' };
+  };
+
+  vm.executeInstruction({
+    opcode: 135,
+    operands: [{ type: 'large', raw: 0x345, value: 0x345 }],
+    nextPc: vm.pc,
+    offset: vm.pc,
+  });
+
+  assert.strictEqual(output, 'bar', 'print_addr should emit decoded text');
+}
+
 function run() {
   testDecoderAndArithmetic();
   testStackAndVariableManagement();
   testMemoryOpcodes();
   testSimpleBranching();
   testCallAndReturn();
+  testObjectTableAddressing();
+  testPrintObjectUsesShortName();
+  testPrintAddrUsesByteAddress();
   console.log('VM core tests passed.');
 }
 

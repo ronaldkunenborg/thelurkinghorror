@@ -323,7 +323,7 @@ class Z3VM {
   }
 
   _objectAddress(objectId) {
-    return this.objectsAddress + 9 * objectId;
+    return this.objectsAddress + 9 * (objectId - 1);
   }
 
   _getObjectParent(objectId) {
@@ -352,6 +352,18 @@ class Z3VM {
 
   _getObjectPropertyTableAddress(objectId) {
     return this.read16(this._objectAddress(objectId) + 7);
+  }
+
+  _readObjectShortName(objectId) {
+    const propertyTableAddress = this._getObjectPropertyTableAddress(objectId);
+    if (!propertyTableAddress) {
+      return '';
+    }
+    const shortNameWords = this.read8(propertyTableAddress);
+    if (shortNameWords === 0) {
+      return '';
+    }
+    return this._readZStringAt(propertyTableAddress + 1).text;
   }
 
   _findPropertyAddress(objectId, propertyId) {
@@ -852,8 +864,17 @@ class Z3VM {
         this.setVariable(varnum, u16(this.getVariable(varnum) - 1));
         return;
       }
+      case 135:
+        this._emitOutput(this._readZStringAt(o(0)).text);
+        return;
       case 136:
         this._callRoutine(o(0), inst.storeVar, inst.nextPc, []);
+        return;
+      case 137:
+        this._removeObject(o(0));
+        return;
+      case 138:
+        this._emitOutput(this._readObjectShortName(o(0)));
         return;
       case 139:
         this._retFromRoutine(o(0));

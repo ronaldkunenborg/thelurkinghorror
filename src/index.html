@@ -42,6 +42,7 @@
       }
 
       .shell {
+        position: relative;
         width: min(980px, 100%);
         height: min(760px, 100%);
         display: grid;
@@ -52,6 +53,12 @@
         box-shadow: var(--shadow);
         overflow: hidden;
         backdrop-filter: blur(6px);
+      }
+
+      .shell.ready .splash {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
       }
 
       .topbar {
@@ -95,6 +102,16 @@
 
       .btn:hover {
         border-color: rgba(140, 247, 214, 0.65);
+      }
+
+      .btn-accent {
+        border-color: rgba(255, 220, 151, 0.38);
+        background: linear-gradient(180deg, rgba(46, 33, 15, 0.95), rgba(24, 18, 9, 0.9));
+        color: var(--accent-2);
+      }
+
+      .btn-accent:hover {
+        border-color: rgba(255, 220, 151, 0.72);
       }
 
       .output {
@@ -163,6 +180,99 @@
         background: rgba(5, 10, 17, 0.9);
       }
 
+      .splash {
+        position: absolute;
+        inset: 0;
+        z-index: 4;
+        display: grid;
+        place-items: center;
+        padding: clamp(18px, 4vw, 40px);
+        background:
+          radial-gradient(130% 120% at 50% 0%, rgba(44, 60, 92, 0.5), transparent 52%),
+          linear-gradient(180deg, rgba(4, 8, 16, 0.78), rgba(3, 6, 12, 0.96));
+        backdrop-filter: blur(8px);
+        transition: opacity 260ms ease, visibility 260ms ease;
+      }
+
+      .splash-panel {
+        width: min(560px, 100%);
+        padding: clamp(22px, 5vw, 38px);
+        border: 1px solid rgba(255, 220, 151, 0.18);
+        border-radius: 24px;
+        background:
+          linear-gradient(180deg, rgba(17, 24, 38, 0.96), rgba(10, 14, 24, 0.92)),
+          radial-gradient(circle at top, rgba(255, 220, 151, 0.06), transparent 58%);
+        box-shadow:
+          0 30px 70px rgba(0, 0, 0, 0.45),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+      }
+
+      .splash-kicker {
+        margin: 0 0 10px;
+        font-size: 0.76rem;
+        letter-spacing: 0.34em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .splash-title {
+        margin: 0;
+        font-size: clamp(2rem, 7vw, 3.7rem);
+        line-height: 0.96;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+        text-shadow: 0 0 24px rgba(255, 220, 151, 0.18);
+      }
+
+      .splash-copy {
+        margin: 18px 0 0;
+        max-width: 32rem;
+        color: var(--text-main);
+        line-height: 1.6;
+      }
+
+      .splash-note {
+        margin: 14px 0 0;
+        max-width: 34rem;
+        color: var(--text-dim);
+        line-height: 1.55;
+        font-size: 0.9rem;
+      }
+
+      .splash-status {
+        margin: 18px 0 0;
+        color: var(--accent);
+        font-size: 0.95rem;
+      }
+
+      .splash-status.error {
+        color: var(--danger);
+      }
+
+      .splash-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .splash-prompt {
+        margin: 22px 0 0;
+        color: var(--accent-2);
+        font-size: 0.9rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .splash-prompt.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
       @keyframes reveal {
         from {
           opacity: 0;
@@ -201,15 +311,38 @@
           gap: 8px;
           padding: 10px 10px 12px;
         }
+
+        .splash-panel {
+          padding: 22px 18px;
+          border-radius: 18px;
+        }
       }
     </style>
   </head>
   <body>
-    <main class="shell" aria-label="Interactive fiction terminal">
+    <main id="shell" class="shell" aria-label="Interactive fiction terminal">
+      <section id="splash" class="splash" aria-live="polite">
+        <div class="splash-panel">
+          <p class="splash-kicker">Interactive Horror</p>
+          <h2 class="splash-title">The Lurking Horror</h2>
+          <p class="splash-copy">
+            The storm is already bad. The campus is almost empty. Somewhere in the old Comp Center, something
+            is waiting.
+          </p>
+          <p class="splash-note">
+            Note: according to the manual, the login is 872325412 and the password is uhlersoth.
+          </p>
+          <p id="splash-status" class="splash-status">Loading bundled story...</p>
+          <p id="splash-prompt" class="splash-prompt">Press any key to enter</p>
+          <div class="splash-actions">
+            <button id="splash-load-local" class="btn btn-accent" type="button">Load Local File</button>
+          </div>
+        </div>
+      </section>
+
       <header class="topbar">
         <h1 class="title">The Lurking Horror</h1>
         <div class="actions">
-          <button id="load-bundled" class="btn" type="button">Load Bundled</button>
           <button id="load-local" class="btn" type="button">Load Local File</button>
         </div>
         <span class="hint">Arrow keys: history</span>
@@ -240,13 +373,20 @@
     <script src="./parser.js"></script>
     <script src="./vm-core.js"></script>
     <script src="./io.js"></script>
+    <script src="./bundled-story.js"></script>
     <script>
       (function bootstrapUi() {
+        const splashShownAt = Date.now();
+        const minimumSplashMs = 1800;
         const localFileInput = document.createElement('input');
         localFileInput.type = 'file';
         localFileInput.accept = '.z3,.z5,.z8,.zblorb,.zlb';
         localFileInput.style.display = 'none';
         document.body.appendChild(localFileInput);
+        const shellEl = document.getElementById('shell');
+        const splashEl = document.getElementById('splash');
+        const splashStatusEl = document.getElementById('splash-status');
+        const splashPromptEl = document.getElementById('splash-prompt');
 
         const ui = new window.UiFramework({
           outputEl: document.getElementById('output'),
@@ -258,26 +398,73 @@
         });
 
         const controller = new window.GameIoController(ui);
-        ui.appendOutput('Shell ready. Load a story to start.', 'system');
-        ui.setStatus('No story loaded', 'Idle');
+        ui.appendOutput('Booting interpreter shell...', 'system');
+        ui.setStatus('Loading bundled story', 'Booting');
 
         ui.focusInput();
         window.appUi = ui;
         window.gameController = controller;
 
-        document.getElementById('load-bundled').addEventListener('click', async () => {
+        function setSplashStatus(message, isError) {
+          splashStatusEl.textContent = message;
+          splashStatusEl.className = isError ? 'splash-status error' : 'splash-status';
+        }
+
+        let splashDismissReady = false;
+        let splashHidden = false;
+
+        function hideSplash() {
+          if (splashHidden) {
+            return;
+          }
+          splashHidden = true;
+          shellEl.classList.add('ready');
+          window.removeEventListener('keydown', handleSplashDismiss);
+          splashEl.removeEventListener('click', handleSplashDismiss);
+        }
+
+        function handleSplashDismiss(event) {
+          if (!splashDismissReady) {
+            return;
+          }
+          if (event.type === 'keydown' && event.key === 'Tab') {
+            return;
+          }
+          hideSplash();
+          ui.focusInput();
+        }
+
+        function armSplashDismiss() {
+          if (splashDismissReady) {
+            return;
+          }
+          splashDismissReady = true;
+          splashPromptEl.classList.add('visible');
+          window.addEventListener('keydown', handleSplashDismiss);
+          splashEl.addEventListener('click', handleSplashDismiss);
+        }
+
+        async function loadBundledStoryAtStartup() {
+          setSplashStatus('Loading bundled story...', false);
           try {
-            await controller.loadStoryFromUrl('../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3');
+            await controller.loadBundledStory();
+            setSplashStatus('Bundled story loaded.', false);
+            const remaining = Math.max(0, minimumSplashMs - (Date.now() - splashShownAt));
+            window.setTimeout(armSplashDismiss, remaining);
           } catch (error) {
+            setSplashStatus('Bundled story failed to load. You can still open a local story file.', true);
             ui.appendOutput('Failed to load bundled story: ' + error.message, 'error');
             ui.setStatus('Load failed', 'Error');
           }
-        });
+        }
 
-        document.getElementById('load-local').addEventListener('click', () => {
+        function openLocalPicker() {
           localFileInput.value = '';
           localFileInput.click();
-        });
+        }
+
+        document.getElementById('load-local').addEventListener('click', openLocalPicker);
+        document.getElementById('splash-load-local').addEventListener('click', openLocalPicker);
 
         localFileInput.addEventListener('change', async event => {
           const file = event.target.files && event.target.files[0];
@@ -285,13 +472,20 @@
             return;
           }
           try {
+            setSplashStatus('Loading selected story file...', false);
             const buffer = await file.arrayBuffer();
             await controller.loadStoryFromArrayBuffer(buffer);
+            splashPromptEl.classList.remove('visible');
+            setSplashStatus('Story loaded.', false);
+            armSplashDismiss();
           } catch (error) {
+            setSplashStatus('Selected file could not be loaded.', true);
             ui.appendOutput('Failed to load selected file: ' + error.message, 'error');
             ui.setStatus('Load failed', 'Error');
           }
         });
+
+        loadBundledStoryAtStartup();
       })();
     </script>
   </body>

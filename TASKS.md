@@ -78,12 +78,31 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Confirmed end-to-end parser + VM + I/O loop executes with current opcode subset
    - Verified full current test set passes (`node tools/test-vm-core.js`, `node tools/test-vm-io.js`, `node tools/test-parser.js`, `node tools/test-integration.js`)
 
-## Pending Tasks
+12. [done] Bugfix opening room startup state
+   - Corrected Z3 object table addressing in `src/vm-core.js` so object 1 resolves to the first object entry
+   - Added `print_obj` and `remove_obj` opcode support needed by the correct startup flow
+   - Added regression coverage in `tools/test-vm-core.js` and `tools/test-integration.js` for the Terminal Room opening text
 
-12. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
+15. [done] Auto-load bundled story with startup splash screen
+   - Added bundled story asset loading on application startup with no separate bundled-load button
+   - Added a dedicated splash overlay in `src/index.html` with loading and error states
+   - Kept local file loading available from both the header and splash screen as a fallback
+
+## Pending Tasks
+ 
+13. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
    - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`
    - Add save slot UI actions (save/load/delete/export/import)
    - Add compatibility checks (story id/release/serial/checksum) before restore
+
+14. [pending] I would like a map of visited locations that shows the locations you visited. Apparently the original package did contain a map of the buildings - we should provide that if we could. The map should be shown while adventuring.
+
+16. [pending] An overview of possible commands should be available under a help-button.
+
+17. [pending] Add splash-screen music support and wire it to `$SOUND`
+   - Play the bundled music file from `data` while the splash screen is visible
+   - Honor the interpreter `$SOUND` preference when deciding whether to play audio
+   - Stop or fade the music when the splash screen is dismissed
 
 ## Refinements
 
