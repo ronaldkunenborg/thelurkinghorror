@@ -232,6 +232,63 @@ function testPrintAddrUsesByteAddress() {
   assert.strictEqual(output, 'bar', 'print_addr should emit decoded text');
 }
 
+function testSoundEffectOpcodeEmitsEvent() {
+  const vm = createVm([0xba]);
+  let captured = null;
+  vm.onSoundEffect = event => {
+    captured = event;
+  };
+
+  vm.executeInstruction({
+    opcode: 245,
+    operands: [
+      { type: 'small', raw: 3, value: 3 },
+      { type: 'small', raw: 2, value: 2 },
+      { type: 'small', raw: 8, value: 8 },
+      { type: 'small', raw: 0x40, value: 0x40 },
+    ],
+    nextPc: vm.pc,
+    offset: vm.pc,
+  });
+
+  assert.deepStrictEqual(
+    captured,
+    { number: 3, effect: 2, volume: 8, routine: 0x40 },
+    'sound_effect should forward event parameters to the I/O hook'
+  );
+}
+
+function testUnknownOpcodeEmitsDebugEvent() {
+  const vm = createVm([0xba]);
+  let unknown = null;
+  vm.onUnknownOpcode = event => {
+    unknown = event;
+  };
+
+  assert.throws(
+    () => {
+      vm.executeInstruction({
+        opcode: 999,
+        operands: [{ type: 'small', raw: 7, value: 7 }],
+        nextPc: vm.pc,
+        offset: 0x123,
+      });
+    },
+    /Unsupported opcode in VM core: 999 at 0x123/,
+    'Unknown opcode should still throw an error'
+  );
+
+  assert.deepStrictEqual(
+    unknown,
+    {
+      opcode: 999,
+      offset: 0x123,
+      operands: [{ type: 'small', raw: 7, value: 7 }],
+    },
+    'Unknown opcode event should include opcode, address, and operands'
+  );
+}
+
 function run() {
   testDecoderAndArithmetic();
   testStackAndVariableManagement();
@@ -241,6 +298,8 @@ function run() {
   testObjectTableAddressing();
   testPrintObjectUsesShortName();
   testPrintAddrUsesByteAddress();
+  testSoundEffectOpcodeEmitsEvent();
+  testUnknownOpcodeEmitsDebugEvent();
   console.log('VM core tests passed.');
 }
 

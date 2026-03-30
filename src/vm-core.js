@@ -49,6 +49,8 @@ class Z3VM {
     const io = config.io || {};
     this.onOutput = typeof io.onOutput === 'function' ? io.onOutput : function () {};
     this.onInputRequested = typeof io.onInputRequested === 'function' ? io.onInputRequested : function () {};
+    this.onSoundEffect = typeof io.onSoundEffect === 'function' ? io.onSoundEffect : function () {};
+    this.onUnknownOpcode = typeof io.onUnknownOpcode === 'function' ? io.onUnknownOpcode : function () {};
 
     this.halted = false;
     this.lastQuit = false;
@@ -76,6 +78,14 @@ class Z3VM {
 
   _emitOutput(text) {
     this.onOutput(String(text));
+  }
+
+  _emitSoundEffect(event) {
+    this.onSoundEffect(event);
+  }
+
+  _emitUnknownOpcode(event) {
+    this.onUnknownOpcode(event);
   }
 
   read8(address) {
@@ -969,8 +979,34 @@ class Z3VM {
       case 233:
         this.setVariable(vref(0), this.getVariable(0));
         return;
-      default:
+      case 245:
+        {
+          const volumeRaw = inst.operands.length > 2 ? o(2) : null;
+          const volumeSigned = volumeRaw === null ? null : s16(volumeRaw);
+          const routine = inst.operands.length > 3 ? o(3) : null;
+        this._emitSoundEffect({
+          number: inst.operands.length > 0 ? o(0) : 0,
+          effect: inst.operands.length > 1 ? o(1) : 2,
+          volume: volumeSigned,
+          volumeRaw,
+          volumeSigned,
+          routine,
+          operandCount: inst.operands.length,
+        });
+        return;
+        }
+      default: {
+        this._emitUnknownOpcode({
+          opcode: op,
+          offset: inst.offset,
+          operands: inst.operands.map(operand => ({
+            type: operand.type,
+            raw: operand.raw,
+            value: operand.value,
+          })),
+        });
         throw new Error('Unsupported opcode in VM core: ' + op + ' at 0x' + inst.offset.toString(16));
+      }
     }
   }
 

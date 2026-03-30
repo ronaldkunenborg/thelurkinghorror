@@ -11,6 +11,7 @@ This project builds a browser-based Z-machine interpreter for Infocom's `The Lur
 - [`docs/PHASE1_FOUNDATION_DESIGN.md`](docs/PHASE1_FOUNDATION_DESIGN.md) - finalized Phase 1 foundation design: parser shape, opcode subset, memory strategy, and implementation architecture diagram.
 - [`docs/QUETZAL_LOCAL_STORAGE.md`](docs/QUETZAL_LOCAL_STORAGE.md) - IndexedDB-based Quetzal slot storage with `.sav` import/export workflow for serverless local save/load.
 - [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architecture decision record for serverless Quetzal persistence via IndexedDB plus file import/export.
+- [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter-specific quality-of-life features (`$SOUND`, `$SOUNDSTATS`) plus HELP/login note extension and sound debug output.
 
 ## Core Assets
 

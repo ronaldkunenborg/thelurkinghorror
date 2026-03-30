@@ -83,30 +83,49 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added `print_obj` and `remove_obj` opcode support needed by the correct startup flow
    - Added regression coverage in `tools/test-vm-core.js` and `tools/test-integration.js` for the Terminal Room opening text
 
-15. [done] Auto-load bundled story with startup splash screen
+13. [done] Auto-load bundled story with startup splash screen
    - Added bundled story asset loading on application startup with no separate bundled-load button
    - Added a dedicated splash overlay in `src/index.html` with loading and error states
    - Kept local file loading available from both the header and splash screen as a fallback
 
+14. [done] Add `$SOUND` interpreter support and VM sound-event plumbing
+   - Added VM support for `sound_effect` opcode event emission
+   - Wired sound events into the game I/O controller and honored `$SOUND` on/off preference before playback
+   - Added browser audio playback scaffolding with sound-id mapping support for story-triggered effects
+   - Added automated tests for VM sound-event emission and I/O `$SOUND` behavior
+
+15. [done] Integrate original The Lurking Horror sound samples into the `$SOUND` pipeline
+   - Added reusable ADF tooling in `tools/adf_tool.py` to list/extract Amiga disk images
+   - Extracted original audio assets from `original_source/Lurking Horror, The - Release 219 (1987)(Infocom)[cr][serial 870912].adf`
+   - Added conversion utility `tools/convert_amiga_sound_dat.py` and generated browser-playable WAV files in `data/soundfx/lurkinghorror`
+   - Wired default sound-id to file mapping in `src/io.js` for in-game `sound_effect` playback
+   - Verified existing automated test suite still passes
+
+16. [done] Add splash-screen music support with attribution
+   - Added splash music playback while the splash overlay is visible
+   - Added fade-out and stop behavior when dismissing the splash screen
+   - Added visible music attribution on splash (`Whirlguy`, CC BY-ND 3.0, Newgrounds)
+   - Copied splash music asset to `src/assets/audio/splash-horror-whirlguy.mp3` and wired `src/index.html` to use it
+
+17. [done] Add white pen on black wax drawings for locations. Style the terminal so it is text on top of the drawing and there is no real border anymore. Move game buttons to a bar on the side.
+   - Added black scene background with room-art layers behind the terminal in `src/index.html`
+   - Added room-driven artwork transition system (fade in/out on location change) with subtle random offset per room entry
+   - Added `onRoomChanged` callback plumbing in `src/io.js` so room transitions can drive background artwork updates
+   - Restyled terminal to centered translucent overlay and moved actions into a side action bar
+   - Wired current available room art (`assets/gfx/lurkinghorror/terminal_room.png`) into the room-art map
+
 ## Pending Tasks
  
-13. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
+18. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
    - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`
    - Add save slot UI actions (save/load/delete/export/import)
    - Add compatibility checks (story id/release/serial/checksum) before restore
 
-14. [pending] I would like a map of visited locations that shows the locations you visited. Apparently the original package did contain a map of the buildings - we should provide that if we could. The map should be shown while adventuring.
+19. [pending] I would like a map of visited locations that shows the locations you visited. Apparently the original package did contain a map of the buildings - we should provide that if we could. The map should be shown while adventuring.
 
-16. [pending] An overview of possible commands should be available under a help-button.
+20. [pending] An overview of possible commands should be available under a Commands-button. If you click any command it should paste it into the command line.
 
-17. [pending] Add splash-screen music support
-   - Play the bundled music file from `data` while the splash screen is visible
-   - Stop or fade the music when the splash screen is dismissed
-
-18. [pending] Add in-game sound effect support and wire it to `$SOUND`
-   - Detect and play the story's own sound-effect events during gameplay
-   - Honor the interpreter `$SOUND` preference when deciding whether to play in-game audio
-   - Keep in-game sound effects separate from splash-screen music behavior
+21. [pending] Add a horizontal volume slider for the game music and another for the sound effects to the sidebar buttons. 
 
 ## Refinements
 

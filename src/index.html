@@ -6,17 +6,18 @@
     <title>The Lurking Horror - Web Interpreter</title>
     <style>
       :root {
-        --bg-0: #0a101a;
-        --bg-1: #162236;
-        --panel: rgba(7, 12, 22, 0.86);
-        --panel-border: rgba(146, 197, 255, 0.22);
-        --text-main: #d5ecff;
-        --text-dim: #8fb2cf;
+        --bg-0: #000000;
+        --viewport-pad: clamp(10px, 2vw, 20px);
+        --panel: rgba(4, 6, 9, 0.62);
+        --panel-border: rgba(190, 214, 234, 0.12);
+        --panel-border-top: rgba(220, 236, 250, 0.3);
+        --text-main: #e9edf2;
+        --text-dim: #a8b5c2;
         --accent: #8cf7d6;
         --accent-2: #ffdc97;
         --danger: #ff7e7e;
-        --shadow: 0 22px 60px rgba(2, 9, 18, 0.6);
-        --radius: 16px;
+        --shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+        --radius: 14px;
       }
 
       * {
@@ -32,27 +33,111 @@
       body {
         font-family: "Cascadia Code", "Fira Code", "Consolas", "Courier New", monospace;
         color: var(--text-main);
-        background:
-          radial-gradient(140% 120% at 0% 0%, #253759 0%, transparent 58%),
-          radial-gradient(120% 120% at 100% 100%, #2a4e49 0%, transparent 52%),
-          linear-gradient(160deg, var(--bg-1), var(--bg-0));
-        display: grid;
-        place-items: center;
-        padding: clamp(10px, 2vw, 20px);
+        background: var(--bg-0);
+        display: block;
+        padding: var(--viewport-pad);
       }
 
       .shell {
         position: relative;
-        width: min(980px, 100%);
-        height: min(760px, 100%);
-        display: grid;
-        grid-template-rows: auto 1fr auto;
-        border: 1px solid var(--panel-border);
+        width: 100%;
+        max-width: none;
+        height: calc(100vh - (var(--viewport-pad) * 2));
+        border: none;
         border-radius: var(--radius);
-        background: var(--panel);
+        background: #000;
         box-shadow: var(--shadow);
         overflow: hidden;
-        backdrop-filter: blur(6px);
+      }
+
+      .shell-frame {
+        position: relative;
+        height: 100%;
+        min-height: 0;
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        padding: 12px;
+        align-items: stretch;
+        justify-content: flex-end;
+        z-index: 2;
+      }
+
+      .hud-group {
+        position: relative;
+        z-index: 3;
+        height: 100%;
+        min-height: 0;
+        flex: 0 0 48%;
+        max-width: 48%;
+        min-width: 0;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
+      }
+
+      .side-actions {
+        width: 132px;
+        height: 100%;
+        border: 1px solid var(--panel-border);
+        border-top-color: var(--panel-border-top);
+        border-radius: 10px;
+        background: rgba(7, 12, 18, 0.52);
+        backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding: 10px;
+      }
+
+      .side-actions-title {
+        font-size: 0.73rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+
+      .terminal-stack {
+        min-width: 0;
+        height: 100%;
+        min-height: 0;
+        display: grid;
+        grid-template-rows: auto 1fr auto auto;
+        border: 1px solid var(--panel-border);
+        border-top-color: var(--panel-border-top);
+        border-radius: var(--radius);
+        background: var(--panel);
+        backdrop-filter: none;
+        position: relative;
+        z-index: 3;
+      }
+
+      .scene-pane {
+        position: relative;
+        flex: 0 0 40%;
+        max-width: 40%;
+        width: auto;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        border: none;
+        border-radius: 0;
+        background: transparent;
+        overflow: visible;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .scene-layer {
+        position: absolute;
+        inset: 0;
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: 50% auto;
+        opacity: 0;
+        transform: translate(0, 0) scale(1.02);
+        z-index: 1;
+        transition: opacity 650ms ease, transform 650ms ease;
       }
 
       .shell.ready .splash {
@@ -64,11 +149,11 @@
       .topbar {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         gap: 12px;
         padding: 12px 16px;
         border-bottom: 1px solid var(--panel-border);
-        background: linear-gradient(180deg, rgba(12, 23, 38, 0.9), rgba(10, 18, 30, 0.6));
+        background: linear-gradient(180deg, rgba(12, 16, 22, 0.8), rgba(8, 12, 16, 0.5));
       }
 
       .title {
@@ -116,8 +201,30 @@
 
       .output {
         overflow-y: auto;
+        min-height: 0;
         padding: 18px 16px 20px;
         line-height: 1.45;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(168, 181, 194, 0.55) transparent;
+      }
+
+      .output::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      .output::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .output::-webkit-scrollbar-thumb {
+        background: rgba(168, 181, 194, 0.55);
+        border-radius: 999px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+      }
+
+      .output::-webkit-scrollbar-thumb:hover {
+        background: rgba(168, 181, 194, 0.75);
       }
 
       .line {
@@ -240,6 +347,18 @@
         font-size: 0.9rem;
       }
 
+      .splash-attribution {
+        margin: 10px 0 0;
+        max-width: 34rem;
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        line-height: 1.45;
+      }
+
+      .splash-attribution a {
+        color: var(--accent);
+      }
+
       .splash-status {
         margin: 18px 0 0;
         color: var(--accent);
@@ -286,20 +405,59 @@
 
       @media (max-width: 700px) {
         body {
-          padding: 8px;
+          padding: 0;
         }
 
         .shell {
           height: 100%;
-          border-radius: 12px;
+          border-radius: 0;
         }
 
-        .topbar {
-          padding: 10px 12px;
+        .shell-frame {
+          padding: 8px;
+          flex-direction: column;
+          gap: 8px;
+          justify-content: flex-start;
         }
 
-        .hint {
-          display: none;
+        .hud-group {
+          position: static;
+          width: 100%;
+          max-width: 100%;
+          flex: 0 0 auto;
+          height: auto;
+          grid-template-columns: 1fr;
+          grid-template-rows: auto 1fr;
+          gap: 8px;
+        }
+
+        .side-actions {
+          width: auto;
+          flex-direction: row;
+          align-items: center;
+          justify-content: flex-start;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+
+        .side-actions-title {
+          margin-right: 6px;
+        }
+
+        .scene-pane {
+          position: static;
+          width: 100%;
+          max-width: 100%;
+          flex: 0 0 auto;
+          height: min(220px, 30vh);
+          pointer-events: none;
+          margin-left: 0;
+          min-height: 140px;
+        }
+
+        .terminal-stack {
+          width: 100%;
+          margin-left: 0;
         }
 
         .output {
@@ -332,6 +490,10 @@
           <p class="splash-note">
             Note: according to the manual, the login is 872325412 and the password is uhlersoth.
           </p>
+          <p class="splash-attribution">
+            Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
+            <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+          </p>
           <p id="splash-status" class="splash-status">Loading bundled story...</p>
           <p id="splash-prompt" class="splash-prompt">Press any key to enter</p>
           <div class="splash-actions">
@@ -339,34 +501,46 @@
           </div>
         </div>
       </section>
+      <div class="shell-frame">
+        <div class="hud-group">
+          <aside class="side-actions" aria-label="Game actions">
+            <span class="side-actions-title">Actions</span>
+            <button id="load-local" class="btn" type="button">Load Local File</button>
+          </aside>
 
-      <header class="topbar">
-        <h1 class="title">The Lurking Horror</h1>
-        <div class="actions">
-          <button id="load-local" class="btn" type="button">Load Local File</button>
+          <div class="terminal-stack">
+            <header class="topbar">
+              <h1 class="title">The Lurking Horror</h1>
+              <span class="hint">Arrow keys: history</span>
+            </header>
+
+            <section id="output" class="output" aria-live="polite"></section>
+
+            <section class="status" aria-label="Status line">
+              <span id="status-left">Loading shell...</span>
+              <span id="status-right">Ready</span>
+            </section>
+
+            <section class="input-row" aria-label="Command input">
+              <span id="prompt" class="prompt">&gt;</span>
+              <input
+                id="command-input"
+                class="command-input"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Enter command..."
+                aria-label="Command input"
+              />
+            </section>
+          </div>
         </div>
-        <span class="hint">Arrow keys: history</span>
-      </header>
 
-      <section id="output" class="output" aria-live="polite"></section>
-
-      <section class="status" aria-label="Status line">
-        <span id="status-left">Loading shell...</span>
-        <span id="status-right">Ready</span>
-      </section>
-
-      <section class="input-row" aria-label="Command input">
-        <span id="prompt" class="prompt">&gt;</span>
-        <input
-          id="command-input"
-          class="command-input"
-          type="text"
-          autocomplete="off"
-          spellcheck="false"
-          placeholder="Enter command..."
-          aria-label="Command input"
-        />
-      </section>
+        <section class="scene-pane" aria-label="Location artwork">
+          <div id="scene-layer-a" class="scene-layer"></div>
+          <div id="scene-layer-b" class="scene-layer"></div>
+        </section>
+      </div>
     </main>
 
     <script src="./ui-framework.js"></script>
@@ -387,6 +561,13 @@
         const splashEl = document.getElementById('splash');
         const splashStatusEl = document.getElementById('splash-status');
         const splashPromptEl = document.getElementById('splash-prompt');
+        const sceneLayerA = document.getElementById('scene-layer-a');
+        const sceneLayerB = document.getElementById('scene-layer-b');
+        const sceneLayers = [sceneLayerA, sceneLayerB];
+        const splashMusic = new Audio('./assets/audio/splash-horror-whirlguy.mp3');
+        splashMusic.loop = false;
+        splashMusic.volume = 0.36;
+        splashMusic.preload = 'auto';
 
         const ui = new window.UiFramework({
           outputEl: document.getElementById('output'),
@@ -397,7 +578,102 @@
           prompt: '>',
         });
 
-        const controller = new window.GameIoController(ui);
+        let activeSceneIndex = 0;
+        const ROOM_ART = {
+          'terminal room': './assets/gfx/lurkinghorror/terminal_room.png',
+        };
+        let currentRoomArt = '';
+
+        function roomKey(name) {
+          return String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
+        }
+
+        function roomKeyCandidates(name) {
+          const base = roomKey(name);
+          if (!base) {
+            return [];
+          }
+          const candidates = new Set();
+          candidates.add(base);
+
+          const withoutParen = base.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+          if (withoutParen) {
+            candidates.add(withoutParen);
+          }
+
+          const withoutCommaClause = base.replace(/,\s*.*$/, '').trim();
+          if (withoutCommaClause) {
+            candidates.add(withoutCommaClause);
+          }
+
+          const strippedState = base
+            .replace(/,\s*(on|in|at|inside|outside|under|over)\b.*$/, '')
+            .trim();
+          if (strippedState) {
+            candidates.add(strippedState);
+          }
+
+          const normalized = Array.from(candidates)
+            .map(text => text.replace(/^the\s+/, '').trim())
+            .filter(Boolean);
+          return Array.from(new Set(normalized));
+        }
+
+        function resolveRoomArt(roomName) {
+          const candidates = roomKeyCandidates(roomName);
+          for (const key of candidates) {
+            if (ROOM_ART[key]) {
+              return ROOM_ART[key];
+            }
+          }
+          for (const knownKey of Object.keys(ROOM_ART)) {
+            for (const candidate of candidates) {
+              if (candidate.startsWith(knownKey)) {
+                return ROOM_ART[knownKey];
+              }
+            }
+          }
+          return '';
+        }
+
+        function randomSceneOffsetPercent() {
+          return ((Math.random() * 2 - 1) * 10).toFixed(2);
+        }
+
+        function setRoomScene(roomName) {
+          const art = resolveRoomArt(roomName);
+          if (art === currentRoomArt) {
+            return;
+          }
+          currentRoomArt = art;
+          const nextIndex = (activeSceneIndex + 1) % sceneLayers.length;
+          const nextLayer = sceneLayers[nextIndex];
+          const prevLayer = sceneLayers[activeSceneIndex];
+
+          if (!art) {
+            prevLayer.style.opacity = '0';
+            nextLayer.style.opacity = '0';
+            return;
+          }
+
+          const offsetX = randomSceneOffsetPercent();
+          const offsetY = randomSceneOffsetPercent();
+          nextLayer.style.backgroundImage = 'url("' + art + '")';
+          nextLayer.style.backgroundPosition = 'calc(50% + ' + offsetX + '%) calc(50% + ' + offsetY + '%)';
+          nextLayer.style.transform = 'scale(1.02)';
+          nextLayer.style.opacity = '1';
+          prevLayer.style.opacity = '0';
+          activeSceneIndex = nextIndex;
+        }
+
+        const controller = new window.GameIoController(ui, {
+          onSoundEvent: () => {
+            stopSplashMusicWithFade();
+          },
+          onRoomChanged: roomName => {
+            setRoomScene(roomName);
+          },
+        });
         ui.appendOutput('Booting interpreter shell...', 'system');
         ui.setStatus('Loading bundled story', 'Booting');
 
@@ -412,6 +688,79 @@
 
         let splashDismissReady = false;
         let splashHidden = false;
+        let splashMusicStarted = false;
+        let splashMusicStopped = false;
+        let splashMusicFadeFrame = 0;
+        let splashMusicNeedsGesture = false;
+        splashMusic.addEventListener('ended', () => {
+          splashMusicStopped = true;
+          splashMusicNeedsGesture = false;
+        });
+
+        function registerSplashMusicGestureRetry() {
+          function retryStart() {
+            if (splashHidden || splashMusicStopped || !splashMusicNeedsGesture) {
+              return;
+            }
+            splashMusicNeedsGesture = false;
+            startSplashMusic();
+          }
+          window.addEventListener('pointerdown', retryStart, { once: true, capture: true });
+          window.addEventListener('keydown', retryStart, { once: true, capture: true });
+          window.addEventListener('touchstart', retryStart, { once: true, capture: true });
+        }
+
+        function startSplashMusic() {
+          if (splashMusicStopped) {
+            return;
+          }
+          if (!splashMusic.paused) {
+            splashMusicStarted = true;
+            return;
+          }
+          const playResult = splashMusic.play();
+          if (playResult && typeof playResult.then === 'function') {
+            playResult
+              .then(() => {
+                splashMusicStarted = true;
+                splashMusicNeedsGesture = false;
+              })
+              .catch(() => {
+                splashMusicNeedsGesture = true;
+                registerSplashMusicGestureRetry();
+              });
+          } else {
+            splashMusicStarted = true;
+          }
+        }
+
+        function stopSplashMusicWithFade() {
+          if (splashMusicStopped) {
+            return;
+          }
+          splashMusicStopped = true;
+          if (splashMusicFadeFrame) {
+            cancelAnimationFrame(splashMusicFadeFrame);
+            splashMusicFadeFrame = 0;
+          }
+          const startVolume = splashMusic.volume;
+          const durationMs = 420;
+          const startAt = performance.now();
+
+          function fadeFrame(now) {
+            const progress = Math.min(1, (now - startAt) / durationMs);
+            splashMusic.volume = startVolume * (1 - progress);
+            if (progress < 1) {
+              splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+              return;
+            }
+            splashMusic.pause();
+            splashMusic.currentTime = 0;
+            splashMusic.volume = startVolume;
+          }
+
+          splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+        }
 
         function hideSplash() {
           if (splashHidden) {
@@ -446,6 +795,7 @@
 
         async function loadBundledStoryAtStartup() {
           setSplashStatus('Loading bundled story...', false);
+          startSplashMusic();
           try {
             await controller.loadBundledStory();
             setSplashStatus('Bundled story loaded.', false);
