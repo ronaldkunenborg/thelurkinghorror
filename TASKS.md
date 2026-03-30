@@ -99,10 +99,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 
 16. [pending] An overview of possible commands should be available under a help-button.
 
-17. [pending] Add splash-screen music support and wire it to `$SOUND`
+17. [pending] Add splash-screen music support
    - Play the bundled music file from `data` while the splash screen is visible
-   - Honor the interpreter `$SOUND` preference when deciding whether to play audio
    - Stop or fade the music when the splash screen is dismissed
+
+18. [pending] Add in-game sound effect support and wire it to `$SOUND`
+   - Detect and play the story's own sound-effect events during gameplay
+   - Honor the interpreter `$SOUND` preference when deciding whether to play in-game audio
+   - Keep in-game sound effects separate from splash-screen music behavior
 
 ## Refinements
 
