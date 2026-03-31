@@ -9,22 +9,18 @@
   <body>
     <main id="shell" class="shell" aria-label="Interactive fiction terminal">
       <section id="splash" class="splash" aria-live="polite">
-        <div class="splash-panel">
-          <p class="splash-kicker">Interactive Horror</p>
-          <h2 class="splash-title">The Lurking Horror</h2>
-          <p class="splash-copy">
-            The storm is already bad. The campus is almost empty. Somewhere in the old Comp Center, something
-            is waiting.
-          </p>
-          <p class="splash-note">
-            Note: according to the manual, the login is 872325412 and the password is uhlersoth.
-          </p>
-          <p class="splash-attribution">
-            Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
-            <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
-          </p>
-          <p id="splash-status" class="splash-status">Loading bundled story...</p>
-          <p id="splash-prompt" class="splash-prompt">Press any key to enter</p>
+        <div class="splash-stage">
+          <div class="splash-art-panel" aria-hidden="true">
+            <img class="splash-art" src="./assets/gfx/splash/box-art.png" alt="" />
+          </div>
+          <div class="splash-panel">
+            <p class="splash-kicker">Interactive Horror</p>
+            <p class="splash-copy">
+              The storm is already bad. The campus is almost empty. Somewhere in the old Comp Center, something
+              is waiting.
+            </p>
+            <p id="splash-status" class="splash-status">Loading...</p>
+          </div>
         </div>
       </section>
         <div class="shell-frame">
@@ -193,6 +189,10 @@
             <span class="volume-label">Sound Effects</span>
             <input id="sfx-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
           </label>
+          <p class="settings-attribution">
+            Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
+            <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+          </p>
         </div>
       </section>
     </main>
@@ -210,7 +210,6 @@
         const shellEl = document.getElementById('shell');
         const splashEl = document.getElementById('splash');
         const splashStatusEl = document.getElementById('splash-status');
-        const splashPromptEl = document.getElementById('splash-prompt');
         const sceneLayerA = document.getElementById('scene-layer-a');
         const sceneLayerB = document.getElementById('scene-layer-b');
         const sceneLayers = [sceneLayerA, sceneLayerB];
@@ -544,7 +543,6 @@
           splashHidden = true;
           shellEl.classList.add('ready');
           window.removeEventListener('keydown', handleSplashDismiss);
-          splashEl.removeEventListener('click', handleSplashDismiss);
         }
 
         function handleSplashDismiss(event) {
@@ -563,22 +561,21 @@
             return;
           }
           splashDismissReady = true;
-          splashPromptEl.classList.add('visible');
+          setSplashStatus('Press any key to enter', false);
           window.addEventListener('keydown', handleSplashDismiss);
-          splashEl.addEventListener('click', handleSplashDismiss);
         }
 
         async function loadBundledStoryAtStartup() {
-          setSplashStatus('Loading bundled story...', false);
+          setSplashStatus('Loading...', false);
           startSplashMusic();
           try {
             await controller.loadBundledStory();
-            setSplashStatus('Bundled story loaded.', false);
             const remaining = Math.max(0, minimumSplashMs - (Date.now() - splashShownAt));
             window.setTimeout(armSplashDismiss, remaining);
           } catch (error) {
-            setSplashStatus('Bundled story failed to load.', true);
-            ui.appendOutput('Failed to load bundled story: ' + error.message, 'error');
+            const message = error && error.message ? error.message : 'Unknown load error.';
+            setSplashStatus('Load error: ' + message, true);
+            ui.appendOutput('Failed to load bundled story: ' + message, 'error');
             ui.setStatus('Load failed', 'Error');
           }
         }

@@ -146,19 +146,19 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Extended `src/io.js` with separate SFX/music volume multipliers and active-audio refresh logic
    - Added regression coverage for SFX/music volume scaling in `tools/test-io-controller-output.js`
 
-21. [done] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
+24. [done] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
    - Added VM-level `save`/`restore` opcode pausing and branch-aware continuation handling in `src/vm-core.js`
    - Added controller-side async slot persistence for story-level save/restore using the existing Quetzal storage path in `src/io.js`
    - Story `save`/`restore` now uses the default local slot `0`, while compatibility checks remain enforced before restore
    - Added VM and controller regression coverage in `tools/test-vm-core.js` and `tools/test-io-controller-output.js`
 
-24. [done] Replace the buttons with icons: a gear icon that opens a dialog where you can set volume for game music and sound effects, load/save icons where you can load and save the game (wired to the text inputs for that). The commands button should have a "?"-type icon. I probably have to create an icon set but you can generate a number of placeholders first. The style is scratch art, white lines on black wax paper.
+25. [done] Replace the buttons with icons: a gear icon that opens a dialog where you can set volume for game music and sound effects, load/save icons where you can load and save the game (wired to the text inputs for that). The commands button should have a "?"-type icon. I probably have to create an icon set but you can generate a number of placeholders first. The style is scratch art, white lines on black wax paper.
    - Replaced the sidebar text buttons with an icon rail in `src/index.html`
    - Added placeholder scratch-style etched icons and icon-rail styling in `src/modern.css`
    - Moved volume controls into a gear-driven settings dialog in `src/index.html` and `src/modern.css`
    - Preserved existing handlers for load local file, save, load, and commands under the new icon UI
 
-25. [done] Create a location map for the documentation in Mermaid format, covering all reachable locations in The Lurking Horror.
+26. [done] Create a location map for the documentation in Mermaid format, covering all reachable locations in The Lurking Horror.
    - Added generated first-pass map document in `docs/LOCATION_MAP.md`, linked from `README.md`
    - Added engine-backed discovery script `tools/discover_location_map.js` plus generated inventory in `tools/location-map-discovery.json`
    - Verified room encoding through the story object model and current-room VM status snapshot before generating links
@@ -166,7 +166,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Left routine-driven and puzzle-only access paths explicitly listed as unresolved follow-up work instead of hiding them
    - Canonical boxed-map reference is now the local PDF `../data/lurking.pdf`; the Mermaid map should be treated as a reconciled working map against that source
 
-26. [done] Reconcile `docs/LOCATION_MAP.md` with the canonical boxed map in `../data/lurking.pdf`.
+27. [done] Reconcile `docs/LOCATION_MAP.md` with the canonical boxed map in `../data/lurking.pdf`.
    - Elevated the boxed-map PDF and extracted booklet map pages to explicit canonical source status in `docs/LOCATION_MAP.md`
    - Added section-by-section reconciliation notes for the upper campus/building page and the lower underground/special-area page
    - Recorded the current known mismatches, especially repeated room-name disambiguation and the not-yet-reconciled Wet Tunnels numbering
@@ -181,31 +181,38 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Chose not to weaken the reference doc for player-facing spoiler concerns
    - Deferred any spoiler-safe or progressive presentation to a future separate artifact, such as the in-game visited map
 
-31. [done] make the volume settings persistent in the local database of the browser. If there are no settings yet, use the current defaults.
+30. [done] make the volume settings persistent in the local database of the browser. If there are no settings yet, use the current defaults.
    - Added IndexedDB-backed interpreter settings storage in `src/quetzal-storage.js` (`InterpreterSettingsStorage`, `interpreter_settings` store)
    - Wired `src/index.html` to load persisted `gameMusicVolume` and `sfxVolume` on startup and fall back to current defaults when no record exists
    - Wired slider input handlers to persist settings after each change
 
-32. [done] when loading using "restore" the music stops playing. The load is now affecting the sound and music differently than it used to do since there never was game music.
+31. [done] when loading using "restore" the music stops playing. The load is now affecting the sound and music differently than it used to do since there never was game music.
    - Changed restore/load audio pre-step in `src/io.js` to stop active sound effects while allowing music to continue
    - Added restore-transition handling so if restored execution immediately starts an SFX, current music and prior SFX are stopped and restored SFX starts
    - Kept music state out of save payloads (VM save format remains unchanged)
    - Added regression coverage in `tools/test-io-controller-output.js` for `$LOAD` SFX-only stop behavior and restore-triggered SFX takeover of music
 
-33. [done] the volume dialog is modal and everything else turns invisible. I want the dialog to be positioned not too far below the gear icon, with the gear icon in the horizontal middle of the dialog. The dialog should blur everything below it and perhaps in a radius around the edges (5px to start with).
+32. [done] the volume dialog is modal and everything else turns invisible. I want the dialog to be positioned not too far below the gear icon, with the gear icon in the horizontal middle of the dialog. The dialog should blur everything below it and perhaps in a radius around the edges (5px to start with).
    - Reworked settings sheet layout in `src/modern.css` to remove full-screen dark modal treatment
    - Anchored dialog positioning in `src/index.html` to the gear button center with responsive clamping and live reposition on resize
    - Added a 5px backdrop blur treatment focused below/around the popup area so the game remains visible behind the panel
 
+33. [done] Improve the splash-screen with the original picture from the box you can find in the data directory (splash-screen.png)
+   - Copied the original box art into `src/assets/gfx/splash/box-art.png` for in-app bundling
+   - Reworked the splash into a larger cinematic split layout (art panel + content panel) in `src/index.html` and `src/modern.css`
+   - Added atmospheric gradients, framing, and subtle artwork drift animation while preserving existing startup flow and music behavior
+   - Removed the splash note text for a cleaner and more focused opening presentation
+
 ## Pending Tasks
 
-27. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.
+34. [pending] Create a list of notable locations with decent descriptive text, with title and description, so we can make images for those.
+
+35. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic
    - Include destinations like `Basalt Bowl` where access is not a simple compass move
    - Label these edges with the final meaningful access action, for example `read paper`, rather than every intermediate UI or parser step
 
-30. [pending] Add an in-game map of visited locations while adventuring.
+36. [pending] Add an in-game map of visited locations while adventuring.
    - Track visited locations during play and show them in the live UI rather than only in documentation
    - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
-
