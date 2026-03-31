@@ -644,20 +644,25 @@ body {
   position: absolute;
   inset: 0;
   z-index: 6;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  background: rgba(2, 4, 8, 0.76);
-  backdrop-filter: blur(8px);
+  display: block;
+  padding: 0;
+  background: transparent;
+  --settings-left: 5px;
+  --settings-top: 84px;
+  --settings-width: min(420px, calc(100% - 10px));
 }
 
 .settings-sheet-panel {
-  width: min(420px, 100%);
+  position: absolute;
+  left: var(--settings-left);
+  top: var(--settings-top);
+  width: var(--settings-width);
   border: 1px solid var(--panel-border-top);
   border-radius: 22px;
   background:
-    radial-gradient(circle at 24% 18%, rgba(255, 255, 255, 0.03), transparent 22%),
-    linear-gradient(180deg, rgba(7, 10, 13, 0.97), rgba(3, 4, 7, 0.98));
+    radial-gradient(circle at 24% 18%, rgba(255, 255, 255, 0.09), transparent 22%),
+    linear-gradient(180deg, rgba(7, 10, 13, 0.3), rgba(3, 4, 7, 0.36));
+  backdrop-filter: blur(5px);
   box-shadow: var(--shadow);
   padding: 22px;
 }
@@ -825,5 +830,10 @@ body {
   .splash-panel {
     padding: 22px 18px;
     border-radius: 18px;
+  }
+
+  .settings-sheet {
+    --settings-left: 5px;
+    --settings-width: calc(100% - 10px);
   }
 }

@@ -179,7 +179,7 @@
         </div>
       </section>
       <section id="settings-sheet" class="settings-sheet" aria-label="Audio settings" hidden>
-        <div class="settings-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="settings-sheet-panel" role="dialog" aria-modal="false" aria-labelledby="settings-title">
           <div class="command-sheet-header">
             <h2 id="settings-title" class="command-sheet-title">Audio Settings</h2>
             <button id="close-settings" class="btn" type="button">Close</button>
@@ -216,8 +216,13 @@
         const sceneLayers = [sceneLayerA, sceneLayerB];
         const commandSheetEl = document.getElementById('command-sheet');
         const settingsSheetEl = document.getElementById('settings-sheet');
+        const settingsButtonEl = document.getElementById('settings-button');
         const musicVolumeEl = document.getElementById('music-volume');
         const sfxVolumeEl = document.getElementById('sfx-volume');
+        const settingsStorage =
+          typeof window.InterpreterSettingsStorage === 'function'
+            ? new window.InterpreterSettingsStorage()
+            : null;
         const splashMusic = new Audio('./assets/audio/splash-horror-whirlguy.mp3');
         const splashMusicBaseVolume = 0.36;
         splashMusic.loop = false;
@@ -325,7 +330,15 @@
         }
 
         const controller = new window.GameIoController(ui, {
-          onSoundEvent: () => {
+          onSoundEvent: event => {
+            const soundEvent = event || {};
+            const effect = Number(soundEvent.resolvedEffect || soundEvent.effect || 0);
+            if (effect !== 2) {
+              return;
+            }
+            if (String(soundEvent.soundClass || '').toLowerCase() === 'music') {
+              return;
+            }
             stopSplashMusicWithFade({ resetToStart: true, markEnded: true });
           },
           onGameMusicPreferenceChanged: enabled => {
@@ -348,6 +361,81 @@
         ui.focusInput();
         window.appUi = ui;
         window.gameController = controller;
+
+        function clampVolume(value, fallback) {
+          const numeric = Number(value);
+          if (!Number.isFinite(numeric)) {
+            return fallback;
+          }
+          return Math.max(0, Math.min(1, numeric));
+        }
+
+        function updateVolumeSliders() {
+          musicVolumeEl.value = String(Math.round(controller.gameMusicVolume * 100));
+          sfxVolumeEl.value = String(Math.round(controller.sfxVolume * 100));
+        }
+
+        async function persistAudioSettings() {
+          if (!settingsStorage || typeof settingsStorage.putAudioSettings !== 'function') {
+            return;
+          }
+          try {
+            await settingsStorage.putAudioSettings({
+              gameMusicVolume: controller.gameMusicVolume,
+              sfxVolume: controller.sfxVolume,
+            });
+          } catch (error) {
+            ui.appendOutput('Audio settings could not be saved locally: ' + error.message, 'error');
+          }
+        }
+
+        async function loadAudioSettings() {
+          updateVolumeSliders();
+          if (!settingsStorage || typeof settingsStorage.getAudioSettings !== 'function') {
+            return;
+          }
+          try {
+            const saved = await settingsStorage.getAudioSettings();
+            if (!saved) {
+              return;
+            }
+            const musicVolume = clampVolume(saved.gameMusicVolume, controller.gameMusicVolume);
+            const sfxVolume = clampVolume(saved.sfxVolume, controller.sfxVolume);
+            controller.setGameMusicVolume(musicVolume);
+            controller.setSoundEffectsVolume(sfxVolume);
+            splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+            updateVolumeSliders();
+          } catch (error) {
+            ui.appendOutput('Audio settings could not be loaded locally: ' + error.message, 'error');
+          }
+        }
+
+        function positionSettingsSheet() {
+          const buttonRect = settingsButtonEl.getBoundingClientRect();
+          const shellRect = shellEl.getBoundingClientRect();
+          const margin = 5;
+          const panelWidth = Math.min(420, Math.max(280, shellRect.width - (margin * 2)));
+          let left = buttonRect.left + (buttonRect.width / 2) - (panelWidth / 2) - shellRect.left;
+          left = Math.max(margin, Math.min(left, shellRect.width - panelWidth - margin));
+          const top = Math.max(
+            margin,
+            Math.min(
+              buttonRect.bottom + 10 - shellRect.top,
+              shellRect.height - 260
+            )
+          );
+          settingsSheetEl.style.setProperty('--settings-left', Math.round(left) + 'px');
+          settingsSheetEl.style.setProperty('--settings-top', Math.round(top) + 'px');
+          settingsSheetEl.style.setProperty('--settings-width', Math.round(panelWidth) + 'px');
+          settingsSheetEl.style.setProperty(
+            '--settings-center-x',
+            Math.round((buttonRect.left + (buttonRect.width / 2)) - shellRect.left) + 'px'
+          );
+          settingsSheetEl.style.setProperty(
+            '--settings-center-y',
+            Math.round((buttonRect.top + (buttonRect.height / 2)) - shellRect.top) + 'px'
+          );
+        }
 
         function setSplashStatus(message, isError) {
           splashStatusEl.textContent = message;
@@ -500,10 +588,12 @@
           const volume = Number(musicVolumeEl.value) / 100;
           controller.setGameMusicVolume(volume);
           splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+          persistAudioSettings();
         });
         sfxVolumeEl.addEventListener('input', () => {
           const volume = Number(sfxVolumeEl.value) / 100;
           controller.setSoundEffectsVolume(volume);
+          persistAudioSettings();
         });
 
         function openCommandSheet() {
@@ -532,6 +622,7 @@
         });
 
         function openSettingsSheet() {
+          positionSettingsSheet();
           settingsSheetEl.hidden = false;
         }
 
@@ -540,14 +631,20 @@
           ui.focusInput();
         }
 
-        document.getElementById('settings-button').addEventListener('click', openSettingsSheet);
+        settingsButtonEl.addEventListener('click', openSettingsSheet);
         document.getElementById('close-settings').addEventListener('click', closeSettingsSheet);
         settingsSheetEl.addEventListener('click', event => {
           if (event.target === settingsSheetEl) {
             closeSettingsSheet();
           }
         });
+        window.addEventListener('resize', () => {
+          if (!settingsSheetEl.hidden) {
+            positionSettingsSheet();
+          }
+        });
 
+        loadAudioSettings();
         loadBundledStoryAtStartup();
       })();
     </script>

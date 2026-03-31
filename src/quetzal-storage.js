@@ -1,8 +1,9 @@
 'use strict';
 
 const DEFAULT_DB_NAME = 'lurking_horror_localdb';
-const DEFAULT_DB_VERSION = 1;
+const DEFAULT_DB_VERSION = 2;
 const DEFAULT_STORE_NAME = 'quetzal_saves';
+const DEFAULT_SETTINGS_STORE_NAME = 'interpreter_settings';
 
 function getIndexedDB() {
   if (typeof globalThis !== 'undefined' && globalThis.indexedDB) {
@@ -98,6 +99,10 @@ class QuetzalStorage {
         }
         if (!store.indexNames.contains('updatedAt')) {
           store.createIndex('updatedAt', 'updatedAt', { unique: false });
+        }
+
+        if (!db.objectStoreNames.contains(DEFAULT_SETTINGS_STORE_NAME)) {
+          db.createObjectStore(DEFAULT_SETTINGS_STORE_NAME, { keyPath: 'key' });
         }
       };
 
@@ -220,6 +225,81 @@ class QuetzalStorage {
   }
 }
 
+class InterpreterSettingsStorage {
+  constructor(options) {
+    const opts = options || {};
+    this.dbName = opts.dbName || DEFAULT_DB_NAME;
+    this.dbVersion = opts.dbVersion || DEFAULT_DB_VERSION;
+    this.storeName = opts.storeName || DEFAULT_SETTINGS_STORE_NAME;
+    this._dbPromise = null;
+  }
+
+  async open() {
+    if (this._dbPromise) {
+      return this._dbPromise;
+    }
+
+    this._dbPromise = new Promise((resolve, reject) => {
+      const indexedDB = getIndexedDB();
+      const request = indexedDB.open(this.dbName, this.dbVersion);
+
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(DEFAULT_STORE_NAME)) {
+          const saveStore = db.createObjectStore(DEFAULT_STORE_NAME, { keyPath: 'id', autoIncrement: true });
+          saveStore.createIndex('storyId', 'storyId', { unique: false });
+          saveStore.createIndex('storyId_slot', ['storyId', 'slot'], { unique: true });
+          saveStore.createIndex('updatedAt', 'updatedAt', { unique: false });
+        }
+
+        if (!db.objectStoreNames.contains(this.storeName)) {
+          db.createObjectStore(this.storeName, { keyPath: 'key' });
+        }
+      };
+
+      request.onsuccess = () => {
+        const db = request.result;
+        db.onversionchange = () => db.close();
+        resolve(db);
+      };
+      request.onerror = () => reject(request.error || new Error('Failed to open IndexedDB'));
+    });
+
+    return this._dbPromise;
+  }
+
+  async getAudioSettings() {
+    const db = await this.open();
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
+    const record = await requestToPromise(store.get('audio'));
+    await transactionCompletePromise(tx);
+    if (!record || typeof record.value !== 'object' || !record.value) {
+      return null;
+    }
+    return Object.assign({}, record.value);
+  }
+
+  async putAudioSettings(settings) {
+    const input = settings || {};
+    const db = await this.open();
+    const tx = db.transaction(this.storeName, 'readwrite');
+    const store = tx.objectStore(this.storeName);
+    await requestToPromise(
+      store.put({
+        key: 'audio',
+        value: {
+          sfxVolume: input.sfxVolume,
+          gameMusicVolume: input.gameMusicVolume,
+          updatedAt: new Date().toISOString(),
+        },
+      })
+    );
+    await transactionCompletePromise(tx);
+    return this.getAudioSettings();
+  }
+}
+
 function createSaveBlob(record) {
   if (!record || !record.quetzalData) {
     throw new Error('createSaveBlob requires a save record with quetzalData');
@@ -284,6 +364,7 @@ async function importSaveFileToSlot(storage, file, metadata) {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     QuetzalStorage,
+    InterpreterSettingsStorage,
     createSaveBlob,
     suggestSaveFilename,
     exportSaveToFile,
@@ -293,6 +374,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
 if (typeof window !== 'undefined') {
   window.QuetzalStorage = QuetzalStorage;
+  window.InterpreterSettingsStorage = InterpreterSettingsStorage;
   window.exportSaveToFile = exportSaveToFile;
   window.importSaveFileToSlot = importSaveFileToSlot;
   window.suggestSaveFilename = suggestSaveFilename;

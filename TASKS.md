@@ -181,6 +181,22 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Chose not to weaken the reference doc for player-facing spoiler concerns
    - Deferred any spoiler-safe or progressive presentation to a future separate artifact, such as the in-game visited map
 
+31. [done] make the volume settings persistent in the local database of the browser. If there are no settings yet, use the current defaults.
+   - Added IndexedDB-backed interpreter settings storage in `src/quetzal-storage.js` (`InterpreterSettingsStorage`, `interpreter_settings` store)
+   - Wired `src/index.html` to load persisted `gameMusicVolume` and `sfxVolume` on startup and fall back to current defaults when no record exists
+   - Wired slider input handlers to persist settings after each change
+
+32. [done] when loading using "restore" the music stops playing. The load is now affecting the sound and music differently than it used to do since there never was game music.
+   - Changed restore/load audio pre-step in `src/io.js` to stop active sound effects while allowing music to continue
+   - Added restore-transition handling so if restored execution immediately starts an SFX, current music and prior SFX are stopped and restored SFX starts
+   - Kept music state out of save payloads (VM save format remains unchanged)
+   - Added regression coverage in `tools/test-io-controller-output.js` for `$LOAD` SFX-only stop behavior and restore-triggered SFX takeover of music
+
+33. [done] the volume dialog is modal and everything else turns invisible. I want the dialog to be positioned not too far below the gear icon, with the gear icon in the horizontal middle of the dialog. The dialog should blur everything below it and perhaps in a radius around the edges (5px to start with).
+   - Reworked settings sheet layout in `src/modern.css` to remove full-screen dark modal treatment
+   - Anchored dialog positioning in `src/index.html` to the gear button center with responsive clamping and live reposition on resize
+   - Added a 5px backdrop blur treatment focused below/around the popup area so the game remains visible behind the panel
+
 ## Pending Tasks
 
 27. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.

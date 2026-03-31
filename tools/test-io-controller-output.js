@@ -688,6 +688,9 @@ async function testLoadCommandRestoresVmSnapshot() {
   controller.storyMeta = createStoryMeta();
   let restored = null;
   controller.vm = {
+    run() {
+      return { haltReason: 'input', quit: false };
+    },
     restoreSaveState(bytes) {
       restored = Array.from(new Uint8Array(bytes));
     },
@@ -748,6 +751,75 @@ async function testSavesCommandListsSlots() {
     ui.lines.some(line => line.includes('[Save slot 3] Slot 3 - Terminal Room')),
     'save listing should print persisted slots'
   );
+}
+
+async function testLoadStopsActiveSfxButKeepsMusic() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const audioBySrc = {};
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+    soundCatalog: {
+      1: { src: './music.mp3', class: 'music' },
+      2: { src: './sfx.wav', class: 'sfx' },
+    },
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.vm = {
+    run() {
+      return { haltReason: 'input', quit: false };
+    },
+    restoreSaveState() {},
+    getStatusSnapshot() {
+      return { roomName: 'Restored Room', score: 7, moves: 8 };
+    },
+  };
+
+  controller._handleVmSoundEffect({ number: 1, effect: 2 });
+  controller._handleVmSoundEffect({ number: 2, effect: 2 });
+
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 1,
+    label: 'Slot 1 - Saved',
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([9, 8, 7]),
+  });
+
+  controller.submitCommand('$LOAD 1');
+  await flushAsyncWork();
+
+  assert.strictEqual(audioBySrc['./sfx.wav'].pauseCalls, 1, 'load should stop active sound effects');
+  assert.strictEqual(audioBySrc['./music.mp3'].pauseCalls, 0, 'load should keep active music running');
 }
 
 async function testStorySaveOpcodeStoresSuccessfulContinuation() {
@@ -841,6 +913,80 @@ async function testStoryRestoreOpcodeLoadsDefaultSlot() {
   );
 }
 
+async function testStoryRestoreStopsMusicWhenRestoredStateStartsSfx() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const audioBySrc = {};
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+    soundCatalog: {
+      1: { src: './music.mp3', class: 'music' },
+      2: { src: './sfx.wav', class: 'sfx' },
+    },
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+  });
+  controller.storyMeta = createStoryMeta();
+  let runCount = 0;
+  controller.vm = {
+    run() {
+      runCount += 1;
+      if (runCount === 1) {
+        return { haltReason: 'restore', quit: false };
+      }
+      controller._handleVmSoundEffect({ number: 2, effect: 2 });
+      return { haltReason: 'input', quit: false };
+    },
+    restoreSaveState() {},
+    completePendingRestore() {},
+    getStatusSnapshot() {
+      return { roomName: 'Restored Room', score: 3, moves: 4 };
+    },
+  };
+
+  controller._handleVmSoundEffect({ number: 1, effect: 2 });
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 0,
+    label: 'Slot 0 - Saved',
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([8, 7, 6]),
+  });
+
+  controller.runVm();
+  await flushAsyncWork();
+
+  assert.strictEqual(audioBySrc['./music.mp3'].pauseCalls, 1, 'restore should stop music if restored execution starts a sound effect');
+  assert.strictEqual(audioBySrc['./sfx.wav'].playCalls, 1, 'restore should start the restored sound effect');
+}
+
 async function run() {
   testOutputBuffering();
   testFlushAtRunBoundary();
@@ -864,9 +1010,11 @@ async function run() {
   testSoundEventCommandTriggersSyntheticPlayback();
   await testSaveCommandStoresVmSnapshot();
   await testLoadCommandRestoresVmSnapshot();
+  await testLoadStopsActiveSfxButKeepsMusic();
   await testSavesCommandListsSlots();
   await testStorySaveOpcodeStoresSuccessfulContinuation();
   await testStoryRestoreOpcodeLoadsDefaultSlot();
+  await testStoryRestoreStopsMusicWhenRestoredStateStartsSfx();
   console.log('I/O controller output tests passed.');
 }
 

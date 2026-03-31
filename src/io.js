@@ -76,6 +76,7 @@ class GameIoController {
       comboCounts: new Map(),
     };
     this.importFileInput = this._createImportFileInput();
+    this.restoreAudioTransitionActive = false;
 
     this.ui.setCommandHandler(command => this.submitCommand(command));
     this._syncStatusDisplays();
@@ -139,6 +140,7 @@ class GameIoController {
     try {
       result = this.vm.run(200000);
     } catch (error) {
+      this.restoreAudioTransitionActive = false;
       this._flushVmOutputBuffer();
       this.ui.appendOutput('VM error: ' + error.message, 'error');
       this._syncStatusDisplays();
@@ -147,6 +149,9 @@ class GameIoController {
     }
     this._flushVmOutputBuffer();
     this._syncStatusDisplays();
+    if (result.haltReason !== 'restore') {
+      this.restoreAudioTransitionActive = false;
+    }
     if (result.haltReason === 'input') {
       this.ui.setStatus('Awaiting command', 'Input ready');
       this.ui.focusInput();
@@ -475,11 +480,12 @@ class GameIoController {
       const compat = this._getStoryCompatibilityMeta();
       const record = await this.saveStorage.getSave(compat.storyId, slot);
       this._assertCompatibleSaveRecord(record);
-      this._stopAllSounds();
+      this._prepareAudioForRestore();
       this.vm.restoreSaveState(record.quetzalData);
       this._syncStatusDisplays();
       this.ui.setStatus('Story restore', 'Loaded slot ' + slot);
     } catch (error) {
+      this.restoreAudioTransitionActive = false;
       this.ui.appendOutput('Story restore failed: ' + error.message, 'error');
       this.ui.setStatus('Story restore', 'Restore failed');
       this.vm.completePendingRestore(false);
@@ -553,7 +559,7 @@ class GameIoController {
       const compat = this._getStoryCompatibilityMeta();
       const record = await this.saveStorage.getSave(compat.storyId, slot);
       this._assertCompatibleSaveRecord(record);
-      this._stopAllSounds();
+      this._prepareAudioForRestore();
       this.vm.restoreSaveState(record.quetzalData);
       this._syncStatusDisplays();
       this.ui.appendOutput(
@@ -561,8 +567,9 @@ class GameIoController {
         'system'
       );
       this.ui.setStatus('Interpreter command', 'Loaded slot ' + slot);
-      this.ui.focusInput();
+      await this.runVm();
     } catch (error) {
+      this.restoreAudioTransitionActive = false;
       this.ui.appendOutput('Load failed: ' + error.message, 'error');
       this.ui.setStatus('Interpreter command', 'Load failed');
     }
@@ -710,7 +717,6 @@ class GameIoController {
 
   _handleVmSoundEffect(event) {
     const soundEvent = event || {};
-    this.onSoundEvent(soundEvent);
     const number = Number(soundEvent.number) || 0;
     const effect = Number(soundEvent.effect) || SOUND_EFFECT_START;
     const volumeRaw = (soundEvent.volumeRaw === null || soundEvent.volumeRaw === undefined)
@@ -725,6 +731,12 @@ class GameIoController {
     const operandCount = Number(soundEvent.operandCount) || 0;
     const soundDef = this.soundCatalog[number];
     const soundClass = this._resolveSoundClass(soundDef);
+    this.onSoundEvent(
+      Object.assign({}, soundEvent, {
+        resolvedEffect: effect,
+        soundClass,
+      })
+    );
     const isEnabledForClass = this._isEnabledForSoundClass(soundClass);
     const mappedSrc = soundDef && soundDef.src ? soundDef.src : 'none';
     const gain = this._resolveSoundGain(soundDef, volumeRaw, volumeSigned);
@@ -771,7 +783,12 @@ class GameIoController {
       return;
     }
 
-    this._stopAllSoundsExcept(number, soundClass);
+    if (this.restoreAudioTransitionActive && soundClass === SOUND_CLASS_SFX) {
+      // During restore we keep music alive unless restored execution immediately enters SFX.
+      this._stopAllSoundsExcept(number);
+    } else {
+      this._stopAllSoundsExcept(number, soundClass);
+    }
     this._playSound(number, soundDef, {
       gain,
       restart: false,
@@ -1079,6 +1096,11 @@ class GameIoController {
       }
       this._applySoundParams(audio, soundDef, null);
     }
+  }
+
+  _prepareAudioForRestore() {
+    this.restoreAudioTransitionActive = true;
+    this._stopAllSoundsByClass(SOUND_CLASS_SFX);
   }
 }
 
