@@ -1,8 +1,14 @@
 # The Lurking Horror Location Map
 
-This document is a first-pass Mermaid working map generated from the local game engine.
+This document is the working reconciliation layer between the local game engine and the canonical boxed map.
 
-The canonical map reference is the boxed-map PDF at [`../data/lurking.pdf`](../data/lurking.pdf). This Mermaid version should be treated as a reconciliation layer against that source, not as the sole authority.
+Canonical map sources:
+
+- [`../data/lurking.pdf`](../data/lurking.pdf) - boxed-map PDF
+- [`../data/booklet-page3.png`](../data/booklet-page3.png) - upper/surface map page extracted from the booklet
+- [`../data/booklet-page4.png`](../data/booklet-page4.png) - lower/underground map page extracted from the booklet
+
+The PDF and booklet pages are the canonical presentation source. The Mermaid graph and notes here exist to make that material searchable, linkable, and checkable against the live engine.
 
 ## Discovery basis
 
@@ -10,8 +16,50 @@ The canonical map reference is the boxed-map PDF at [`../data/lurking.pdf`](../d
 - The current room comes from `globals[0]` in the VM status snapshot.
 - Direct movement validation was performed from the opening game state by replaying commands against serialized VM snapshots.
 - Additional links were inferred from single-byte room exit properties once the direction/property mapping was validated.
-- The boxed-map PDF in `../data/lurking.pdf` is the canonical presentation/layout reference for later reconciliation passes.
+- The boxed-map PDF and extracted booklet map pages are the canonical presentation/layout reference.
 - Routine-driven exits and puzzle-only access paths are listed separately when they remain unresolved.
+
+## Canonical section layout
+
+The boxed map is clearly split into stable sections that should drive how we present and review the world:
+
+- `booklet-page3.png` covers the upper campus/building layout:
+  - Smith Street / Computer Center / Temporary Lab
+  - the Infinite Corridor spine
+  - the Great Dome vertical chain
+  - the Brown Building / Skyscraper / Chemistry / Alchemy wing
+- `booklet-page4.png` covers the lower and special-area layout:
+  - the main interior stack from Terminal Room to Roof
+  - the basement, storage, and steam-tunnel network
+  - the Dream area (`Place`, `Basalt Bowl`, `At Platform`)
+  - the Wet Tunnels inset and `Inner Lair`
+
+## Reconciliation status against the boxed map
+
+The current engine-derived room inventory lines up well with the boxed map's major named areas. The canonical map also clarified several presentation choices that were ambiguous in the raw generated graph:
+
+- duplicated room names should be presented as canonical groups rather than as isolated object ids
+- the world is better understood as page-level sections, not as one flat technical adjacency dump
+- the Dream area is a distinct boxed subsection, not just three loose nodes
+- the Wet Tunnels are a numbered inset on the boxed map and should eventually be reconciled to a player-facing numbering scheme rather than repeated generic `Wet Tunnel` labels
+- the boxed map legend distinguishes one-way, puzzle-gated, restricted, and cross-section passages; the current Mermaid graph does not yet encode all of those distinctions cleanly
+
+Known mismatches or still-open reconciliation points:
+
+- the Mermaid graph still uses engine object ids to disambiguate repeated room names
+- the numbered Wet Tunnels inset has not yet been fully mapped from booklet numbering to specific engine room ids
+- several puzzle-only or routine-driven links are known from the booklet, but still need cleaner player-facing labels in this doc
+
+## Spoiler policy
+
+This document is intentionally a full technical/reference map, not a spoiler-safe player aid.
+
+Decision for now:
+
+- keep `docs/LOCATION_MAP.md` as the full internal/reference version
+- leave hidden late-game areas and special-access routes visible here when they are known
+- do not treat this document as the default in-game map experience
+- handle any future spoiler-safe or progressive map as a separate artifact rather than weakening this reference doc
 
 ## Verified exit property mapping
 
@@ -301,6 +349,32 @@ flowchart TD
   class R249 listed
 ```
 
+## Canonical grouping crosswalk
+
+This crosswalk records how the current engine-discovered rooms line up with the booklet map's visible sections.
+
+### Upper campus and corridor page (`booklet-page3.png`)
+
+- `Mass. Ave. (190)` -> left end of the Infinite Corridor chain
+- `Infinite Corridor (218, 214, 210, 208, 206)` -> central horizontal spine
+- `Aero Lobby (136)` -> branch above the west corridor
+- `Engineering Building (38)` -> branch below the west corridor
+- `Great Dome (249)`, `Top of Dome (213)`, `Roof of Great Dome (121)`, `On the Great Dome (145)` -> central vertical chain
+- `Computer Center (65)` and `Temporary Lab (140)` -> upper-left pair beneath the two `Smith Street` rooms (`185`, `98`)
+- `Fruits and Nuts (150)`, `Cluttered Passage (179)`, `Chemistry Building (248)`, `Department of Alchemy (174)`, `Lab (42)`, `Cinderblock Tunnel (17)` -> east/southeast branch
+- `Brown Building (240)`, `Top Floor (195)`, `Inside Dome (109)`, `Skyscraper Roof (222)`, `Brown Basement (200)`, `Small Courtyard (16)` -> east-side Brown/Skyscraper branch
+
+### Lower interior and underground page (`booklet-page4.png`)
+
+- `Terminal Room (176)`, `Second Floor (137)`, `Third Floor (110)`, `Roof (127)` -> main vertical interior stack
+- `Kitchen (33)` -> west branch from the upper interior stack
+- `Computer Center (65)`, `Basement (27)`, `Temporary Basement (202)`, `Dead Storage (47)`, `Ancient Storage (171)` -> basement/storage chain
+- `Aero Lobby (136)`, `Stairway (35)`, `Aero Basement (158)`, `Subbasement (142)`, `Tomb (9)` -> west basement branch
+- `Muddy Tunnel (39)`, `Tunnel Entrance (34)`, `Steam Tunnel (66, 78, 138, 221, 227)`, `Concrete Box (37)` -> main tunnel chain
+- `Renovated Cave (201)`, `Before the Altar (149)`, `Brick Tunnel (25)`, `Lab (42)`, `Cinderblock Tunnel (17)` -> east underground branch
+- `Place (152)`, `Basalt Bowl (134)`, `At Platform (21)` -> Dream inset
+- `Large Chamber (99)`, `Inner Lair (69)`, and the repeated `Wet Tunnel` rooms (`15`, `51`, `87`, `117`, `131`, `161`, `164`, `181`, `184`, `187`, `232`, `234`) -> Wet Tunnels section still awaiting numbered reconciliation
+
 ## Location inventory
 
 - `9` Tomb - discovered from opening-state exploration via `south -> down -> down -> west -> west -> down -> northwest`
@@ -454,6 +528,6 @@ flowchart TD
 ## Notes
 
 - This first pass is complete for the room inventory and for direct room-id exits decoded from the story data.
-- The Mermaid graph has not yet been fully reconciled against the canonical boxed map in [`../data/lurking.pdf`](../data/lurking.pdf).
+- The canonical references for reconciliation are [`../data/lurking.pdf`](../data/lurking.pdf), [`../data/booklet-page3.png`](../data/booklet-page3.png), and [`../data/booklet-page4.png`](../data/booklet-page4.png).
 - Some special-access transitions are not yet tied back to a single player-facing action label. Those show up in the unresolved exit list above.
 - The example special transition mentioned in task 25, reaching `Basalt Bowl`, remains a likely puzzle-driven access path that needs a later pass for a cleaner player-facing edge label.

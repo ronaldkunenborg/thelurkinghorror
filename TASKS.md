@@ -166,25 +166,27 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Left routine-driven and puzzle-only access paths explicitly listed as unresolved follow-up work instead of hiding them
    - Canonical boxed-map reference is now the local PDF `../data/lurking.pdf`; the Mermaid map should be treated as a reconciled working map against that source
 
-## Pending Tasks
+26. [done] Reconcile `docs/LOCATION_MAP.md` with the canonical boxed map in `../data/lurking.pdf`.
+   - Elevated the boxed-map PDF and extracted booklet map pages to explicit canonical source status in `docs/LOCATION_MAP.md`
+   - Added section-by-section reconciliation notes for the upper campus/building page and the lower underground/special-area page
+   - Recorded the current known mismatches, especially repeated room-name disambiguation and the not-yet-reconciled Wet Tunnels numbering
 
-26. [pending] Reconcile `docs/LOCATION_MAP.md` with the canonical boxed map in `../data/lurking.pdf`.
-   - Use the PDF as the authoritative layout and grouping reference
-   - Use the game engine and discovery script as the verification layer when the PDF and generated map disagree
-   - Record concrete mismatches between the PDF and the generated map before changing the Mermaid graph
+28. [done] Add a direct reference path to the canonical boxed-map PDF in the documentation and decide how prominently it should be exposed.
+   - Kept the canonical PDF linked from `README.md` and `docs/LOCATION_MAP.md`
+   - Added direct links to the extracted booklet map pages alongside the PDF for faster local reference
+   - Treated the PDF and booklet pages as reference material for documentation and map reconciliation
+
+29. [done] Review the published location map for spoiler risk and decide whether to keep the full map, publish a reduced map, or publish a progressive/unlockable version.
+   - Marked `docs/LOCATION_MAP.md` explicitly as the full spoiler-heavy technical/reference version
+   - Chose not to weaken the reference doc for player-facing spoiler concerns
+   - Deferred any spoiler-safe or progressive presentation to a future separate artifact, such as the in-game visited map
+
+## Pending Tasks
 
 27. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic
    - Include destinations like `Basalt Bowl` where access is not a simple compass move
    - Label these edges with the final meaningful access action, for example `read paper`, rather than every intermediate UI or parser step
-
-28. [pending] Add a direct reference path to the canonical boxed-map PDF in the documentation and decide how prominently it should be exposed.
-   - Link `../data/lurking.pdf` from `README.md` and/or `docs/LOCATION_MAP.md` in a way that makes its canonical status clear
-   - Decide whether the local PDF should be treated as reference-only or as part of the published documentation set
-
-29. [pending] Review the published location map for spoiler risk and decide whether to keep the full map, publish a reduced map, or publish a progressive/unlockable version.
-   - Assess whether hidden late-game areas and puzzle-only access routes are too revealing in the current Mermaid map
-   - Record the decision in the map doc or an ADR if the project chooses a filtered/public-facing version
 
 30. [pending] Add an in-game map of visited locations while adventuring.
    - Track visited locations during play and show them in the live UI rather than only in documentation

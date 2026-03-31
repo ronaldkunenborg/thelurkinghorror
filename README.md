@@ -86,6 +86,8 @@ Important runtime/source assets:
 
 - [`../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`](../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3) - target story file used for parser/VM development and validation.
 - [`../data/lurking.pdf`](../data/lurking.pdf) - canonical boxed-map PDF used as the reference layout for location-map reconciliation.
+- [`../data/booklet-page3.png`](../data/booklet-page3.png) - extracted upper/surface boxed-map page used for map reconciliation.
+- [`../data/booklet-page4.png`](../data/booklet-page4.png) - extracted lower/underground boxed-map page used for map reconciliation.
 - [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music used by the startup overlay.
 - [`src/assets/gfx/lurkinghorror/terminal_room.png`](src/assets/gfx/lurkinghorror/terminal_room.png) - current room-art asset used by the scene system.
 
@@ -108,4 +110,4 @@ Useful local checks:
 - [`docs/QUETZAL_LOCAL_STORAGE.md`](docs/QUETZAL_LOCAL_STORAGE.md) - IndexedDB-based Quetzal slot storage with `.sav` import/export workflow for serverless local save/load.
 - [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architecture decision record for serverless Quetzal persistence via IndexedDB plus file import/export.
 - [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter-specific quality-of-life features including `$SOUND`, `$GAMESOUND`, `$DEBUG`, save/load commands, HELP/login note extension, and sound debug output.
-- [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - first-pass Mermaid working map generated from the local game engine and intended to be reconciled against the canonical boxed-map PDF.
+- [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - spoiler-heavy technical/reference map reconciling the live engine with the canonical boxed-map PDF/booklet pages.
