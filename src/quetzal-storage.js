@@ -133,7 +133,6 @@ class QuetzalStorage {
 
     const existing = await requestToPromise(slotIndex.get([input.storyId, input.slot]));
     const record = {
-      id: existing ? existing.id : undefined,
       storyId: input.storyId,
       slot: input.slot,
       label: input.label || '',
@@ -146,6 +145,9 @@ class QuetzalStorage {
       createdAt: existing ? existing.createdAt : now,
       updatedAt: now,
     };
+    if (existing && existing.id !== undefined && existing.id !== null) {
+      record.id = existing.id;
+    }
 
     const id = await requestToPromise(store.put(record));
     await transactionCompletePromise(tx);
@@ -279,10 +281,19 @@ async function importSaveFileToSlot(storage, file, metadata) {
   });
 }
 
-module.exports = {
-  QuetzalStorage,
-  createSaveBlob,
-  suggestSaveFilename,
-  exportSaveToFile,
-  importSaveFileToSlot,
-};
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    QuetzalStorage,
+    createSaveBlob,
+    suggestSaveFilename,
+    exportSaveToFile,
+    importSaveFileToSlot,
+  };
+}
+
+if (typeof window !== 'undefined') {
+  window.QuetzalStorage = QuetzalStorage;
+  window.exportSaveToFile = exportSaveToFile;
+  window.importSaveFileToSlot = importSaveFileToSlot;
+  window.suggestSaveFilename = suggestSaveFilename;
+}

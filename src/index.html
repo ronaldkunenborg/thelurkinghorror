@@ -90,6 +90,10 @@
         padding: 10px;
       }
 
+      .side-actions .btn {
+        width: 100%;
+      }
+
       .side-actions-title {
         font-size: 0.73rem;
         letter-spacing: 0.12em;
@@ -149,11 +153,18 @@
       .topbar {
         display: flex;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         gap: 12px;
         padding: 12px 16px;
         border-bottom: 1px solid var(--panel-border);
         background: linear-gradient(180deg, rgba(12, 16, 22, 0.8), rgba(8, 12, 16, 0.5));
+      }
+
+      .topbar-copy {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        min-width: 0;
       }
 
       .title {
@@ -167,6 +178,22 @@
       .hint {
         font-size: 0.8rem;
         color: var(--text-dim);
+      }
+
+      .topbar-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: var(--text-dim);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .topbar-meta strong {
+        color: var(--text-main);
+        font-weight: 600;
+        margin-left: 6px;
       }
 
       .actions {
@@ -392,6 +419,96 @@
         transform: translateY(0);
       }
 
+      .command-sheet[hidden] {
+        display: none;
+      }
+
+      .command-sheet {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: rgba(2, 4, 8, 0.82);
+        backdrop-filter: blur(8px);
+      }
+
+      .command-sheet-panel {
+        width: min(760px, 100%);
+        max-height: min(80vh, 780px);
+        overflow: auto;
+        border: 1px solid var(--panel-border-top);
+        border-radius: 20px;
+        background: rgba(6, 10, 16, 0.96);
+        box-shadow: var(--shadow);
+        padding: 20px;
+      }
+
+      .command-sheet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .command-sheet-title {
+        margin: 0;
+        font-size: 1rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent-2);
+      }
+
+      .command-section {
+        margin-top: 18px;
+      }
+
+      .command-section h3 {
+        margin: 0 0 10px;
+        font-size: 0.8rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+
+      .command-subsection {
+        margin-top: 14px;
+      }
+
+      .command-subsection h4 {
+        margin: 0 0 8px;
+        font-size: 0.74rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .command-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+      }
+
+      .command-chip {
+        text-align: left;
+        padding: 10px 12px;
+      }
+
+      .command-chip strong {
+        display: block;
+        color: var(--accent);
+        margin-bottom: 4px;
+      }
+
+      .command-chip span {
+        display: block;
+        color: var(--text-dim);
+        font-size: 0.78rem;
+        line-height: 1.4;
+      }
+
       @keyframes reveal {
         from {
           opacity: 0;
@@ -506,12 +623,21 @@
           <aside class="side-actions" aria-label="Game actions">
             <span class="side-actions-title">Actions</span>
             <button id="load-local" class="btn" type="button">Load Local File</button>
+            <button id="save-slot" class="btn" type="button">Save</button>
+            <button id="load-slot" class="btn" type="button">Load</button>
+            <button id="commands-button" class="btn" type="button">Commands</button>
           </aside>
 
           <div class="terminal-stack">
             <header class="topbar">
-              <h1 class="title">The Lurking Horror</h1>
-              <span class="hint">Arrow keys: history</span>
+              <div class="topbar-copy">
+                <h1 class="title">The Lurking Horror</h1>
+                <span id="topbar-room" class="hint"></span>
+              </div>
+              <div class="topbar-meta" aria-label="Game status">
+                <span>Score<strong id="topbar-score">--</strong></span>
+                <span>Moves<strong id="topbar-moves">--</strong></span>
+              </div>
             </header>
 
             <section id="output" class="output" aria-live="polite"></section>
@@ -541,11 +667,104 @@
           <div id="scene-layer-b" class="scene-layer"></div>
         </section>
       </div>
+      <section id="command-sheet" class="command-sheet" aria-label="Commands overview" hidden>
+        <div class="command-sheet-panel">
+          <div class="command-sheet-header">
+            <h2 class="command-sheet-title">Commands Overview</h2>
+            <button id="close-commands" class="btn" type="button">Close</button>
+          </div>
+          <div class="command-section">
+            <h3>In-Game Commands</h3>
+            <div class="command-subsection">
+              <h4>Movement</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="north"><strong>north (n)</strong><span>Move north.</span></button>
+                <button class="btn command-chip" type="button" data-command="south"><strong>south (s)</strong><span>Move south.</span></button>
+                <button class="btn command-chip" type="button" data-command="east"><strong>east (e)</strong><span>Move east.</span></button>
+                <button class="btn command-chip" type="button" data-command="west"><strong>west (w)</strong><span>Move west.</span></button>
+                <button class="btn command-chip" type="button" data-command="up"><strong>up (u)</strong><span>Go up a level or ladder.</span></button>
+                <button class="btn command-chip" type="button" data-command="down"><strong>down (d)</strong><span>Go down a level or ladder.</span></button>
+                <button class="btn command-chip" type="button" data-command="enter"><strong>enter</strong><span>Enter a room, vehicle, or area.</span></button>
+                <button class="btn command-chip" type="button" data-command="exit"><strong>exit</strong><span>Leave the current enclosed area.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>Observation</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="look"><strong>look (l)</strong><span>Repeat the current room description.</span></button>
+                <button class="btn command-chip" type="button" data-command="examine"><strong>examine (x)</strong><span>Inspect an object in more detail.</span></button>
+                <button class="btn command-chip" type="button" data-command="search <object>"><strong>search &lt;object&gt;</strong><span>Search furniture or containers carefully.</span></button>
+                <button class="btn command-chip" type="button" data-command="read <object>"><strong>read &lt;object&gt;</strong><span>Read writing on an object.</span></button>
+                <button class="btn command-chip" type="button" data-command="listen"><strong>listen</strong><span>Check for ambient sounds or clues.</span></button>
+                <button class="btn command-chip" type="button" data-command="smell"><strong>smell</strong><span>Try for scent-based clues.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>Inventory</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="inventory"><strong>inventory (i)</strong><span>Review what you are carrying.</span></button>
+                <button class="btn command-chip" type="button" data-command="take <object>"><strong>take &lt;object&gt;</strong><span>Pick up an object.</span></button>
+                <button class="btn command-chip" type="button" data-command="drop <object>"><strong>drop &lt;object&gt;</strong><span>Put down an object.</span></button>
+                <button class="btn command-chip" type="button" data-command="wear <object>"><strong>wear &lt;object&gt;</strong><span>Put on something wearable.</span></button>
+                <button class="btn command-chip" type="button" data-command="remove <object>"><strong>remove &lt;object&gt;</strong><span>Take off something worn.</span></button>
+                <button class="btn command-chip" type="button" data-command="open <object>"><strong>open &lt;object&gt;</strong><span>Open a container or door.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>Interaction</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="close <object>"><strong>close &lt;object&gt;</strong><span>Close something open.</span></button>
+                <button class="btn command-chip" type="button" data-command="use <object> on <object>"><strong>use &lt;object&gt; on &lt;object&gt;</strong><span>Use one object on another.</span></button>
+                <button class="btn command-chip" type="button" data-command="push <object>"><strong>push &lt;object&gt;</strong><span>Press or push a control.</span></button>
+                <button class="btn command-chip" type="button" data-command="turn on <object>"><strong>turn on &lt;object&gt;</strong><span>Switch devices on.</span></button>
+                <button class="btn command-chip" type="button" data-command="turn off <object>"><strong>turn off &lt;object&gt;</strong><span>Switch devices off.</span></button>
+                <button class="btn command-chip" type="button" data-command="ask <person> about <topic>"><strong>ask &lt;person&gt; about &lt;topic&gt;</strong><span>Try topic-based conversation.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>System And Meta</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="score"><strong>score</strong><span>Check score and moves in-story.</span></button>
+                <button class="btn command-chip" type="button" data-command="time"><strong>time (t)</strong><span>Ask the game for the current in-world time.</span></button>
+                <button class="btn command-chip" type="button" data-command="wait"><strong>wait (z)</strong><span>Pass one turn.</span></button>
+                <button class="btn command-chip" type="button" data-command="again"><strong>again (g)</strong><span>Repeat the previous command after at least one turn.</span></button>
+                <button class="btn command-chip" type="button" data-command="oops"><strong>oops (o)</strong><span>Correct the last command's typo by following with a replacement word.</span></button>
+                <button class="btn command-chip" type="button" data-command="yes"><strong>yes (y)</strong><span>Answer confirmation prompts affirmatively.</span></button>
+                <button class="btn command-chip" type="button" data-command="restart"><strong>restart</strong><span>Restart the current story session.</span></button>
+                <button class="btn command-chip" type="button" data-command="quit"><strong>quit (q)</strong><span>Quit the story.</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="command-section">
+            <h3>Game Control Commands</h3>
+            <div class="command-grid">
+              <button class="btn command-chip" type="button" data-command="$SAVE"><strong>$SAVE</strong><span>Save to the default local slot 0.</span></button>
+              <button class="btn command-chip" type="button" data-command="$LOAD"><strong>$LOAD</strong><span>Load the default local slot 0.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SAVE 1"><strong>$SAVE 1</strong><span>Save into a numbered local slot.</span></button>
+              <button class="btn command-chip" type="button" data-command="$LOAD 1"><strong>$LOAD 1</strong><span>Load a numbered local slot.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SAVES"><strong>$SAVES</strong><span>List local save slots for this story.</span></button>
+              <button class="btn command-chip" type="button" data-command="$DELETE 1"><strong>$DELETE 1</strong><span>Delete a numbered local save slot.</span></button>
+              <button class="btn command-chip" type="button" data-command="$EXPORT 1"><strong>$EXPORT 1</strong><span>Download a numbered slot as a `.sav` file.</span></button>
+              <button class="btn command-chip" type="button" data-command="$IMPORT 1"><strong>$IMPORT 1</strong><span>Import a `.sav` file into a numbered slot.</span></button>
+            </div>
+          </div>
+          <div class="command-section">
+            <h3>Meta Commands</h3>
+            <div class="command-grid">
+              <button class="btn command-chip" type="button" data-command="$SOUND"><strong>$SOUND</strong><span>Toggle in-game sound effects only.</span></button>
+              <button class="btn command-chip" type="button" data-command="$GAMESOUND"><strong>$GAMESOUND</strong><span>Toggle splash and other game music.</span></button>
+              <button class="btn command-chip" type="button" data-command="$DEBUG"><strong>$DEBUG</strong><span>Toggle debug-only VM and sound diagnostics.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SOUNDSTATS"><strong>$SOUNDSTATS</strong><span>Print captured sound-event statistics.</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script src="./ui-framework.js"></script>
     <script src="./parser.js"></script>
     <script src="./vm-core.js"></script>
+    <script src="./quetzal-storage.js"></script>
     <script src="./io.js"></script>
     <script src="./bundled-story.js"></script>
     <script>
@@ -564,9 +783,11 @@
         const sceneLayerA = document.getElementById('scene-layer-a');
         const sceneLayerB = document.getElementById('scene-layer-b');
         const sceneLayers = [sceneLayerA, sceneLayerB];
+        const commandSheetEl = document.getElementById('command-sheet');
         const splashMusic = new Audio('./assets/audio/splash-horror-whirlguy.mp3');
+        const splashMusicBaseVolume = 0.36;
         splashMusic.loop = false;
-        splashMusic.volume = 0.36;
+        splashMusic.volume = splashMusicBaseVolume;
         splashMusic.preload = 'auto';
 
         const ui = new window.UiFramework({
@@ -575,6 +796,9 @@
           promptEl: document.getElementById('prompt'),
           statusLeftEl: document.getElementById('status-left'),
           statusRightEl: document.getElementById('status-right'),
+          topbarRoomEl: document.getElementById('topbar-room'),
+          topbarScoreEl: document.getElementById('topbar-score'),
+          topbarMovesEl: document.getElementById('topbar-moves'),
           prompt: '>',
         });
 
@@ -668,7 +892,17 @@
 
         const controller = new window.GameIoController(ui, {
           onSoundEvent: () => {
-            stopSplashMusicWithFade();
+            stopSplashMusicWithFade({ resetToStart: true, markEnded: true });
+          },
+          onGameMusicPreferenceChanged: enabled => {
+            if (!enabled) {
+              stopSplashMusicWithFade({ resetToStart: true, markEnded: false });
+              return;
+            }
+            if (typeof splashMusic.currentTime === 'number') {
+              splashMusic.currentTime = 0;
+            }
+            startSplashMusic();
           },
           onRoomChanged: roomName => {
             setRoomScene(roomName);
@@ -689,17 +923,17 @@
         let splashDismissReady = false;
         let splashHidden = false;
         let splashMusicStarted = false;
-        let splashMusicStopped = false;
+        let splashMusicEnded = false;
         let splashMusicFadeFrame = 0;
         let splashMusicNeedsGesture = false;
         splashMusic.addEventListener('ended', () => {
-          splashMusicStopped = true;
+          splashMusicEnded = true;
           splashMusicNeedsGesture = false;
         });
 
         function registerSplashMusicGestureRetry() {
           function retryStart() {
-            if (splashHidden || splashMusicStopped || !splashMusicNeedsGesture) {
+            if (splashMusicEnded || !controller.gameMusicEnabled || !splashMusicNeedsGesture) {
               return;
             }
             splashMusicNeedsGesture = false;
@@ -711,9 +945,11 @@
         }
 
         function startSplashMusic() {
-          if (splashMusicStopped) {
+          if (splashMusicEnded || !controller.gameMusicEnabled) {
             return;
           }
+          cancelSplashMusicFade(true);
+          splashMusic.volume = splashMusicBaseVolume;
           if (!splashMusic.paused) {
             splashMusicStarted = true;
             return;
@@ -734,15 +970,28 @@
           }
         }
 
-        function stopSplashMusicWithFade() {
-          if (splashMusicStopped) {
+        function cancelSplashMusicFade(restoreVolume) {
+          if (!splashMusicFadeFrame) {
+            if (restoreVolume) {
+              splashMusic.volume = splashMusicBaseVolume;
+            }
             return;
           }
-          splashMusicStopped = true;
-          if (splashMusicFadeFrame) {
-            cancelAnimationFrame(splashMusicFadeFrame);
-            splashMusicFadeFrame = 0;
+          cancelAnimationFrame(splashMusicFadeFrame);
+          splashMusicFadeFrame = 0;
+          if (restoreVolume) {
+            splashMusic.volume = splashMusicBaseVolume;
           }
+        }
+
+        function stopSplashMusicWithFade(options) {
+          const opts = options || {};
+          if (splashMusicEnded) {
+            return;
+          }
+          cancelSplashMusicFade(false);
+          const resetToStart = opts.resetToStart !== false;
+          const markEnded = !!opts.markEnded;
           const startVolume = splashMusic.volume;
           const durationMs = 420;
           const startAt = performance.now();
@@ -755,8 +1004,12 @@
               return;
             }
             splashMusic.pause();
-            splashMusic.currentTime = 0;
+            if (resetToStart && typeof splashMusic.currentTime === 'number') {
+              splashMusic.currentTime = 0;
+            }
             splashMusic.volume = startVolume;
+            splashMusicFadeFrame = 0;
+            splashMusicEnded = markEnded;
           }
 
           splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
@@ -815,6 +1068,33 @@
 
         document.getElementById('load-local').addEventListener('click', openLocalPicker);
         document.getElementById('splash-load-local').addEventListener('click', openLocalPicker);
+        document.getElementById('save-slot').addEventListener('click', () => controller.submitCommand('$SAVE'));
+        document.getElementById('load-slot').addEventListener('click', () => controller.submitCommand('$LOAD'));
+
+        function openCommandSheet() {
+          commandSheetEl.hidden = false;
+        }
+
+        function closeCommandSheet() {
+          commandSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('commands-button').addEventListener('click', openCommandSheet);
+        document.getElementById('close-commands').addEventListener('click', closeCommandSheet);
+        commandSheetEl.addEventListener('click', event => {
+          if (event.target === commandSheetEl) {
+            closeCommandSheet();
+          }
+        });
+        commandSheetEl.addEventListener('click', event => {
+          const trigger = event.target.closest('[data-command]');
+          if (!trigger) {
+            return;
+          }
+          ui.setInputValue(trigger.dataset.command || '');
+          closeCommandSheet();
+        });
 
         localFileInput.addEventListener('change', async event => {
           const file = event.target.files && event.target.files[0];

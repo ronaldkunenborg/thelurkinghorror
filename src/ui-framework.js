@@ -8,6 +8,9 @@ class UiFramework {
     this.promptEl = opts.promptEl;
     this.statusLeftEl = opts.statusLeftEl;
     this.statusRightEl = opts.statusRightEl;
+    this.topbarRoomEl = opts.topbarRoomEl || null;
+    this.topbarScoreEl = opts.topbarScoreEl || null;
+    this.topbarMovesEl = opts.topbarMovesEl || null;
 
     if (!this.outputEl || !this.inputEl || !this.statusLeftEl || !this.statusRightEl) {
       throw new Error('UiFramework requires output, input, and status elements');
@@ -34,6 +37,18 @@ class UiFramework {
     this.statusRightEl.textContent = rightText || '';
   }
 
+  setTopbarMeta(roomName, score, moves) {
+    if (this.topbarRoomEl) {
+      this.topbarRoomEl.textContent = roomName || '';
+    }
+    if (this.topbarScoreEl) {
+      this.topbarScoreEl.textContent = score === '' ? '--' : String(score);
+    }
+    if (this.topbarMovesEl) {
+      this.topbarMovesEl.textContent = moves === '' ? '--' : String(moves);
+    }
+  }
+
   appendOutput(text, cssClass) {
     const line = document.createElement('div');
     line.className = cssClass ? 'line ' + cssClass : 'line';
@@ -48,6 +63,11 @@ class UiFramework {
 
   focusInput() {
     this.inputEl.focus();
+  }
+
+  setInputValue(text) {
+    this.inputEl.value = text || '';
+    this.focusInput();
   }
 
   setCommandHandler(handler) {

@@ -147,7 +147,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Analyze original Amiga sound files for speed clues.")
     parser.add_argument(
       "--input-dir",
-      default="app/data/amiga_sound_original",
+      default="../data/amiga_sound_original",
       help="Directory containing s*.dat / s*.mid / s*.nam files.",
     )
     parser.add_argument(

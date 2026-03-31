@@ -3,10 +3,50 @@
 const assert = require('assert');
 const { GameIoController } = require('../src/io.js');
 
+function flushAsyncWork() {
+  return new Promise(resolve => setTimeout(resolve, 0));
+}
+
+function createStoryMeta() {
+  return {
+    release: 219,
+    serial: '870912',
+    header: {
+      headerChecksum: 0x747a,
+    },
+  };
+}
+
+function createSaveStorage() {
+  const records = new Map();
+  return {
+    async putSave(record) {
+      const key = record.storyId + ':' + record.slot;
+      const stored = Object.assign({}, record, {
+        id: key,
+        updatedAt: '2026-03-31T00:00:00.000Z',
+        quetzalData: record.quetzalData,
+      });
+      records.set(key, stored);
+      return stored;
+    },
+    async getSave(storyId, slot) {
+      return records.get(storyId + ':' + slot) || null;
+    },
+    async listSaves(storyId) {
+      return Array.from(records.values()).filter(record => record.storyId === storyId);
+    },
+    async deleteSave(storyId, slot) {
+      return records.delete(storyId + ':' + slot);
+    },
+  };
+}
+
 function createUi() {
   return {
     lines: [],
     statuses: [],
+    topbarMeta: [],
     handler: null,
     appendOutput(text) {
       this.lines.push(text);
@@ -16,6 +56,9 @@ function createUi() {
     },
     setStatus(left, right) {
       this.statuses.push([left, right]);
+    },
+    setTopbarMeta(room, score, moves) {
+      this.topbarMeta.push([room, score, moves]);
     },
     focusInput() {},
     setCommandHandler(handler) {
@@ -111,6 +154,28 @@ function testComputerHelpAddsManualNoteRegardlessOfRoomState() {
   );
 }
 
+function testDebugCommandTogglesDebugOutput() {
+  const ui = createUi();
+  const controller = new GameIoController(ui);
+  controller.vm = { haltReason: null };
+
+  controller._handleVmSoundEffect({ number: 99, effect: 2 });
+  assert.deepStrictEqual(ui.lines, [], 'debug output should stay hidden by default');
+
+  controller.submitCommand('$DEBUG');
+  controller._handleVmSoundEffect({ number: 99, effect: 2 });
+  controller.submitCommand('$DEBUG');
+  controller._handleVmSoundEffect({ number: 99, effect: 2 });
+
+  assert.ok(ui.lines.includes('Debug output is now on.'), '$DEBUG should report when debug output is enabled');
+  assert.ok(ui.lines.includes('Debug output is now off.'), '$DEBUG should report when debug output is disabled');
+  assert.strictEqual(
+    ui.lines.filter(line => line.startsWith('[SFX debug]')).length,
+    1,
+    'debug output should only be emitted while debug mode is enabled'
+  );
+}
+
 function testSoundInterpreterCommandWorksWithoutVmInput() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -122,19 +187,36 @@ function testSoundInterpreterCommandWorksWithoutVmInput() {
   assert.deepStrictEqual(
     ui.lines,
     [
-      'Sound is now off.',
-      'Sound is now on.',
+      'Sound effects are now off.',
+      'Sound effects are now on.',
     ],
     '$SOUND should toggle interpreter sound preference without requiring VM input'
   );
   assert.deepStrictEqual(
     ui.statuses.slice(-2),
     [
-      ['Interpreter command', 'Sound off'],
-      ['Interpreter command', 'Sound on'],
+      ['Interpreter command', 'SFX off'],
+      ['Interpreter command', 'SFX on'],
     ],
     '$SOUND should update interpreter status when toggled'
   );
+}
+
+function testGameSoundAliasWorksWithoutVmInput() {
+  const ui = createUi();
+  const musicStates = [];
+  const controller = new GameIoController(ui);
+  controller.vm = { haltReason: null };
+  controller.onGameMusicPreferenceChanged = enabled => musicStates.push(enabled);
+
+  controller.submitCommand('$GAMESOUND');
+
+  assert.deepStrictEqual(
+    ui.lines,
+    ['Game music is now off.'],
+    '$GAMESOUND should toggle game music preference'
+  );
+  assert.deepStrictEqual(musicStates, [false], '$GAMESOUND should notify music preference changes');
 }
 
 function testMappedSoundPlaybackRespectsPreference() {
@@ -170,6 +252,76 @@ function testMappedSoundPlaybackRespectsPreference() {
   assert.strictEqual(fakeAudio.playCalls, 1, 'sound should not play when disabled');
 }
 
+function testGameMusicToggleDoesNotDisableSoundEffects() {
+  const ui = createUi();
+  const fakeAudio = {
+    loop: false,
+    paused: true,
+    currentTime: 0,
+    playCalls: 0,
+    pauseCalls: 0,
+    addEventListener() {},
+    play() {
+      this.paused = false;
+      this.playCalls++;
+      return Promise.resolve();
+    },
+    pause() {
+      this.paused = true;
+      this.pauseCalls++;
+    },
+  };
+  const controller = new GameIoController(ui, {
+    soundCatalog: {
+      7: { src: './data/sample-7.mp3', class: 'sfx' },
+    },
+    audioFactory() {
+      return fakeAudio;
+    },
+  });
+  controller.vm = { haltReason: null };
+
+  controller.submitCommand('$GAMESOUND');
+  controller._handleVmSoundEffect({ number: 7, effect: 2 });
+
+  assert.strictEqual(fakeAudio.playCalls, 1, 'turning game music off should not block sound effects');
+}
+
+function testSoundToggleDoesNotDisableMusicClassPlayback() {
+  const ui = createUi();
+  const fakeAudio = {
+    loop: false,
+    paused: true,
+    currentTime: 0,
+    playCalls: 0,
+    pauseCalls: 0,
+    addEventListener() {},
+    play() {
+      this.paused = false;
+      this.playCalls++;
+      return Promise.resolve();
+    },
+    pause() {
+      this.paused = true;
+      this.pauseCalls++;
+    },
+  };
+  const controller = new GameIoController(ui, {
+    soundCatalog: {
+      1: { src: './music.mp3', class: 'music' },
+    },
+    audioFactory() {
+      return fakeAudio;
+    },
+  });
+  controller.vm = { haltReason: null };
+
+  controller.submitCommand('$SOUND');
+  controller._handleVmSoundEffect({ number: 1, effect: 2 });
+
+  assert.strictEqual(fakeAudio.playCalls, 1, 'turning sound effects off should not block music-class playback');
+}
+
 function testMissingMappedSoundWarnsOnce() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -178,15 +330,43 @@ function testMissingMappedSoundWarnsOnce() {
   controller._handleVmSoundEffect({ number: 99, effect: 2 });
 
   const debugLines = ui.lines.filter(line => line.startsWith('[SFX debug]'));
-  assert.strictEqual(debugLines.length, 2, 'each sound event should emit one SFX debug line');
-  assert.ok(
-    debugLines.every(line => line.includes('id=99') && line.includes('effect=start') && line.includes('mapped=none')),
-    'SFX debug line should include sound id, effect, and mapping status'
+  assert.strictEqual(debugLines.length, 0, 'debug lines should stay hidden until debug mode is enabled');
+}
+
+function testVmStatusSnapshotUpdatesTopbarAndRoomChanges() {
+  const ui = createUi();
+  const roomChanges = [];
+  const controller = new GameIoController(ui, {
+    onRoomChanged(roomName) {
+      roomChanges.push(roomName);
+    },
+  });
+  let runCount = 0;
+  controller.vm = {
+    haltReason: null,
+    run() {
+      runCount++;
+      return { haltReason: 'input', quit: false };
+    },
+    getStatusSnapshot() {
+      if (runCount === 0) {
+        return { roomName: '', score: 0, moves: 0 };
+      }
+      return { roomName: 'Terminal Room', score: 5, moves: 12 };
+    },
+  };
+
+  controller.runVm();
+
+  assert.deepStrictEqual(
+    ui.topbarMeta.slice(-1)[0],
+    ['Terminal Room', '5', '12'],
+    'controller should push room, score, and moves into the topbar UI'
   );
   assert.deepStrictEqual(
-    ui.lines.filter(line => line.startsWith('Sound #')),
-    ['Sound #99 requested, but no sample is mapped yet.'],
-    'missing sound mapping should be announced once per sound id'
+    roomChanges,
+    ['Terminal Room'],
+    'room changes should follow VM status snapshots instead of text heuristics'
   );
 }
 
@@ -378,6 +558,7 @@ function testSoundEventCommandTriggersSyntheticPlayback() {
     },
   });
   controller.vm = { haltReason: null };
+  controller.submitCommand('$DEBUG');
 
   controller.submitCommand('$SOUNDEVENT 10 2 8');
 
@@ -392,20 +573,128 @@ function testSoundEventCommandTriggersSyntheticPlayback() {
   );
 }
 
-function run() {
+async function testSaveCommandStoresVmSnapshot() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.currentRoomName = 'Terminal Room';
+  controller.vm = {
+    serializeSaveState() {
+      return new Uint8Array([1, 2, 3]);
+    },
+    getStatusSnapshot() {
+      return { roomName: 'Terminal Room', score: 1, moves: 2 };
+    },
+  };
+
+  controller.submitCommand('$SAVE 2');
+  await flushAsyncWork();
+
+  const record = await storage.getSave('lurking-horror-r219-870912', 2);
+  assert.ok(record, 'save command should persist a slot');
+  assert.strictEqual(record.label, 'Slot 2 - Terminal Room', 'save label should include slot and room');
+  assert.ok(ui.lines.some(line => line.includes('Saved slot 2')), 'save command should report success');
+}
+
+async function testLoadCommandRestoresVmSnapshot() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+  });
+  controller.storyMeta = createStoryMeta();
+  let restored = null;
+  controller.vm = {
+    restoreSaveState(bytes) {
+      restored = Array.from(new Uint8Array(bytes));
+    },
+    getStatusSnapshot() {
+      return { roomName: 'Restored Room', score: 7, moves: 8 };
+    },
+  };
+
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 1,
+    label: 'Slot 1 - Saved',
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([9, 8, 7]),
+  });
+
+  controller.submitCommand('$LOAD 1');
+  await flushAsyncWork();
+
+  assert.deepStrictEqual(restored, [9, 8, 7], 'load command should restore saved bytes into the VM');
+  assert.ok(ui.lines.some(line => line.includes('Loaded slot 1')), 'load command should report success');
+  assert.deepStrictEqual(
+    ui.topbarMeta.slice(-1)[0],
+    ['Restored Room', '7', '8'],
+    'load should refresh room and score metadata after restore'
+  );
+}
+
+async function testSavesCommandListsSlots() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.vm = {
+    getStatusSnapshot() {
+      return { roomName: 'Terminal Room', score: 0, moves: 0 };
+    },
+  };
+
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 3,
+    label: 'Slot 3 - Terminal Room',
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([1]),
+  });
+
+  controller.submitCommand('$SAVES');
+  await flushAsyncWork();
+
+  assert.ok(
+    ui.lines.some(line => line.includes('[Save slot 3] Slot 3 - Terminal Room')),
+    'save listing should print persisted slots'
+  );
+}
+
+async function run() {
   testOutputBuffering();
   testFlushAtRunBoundary();
   testComputerHelpAddsManualNote();
   testComputerHelpAddsManualNoteRegardlessOfRoomState();
+  testDebugCommandTogglesDebugOutput();
   testSoundInterpreterCommandWorksWithoutVmInput();
+  testGameSoundAliasWorksWithoutVmInput();
   testMappedSoundPlaybackRespectsPreference();
+  testGameMusicToggleDoesNotDisableSoundEffects();
+  testSoundToggleDoesNotDisableMusicClassPlayback();
   testMissingMappedSoundWarnsOnce();
+  testVmStatusSnapshotUpdatesTopbarAndRoomChanges();
   testStartingNewSampleStopsPreviousSample();
   testDefaultSfxLoopsUntilExplicitStop();
   testMusicAndSfxUseSeparateReplacementGroups();
   testSoundStatsAllPrintsEventBreakdown();
   testSoundEventCommandTriggersSyntheticPlayback();
+  await testSaveCommandStoresVmSnapshot();
+  await testLoadCommandRestoresVmSnapshot();
+  await testSavesCommandListsSlots();
   console.log('I/O controller output tests passed.');
 }
 
-run();
+run().catch(error => {
+  console.error(error);
+  process.exit(1);
+});

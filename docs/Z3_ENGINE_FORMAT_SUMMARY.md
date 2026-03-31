@@ -5,7 +5,7 @@ This document captures the practical Z3 format details needed to implement the p
 ## Scope and sources
 
 - Standard reference: Z-Machine Standards Document 1.1, especially sections 1, 5, 6, 11, 12, 13, 14, 15.
-- Story file analyzed: `data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`.
+- Story file analyzed: `../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`.
 
 ## Memory model (Version 3)
 

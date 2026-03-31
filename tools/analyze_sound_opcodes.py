@@ -211,7 +211,7 @@ def analyze(data: bytes, initial_pc: int):
 
 
 def main():
-    path = Path("app/data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3")
+    path = Path("../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3")
     data = path.read_bytes()
     initial_pc = read_u16(data, 0x06)
     calls = analyze(data, initial_pc)

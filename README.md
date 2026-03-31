@@ -15,4 +15,4 @@ This project builds a browser-based Z-machine interpreter for Infocom's `The Lur
 
 ## Core Assets
 
-- [`data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`](data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3) - target story file used for parser/VM development and validation.
+- [`../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`](../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3) - target story file used for parser/VM development and validation.

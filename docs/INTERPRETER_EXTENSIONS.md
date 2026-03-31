@@ -64,7 +64,7 @@ Blorb sound assets used by this project come from IF Archive:
 
 Local project copy:
 
-- `data/TheLurkingHorror.blb`
+- `../data/TheLurkingHorror.blb`
 
 Current runtime extraction target used by the interpreter mapping:
 

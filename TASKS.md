@@ -97,7 +97,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 15. [done] Integrate original The Lurking Horror sound samples into the `$SOUND` pipeline
    - Added reusable ADF tooling in `tools/adf_tool.py` to list/extract Amiga disk images
    - Extracted original audio assets from `original_source/Lurking Horror, The - Release 219 (1987)(Infocom)[cr][serial 870912].adf`
-   - Added conversion utility `tools/convert_amiga_sound_dat.py` and generated browser-playable WAV files in `data/soundfx/lurkinghorror`
+   - Added conversion utility `tools/convert_amiga_sound_dat.py` and generated browser-playable WAV files in `../data/soundfx/lurkinghorror`
    - Wired default sound-id to file mapping in `src/io.js` for in-game `sound_effect` playback
    - Verified existing automated test suite still passes
 
@@ -114,22 +114,46 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Restyled terminal to centered translucent overlay and moved actions into a side action bar
    - Wired current available room art (`assets/gfx/lurkinghorror/terminal_room.png`) into the room-art map
 
+18. [done] Gate sound and VM debug output behind `$DEBUG`, with debug off by default; support `$GAMESOUND`
+   - Added interpreter-level `$DEBUG` toggle in `src/io.js` with default-off behavior for `[SFX debug]`, `[VM debug]`, and missing-sample notices
+   - Kept `$SOUND` working and added `$GAMESOUND` as an alias for game-audio on/off control
+   - Added regression coverage for debug gating and `$GAMESOUND` command handling in `tools/test-io-controller-output.js`
+
+19. [done] Fix restart opcode crash after restart confirmation
+   - Implemented Z-machine opcode `183` (`restart`) in `src/vm-core.js`
+   - Restored original dynamic memory, cleared VM stacks/input state, and reset the PC to the story entrypoint on restart
+   - Added VM restart regression coverage in `tools/test-vm-core.js`
+
+20. [done] Make room artwork updates follow actual room state instead of fragile output heuristics
+   - Added VM status snapshots in `src/vm-core.js` for current room object, score, and moves
+   - Switched `src/io.js` room-tracking to use VM status snapshots so examining objects like the PC no longer clears room art
+   - Added controller coverage for snapshot-driven room-change handling in `tools/test-io-controller-output.js`
+
+21. [done] Display score and moves in the top bar
+   - Added top-bar room/score/moves UI in `src/index.html`
+   - Extended `src/ui-framework.js` with top-bar metadata updates
+   - Wired `src/io.js` to push room, score, and move counts from VM status snapshots into the UI
+
+22. [done] Add interpreter save/load commands, sidebar buttons, and a commands overview
+   - Added interpreter-level local save commands in `src/io.js`: `$SAVE`, `$LOAD`, `$SAVES`, `$DELETE`, `$EXPORT`, `$IMPORT`
+   - Wired VM snapshot serialization/restoration in `src/vm-core.js` and persisted those bytes through `src/quetzal-storage.js`
+   - Added sidebar `Save`, `Load`, and `Commands` buttons plus a command overview sheet in `src/index.html`
+   - Added command-paste support in `src/ui-framework.js` and regression coverage in `tools/test-vm-core.js` and `tools/test-io-controller-output.js`
+
 ## Pending Tasks
- 
-18. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
+
+21. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
    - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`
-   - Add save slot UI actions (save/load/delete/export/import)
-   - Add compatibility checks (story id/release/serial/checksum) before restore
+   - Story-level `save`/`restore` opcodes are still pending; current save/load support is interpreter-level commands and UI
+   - Keep compatibility checks (story id/release/serial/checksum) enforced before restore
 
-19. [pending] I would like a map of visited locations that shows the locations you visited. Apparently the original package did contain a map of the buildings - we should provide that if we could. The map should be shown while adventuring.
+23. [pending] Add a horizontal volume slider for the game music and another for the sound effects to the sidebar buttons.
 
-20. [pending] An overview of possible commands should be available under a Commands-button. If you click any command it should paste it into the command line.
-
-21. [pending] Add a horizontal volume slider for the game music and another for the sound effects to the sidebar buttons. 
+24. [pending] Replace the buttons with icons: a gear icon that opens a dialog where you can set volume for game music and sound effects, load/save icons where you can load and save the game (wired to the text inputs for that). The commands button should have a "?"-type icon. I probably have to create an icon set but you can generate a number of placeholders first. The style is scratch art, white lines on black wax paper.
 
 ## Refinements
 
-nnn. [refine] None. Remove this when we get our first task in this section.
+R1. [pending] I would like a map of visited locations that shows the locations you visited. Apparently the original package did contain a map of the buildings - we should provide that if we could. The map should be shown while adventuring.
 
 ## Future Tasks
 

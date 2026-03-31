@@ -215,7 +215,7 @@ thelurkinghorror/
 │   ├── AGENTS.md              # Project rules
 │   ├── TASKS.md               # Task tracking
 │   ├── IMPLEMENTATION_PLAN.md  # This document
-│   ├── data/
+│   ├── ../data/
 │   │   └── The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3
 │   └── src/
 │       ├── index.html         # Single HTML file with embedded CSS/JS

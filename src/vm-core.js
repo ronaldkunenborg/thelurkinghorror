@@ -23,6 +23,23 @@ function write16(memory, address, value) {
   memory[address + 1] = value & 0xff;
 }
 
+function read32(memory, address) {
+  return (
+    ((memory[address] << 24) >>> 0) |
+    (memory[address + 1] << 16) |
+    (memory[address + 2] << 8) |
+    memory[address + 3]
+  ) >>> 0;
+}
+
+function write32(memory, address, value) {
+  const v = value >>> 0;
+  memory[address] = (v >>> 24) & 0xff;
+  memory[address + 1] = (v >>> 16) & 0xff;
+  memory[address + 2] = (v >>> 8) & 0xff;
+  memory[address + 3] = v & 0xff;
+}
+
 const STORE_OPCODES = new Set([8, 9, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 129, 130, 131, 132, 136, 142, 143, 224, 231]);
 const BRANCH_OPCODES = new Set([1, 2, 3, 4, 5, 6, 7, 10, 128, 129, 130]);
 const PRINTER_OPCODES = new Set([178, 179]);
@@ -34,6 +51,7 @@ class Z3VM {
     }
 
     this.memory = config.memory;
+    this.originalMemory = new Uint8Array(config.memory);
     this.header = config.header;
     this.staticBase = config.header.staticBase;
     this.highMemoryBase = config.header.highMemoryBase;
@@ -86,6 +104,128 @@ class Z3VM {
 
   _emitUnknownOpcode(event) {
     this.onUnknownOpcode(event);
+  }
+
+  _resetMachineState() {
+    this.halted = false;
+    this.lastQuit = false;
+    this.haltReason = null;
+    this.evalStack = [];
+    this.callStack = [];
+    this.currentFrame = this._makeRootFrame();
+    this.pendingInput = null;
+    this.pc = this.header.initialPc;
+  }
+
+  _restartStory() {
+    for (let i = 0; i < this.staticBase; i++) {
+      this.memory[i] = this.originalMemory[i];
+    }
+    this._dictionaryMeta = null;
+    this._resetMachineState();
+  }
+
+  _captureFrame(frame) {
+    return {
+      locals: Array.from(frame.locals),
+      returnPc: frame.returnPc >>> 0,
+      storeVar: frame.storeVar | 0,
+    };
+  }
+
+  _restoreFrame(snapshot) {
+    const frame = {
+      locals: new Uint16Array(15),
+      returnPc: snapshot && Number.isFinite(snapshot.returnPc) ? (snapshot.returnPc >>> 0) : 0,
+      storeVar: snapshot && Number.isFinite(snapshot.storeVar) ? (snapshot.storeVar | 0) : -1,
+    };
+    const locals = snapshot && Array.isArray(snapshot.locals) ? snapshot.locals : [];
+    for (let i = 0; i < frame.locals.length && i < locals.length; i++) {
+      frame.locals[i] = u16(locals[i]);
+    }
+    return frame;
+  }
+
+  createSaveState() {
+    return {
+      version: 1,
+      pc: this.pc >>> 0,
+      halted: !!this.halted,
+      lastQuit: !!this.lastQuit,
+      haltReason: this.haltReason || null,
+      pendingInput: this.pendingInput
+        ? {
+            textAddr: this.pendingInput.textAddr >>> 0,
+            parseAddr: this.pendingInput.parseAddr >>> 0,
+          }
+        : null,
+      evalStack: this.evalStack.map(value => u16(value)),
+      callStack: this.callStack.map(frame => this._captureFrame(frame)),
+      currentFrame: this._captureFrame(this.currentFrame),
+      dynamicMemory: Array.from(this.memory.subarray(0, this.staticBase)),
+    };
+  }
+
+  serializeSaveState() {
+    const encoder = new TextEncoder();
+    const payloadBytes = encoder.encode(JSON.stringify(this.createSaveState()));
+    const out = new Uint8Array(8 + payloadBytes.length);
+    out[0] = 0x54; // T
+    out[1] = 0x4c; // L
+    out[2] = 0x48; // H
+    out[3] = 0x53; // S
+    write16(out, 4, 1);
+    write16(out, 6, payloadBytes.length);
+    out.set(payloadBytes, 8);
+    return out;
+  }
+
+  restoreSaveState(bytes) {
+    const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+    if (data.length < 8) {
+      throw new Error('Save data is too small');
+    }
+    if (data[0] !== 0x54 || data[1] !== 0x4c || data[2] !== 0x48 || data[3] !== 0x53) {
+      throw new Error('Unsupported save file format');
+    }
+    const formatVersion = read16(data, 4);
+    if (formatVersion !== 1) {
+      throw new Error('Unsupported save format version: ' + formatVersion);
+    }
+    const payloadLength = read16(data, 6);
+    if (data.length !== 8 + payloadLength) {
+      throw new Error('Save payload length mismatch');
+    }
+
+    const decoder = new TextDecoder();
+    const snapshot = JSON.parse(decoder.decode(data.subarray(8)));
+    const dynamicMemory = Array.isArray(snapshot.dynamicMemory) ? snapshot.dynamicMemory : null;
+    if (!dynamicMemory || dynamicMemory.length !== this.staticBase) {
+      throw new Error('Save is incompatible with current story memory layout');
+    }
+
+    for (let i = 0; i < dynamicMemory.length; i++) {
+      this.memory[i] = dynamicMemory[i] & 0xff;
+    }
+
+    this.pc = Number.isFinite(snapshot.pc) ? (snapshot.pc >>> 0) : this.header.initialPc;
+    this.halted = !!snapshot.halted;
+    this.lastQuit = !!snapshot.lastQuit;
+    this.haltReason = snapshot.haltReason || null;
+    this.pendingInput = snapshot.pendingInput
+      ? {
+          textAddr: Number(snapshot.pendingInput.textAddr) >>> 0,
+          parseAddr: Number(snapshot.pendingInput.parseAddr) >>> 0,
+        }
+      : null;
+    this.evalStack = Array.isArray(snapshot.evalStack)
+      ? snapshot.evalStack.map(value => u16(value))
+      : [];
+    this.callStack = Array.isArray(snapshot.callStack)
+      ? snapshot.callStack.map(frame => this._restoreFrame(frame))
+      : [];
+    this.currentFrame = this._restoreFrame(snapshot.currentFrame);
+    this._dictionaryMeta = null;
   }
 
   read8(address) {
@@ -731,6 +871,18 @@ class Z3VM {
     this.haltReason = null;
   }
 
+  getStatusSnapshot() {
+    const roomObjectId = this.read16(this.globalsAddress);
+    const secondary = this.read16(this.globalsAddress + 2);
+    const tertiary = this.read16(this.globalsAddress + 4);
+    return {
+      roomObjectId,
+      roomName: roomObjectId ? this._readObjectShortName(roomObjectId) : '',
+      score: s16(secondary),
+      moves: tertiary & 0xffff,
+    };
+  }
+
   executeInstruction(inst) {
     const op = inst.opcode;
     const o = index => this._operandValue(inst.operands[index]);
@@ -916,6 +1068,9 @@ class Z3VM {
         this._retFromRoutine(1);
         return;
       case 180:
+        return;
+      case 183:
+        this._restartStory();
         return;
       case 184:
         this._retFromRoutine(this.getVariable(0));

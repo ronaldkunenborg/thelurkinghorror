@@ -7,7 +7,7 @@ const { Z3VM } = require('../src/vm-core.js');
 
 function run() {
   const bytes = fs.readFileSync(
-    'data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3'
+    '../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3'
   );
   const parsed = parseZ3Story(bytes);
 

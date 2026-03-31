@@ -253,9 +253,103 @@ function testSoundEffectOpcodeEmitsEvent() {
 
   assert.deepStrictEqual(
     captured,
-    { number: 3, effect: 2, volume: 8, routine: 0x40 },
+    { number: 3, effect: 2, volume: 8, volumeRaw: 8, volumeSigned: 8, routine: 0x40, operandCount: 4 },
     'sound_effect should forward event parameters to the I/O hook'
   );
+}
+
+function testRestartRestoresDynamicMemoryAndPc() {
+  const vm = createVm([0xb7, 0xba]);
+  vm.write8(0x80, 0x33);
+  vm.write16(0x100, 7);
+  vm.evalStack.push(9);
+  vm.callStack.push(vm._makeRootFrame());
+  vm.currentFrame.locals[0] = 0x55;
+  vm.pc = 0x99;
+  vm.halted = true;
+  vm.haltReason = 'input';
+  vm.pendingInput = { textAddr: 1, parseAddr: 2 };
+
+  vm.executeInstruction({
+    opcode: 183,
+    operands: [],
+    nextPc: 0x41,
+    offset: 0x40,
+  });
+
+  assert.strictEqual(vm.read8(0x80), 0, 'restart should restore original dynamic memory');
+  assert.strictEqual(vm.read16(0x100), 0, 'restart should restore globals from original story state');
+  assert.strictEqual(vm.pc, 0x40, 'restart should reset PC to initial address');
+  assert.deepStrictEqual(vm.evalStack, [], 'restart should clear evaluation stack');
+  assert.deepStrictEqual(vm.callStack, [], 'restart should clear call stack');
+  assert.strictEqual(vm.currentFrame.locals[0], 0, 'restart should reset locals');
+  assert.strictEqual(vm.pendingInput, null, 'restart should clear pending input');
+  assert.strictEqual(vm.halted, false, 'restart should resume execution state');
+  assert.strictEqual(vm.haltReason, null, 'restart should clear halt reason');
+}
+
+function testStatusSnapshotExposesRoomScoreAndMoves() {
+  const vm = createVm([0xba], { size: 0x500 });
+  vm._readObjectShortName = objectId => {
+    assert.strictEqual(objectId, 12, 'status snapshot should read the current room object name');
+    return 'Terminal Room';
+  };
+
+  write16(vm.memory, 0x100, 12);
+  write16(vm.memory, 0x102, 42);
+  write16(vm.memory, 0x104, 99);
+
+  assert.deepStrictEqual(
+    vm.getStatusSnapshot(),
+    {
+      roomObjectId: 12,
+      roomName: 'Terminal Room',
+      score: 42,
+      moves: 99,
+    },
+    'status snapshot should expose room, score, and moves from global variables'
+  );
+}
+
+function testSaveStateRoundTripRestoresVmState() {
+  const vm = createVm([0xba], { size: 0x500 });
+  vm.write8(0x80, 0x7a);
+  vm.pc = 0x4567;
+  vm.halted = true;
+  vm.haltReason = 'input';
+  vm.pendingInput = { textAddr: 0x120, parseAddr: 0x140 };
+  vm.evalStack = [1, 2, 3];
+  vm.currentFrame.locals[0] = 0x2222;
+  vm.currentFrame.returnPc = 0x3333;
+  vm.currentFrame.storeVar = 0x10;
+  vm.callStack.push({
+    locals: new Uint16Array([9, 8, 7]),
+    returnPc: 0x1234,
+    storeVar: 0x11,
+  });
+
+  const saved = vm.serializeSaveState();
+
+  vm.write8(0x80, 0x00);
+  vm.pc = 0;
+  vm.halted = false;
+  vm.haltReason = null;
+  vm.pendingInput = null;
+  vm.evalStack = [];
+  vm.callStack = [];
+  vm.currentFrame = vm._makeRootFrame();
+
+  vm.restoreSaveState(saved);
+
+  assert.strictEqual(vm.read8(0x80), 0x7a, 'restore should restore dynamic memory');
+  assert.strictEqual(vm.pc, 0x4567, 'restore should restore program counter');
+  assert.strictEqual(vm.halted, true, 'restore should restore halted flag');
+  assert.strictEqual(vm.haltReason, 'input', 'restore should restore halt reason');
+  assert.deepStrictEqual(vm.pendingInput, { textAddr: 0x120, parseAddr: 0x140 }, 'restore should restore pending input');
+  assert.deepStrictEqual(vm.evalStack, [1, 2, 3], 'restore should restore evaluation stack');
+  assert.strictEqual(vm.callStack.length, 1, 'restore should restore call stack frames');
+  assert.strictEqual(vm.callStack[0].locals[0], 9, 'restore should restore frame locals');
+  assert.strictEqual(vm.currentFrame.locals[0], 0x2222, 'restore should restore current frame locals');
 }
 
 function testUnknownOpcodeEmitsDebugEvent() {
@@ -299,6 +393,9 @@ function run() {
   testPrintObjectUsesShortName();
   testPrintAddrUsesByteAddress();
   testSoundEffectOpcodeEmitsEvent();
+  testRestartRestoresDynamicMemoryAndPc();
+  testStatusSnapshotExposesRoomScoreAndMoves();
+  testSaveStateRoundTripRestoresVmState();
   testUnknownOpcodeEmitsDebugEvent();
   console.log('VM core tests passed.');
 }

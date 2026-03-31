@@ -8,6 +8,7 @@ const SOUND_EFFECT_STOP = 3;
 const SOUND_EFFECT_FINISH = 4;
 const SOUND_CLASS_SFX = 'sfx';
 const SOUND_CLASS_MUSIC = 'music';
+const DEFAULT_SAVE_SLOT = 0;
 const DEFAULT_SOUND_CATALOG = {
   3: { src: './assets/soundfx/blorb/s3.wav', class: SOUND_CLASS_SFX },
   4: { src: './assets/soundfx/blorb/s4.wav', class: SOUND_CLASS_SFX },
@@ -37,13 +38,30 @@ class GameIoController {
     this.outputBuffer = '';
     this.currentRoomName = '';
     this.previousVmLine = '';
-    this.soundEnabled = true;
+    this.debugEnabled = false;
+    this.sfxEnabled = true;
+    this.gameMusicEnabled = true;
     this.soundCatalog = Object.assign({}, DEFAULT_SOUND_CATALOG, opts.soundCatalog || {});
     this.onSoundEvent = typeof opts.onSoundEvent === 'function' ? opts.onSoundEvent : function () {};
     this.onRoomChanged = typeof opts.onRoomChanged === 'function' ? opts.onRoomChanged : function () {};
+    this.onGameMusicPreferenceChanged =
+      typeof opts.onGameMusicPreferenceChanged === 'function'
+        ? opts.onGameMusicPreferenceChanged
+        : function () {};
     this.audioFactory = typeof opts.audioFactory === 'function'
       ? opts.audioFactory
       : (typeof Audio === 'function' ? src => new Audio(src) : null);
+    this.saveStorage = opts.saveStorage || this._createDefaultSaveStorage();
+    this.saveExporter = typeof opts.saveExporter === 'function'
+      ? opts.saveExporter
+      : (typeof window !== 'undefined' && typeof window.exportSaveToFile === 'function'
+        ? window.exportSaveToFile
+        : null);
+    this.saveImporter = typeof opts.saveImporter === 'function'
+      ? opts.saveImporter
+      : (typeof window !== 'undefined' && typeof window.importSaveFileToSlot === 'function'
+        ? window.importSaveFileToSlot
+        : null);
     this.activeSounds = new Map();
     this.warnedMissingSoundIds = new Set();
     this.soundStats = {
@@ -55,8 +73,10 @@ class GameIoController {
       volumeRawValues: new Set(),
       comboCounts: new Map(),
     };
+    this.importFileInput = this._createImportFileInput();
 
     this.ui.setCommandHandler(command => this.submitCommand(command));
+    this._syncStatusDisplays();
   }
 
   async loadStoryFromArrayBuffer(buffer) {
@@ -88,6 +108,7 @@ class GameIoController {
     this.ui.clearOutput();
     this.ui.appendOutput('Story loaded: release ' + parsed.release + ', serial ' + parsed.serial, 'system');
     this.ui.setStatus('Story loaded', 'Running');
+    this._syncStatusDisplays();
     this.runVm();
   }
 
@@ -118,10 +139,12 @@ class GameIoController {
     } catch (error) {
       this._flushVmOutputBuffer();
       this.ui.appendOutput('VM error: ' + error.message, 'error');
+      this._syncStatusDisplays();
       this.ui.setStatus('Execution error', 'Stopped');
       return;
     }
     this._flushVmOutputBuffer();
+    this._syncStatusDisplays();
     if (result.haltReason === 'input') {
       this.ui.setStatus('Awaiting command', 'Input ready');
       this.ui.focusInput();
@@ -161,15 +184,47 @@ class GameIoController {
       return false;
     }
     if (normalized === '$SOUND') {
-      this.soundEnabled = !this.soundEnabled;
-      if (!this.soundEnabled) {
-        this._stopAllSounds();
-      }
+      return this._toggleSoundEffects();
+    }
+    if (normalized === '$GAMESOUND') {
+      return this._toggleGameMusic();
+    }
+    if (normalized === '$DEBUG') {
+      this.debugEnabled = !this.debugEnabled;
       this.ui.appendOutput(
-        'Sound is now ' + (this.soundEnabled ? 'on' : 'off') + '.',
+        'Debug output is now ' + (this.debugEnabled ? 'on' : 'off') + '.',
         'system'
       );
-      this.ui.setStatus('Interpreter command', this.soundEnabled ? 'Sound on' : 'Sound off');
+      this.ui.setStatus('Interpreter command', this.debugEnabled ? 'Debug on' : 'Debug off');
+      return true;
+    }
+    if (normalized.startsWith('$SAVES')) {
+      this._listSaveSlots();
+      return true;
+    }
+    if (normalized.startsWith('$SAVE')) {
+      const slot = this._parseSlotCommand(original, DEFAULT_SAVE_SLOT);
+      this._saveToSlot(slot);
+      return true;
+    }
+    if (normalized.startsWith('$LOAD')) {
+      const slot = this._parseSlotCommand(original, DEFAULT_SAVE_SLOT);
+      this._loadFromSlot(slot);
+      return true;
+    }
+    if (normalized.startsWith('$DELETE')) {
+      const slot = this._parseSlotCommand(original, DEFAULT_SAVE_SLOT);
+      this._deleteSlot(slot);
+      return true;
+    }
+    if (normalized.startsWith('$EXPORT')) {
+      const slot = this._parseSlotCommand(original, DEFAULT_SAVE_SLOT);
+      this._exportSlot(slot);
+      return true;
+    }
+    if (normalized.startsWith('$IMPORT')) {
+      const slot = this._parseSlotCommand(original, DEFAULT_SAVE_SLOT);
+      this._importIntoSlot(slot);
       return true;
     }
     if (normalized.startsWith('$SOUNDSTATS')) {
@@ -246,6 +301,285 @@ class GameIoController {
     return true;
   }
 
+  _toggleSoundEffects() {
+      this.sfxEnabled = !this.sfxEnabled;
+      if (!this.sfxEnabled) {
+        this._stopAllSoundsByClass(SOUND_CLASS_SFX);
+      }
+      this.ui.appendOutput(
+        'Sound effects are now ' + (this.sfxEnabled ? 'on' : 'off') + '.',
+        'system'
+      );
+      this.ui.setStatus('Interpreter command', this.sfxEnabled ? 'SFX on' : 'SFX off');
+      return true;
+  }
+
+  _toggleGameMusic() {
+      this.gameMusicEnabled = !this.gameMusicEnabled;
+      if (!this.gameMusicEnabled) {
+        this._stopAllSoundsByClass(SOUND_CLASS_MUSIC);
+      }
+      this.onGameMusicPreferenceChanged(this.gameMusicEnabled);
+      this.ui.appendOutput(
+        'Game music is now ' + (this.gameMusicEnabled ? 'on' : 'off') + '.',
+        'system'
+      );
+      this.ui.setStatus('Interpreter command', this.gameMusicEnabled ? 'Music on' : 'Music off');
+      return true;
+  }
+
+  _createDefaultSaveStorage() {
+    if (typeof window !== 'undefined' && typeof window.QuetzalStorage === 'function') {
+      return new window.QuetzalStorage();
+    }
+    return null;
+  }
+
+  _createImportFileInput() {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.sav';
+    input.style.display = 'none';
+    input.addEventListener('change', event => {
+      const file = event.target.files && event.target.files[0];
+      const slot = Number(input.dataset.slot || DEFAULT_SAVE_SLOT);
+      input.value = '';
+      if (file) {
+        this._importFileIntoSlot(file, slot);
+      }
+    });
+    document.body.appendChild(input);
+    return input;
+  }
+
+  _parseSlotCommand(command, defaultSlot) {
+    const match = String(command || '').trim().match(/^\$\w+\s+(\d+)\s*$/i);
+    return match ? Number(match[1]) : defaultSlot;
+  }
+
+  _getStoryId() {
+    if (!this.storyMeta) {
+      return '';
+    }
+    return 'lurking-horror-r' + this.storyMeta.release + '-' + this.storyMeta.serial;
+  }
+
+  _getStoryCompatibilityMeta() {
+    if (!this.storyMeta) {
+      return null;
+    }
+    return {
+      storyId: this._getStoryId(),
+      release: this.storyMeta.release,
+      serial: this.storyMeta.serial,
+      checksum: this.storyMeta.header.headerChecksum,
+    };
+  }
+
+  _ensureSaveAvailable(actionLabel) {
+    if (!this.vm || !this.storyMeta) {
+      this.ui.appendOutput('No story loaded yet.', 'error');
+      this.ui.setStatus('Interpreter command', actionLabel + ' unavailable');
+      return false;
+    }
+    if (!this.saveStorage) {
+      this.ui.appendOutput('Local save storage is not available in this environment.', 'error');
+      this.ui.setStatus('Interpreter command', actionLabel + ' unavailable');
+      return false;
+    }
+    return true;
+  }
+
+  _buildSaveLabel(slot) {
+    const roomName = this.currentRoomName || 'Unknown room';
+    return 'Slot ' + slot + ' - ' + roomName;
+  }
+
+  async _saveToSlot(slot) {
+    if (!this._ensureSaveAvailable('Save')) {
+      return;
+    }
+    if (!this.vm || typeof this.vm.serializeSaveState !== 'function') {
+      this.ui.appendOutput('Save support is not available in this VM build.', 'error');
+      this.ui.setStatus('Interpreter command', 'Save unavailable');
+      return;
+    }
+    try {
+      const compat = this._getStoryCompatibilityMeta();
+      const record = await this.saveStorage.putSave({
+        storyId: compat.storyId,
+        slot,
+        label: this._buildSaveLabel(slot),
+        serial: compat.serial,
+        release: compat.release,
+        checksum: compat.checksum,
+        quetzalData: this.vm.serializeSaveState(),
+      });
+      this.ui.appendOutput(
+        'Saved slot ' + slot + ' (' + (record && record.label ? record.label : this._buildSaveLabel(slot)) + ').',
+        'system'
+      );
+      this.ui.setStatus('Interpreter command', 'Saved slot ' + slot);
+    } catch (error) {
+      this.ui.appendOutput('Save failed: ' + error.message, 'error');
+      this.ui.setStatus('Interpreter command', 'Save failed');
+    }
+  }
+
+  _assertCompatibleSaveRecord(record) {
+    const compat = this._getStoryCompatibilityMeta();
+    if (!compat) {
+      throw new Error('No story metadata is loaded');
+    }
+    if (!record) {
+      throw new Error('Save slot is empty');
+    }
+    if (record.storyId !== compat.storyId) {
+      throw new Error('Save belongs to a different story build');
+    }
+    if (Number(record.release) !== Number(compat.release)) {
+      throw new Error('Save release does not match the current story');
+    }
+    if (String(record.serial) !== String(compat.serial)) {
+      throw new Error('Save serial does not match the current story');
+    }
+    if (Number(record.checksum) !== Number(compat.checksum)) {
+      throw new Error('Save checksum does not match the current story');
+    }
+  }
+
+  async _loadFromSlot(slot) {
+    if (!this._ensureSaveAvailable('Load')) {
+      return;
+    }
+    if (!this.vm || typeof this.vm.restoreSaveState !== 'function') {
+      this.ui.appendOutput('Load support is not available in this VM build.', 'error');
+      this.ui.setStatus('Interpreter command', 'Load unavailable');
+      return;
+    }
+    try {
+      const compat = this._getStoryCompatibilityMeta();
+      const record = await this.saveStorage.getSave(compat.storyId, slot);
+      this._assertCompatibleSaveRecord(record);
+      this._stopAllSounds();
+      this.vm.restoreSaveState(record.quetzalData);
+      this._syncStatusDisplays();
+      this.ui.appendOutput(
+        'Loaded slot ' + slot + ' (' + (record.label || 'saved game') + ').',
+        'system'
+      );
+      this.ui.setStatus('Interpreter command', 'Loaded slot ' + slot);
+      this.ui.focusInput();
+    } catch (error) {
+      this.ui.appendOutput('Load failed: ' + error.message, 'error');
+      this.ui.setStatus('Interpreter command', 'Load failed');
+    }
+  }
+
+  async _deleteSlot(slot) {
+    if (!this._ensureSaveAvailable('Delete')) {
+      return;
+    }
+    try {
+      const deleted = await this.saveStorage.deleteSave(this._getStoryId(), slot);
+      this.ui.appendOutput(
+        deleted ? 'Deleted save slot ' + slot + '.' : 'Save slot ' + slot + ' is already empty.',
+        'system'
+      );
+      this.ui.setStatus('Interpreter command', deleted ? 'Deleted slot ' + slot : 'Slot empty');
+    } catch (error) {
+      this.ui.appendOutput('Delete failed: ' + error.message, 'error');
+      this.ui.setStatus('Interpreter command', 'Delete failed');
+    }
+  }
+
+  async _listSaveSlots() {
+    if (!this._ensureSaveAvailable('Save list')) {
+      return;
+    }
+    try {
+      const records = await this.saveStorage.listSaves(this._getStoryId());
+      if (!records.length) {
+        this.ui.appendOutput('No local saves yet.', 'system');
+        this.ui.setStatus('Interpreter command', 'No saves');
+        return;
+      }
+      for (const record of records) {
+        this.ui.appendOutput(
+          '[Save slot ' + record.slot + '] ' +
+          (record.label || 'saved game') +
+          ' | updated ' + record.updatedAt,
+          'system'
+        );
+      }
+      this.ui.setStatus('Interpreter command', 'Listed saves');
+    } catch (error) {
+      this.ui.appendOutput('Listing saves failed: ' + error.message, 'error');
+      this.ui.setStatus('Interpreter command', 'Save list failed');
+    }
+  }
+
+  async _exportSlot(slot) {
+    if (!this._ensureSaveAvailable('Export')) {
+      return;
+    }
+    if (!this.saveExporter) {
+      this.ui.appendOutput('Save export is not available in this environment.', 'error');
+      this.ui.setStatus('Interpreter command', 'Export unavailable');
+      return;
+    }
+    try {
+      const record = await this.saveStorage.getSave(this._getStoryId(), slot);
+      this._assertCompatibleSaveRecord(record);
+      await this.saveExporter(record);
+      this.ui.appendOutput('Exported save slot ' + slot + '.', 'system');
+      this.ui.setStatus('Interpreter command', 'Exported slot ' + slot);
+    } catch (error) {
+      this.ui.appendOutput('Export failed: ' + error.message, 'error');
+      this.ui.setStatus('Interpreter command', 'Export failed');
+    }
+  }
+
+  _importIntoSlot(slot) {
+    if (!this._ensureSaveAvailable('Import')) {
+      return;
+    }
+    if (!this.importFileInput || !this.saveImporter) {
+      this.ui.appendOutput('Save import is not available in this environment.', 'error');
+      this.ui.setStatus('Interpreter command', 'Import unavailable');
+      return;
+    }
+    this.importFileInput.dataset.slot = String(slot);
+    this.importFileInput.click();
+  }
+
+  async _importFileIntoSlot(file, slot) {
+    try {
+      const compat = this._getStoryCompatibilityMeta();
+      const record = await this.saveImporter(this.saveStorage, file, {
+        storyId: compat.storyId,
+        slot,
+        label: 'Imported slot ' + slot,
+        serial: compat.serial,
+        release: compat.release,
+        checksum: compat.checksum,
+      });
+      this.ui.appendOutput(
+        'Imported ' + (file.name || 'save file') + ' into slot ' + slot + '.',
+        'system'
+      );
+      this.ui.setStatus('Interpreter command', 'Imported slot ' + slot);
+      return record;
+    } catch (error) {
+      this.ui.appendOutput('Import failed: ' + error.message, 'error');
+      this.ui.setStatus('Interpreter command', 'Import failed');
+      return null;
+    }
+  }
+
   _handleVmOutput(text) {
     const normalized = String(text).replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     for (let i = 0; i < normalized.length; i++) {
@@ -274,13 +608,6 @@ class GameIoController {
 
   _appendVmLine(line) {
     this.ui.appendOutput(line);
-    if (line.startsWith('This ') && this.previousVmLine) {
-      const nextRoomName = this.previousVmLine;
-      if (nextRoomName && nextRoomName !== this.currentRoomName) {
-        this.currentRoomName = nextRoomName;
-        this.onRoomChanged(this.currentRoomName);
-      }
-    }
     if (this._isComputerHelpHintLine(line)) {
       this.ui.appendOutput(COMPUTER_HELP_NOTE, 'system');
     }
@@ -308,23 +635,24 @@ class GameIoController {
       : Number(soundEvent.routine);
     const operandCount = Number(soundEvent.operandCount) || 0;
     const soundDef = this.soundCatalog[number];
+    const soundClass = this._resolveSoundClass(soundDef);
+    const isEnabledForClass = this._isEnabledForSoundClass(soundClass);
     const mappedSrc = soundDef && soundDef.src ? soundDef.src : 'none';
     const gain = this._resolveSoundGain(soundDef, volumeRaw, volumeSigned);
-    this.ui.appendOutput(
+    this._appendDebugOutput(
       '[SFX debug] id=' + number +
       ' effect=' + this._soundEffectName(effect) +
-      ' sound=' + (this.soundEnabled ? 'on' : 'off') +
+      ' sound=' + (isEnabledForClass ? 'on' : 'off') +
       ' mapped=' + mappedSrc +
       ' gain=' + (gain === null ? 'default' : gain.toFixed(3)) +
       ' volumeRaw=' + (volumeRaw === null ? 'none' : volumeRaw) +
       ' volumeSigned=' + (volumeSigned === null ? 'none' : volumeSigned) +
       ' routine=' + (routine === null ? 'none' : routine) +
-      ' operands=' + operandCount,
-      'system'
+      ' operands=' + operandCount
     );
     this._recordSoundEvent(number, effect, volumeRaw);
 
-    if (!number || !this.soundEnabled) {
+    if (!number || !isEnabledForClass) {
       return;
     }
 
@@ -349,12 +677,11 @@ class GameIoController {
     if (!soundDef || !soundDef.src) {
       if (!this.warnedMissingSoundIds.has(number)) {
         this.warnedMissingSoundIds.add(number);
-        this.ui.appendOutput('Sound #' + number + ' requested, but no sample is mapped yet.', 'system');
+        this._appendDebugOutput('Sound #' + number + ' requested, but no sample is mapped yet.');
       }
       return;
     }
 
-    const soundClass = this._resolveSoundClass(soundDef);
     this._stopAllSoundsExcept(number, soundClass);
     this._playSound(number, soundDef, {
       gain,
@@ -383,7 +710,32 @@ class GameIoController {
     const offset = Number(event && event.offset);
     const opText = Number.isFinite(opcode) ? opcode : '?';
     const addrText = Number.isFinite(offset) ? '0x' + offset.toString(16) : 'unknown';
-    this.ui.appendOutput('[VM debug] Unknown opcode ' + opText + ' at ' + addrText + '.', 'system');
+    this._appendDebugOutput('[VM debug] Unknown opcode ' + opText + ' at ' + addrText + '.');
+  }
+
+  _appendDebugOutput(text) {
+    if (!this.debugEnabled) {
+      return;
+    }
+    this.ui.appendOutput(text, 'system');
+  }
+
+  _syncStatusDisplays() {
+    if (!this.vm || typeof this.vm.getStatusSnapshot !== 'function') {
+      this.ui.setTopbarMeta('', '', '');
+      return;
+    }
+    const snapshot = this.vm.getStatusSnapshot();
+    const roomName = snapshot && snapshot.roomName ? snapshot.roomName : '';
+    if (roomName && roomName !== this.currentRoomName) {
+      this.currentRoomName = roomName;
+      this.onRoomChanged(this.currentRoomName);
+    }
+    this.ui.setTopbarMeta(
+      roomName || '',
+      snapshot && Number.isFinite(snapshot.score) ? String(snapshot.score) : '',
+      snapshot && Number.isFinite(snapshot.moves) ? String(snapshot.moves) : ''
+    );
   }
 
   _recordSoundEvent(number, effect, volumeRaw) {
@@ -450,6 +802,13 @@ class GameIoController {
     return SOUND_CLASS_SFX;
   }
 
+  _isEnabledForSoundClass(soundClass) {
+    if (soundClass === SOUND_CLASS_MUSIC) {
+      return this.gameMusicEnabled;
+    }
+    return this.sfxEnabled;
+  }
+
   _resolveLoopSetting(soundDef) {
     if (typeof soundDef?.loop === 'boolean') {
       return soundDef.loop;
@@ -469,7 +828,7 @@ class GameIoController {
     }
     audio = this.audioFactory(soundDef.src);
     if (!audio) {
-      this.ui.appendOutput('[SFX debug] id=' + number + ' audioFactory returned no audio object.', 'system');
+      this._appendDebugOutput('[SFX debug] id=' + number + ' audioFactory returned no audio object.');
       return null;
     }
     this.activeSounds.set(number, audio);
@@ -481,9 +840,8 @@ class GameIoController {
         this.activeSounds.delete(number);
       });
       audio.addEventListener('error', () => {
-        this.ui.appendOutput(
-          '[SFX debug] id=' + number + ' audio element error while loading/playing ' + soundDef.src,
-          'system'
+        this._appendDebugOutput(
+          '[SFX debug] id=' + number + ' audio element error while loading/playing ' + soundDef.src
         );
       });
     }
@@ -537,10 +895,7 @@ class GameIoController {
       if (playResult && typeof playResult.catch === 'function') {
         playResult.catch(error => {
           const message = error && error.message ? error.message : String(error);
-          this.ui.appendOutput(
-            '[SFX debug] id=' + number + ' play() failed: ' + message,
-            'system'
-          );
+          this._appendDebugOutput('[SFX debug] id=' + number + ' play() failed: ' + message);
         });
       }
     }
@@ -573,6 +928,17 @@ class GameIoController {
   _stopAllSounds() {
     const activeIds = Array.from(this.activeSounds.keys());
     for (const number of activeIds) {
+      this._stopSound(number);
+    }
+  }
+
+  _stopAllSoundsByClass(soundClass) {
+    const activeIds = Array.from(this.activeSounds.keys());
+    for (const number of activeIds) {
+      const activeDef = this.soundCatalog[number];
+      if (this._resolveSoundClass(activeDef) !== soundClass) {
+        continue;
+      }
       this._stopSound(number);
     }
   }
