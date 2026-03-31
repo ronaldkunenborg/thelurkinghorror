@@ -175,6 +175,13 @@ class GameIoController {
     if (this._handleInterpreterCommand(command)) {
       return;
     }
+    const normalized = String(command || '').trim().toLowerCase();
+    if (normalized === 'load') {
+      this.ui.appendOutput('Use "restore" for the story command, or "$LOAD" for interpreter slot loading.', 'system');
+      this.ui.setStatus('Command hint', 'Use restore or $LOAD');
+      this.ui.focusInput();
+      return;
+    }
     if (!this.vm) {
       this.ui.appendOutput('No story loaded yet.', 'error');
       return;

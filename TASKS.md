@@ -152,14 +152,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Story `save`/`restore` now uses the default local slot `0`, while compatibility checks remain enforced before restore
    - Added VM and controller regression coverage in `tools/test-vm-core.js` and `tools/test-io-controller-output.js`
 
-## Pending Tasks
+24. [done] Replace the buttons with icons: a gear icon that opens a dialog where you can set volume for game music and sound effects, load/save icons where you can load and save the game (wired to the text inputs for that). The commands button should have a "?"-type icon. I probably have to create an icon set but you can generate a number of placeholders first. The style is scratch art, white lines on black wax paper.
+   - Replaced the sidebar text buttons with an icon rail in `src/index.html`
+   - Added placeholder scratch-style etched icons and icon-rail styling in `src/modern.css`
+   - Moved volume controls into a gear-driven settings dialog in `src/index.html` and `src/modern.css`
+   - Preserved existing handlers for load local file, save, load, and commands under the new icon UI
 
-24. [pending] Replace the buttons with icons: a gear icon that opens a dialog where you can set volume for game music and sound effects, load/save icons where you can load and save the game (wired to the text inputs for that). The commands button should have a "?"-type icon. I probably have to create an icon set but you can generate a number of placeholders first. The style is scratch art, white lines on black wax paper.
+## Pending Tasks
 
 ## Refinements
 
 R1. [pending] I would like a map of visited locations that shows the locations you visited. Apparently the original package did contain a map of the buildings - we should provide that if we could. The map should be shown while adventuring.
-
-## Future Tasks
-
-nnn. [future] None. Remove this when we get our first task in this section.

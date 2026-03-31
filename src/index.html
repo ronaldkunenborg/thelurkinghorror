@@ -25,27 +25,24 @@
           </p>
           <p id="splash-status" class="splash-status">Loading bundled story...</p>
           <p id="splash-prompt" class="splash-prompt">Press any key to enter</p>
-          <div class="splash-actions">
-            <button id="splash-load-local" class="btn btn-accent" type="button">Load Local File</button>
-          </div>
         </div>
       </section>
-      <div class="shell-frame">
+        <div class="shell-frame">
         <div class="hud-group">
           <aside class="side-actions" aria-label="Game actions">
             <span class="side-actions-title">Actions</span>
-            <button id="load-local" class="btn" type="button">Load Local File</button>
-            <button id="save-slot" class="btn" type="button">Save</button>
-            <button id="load-slot" class="btn" type="button">Load</button>
-            <button id="commands-button" class="btn" type="button">Commands</button>
-            <label class="volume-control" for="music-volume">
-              <span class="volume-label">Game Music</span>
-              <input id="music-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
-            </label>
-            <label class="volume-control" for="sfx-volume">
-              <span class="volume-label">Sound Effects</span>
-              <input id="sfx-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
-            </label>
+            <button id="load-slot" class="icon-btn" type="button" aria-label="Load game" title="Load game">
+              <span class="icon-etch icon-load" aria-hidden="true"></span>
+            </button>
+            <button id="save-slot" class="icon-btn" type="button" aria-label="Save game" title="Save game">
+              <span class="icon-etch icon-save" aria-hidden="true"></span>
+            </button>
+            <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
+              <span class="icon-etch icon-help" aria-hidden="true">?</span>
+            </button>
+            <button id="settings-button" class="icon-btn" type="button" aria-label="Audio settings" title="Audio settings">
+              <span class="icon-etch icon-gear" aria-hidden="true"></span>
+            </button>
           </aside>
 
           <div class="terminal-stack">
@@ -145,6 +142,8 @@
               <h4>System And Meta</h4>
               <div class="command-grid">
                 <button class="btn command-chip" type="button" data-command="score"><strong>score</strong><span>Check score and moves in-story.</span></button>
+                <button class="btn command-chip" type="button" data-command="save"><strong>save</strong><span>Story save; writes the game-native save to slot 0 only.</span></button>
+                <button class="btn command-chip" type="button" data-command="restore"><strong>restore</strong><span>Story restore; reads the game-native save from slot 0 only.</span></button>
                 <button class="btn command-chip" type="button" data-command="time"><strong>time (t)</strong><span>Ask the game for the current in-world time.</span></button>
                 <button class="btn command-chip" type="button" data-command="wait"><strong>wait (z)</strong><span>Pass one turn.</span></button>
                 <button class="btn command-chip" type="button" data-command="again"><strong>again (g)</strong><span>Repeat the previous command after at least one turn.</span></button>
@@ -158,8 +157,8 @@
           <div class="command-section">
             <h3>Game Control Commands</h3>
             <div class="command-grid">
-              <button class="btn command-chip" type="button" data-command="$SAVE"><strong>$SAVE</strong><span>Save to the default local slot 0.</span></button>
-              <button class="btn command-chip" type="button" data-command="$LOAD"><strong>$LOAD</strong><span>Load the default local slot 0.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SAVE"><strong>$SAVE</strong><span>Interpreter save to local slot 0. The save button uses this path.</span></button>
+              <button class="btn command-chip" type="button" data-command="$LOAD"><strong>$LOAD</strong><span>Interpreter load from local slot 0. The load button uses this path.</span></button>
               <button class="btn command-chip" type="button" data-command="$SAVE 1"><strong>$SAVE 1</strong><span>Save into a numbered local slot.</span></button>
               <button class="btn command-chip" type="button" data-command="$LOAD 1"><strong>$LOAD 1</strong><span>Load a numbered local slot.</span></button>
               <button class="btn command-chip" type="button" data-command="$SAVES"><strong>$SAVES</strong><span>List local save slots for this story.</span></button>
@@ -179,6 +178,23 @@
           </div>
         </div>
       </section>
+      <section id="settings-sheet" class="settings-sheet" aria-label="Audio settings" hidden>
+        <div class="settings-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+          <div class="command-sheet-header">
+            <h2 id="settings-title" class="command-sheet-title">Audio Settings</h2>
+            <button id="close-settings" class="btn" type="button">Close</button>
+          </div>
+          <p class="settings-copy">Set splash/game music and in-game sound effect volume separately.</p>
+          <label class="settings-control" for="music-volume">
+            <span class="volume-label">Game Music</span>
+            <input id="music-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+          </label>
+          <label class="settings-control" for="sfx-volume">
+            <span class="volume-label">Sound Effects</span>
+            <input id="sfx-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+          </label>
+        </div>
+      </section>
     </main>
 
     <script src="./ui-framework.js"></script>
@@ -191,11 +207,6 @@
       (function bootstrapUi() {
         const splashShownAt = Date.now();
         const minimumSplashMs = 1800;
-        const localFileInput = document.createElement('input');
-        localFileInput.type = 'file';
-        localFileInput.accept = '.z3,.z5,.z8,.zblorb,.zlb';
-        localFileInput.style.display = 'none';
-        document.body.appendChild(localFileInput);
         const shellEl = document.getElementById('shell');
         const splashEl = document.getElementById('splash');
         const splashStatusEl = document.getElementById('splash-status');
@@ -204,6 +215,7 @@
         const sceneLayerB = document.getElementById('scene-layer-b');
         const sceneLayers = [sceneLayerA, sceneLayerB];
         const commandSheetEl = document.getElementById('command-sheet');
+        const settingsSheetEl = document.getElementById('settings-sheet');
         const musicVolumeEl = document.getElementById('music-volume');
         const sfxVolumeEl = document.getElementById('sfx-volume');
         const splashMusic = new Audio('./assets/audio/splash-horror-whirlguy.mp3');
@@ -477,19 +489,11 @@
             const remaining = Math.max(0, minimumSplashMs - (Date.now() - splashShownAt));
             window.setTimeout(armSplashDismiss, remaining);
           } catch (error) {
-            setSplashStatus('Bundled story failed to load. You can still open a local story file.', true);
+            setSplashStatus('Bundled story failed to load.', true);
             ui.appendOutput('Failed to load bundled story: ' + error.message, 'error');
             ui.setStatus('Load failed', 'Error');
           }
         }
-
-        function openLocalPicker() {
-          localFileInput.value = '';
-          localFileInput.click();
-        }
-
-        document.getElementById('load-local').addEventListener('click', openLocalPicker);
-        document.getElementById('splash-load-local').addEventListener('click', openLocalPicker);
         document.getElementById('save-slot').addEventListener('click', () => controller.submitCommand('$SAVE'));
         document.getElementById('load-slot').addEventListener('click', () => controller.submitCommand('$LOAD'));
         musicVolumeEl.addEventListener('input', () => {
@@ -527,22 +531,20 @@
           closeCommandSheet();
         });
 
-        localFileInput.addEventListener('change', async event => {
-          const file = event.target.files && event.target.files[0];
-          if (!file) {
-            return;
-          }
-          try {
-            setSplashStatus('Loading selected story file...', false);
-            const buffer = await file.arrayBuffer();
-            await controller.loadStoryFromArrayBuffer(buffer);
-            splashPromptEl.classList.remove('visible');
-            setSplashStatus('Story loaded.', false);
-            armSplashDismiss();
-          } catch (error) {
-            setSplashStatus('Selected file could not be loaded.', true);
-            ui.appendOutput('Failed to load selected file: ' + error.message, 'error');
-            ui.setStatus('Load failed', 'Error');
+        function openSettingsSheet() {
+          settingsSheetEl.hidden = false;
+        }
+
+        function closeSettingsSheet() {
+          settingsSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('settings-button').addEventListener('click', openSettingsSheet);
+        document.getElementById('close-settings').addEventListener('click', closeSettingsSheet);
+        settingsSheetEl.addEventListener('click', event => {
+          if (event.target === settingsSheetEl) {
+            closeSettingsSheet();
           }
         });
 

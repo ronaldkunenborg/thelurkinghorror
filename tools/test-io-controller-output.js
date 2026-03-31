@@ -219,6 +219,24 @@ function testGameSoundAliasWorksWithoutVmInput() {
   assert.deepStrictEqual(musicStates, [false], '$GAMESOUND should notify music preference changes');
 }
 
+function testPlainLoadShowsRestoreHint() {
+  const ui = createUi();
+  const controller = new GameIoController(ui);
+  controller.vm = { haltReason: 'input' };
+
+  controller.submitCommand('load');
+
+  assert.ok(
+    ui.lines.includes('Use "restore" for the story command, or "$LOAD" for interpreter slot loading.'),
+    'plain load should show a restore/$LOAD hint instead of going through the story parser'
+  );
+  assert.deepStrictEqual(
+    ui.statuses.slice(-1)[0],
+    ['Command hint', 'Use restore or $LOAD'],
+    'plain load hint should update the status line'
+  );
+}
+
 function testMappedSoundPlaybackRespectsPreference() {
   const ui = createUi();
   const fakeAudio = {
@@ -831,6 +849,7 @@ async function run() {
   testDebugCommandTogglesDebugOutput();
   testSoundInterpreterCommandWorksWithoutVmInput();
   testGameSoundAliasWorksWithoutVmInput();
+  testPlainLoadShowsRestoreHint();
   testMappedSoundPlaybackRespectsPreference();
   testGameMusicToggleDoesNotDisableSoundEffects();
   testSoundToggleDoesNotDisableMusicClassPlayback();
