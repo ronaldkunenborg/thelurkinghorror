@@ -1,0 +1,2133 @@
+{
+  "roomEncoding": {
+    "roomRootObjectId": 49,
+    "roomCount": 71,
+    "currentRoomGlobalOffset": "globals[0]"
+  },
+  "rooms": [
+    {
+      "id": 9,
+      "name": "Tomb"
+    },
+    {
+      "id": 15,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 16,
+      "name": "Small Courtyard"
+    },
+    {
+      "id": 17,
+      "name": "Cinderblock Tunnel"
+    },
+    {
+      "id": 21,
+      "name": "At Platform"
+    },
+    {
+      "id": 25,
+      "name": "Brick Tunnel"
+    },
+    {
+      "id": 27,
+      "name": "Basement"
+    },
+    {
+      "id": 33,
+      "name": "Kitchen"
+    },
+    {
+      "id": 34,
+      "name": "Tunnel Entrance"
+    },
+    {
+      "id": 35,
+      "name": "Stairway"
+    },
+    {
+      "id": 37,
+      "name": "Concrete Box"
+    },
+    {
+      "id": 38,
+      "name": "Engineering Building"
+    },
+    {
+      "id": 39,
+      "name": "Muddy Tunnel"
+    },
+    {
+      "id": 42,
+      "name": "Lab"
+    },
+    {
+      "id": 47,
+      "name": "Dead Storage"
+    },
+    {
+      "id": 51,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 65,
+      "name": "Computer Center"
+    },
+    {
+      "id": 66,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 69,
+      "name": "Inner Lair"
+    },
+    {
+      "id": 78,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 87,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 98,
+      "name": "Smith Street"
+    },
+    {
+      "id": 99,
+      "name": "Large Chamber"
+    },
+    {
+      "id": 109,
+      "name": "Inside Dome"
+    },
+    {
+      "id": 110,
+      "name": "Third Floor"
+    },
+    {
+      "id": 117,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 121,
+      "name": "Roof of Great Dome"
+    },
+    {
+      "id": 124,
+      "name": "Elevator"
+    },
+    {
+      "id": 127,
+      "name": "Roof"
+    },
+    {
+      "id": 131,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 134,
+      "name": "Basalt Bowl"
+    },
+    {
+      "id": 136,
+      "name": "Aero Lobby"
+    },
+    {
+      "id": 137,
+      "name": "Second Floor"
+    },
+    {
+      "id": 138,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 140,
+      "name": "Temporary Lab"
+    },
+    {
+      "id": 142,
+      "name": "Subbasement"
+    },
+    {
+      "id": 145,
+      "name": "On the Great Dome"
+    },
+    {
+      "id": 149,
+      "name": "Before the Altar"
+    },
+    {
+      "id": 150,
+      "name": "Fruits and Nuts"
+    },
+    {
+      "id": 152,
+      "name": "Place"
+    },
+    {
+      "id": 158,
+      "name": "Aero Basement"
+    },
+    {
+      "id": 161,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 164,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 171,
+      "name": "Ancient Storage"
+    },
+    {
+      "id": 174,
+      "name": "Department of Alchemy"
+    },
+    {
+      "id": 176,
+      "name": "Terminal Room"
+    },
+    {
+      "id": 179,
+      "name": "Cluttered Passage"
+    },
+    {
+      "id": 180,
+      "name": "Great Court"
+    },
+    {
+      "id": 181,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 184,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 185,
+      "name": "Smith Street"
+    },
+    {
+      "id": 187,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 190,
+      "name": "Mass. Ave."
+    },
+    {
+      "id": 195,
+      "name": "Top Floor"
+    },
+    {
+      "id": 200,
+      "name": "Brown Basement"
+    },
+    {
+      "id": 201,
+      "name": "Renovated Cave"
+    },
+    {
+      "id": 202,
+      "name": "Temporary Basement"
+    },
+    {
+      "id": 206,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 208,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 210,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 213,
+      "name": "Top of Dome"
+    },
+    {
+      "id": 214,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 218,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 221,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 222,
+      "name": "Skyscraper Roof"
+    },
+    {
+      "id": 227,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 232,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 234,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 240,
+      "name": "Brown Building"
+    },
+    {
+      "id": 248,
+      "name": "Chemistry Building"
+    },
+    {
+      "id": 249,
+      "name": "Great Dome"
+    }
+  ],
+  "startRoomId": 176,
+  "discoveredRooms": [
+    {
+      "id": 9,
+      "name": "Tomb",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west",
+        "down",
+        "northwest"
+      ]
+    },
+    {
+      "id": 27,
+      "name": "Basement",
+      "path": [
+        "south",
+        "down",
+        "down"
+      ]
+    },
+    {
+      "id": 33,
+      "name": "Kitchen",
+      "path": [
+        "south",
+        "west"
+      ]
+    },
+    {
+      "id": 35,
+      "name": "Stairway",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west"
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Engineering Building",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west",
+        "up",
+        "south",
+        "south"
+      ]
+    },
+    {
+      "id": 47,
+      "name": "Dead Storage",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "east",
+        "east"
+      ]
+    },
+    {
+      "id": 65,
+      "name": "Computer Center",
+      "path": [
+        "south",
+        "down"
+      ]
+    },
+    {
+      "id": 98,
+      "name": "Smith Street",
+      "path": [
+        "south",
+        "down",
+        "north",
+        "east"
+      ]
+    },
+    {
+      "id": 110,
+      "name": "Third Floor",
+      "path": [
+        "south",
+        "up"
+      ]
+    },
+    {
+      "id": 127,
+      "name": "Roof",
+      "path": [
+        "south",
+        "up",
+        "up"
+      ]
+    },
+    {
+      "id": 136,
+      "name": "Aero Lobby",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west",
+        "up"
+      ]
+    },
+    {
+      "id": 137,
+      "name": "Second Floor",
+      "path": [
+        "south"
+      ]
+    },
+    {
+      "id": 140,
+      "name": "Temporary Lab",
+      "path": [
+        "south",
+        "down",
+        "north",
+        "east",
+        "south"
+      ]
+    },
+    {
+      "id": 142,
+      "name": "Subbasement",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west",
+        "down"
+      ]
+    },
+    {
+      "id": 158,
+      "name": "Aero Basement",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west"
+      ]
+    },
+    {
+      "id": 176,
+      "name": "Terminal Room",
+      "path": []
+    },
+    {
+      "id": 185,
+      "name": "Smith Street",
+      "path": [
+        "south",
+        "down",
+        "north"
+      ]
+    },
+    {
+      "id": 190,
+      "name": "Mass. Ave.",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west",
+        "up",
+        "south",
+        "west"
+      ]
+    },
+    {
+      "id": 202,
+      "name": "Temporary Basement",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "east"
+      ]
+    },
+    {
+      "id": 214,
+      "name": "Infinite Corridor",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west",
+        "up",
+        "south",
+        "east"
+      ]
+    },
+    {
+      "id": 218,
+      "name": "Infinite Corridor",
+      "path": [
+        "south",
+        "down",
+        "down",
+        "west",
+        "west",
+        "up",
+        "south"
+      ]
+    }
+  ],
+  "undiscoveredRooms": [
+    {
+      "id": 15,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 16,
+      "name": "Small Courtyard"
+    },
+    {
+      "id": 17,
+      "name": "Cinderblock Tunnel"
+    },
+    {
+      "id": 21,
+      "name": "At Platform"
+    },
+    {
+      "id": 25,
+      "name": "Brick Tunnel"
+    },
+    {
+      "id": 34,
+      "name": "Tunnel Entrance"
+    },
+    {
+      "id": 37,
+      "name": "Concrete Box"
+    },
+    {
+      "id": 39,
+      "name": "Muddy Tunnel"
+    },
+    {
+      "id": 42,
+      "name": "Lab"
+    },
+    {
+      "id": 51,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 66,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 69,
+      "name": "Inner Lair"
+    },
+    {
+      "id": 78,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 87,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 99,
+      "name": "Large Chamber"
+    },
+    {
+      "id": 109,
+      "name": "Inside Dome"
+    },
+    {
+      "id": 117,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 121,
+      "name": "Roof of Great Dome"
+    },
+    {
+      "id": 124,
+      "name": "Elevator"
+    },
+    {
+      "id": 131,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 134,
+      "name": "Basalt Bowl"
+    },
+    {
+      "id": 138,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 145,
+      "name": "On the Great Dome"
+    },
+    {
+      "id": 149,
+      "name": "Before the Altar"
+    },
+    {
+      "id": 150,
+      "name": "Fruits and Nuts"
+    },
+    {
+      "id": 152,
+      "name": "Place"
+    },
+    {
+      "id": 161,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 164,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 171,
+      "name": "Ancient Storage"
+    },
+    {
+      "id": 174,
+      "name": "Department of Alchemy"
+    },
+    {
+      "id": 179,
+      "name": "Cluttered Passage"
+    },
+    {
+      "id": 180,
+      "name": "Great Court"
+    },
+    {
+      "id": 181,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 184,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 187,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 195,
+      "name": "Top Floor"
+    },
+    {
+      "id": 200,
+      "name": "Brown Basement"
+    },
+    {
+      "id": 201,
+      "name": "Renovated Cave"
+    },
+    {
+      "id": 206,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 208,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 210,
+      "name": "Infinite Corridor"
+    },
+    {
+      "id": 213,
+      "name": "Top of Dome"
+    },
+    {
+      "id": 221,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 222,
+      "name": "Skyscraper Roof"
+    },
+    {
+      "id": 227,
+      "name": "Steam Tunnel"
+    },
+    {
+      "id": 232,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 234,
+      "name": "Wet Tunnel"
+    },
+    {
+      "id": 240,
+      "name": "Brown Building"
+    },
+    {
+      "id": 248,
+      "name": "Chemistry Building"
+    },
+    {
+      "id": 249,
+      "name": "Great Dome"
+    }
+  ],
+  "propertyCommands": [
+    {
+      "propertyId": 22,
+      "command": "down"
+    },
+    {
+      "propertyId": 23,
+      "command": "up"
+    },
+    {
+      "propertyId": 25,
+      "command": "west"
+    },
+    {
+      "propertyId": 27,
+      "command": "south"
+    },
+    {
+      "propertyId": 29,
+      "command": "east"
+    },
+    {
+      "propertyId": 31,
+      "command": "north"
+    }
+  ],
+  "edges": [
+    {
+      "from": 9,
+      "to": 142,
+      "command": "exit",
+      "kind": "dynamic"
+    },
+    {
+      "from": 9,
+      "to": 142,
+      "command": "southeast",
+      "kind": "dynamic"
+    },
+    {
+      "from": 15,
+      "to": 184,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 15,
+      "to": 187,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 15,
+      "to": 131,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 16,
+      "to": 240,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 17,
+      "to": 25,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 25,
+      "to": 201,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 25,
+      "to": 17,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 27,
+      "to": 202,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 27,
+      "to": 65,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 27,
+      "to": 158,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 33,
+      "to": 137,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 34,
+      "to": 39,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 34,
+      "to": 221,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 34,
+      "to": 39,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 35,
+      "to": 142,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 35,
+      "to": 158,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 35,
+      "to": 136,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 38,
+      "to": 218,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 39,
+      "to": 99,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 39,
+      "to": 34,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 39,
+      "to": 34,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 47,
+      "to": 202,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 51,
+      "to": 181,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 51,
+      "to": 232,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 51,
+      "to": 87,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 51,
+      "to": 131,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 65,
+      "to": 27,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 65,
+      "to": 185,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 65,
+      "to": 137,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 66,
+      "to": 78,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 78,
+      "to": 138,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 87,
+      "to": 117,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 87,
+      "to": 117,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 87,
+      "to": 51,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 87,
+      "to": 131,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 87,
+      "to": 232,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 98,
+      "to": 140,
+      "command": "enter",
+      "kind": "dynamic"
+    },
+    {
+      "from": 98,
+      "to": 140,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 98,
+      "to": 185,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 99,
+      "to": 39,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 110,
+      "to": 137,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 110,
+      "to": 127,
+      "command": "exit",
+      "kind": "dynamic"
+    },
+    {
+      "from": 110,
+      "to": 127,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 117,
+      "to": 161,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 117,
+      "to": 234,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 121,
+      "to": 145,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 127,
+      "to": 110,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 127,
+      "to": 110,
+      "command": "enter",
+      "kind": "dynamic"
+    },
+    {
+      "from": 131,
+      "to": 164,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 131,
+      "to": 15,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 131,
+      "to": 87,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 131,
+      "to": 234,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 134,
+      "to": 21,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 134,
+      "to": 152,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 136,
+      "to": 35,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 136,
+      "to": 218,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 137,
+      "to": 65,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 137,
+      "to": 176,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 137,
+      "to": 110,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 137,
+      "to": 33,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 140,
+      "to": 202,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 140,
+      "to": 98,
+      "command": "exit",
+      "kind": "dynamic"
+    },
+    {
+      "from": 140,
+      "to": 98,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 142,
+      "to": 9,
+      "command": "northwest",
+      "kind": "dynamic"
+    },
+    {
+      "from": 142,
+      "to": 35,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 145,
+      "to": 121,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 149,
+      "to": 201,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 150,
+      "to": 179,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 150,
+      "to": 206,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 152,
+      "to": 134,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 158,
+      "to": 27,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 158,
+      "to": 35,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 161,
+      "to": 117,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 161,
+      "to": 184,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 161,
+      "to": 15,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 161,
+      "to": 164,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 164,
+      "to": 131,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 164,
+      "to": 187,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 164,
+      "to": 184,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 164,
+      "to": 234,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 171,
+      "to": 47,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 176,
+      "to": 137,
+      "command": "exit",
+      "kind": "dynamic"
+    },
+    {
+      "from": 176,
+      "to": 137,
+      "command": "south",
+      "kind": "dynamic"
+    },
+    {
+      "from": 179,
+      "to": 150,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 181,
+      "to": 51,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 184,
+      "to": 161,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 184,
+      "to": 164,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 184,
+      "to": 15,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 185,
+      "to": 98,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 185,
+      "to": 65,
+      "command": "enter",
+      "kind": "dynamic"
+    },
+    {
+      "from": 185,
+      "to": 65,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 187,
+      "to": 164,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 187,
+      "to": 15,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 187,
+      "to": 99,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 190,
+      "to": 218,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 190,
+      "to": 218,
+      "command": "enter",
+      "kind": "dynamic"
+    },
+    {
+      "from": 195,
+      "to": 240,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 200,
+      "to": 240,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 201,
+      "to": 149,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 201,
+      "to": 25,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 202,
+      "to": 47,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 202,
+      "to": 140,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 202,
+      "to": 27,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 206,
+      "to": 208,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 208,
+      "to": 210,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 210,
+      "to": 249,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 210,
+      "to": 214,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 214,
+      "to": 218,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 218,
+      "to": 214,
+      "command": "east",
+      "kind": "dynamic"
+    },
+    {
+      "from": 218,
+      "to": 190,
+      "command": "exit",
+      "kind": "dynamic"
+    },
+    {
+      "from": 218,
+      "to": 136,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 218,
+      "to": 38,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 218,
+      "to": 190,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 221,
+      "to": 227,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 222,
+      "to": 109,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 232,
+      "to": 161,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 234,
+      "to": 131,
+      "command": "east",
+      "kind": "static-direct",
+      "propertyId": 29
+    },
+    {
+      "from": 234,
+      "to": 164,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 234,
+      "to": 117,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 234,
+      "to": 187,
+      "command": "west",
+      "kind": "static-direct",
+      "propertyId": 25
+    },
+    {
+      "from": 240,
+      "to": 200,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    },
+    {
+      "from": 240,
+      "to": 16,
+      "command": "south",
+      "kind": "static-direct",
+      "propertyId": 27
+    },
+    {
+      "from": 240,
+      "to": 195,
+      "command": "up",
+      "kind": "static-direct",
+      "propertyId": 23
+    },
+    {
+      "from": 248,
+      "to": 206,
+      "command": "north",
+      "kind": "static-direct",
+      "propertyId": 31
+    },
+    {
+      "from": 249,
+      "to": 210,
+      "command": "down",
+      "kind": "static-direct",
+      "propertyId": 22
+    }
+  ],
+  "unresolvedExitProperties": [
+    {
+      "from": 9,
+      "propertyId": 20,
+      "length": 3,
+      "command": null,
+      "rawValue": 29237
+    },
+    {
+      "from": 9,
+      "propertyId": 22,
+      "length": 5,
+      "command": "down",
+      "rawValue": 58231
+    },
+    {
+      "from": 9,
+      "propertyId": 28,
+      "length": 3,
+      "command": null,
+      "rawValue": 29237
+    },
+    {
+      "from": 17,
+      "propertyId": 23,
+      "length": 3,
+      "command": "up",
+      "rawValue": 26004
+    },
+    {
+      "from": 25,
+      "propertyId": 23,
+      "length": 3,
+      "command": "up",
+      "rawValue": 24862
+    },
+    {
+      "from": 27,
+      "propertyId": 21,
+      "length": 3,
+      "command": null,
+      "rawValue": 29114
+    },
+    {
+      "from": 27,
+      "propertyId": 22,
+      "length": 3,
+      "command": "down",
+      "rawValue": 23515
+    },
+    {
+      "from": 27,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 29114
+    },
+    {
+      "from": 37,
+      "propertyId": 20,
+      "length": 3,
+      "command": null,
+      "rawValue": 32026
+    },
+    {
+      "from": 37,
+      "propertyId": 23,
+      "length": 3,
+      "command": "up",
+      "rawValue": 32026
+    },
+    {
+      "from": 37,
+      "propertyId": 31,
+      "length": 4,
+      "command": "north",
+      "rawValue": 35506
+    },
+    {
+      "from": 38,
+      "propertyId": 25,
+      "length": 2,
+      "command": "west",
+      "rawValue": 62425
+    },
+    {
+      "from": 38,
+      "propertyId": 27,
+      "length": 2,
+      "command": "south",
+      "rawValue": 62425
+    },
+    {
+      "from": 38,
+      "propertyId": 29,
+      "length": 2,
+      "command": "east",
+      "rawValue": 62425
+    },
+    {
+      "from": 42,
+      "propertyId": 22,
+      "length": 3,
+      "command": "down",
+      "rawValue": 38296
+    },
+    {
+      "from": 42,
+      "propertyId": 31,
+      "length": 3,
+      "command": "north",
+      "rawValue": 38324
+    },
+    {
+      "from": 47,
+      "propertyId": 21,
+      "length": 3,
+      "command": null,
+      "rawValue": 23724
+    },
+    {
+      "from": 47,
+      "propertyId": 29,
+      "length": 3,
+      "command": "east",
+      "rawValue": 23724
+    },
+    {
+      "from": 65,
+      "propertyId": 21,
+      "length": 3,
+      "command": null,
+      "rawValue": 29114
+    },
+    {
+      "from": 65,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 29114
+    },
+    {
+      "from": 66,
+      "propertyId": 25,
+      "length": 3,
+      "command": "west",
+      "rawValue": 30282
+    },
+    {
+      "from": 69,
+      "propertyId": 23,
+      "length": 5,
+      "command": "up",
+      "rawValue": 46447
+    },
+    {
+      "from": 78,
+      "propertyId": 25,
+      "length": 3,
+      "command": "west",
+      "rawValue": 30282
+    },
+    {
+      "from": 98,
+      "propertyId": 29,
+      "length": 2,
+      "command": "east",
+      "rawValue": 63717
+    },
+    {
+      "from": 99,
+      "propertyId": 22,
+      "length": 3,
+      "command": "down",
+      "rawValue": 53367
+    },
+    {
+      "from": 109,
+      "propertyId": 20,
+      "length": 3,
+      "command": null,
+      "rawValue": 51938
+    },
+    {
+      "from": 109,
+      "propertyId": 22,
+      "length": 3,
+      "command": "down",
+      "rawValue": 51938
+    },
+    {
+      "from": 110,
+      "propertyId": 21,
+      "length": 3,
+      "command": null,
+      "rawValue": 29114
+    },
+    {
+      "from": 110,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 29114
+    },
+    {
+      "from": 110,
+      "propertyId": 31,
+      "length": 2,
+      "command": "north",
+      "rawValue": 62891
+    },
+    {
+      "from": 121,
+      "propertyId": 21,
+      "length": 5,
+      "command": null,
+      "rawValue": 54612
+    },
+    {
+      "from": 121,
+      "propertyId": 27,
+      "length": 5,
+      "command": "south",
+      "rawValue": 54612
+    },
+    {
+      "from": 124,
+      "propertyId": 20,
+      "length": 3,
+      "command": null,
+      "rawValue": 29187
+    },
+    {
+      "from": 124,
+      "propertyId": 31,
+      "length": 3,
+      "command": "north",
+      "rawValue": 29187
+    },
+    {
+      "from": 137,
+      "propertyId": 21,
+      "length": 3,
+      "command": null,
+      "rawValue": 29114
+    },
+    {
+      "from": 137,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 29114
+    },
+    {
+      "from": 138,
+      "propertyId": 25,
+      "length": 3,
+      "command": "west",
+      "rawValue": 30282
+    },
+    {
+      "from": 138,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 30651
+    },
+    {
+      "from": 138,
+      "propertyId": 29,
+      "length": 2,
+      "command": "east",
+      "rawValue": 62904
+    },
+    {
+      "from": 142,
+      "propertyId": 24,
+      "length": 3,
+      "command": null,
+      "rawValue": 29237
+    },
+    {
+      "from": 171,
+      "propertyId": 22,
+      "length": 3,
+      "command": "down",
+      "rawValue": 24382
+    },
+    {
+      "from": 174,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 36431
+    },
+    {
+      "from": 174,
+      "propertyId": 31,
+      "length": 5,
+      "command": "north",
+      "rawValue": 63596
+    },
+    {
+      "from": 176,
+      "propertyId": 20,
+      "length": 3,
+      "command": null,
+      "rawValue": 22935
+    },
+    {
+      "from": 176,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 22935
+    },
+    {
+      "from": 180,
+      "propertyId": 31,
+      "length": 2,
+      "command": "north",
+      "rawValue": 61460
+    },
+    {
+      "from": 181,
+      "propertyId": 21,
+      "length": 5,
+      "command": null,
+      "rawValue": 17775
+    },
+    {
+      "from": 181,
+      "propertyId": 27,
+      "length": 5,
+      "command": "south",
+      "rawValue": 17775
+    },
+    {
+      "from": 185,
+      "propertyId": 25,
+      "length": 2,
+      "command": "west",
+      "rawValue": 63717
+    },
+    {
+      "from": 195,
+      "propertyId": 20,
+      "length": 5,
+      "command": null,
+      "rawValue": 56995
+    },
+    {
+      "from": 195,
+      "propertyId": 25,
+      "length": 5,
+      "command": "west",
+      "rawValue": 56995
+    },
+    {
+      "from": 206,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 40577
+    },
+    {
+      "from": 206,
+      "propertyId": 31,
+      "length": 3,
+      "command": "north",
+      "rawValue": 40577
+    },
+    {
+      "from": 208,
+      "propertyId": 27,
+      "length": 2,
+      "command": "south",
+      "rawValue": 62425
+    },
+    {
+      "from": 208,
+      "propertyId": 29,
+      "length": 3,
+      "command": "east",
+      "rawValue": 40577
+    },
+    {
+      "from": 208,
+      "propertyId": 31,
+      "length": 2,
+      "command": "north",
+      "rawValue": 62425
+    },
+    {
+      "from": 210,
+      "propertyId": 20,
+      "length": 3,
+      "command": null,
+      "rawValue": 40536
+    },
+    {
+      "from": 210,
+      "propertyId": 27,
+      "length": 3,
+      "command": "south",
+      "rawValue": 40536
+    },
+    {
+      "from": 210,
+      "propertyId": 29,
+      "length": 3,
+      "command": "east",
+      "rawValue": 40577
+    },
+    {
+      "from": 213,
+      "propertyId": 20,
+      "length": 5,
+      "command": null,
+      "rawValue": 31060
+    },
+    {
+      "from": 213,
+      "propertyId": 31,
+      "length": 5,
+      "command": "north",
+      "rawValue": 31060
+    },
+    {
+      "from": 214,
+      "propertyId": 27,
+      "length": 2,
+      "command": "south",
+      "rawValue": 62425
+    },
+    {
+      "from": 214,
+      "propertyId": 29,
+      "length": 3,
+      "command": "east",
+      "rawValue": 40577
+    },
+    {
+      "from": 214,
+      "propertyId": 31,
+      "length": 2,
+      "command": "north",
+      "rawValue": 62425
+    },
+    {
+      "from": 218,
+      "propertyId": 29,
+      "length": 3,
+      "command": "east",
+      "rawValue": 40577
+    },
+    {
+      "from": 221,
+      "propertyId": 25,
+      "length": 3,
+      "command": "west",
+      "rawValue": 30282
+    },
+    {
+      "from": 222,
+      "propertyId": 21,
+      "length": 3,
+      "command": null,
+      "rawValue": 51702
+    },
+    {
+      "from": 222,
+      "propertyId": 29,
+      "length": 3,
+      "command": "east",
+      "rawValue": 51702
+    },
+    {
+      "from": 227,
+      "propertyId": 23,
+      "length": 5,
+      "command": "up",
+      "rawValue": 2423
+    },
+    {
+      "from": 227,
+      "propertyId": 25,
+      "length": 3,
+      "command": "west",
+      "rawValue": 30282
+    },
+    {
+      "from": 227,
+      "propertyId": 29,
+      "length": 3,
+      "command": "east",
+      "rawValue": 30247
+    },
+    {
+      "from": 248,
+      "propertyId": 27,
+      "length": 5,
+      "command": "south",
+      "rawValue": 44652
+    },
+    {
+      "from": 249,
+      "propertyId": 23,
+      "length": 2,
+      "command": "up",
+      "rawValue": 62977
+    }
+  ]
+}

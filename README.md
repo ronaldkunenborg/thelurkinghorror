@@ -7,7 +7,7 @@ This project builds a browser-based Z-machine interpreter for Infocom's `The Lur
 The app currently provides:
 
 - a browser-based Z-machine v3 interpreter focused on `The Lurking Horror`
-- bundled-story startup with a splash screen and optional local story-file loading
+- bundled-story startup with a splash screen
 - a styled terminal UI with location artwork, a sidebar action bar, and responsive mobile layout
 - top-bar room, score, and moves display driven from VM status state
 - in-game sound effects support via `$SOUND`
@@ -85,6 +85,7 @@ Project source now lives under `app/`, while large story/source data assets are 
 Important runtime/source assets:
 
 - [`../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`](../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3) - target story file used for parser/VM development and validation.
+- [`../data/lurking.pdf`](../data/lurking.pdf) - canonical boxed-map PDF used as the reference layout for location-map reconciliation.
 - [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music used by the startup overlay.
 - [`src/assets/gfx/lurkinghorror/terminal_room.png`](src/assets/gfx/lurkinghorror/terminal_room.png) - current room-art asset used by the scene system.
 
@@ -107,3 +108,4 @@ Useful local checks:
 - [`docs/QUETZAL_LOCAL_STORAGE.md`](docs/QUETZAL_LOCAL_STORAGE.md) - IndexedDB-based Quetzal slot storage with `.sav` import/export workflow for serverless local save/load.
 - [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architecture decision record for serverless Quetzal persistence via IndexedDB plus file import/export.
 - [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter-specific quality-of-life features including `$SOUND`, `$GAMESOUND`, `$DEBUG`, save/load commands, HELP/login note extension, and sound debug output.
+- [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - first-pass Mermaid working map generated from the local game engine and intended to be reconciled against the canonical boxed-map PDF.

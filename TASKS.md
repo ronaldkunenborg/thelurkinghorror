@@ -3,7 +3,7 @@
 Completed tasks should be moved to ## Recent Completed Context.
 Completed tasks that are no longer needed for day-to-day context have been moved to `TASKS_archived.md`.
 Pending tasks are listed under ## Pending tasks with status [pending].
-Tasks under ## Refinements are optional with status [refine] and should only be done by user demand.
+Optional or not-yet-fleshed-out ideas should be turned into normal pending tasks once they are concrete enough to execute.
 Ideas for expansion and new capabilities go under ## Future tasks with status [future]
 
 ## Recent Completed Context
@@ -158,8 +158,36 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Moved volume controls into a gear-driven settings dialog in `src/index.html` and `src/modern.css`
    - Preserved existing handlers for load local file, save, load, and commands under the new icon UI
 
+25. [done] Create a location map for the documentation in Mermaid format, covering all reachable locations in The Lurking Horror.
+   - Added generated first-pass map document in `docs/LOCATION_MAP.md`, linked from `README.md`
+   - Added engine-backed discovery script `tools/discover_location_map.js` plus generated inventory in `tools/location-map-discovery.json`
+   - Verified room encoding through the story object model and current-room VM status snapshot before generating links
+   - Combined dynamic command validation from opening-state exploration with direct room-exit property decoding for the first-pass Mermaid graph
+   - Left routine-driven and puzzle-only access paths explicitly listed as unresolved follow-up work instead of hiding them
+   - Canonical boxed-map reference is now the local PDF `../data/lurking.pdf`; the Mermaid map should be treated as a reconciled working map against that source
+
 ## Pending Tasks
 
-## Refinements
+26. [pending] Reconcile `docs/LOCATION_MAP.md` with the canonical boxed map in `../data/lurking.pdf`.
+   - Use the PDF as the authoritative layout and grouping reference
+   - Use the game engine and discovery script as the verification layer when the PDF and generated map disagree
+   - Record concrete mismatches between the PDF and the generated map before changing the Mermaid graph
 
-R1. [pending] I would like a map of visited locations that shows the locations you visited. Apparently the original package did contain a map of the buildings - we should provide that if we could. The map should be shown while adventuring.
+27. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.
+   - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic
+   - Include destinations like `Basalt Bowl` where access is not a simple compass move
+   - Label these edges with the final meaningful access action, for example `read paper`, rather than every intermediate UI or parser step
+
+28. [pending] Add a direct reference path to the canonical boxed-map PDF in the documentation and decide how prominently it should be exposed.
+   - Link `../data/lurking.pdf` from `README.md` and/or `docs/LOCATION_MAP.md` in a way that makes its canonical status clear
+   - Decide whether the local PDF should be treated as reference-only or as part of the published documentation set
+
+29. [pending] Review the published location map for spoiler risk and decide whether to keep the full map, publish a reduced map, or publish a progressive/unlockable version.
+   - Assess whether hidden late-game areas and puzzle-only access routes are too revealing in the current Mermaid map
+   - Record the decision in the map doc or an ADR if the project chooses a filtered/public-facing version
+
+30. [pending] Add an in-game map of visited locations while adventuring.
+   - Track visited locations during play and show them in the live UI rather than only in documentation
+   - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
+   - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
+
