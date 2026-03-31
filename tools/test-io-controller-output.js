@@ -732,6 +732,97 @@ async function testSavesCommandListsSlots() {
   );
 }
 
+async function testStorySaveOpcodeStoresSuccessfulContinuation() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.currentRoomName = 'Terminal Room';
+  let completed = null;
+  let runCount = 0;
+  controller.vm = {
+    run() {
+      runCount += 1;
+      return runCount === 1
+        ? { haltReason: 'save', quit: false }
+        : { haltReason: 'input', quit: false };
+    },
+    serializePendingSaveState() {
+      return new Uint8Array([4, 5, 6]);
+    },
+    completePendingSave(success) {
+      completed = success;
+    },
+    getStatusSnapshot() {
+      return { roomName: 'Terminal Room', score: 12, moves: 34 };
+    },
+  };
+
+  controller.runVm();
+  await flushAsyncWork();
+
+  const record = await storage.getSave('lurking-horror-r219-870912', 0);
+  assert.ok(record, 'story save opcode should persist the default slot');
+  assert.deepStrictEqual(Array.from(new Uint8Array(record.quetzalData)), [4, 5, 6], 'story save should persist the VM-provided continuation snapshot');
+  assert.strictEqual(completed, true, 'story save should resume the VM with a successful save result');
+  assert.ok(
+    ui.statuses.some(([left, right]) => left === 'Story save' && right === 'Saved slot 0'),
+    'story save should update the status bar when the slot is written'
+  );
+}
+
+async function testStoryRestoreOpcodeLoadsDefaultSlot() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+  });
+  controller.storyMeta = createStoryMeta();
+  let restored = null;
+  let restoreFailureResult = null;
+  let runCount = 0;
+  controller.vm = {
+    run() {
+      runCount += 1;
+      return runCount === 1
+        ? { haltReason: 'restore', quit: false }
+        : { haltReason: 'input', quit: false };
+    },
+    restoreSaveState(bytes) {
+      restored = Array.from(new Uint8Array(bytes));
+    },
+    completePendingRestore(success) {
+      restoreFailureResult = success;
+    },
+    getStatusSnapshot() {
+      return { roomName: 'Restored Room', score: 99, moves: 100 };
+    },
+  };
+
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 0,
+    label: 'Slot 0 - Terminal Room',
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([8, 7, 6]),
+  });
+
+  controller.runVm();
+  await flushAsyncWork();
+
+  assert.deepStrictEqual(restored, [8, 7, 6], 'story restore should load the default slot into the VM');
+  assert.strictEqual(restoreFailureResult, null, 'successful story restore should not take the failure continuation');
+  assert.deepStrictEqual(
+    ui.topbarMeta.slice(-1)[0],
+    ['Restored Room', '99', '100'],
+    'story restore should refresh room, score, and moves after restore'
+  );
+}
+
 async function run() {
   testOutputBuffering();
   testFlushAtRunBoundary();
@@ -755,6 +846,8 @@ async function run() {
   await testSaveCommandStoresVmSnapshot();
   await testLoadCommandRestoresVmSnapshot();
   await testSavesCommandListsSlots();
+  await testStorySaveOpcodeStoresSuccessfulContinuation();
+  await testStoryRestoreOpcodeLoadsDefaultSlot();
   console.log('I/O controller output tests passed.');
 }
 

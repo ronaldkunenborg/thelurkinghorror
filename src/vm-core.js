@@ -41,7 +41,7 @@ function write32(memory, address, value) {
 }
 
 const STORE_OPCODES = new Set([8, 9, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 129, 130, 131, 132, 136, 142, 143, 224, 231]);
-const BRANCH_OPCODES = new Set([1, 2, 3, 4, 5, 6, 7, 10, 128, 129, 130]);
+const BRANCH_OPCODES = new Set([1, 2, 3, 4, 5, 6, 7, 10, 128, 129, 130, 181, 182]);
 const PRINTER_OPCODES = new Set([178, 179]);
 
 class Z3VM {
@@ -77,6 +77,8 @@ class Z3VM {
     this.callStack = [];
     this.currentFrame = this._makeRootFrame();
     this.pendingInput = null;
+    this.pendingSave = null;
+    this.pendingRestore = null;
     this._dictionaryMeta = null;
   }
 
@@ -114,6 +116,8 @@ class Z3VM {
     this.callStack = [];
     this.currentFrame = this._makeRootFrame();
     this.pendingInput = null;
+    this.pendingSave = null;
+    this.pendingRestore = null;
     this.pc = this.header.initialPc;
   }
 
@@ -166,9 +170,9 @@ class Z3VM {
     };
   }
 
-  serializeSaveState() {
+  _serializeSnapshot(snapshot) {
     const encoder = new TextEncoder();
-    const payloadBytes = encoder.encode(JSON.stringify(this.createSaveState()));
+    const payloadBytes = encoder.encode(JSON.stringify(snapshot));
     const out = new Uint8Array(8 + payloadBytes.length);
     out[0] = 0x54; // T
     out[1] = 0x4c; // L
@@ -178,6 +182,101 @@ class Z3VM {
     write16(out, 6, payloadBytes.length);
     out.set(payloadBytes, 8);
     return out;
+  }
+
+  serializeSaveState() {
+    return this._serializeSnapshot(this.createSaveState());
+  }
+
+  _capturePendingBranch(inst) {
+    return {
+      nextPc: inst && Number.isFinite(inst.nextPc) ? (inst.nextPc >>> 0) : (this.pc >>> 0),
+      branch: inst && inst.branch
+        ? {
+            ifTrue: !!inst.branch.ifTrue,
+            offset: inst.branch.offset | 0,
+          }
+        : null,
+    };
+  }
+
+  _applyPendingBranchState(target, pendingBranch, condition) {
+    if (!pendingBranch || !pendingBranch.branch) {
+      return;
+    }
+    if (!!condition !== !!pendingBranch.branch.ifTrue) {
+      return;
+    }
+
+    const branchOffset = pendingBranch.branch.offset | 0;
+    if (branchOffset === 0 || branchOffset === 1) {
+      this._retFromSnapshot(target, branchOffset);
+      return;
+    }
+    target.pc = (pendingBranch.nextPc + branchOffset - 2) >>> 0;
+  }
+
+  _retFromSnapshot(snapshot, value) {
+    const result = u16(value);
+    const currentFrame = snapshot.currentFrame || this._captureFrame(this._makeRootFrame());
+    const callStack = Array.isArray(snapshot.callStack) ? snapshot.callStack : [];
+
+    if (callStack.length === 0) {
+      snapshot.halted = true;
+      snapshot.haltReason = 'return';
+      snapshot.pc = currentFrame.returnPc >>> 0;
+      return result;
+    }
+
+    const parentFrame = callStack.pop();
+    snapshot.currentFrame = parentFrame;
+    snapshot.callStack = callStack;
+    snapshot.pc = currentFrame.returnPc >>> 0;
+    if (Number.isFinite(currentFrame.storeVar) && currentFrame.storeVar >= 0) {
+      this._setVariableOnSnapshot(snapshot, currentFrame.storeVar, result);
+    }
+    snapshot.halted = false;
+    snapshot.haltReason = null;
+    return result;
+  }
+
+  _setVariableOnSnapshot(snapshot, varnum, value) {
+    const result = u16(value);
+    if (varnum === 0) {
+      if (!Array.isArray(snapshot.evalStack)) {
+        snapshot.evalStack = [];
+      }
+      snapshot.evalStack.push(result);
+      return;
+    }
+    if (varnum >= 1 && varnum <= 15) {
+      if (!snapshot.currentFrame || !Array.isArray(snapshot.currentFrame.locals)) {
+        snapshot.currentFrame = snapshot.currentFrame || this._captureFrame(this._makeRootFrame());
+        snapshot.currentFrame.locals = Array.isArray(snapshot.currentFrame.locals)
+          ? snapshot.currentFrame.locals
+          : Array.from(this._makeRootFrame().locals);
+      }
+      snapshot.currentFrame.locals[varnum - 1] = result;
+      return;
+    }
+    const globalOffset = this.globalsAddress + (varnum - 16) * 2;
+    const index = globalOffset >>> 0;
+    if (!Array.isArray(snapshot.dynamicMemory) || index + 1 >= snapshot.dynamicMemory.length) {
+      throw new Error('Snapshot write outside dynamic memory at 0x' + globalOffset.toString(16));
+    }
+    snapshot.dynamicMemory[index] = (result >> 8) & 0xff;
+    snapshot.dynamicMemory[index + 1] = result & 0xff;
+  }
+
+  serializePendingSaveState() {
+    if (!this.pendingSave) {
+      throw new Error('No pending save opcode');
+    }
+    const snapshot = this.createSaveState();
+    snapshot.halted = false;
+    snapshot.haltReason = null;
+    this._applyPendingBranchState(snapshot, this.pendingSave, true);
+    return this._serializeSnapshot(snapshot);
   }
 
   restoreSaveState(bytes) {
@@ -225,7 +324,31 @@ class Z3VM {
       ? snapshot.callStack.map(frame => this._restoreFrame(frame))
       : [];
     this.currentFrame = this._restoreFrame(snapshot.currentFrame);
+    this.pendingSave = null;
+    this.pendingRestore = null;
     this._dictionaryMeta = null;
+  }
+
+  completePendingSave(success) {
+    if (!this.pendingSave) {
+      throw new Error('No pending save opcode');
+    }
+    const pendingSave = this.pendingSave;
+    this.pendingSave = null;
+    this.halted = false;
+    this.haltReason = null;
+    this._applyPendingBranchState(this, pendingSave, !!success);
+  }
+
+  completePendingRestore(success) {
+    if (!this.pendingRestore) {
+      throw new Error('No pending restore opcode');
+    }
+    const pendingRestore = this.pendingRestore;
+    this.pendingRestore = null;
+    this.halted = false;
+    this.haltReason = null;
+    this._applyPendingBranchState(this, pendingRestore, !!success);
   }
 
   read8(address) {
@@ -1068,6 +1191,18 @@ class Z3VM {
         this._retFromRoutine(1);
         return;
       case 180:
+        return;
+      case 181:
+        this.pendingSave = this._capturePendingBranch(inst);
+        this.pendingRestore = null;
+        this.halted = true;
+        this.haltReason = 'save';
+        return;
+      case 182:
+        this.pendingRestore = this._capturePendingBranch(inst);
+        this.pendingSave = null;
+        this.halted = true;
+        this.haltReason = 'restore';
         return;
       case 183:
         this._restartStory();

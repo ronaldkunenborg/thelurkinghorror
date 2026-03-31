@@ -146,12 +146,13 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Extended `src/io.js` with separate SFX/music volume multipliers and active-audio refresh logic
    - Added regression coverage for SFX/music volume scaling in `tools/test-io-controller-output.js`
 
-## Pending Tasks
+21. [done] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
+   - Added VM-level `save`/`restore` opcode pausing and branch-aware continuation handling in `src/vm-core.js`
+   - Added controller-side async slot persistence for story-level save/restore using the existing Quetzal storage path in `src/io.js`
+   - Story `save`/`restore` now uses the default local slot `0`, while compatibility checks remain enforced before restore
+   - Added VM and controller regression coverage in `tools/test-vm-core.js` and `tools/test-io-controller-output.js`
 
-21. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
-   - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`
-   - Story-level `save`/`restore` opcodes are still pending; current save/load support is interpreter-level commands and UI
-   - Keep compatibility checks (story id/release/serial/checksum) enforced before restore
+## Pending Tasks
 
 24. [pending] Replace the buttons with icons: a gear icon that opens a dialog where you can set volume for game music and sound effects, load/save icons where you can load and save the game (wired to the text inputs for that). The commands button should have a "?"-type icon. I probably have to create an icon set but you can generate a number of placeholders first. The style is scratch art, white lines on black wax paper.
 

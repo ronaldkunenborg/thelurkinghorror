@@ -352,6 +352,77 @@ function testSaveStateRoundTripRestoresVmState() {
   assert.strictEqual(vm.currentFrame.locals[0], 0x2222, 'restore should restore current frame locals');
 }
 
+function testSaveOpcodeSerializesSuccessfulBranchContinuation() {
+  const vm = createVm([0xba], { size: 0x500 });
+  vm.write8(0x80, 0x7a);
+  vm.pc = 0x4567;
+  vm.executeInstruction({
+    opcode: 181,
+    operands: [],
+    branch: { ifTrue: true, offset: 4 },
+    nextPc: 0x4569,
+    offset: 0x4567,
+  });
+
+  assert.strictEqual(vm.halted, true, 'save opcode should halt the VM while storage is pending');
+  assert.strictEqual(vm.haltReason, 'save', 'save opcode should expose save halt reason');
+
+  const saved = vm.serializePendingSaveState();
+  const restoredVm = createVm([0xba], { size: 0x500 });
+  restoredVm.restoreSaveState(saved);
+
+  assert.strictEqual(restoredVm.pc, 0x456b, 'serialized save should resume at the successful save branch target');
+  assert.strictEqual(restoredVm.halted, false, 'serialized save should not preserve transient save halt state');
+  assert.strictEqual(restoredVm.haltReason, null, 'serialized save should clear transient save halt reason');
+  assert.strictEqual(restoredVm.read8(0x80), 0x7a, 'serialized save should preserve dynamic memory');
+}
+
+function testSaveOpcodeCompletionAppliesSuccessAndFailureBranches() {
+  const successVm = createVm([0xba]);
+  successVm.executeInstruction({
+    opcode: 181,
+    operands: [],
+    branch: { ifTrue: true, offset: 6 },
+    nextPc: 0x90,
+    offset: 0x80,
+  });
+  successVm.completePendingSave(true);
+  assert.strictEqual(successVm.halted, false, 'successful save completion should resume execution');
+  assert.strictEqual(successVm.haltReason, null, 'successful save completion should clear halt reason');
+  assert.strictEqual(successVm.pc, 0x94, 'successful save completion should branch true');
+
+  const failureVm = createVm([0xba]);
+  failureVm.executeInstruction({
+    opcode: 181,
+    operands: [],
+    branch: { ifTrue: true, offset: 6 },
+    nextPc: 0x90,
+    offset: 0x80,
+  });
+  failureVm.completePendingSave(false);
+  assert.strictEqual(failureVm.pc, 0x90, 'failed save completion should fall through without branching');
+}
+
+function testRestoreOpcodeCompletionAppliesFailureBranch() {
+  const vm = createVm([0xba]);
+  vm.executeInstruction({
+    opcode: 182,
+    operands: [],
+    branch: { ifTrue: true, offset: 5 },
+    nextPc: 0xa0,
+    offset: 0x90,
+  });
+
+  assert.strictEqual(vm.halted, true, 'restore opcode should halt the VM while storage is pending');
+  assert.strictEqual(vm.haltReason, 'restore', 'restore opcode should expose restore halt reason');
+
+  vm.completePendingRestore(false);
+
+  assert.strictEqual(vm.halted, false, 'failed restore should resume execution');
+  assert.strictEqual(vm.haltReason, null, 'failed restore should clear halt reason');
+  assert.strictEqual(vm.pc, 0xa0, 'failed restore should fall through without branching');
+}
+
 function testUnknownOpcodeEmitsDebugEvent() {
   const vm = createVm([0xba]);
   let unknown = null;
@@ -396,6 +467,9 @@ function run() {
   testRestartRestoresDynamicMemoryAndPc();
   testStatusSnapshotExposesRoomScoreAndMoves();
   testSaveStateRoundTripRestoresVmState();
+  testSaveOpcodeSerializesSuccessfulBranchContinuation();
+  testSaveOpcodeCompletionAppliesSuccessAndFailureBranches();
+  testRestoreOpcodeCompletionAppliesFailureBranch();
   testUnknownOpcodeEmitsDebugEvent();
   console.log('VM core tests passed.');
 }

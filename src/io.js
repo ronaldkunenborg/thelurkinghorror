@@ -131,7 +131,7 @@ class GameIoController {
     return this.loadStoryFromArrayBuffer(bundledStory.getArrayBuffer());
   }
 
-  runVm() {
+  async runVm() {
     if (!this.vm) {
       return;
     }
@@ -150,6 +150,14 @@ class GameIoController {
     if (result.haltReason === 'input') {
       this.ui.setStatus('Awaiting command', 'Input ready');
       this.ui.focusInput();
+      return;
+    }
+    if (result.haltReason === 'save') {
+      await this._handleVmSaveOpcode();
+      return;
+    }
+    if (result.haltReason === 'restore') {
+      await this._handleVmRestoreOpcode();
       return;
     }
     if (result.haltReason === 'quit' || result.quit) {
@@ -408,6 +416,68 @@ class GameIoController {
   _buildSaveLabel(slot) {
     const roomName = this.currentRoomName || 'Unknown room';
     return 'Slot ' + slot + ' - ' + roomName;
+  }
+
+  async _handleVmSaveOpcode() {
+    if (!this.vm || typeof this.vm.completePendingSave !== 'function') {
+      this.ui.appendOutput('Story save is not available in this VM build.', 'error');
+      this.ui.setStatus('Story save', 'Unavailable');
+      return;
+    }
+    if (!this._ensureSaveAvailable('Story save')) {
+      this.vm.completePendingSave(false);
+      this.runVm();
+      return;
+    }
+    try {
+      const compat = this._getStoryCompatibilityMeta();
+      const slot = DEFAULT_SAVE_SLOT;
+      await this.saveStorage.putSave({
+        storyId: compat.storyId,
+        slot,
+        label: this._buildSaveLabel(slot),
+        serial: compat.serial,
+        release: compat.release,
+        checksum: compat.checksum,
+        quetzalData: this.vm.serializePendingSaveState(),
+      });
+      this.vm.completePendingSave(true);
+      this._syncStatusDisplays();
+      this.ui.setStatus('Story save', 'Saved slot ' + slot);
+    } catch (error) {
+      this.ui.appendOutput('Story save failed: ' + error.message, 'error');
+      this.ui.setStatus('Story save', 'Save failed');
+      this.vm.completePendingSave(false);
+    }
+    this.runVm();
+  }
+
+  async _handleVmRestoreOpcode() {
+    if (!this.vm || typeof this.vm.completePendingRestore !== 'function') {
+      this.ui.appendOutput('Story restore is not available in this VM build.', 'error');
+      this.ui.setStatus('Story restore', 'Unavailable');
+      return;
+    }
+    if (!this._ensureSaveAvailable('Story restore')) {
+      this.vm.completePendingRestore(false);
+      this.runVm();
+      return;
+    }
+    const slot = DEFAULT_SAVE_SLOT;
+    try {
+      const compat = this._getStoryCompatibilityMeta();
+      const record = await this.saveStorage.getSave(compat.storyId, slot);
+      this._assertCompatibleSaveRecord(record);
+      this._stopAllSounds();
+      this.vm.restoreSaveState(record.quetzalData);
+      this._syncStatusDisplays();
+      this.ui.setStatus('Story restore', 'Loaded slot ' + slot);
+    } catch (error) {
+      this.ui.appendOutput('Story restore failed: ' + error.message, 'error');
+      this.ui.setStatus('Story restore', 'Restore failed');
+      this.vm.completePendingRestore(false);
+    }
+    this.runVm();
   }
 
   async _saveToSlot(slot) {
