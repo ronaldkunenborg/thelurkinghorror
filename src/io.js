@@ -41,6 +41,8 @@ class GameIoController {
     this.debugEnabled = false;
     this.sfxEnabled = true;
     this.gameMusicEnabled = true;
+    this.sfxVolume = 1;
+    this.gameMusicVolume = 1;
     this.soundCatalog = Object.assign({}, DEFAULT_SOUND_CATALOG, opts.soundCatalog || {});
     this.onSoundEvent = typeof opts.onSoundEvent === 'function' ? opts.onSoundEvent : function () {};
     this.onRoomChanged = typeof opts.onRoomChanged === 'function' ? opts.onRoomChanged : function () {};
@@ -326,6 +328,16 @@ class GameIoController {
       );
       this.ui.setStatus('Interpreter command', this.gameMusicEnabled ? 'Music on' : 'Music off');
       return true;
+  }
+
+  setSoundEffectsVolume(value) {
+    this.sfxVolume = this._clampVolume(value);
+    this._refreshActiveSoundVolumes(SOUND_CLASS_SFX);
+  }
+
+  setGameMusicVolume(value) {
+    this.gameMusicVolume = this._clampVolume(value);
+    this._refreshActiveSoundVolumes(SOUND_CLASS_MUSIC);
   }
 
   _createDefaultSaveStorage() {
@@ -788,6 +800,14 @@ class GameIoController {
     return Math.max(0, Math.min(1, lowByte / 255));
   }
 
+  _clampVolume(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return 1;
+    }
+    return Math.max(0, Math.min(1, numeric));
+  }
+
   _resolveSoundClass(soundDef) {
     if (!soundDef) {
       return SOUND_CLASS_SFX;
@@ -807,6 +827,13 @@ class GameIoController {
       return this.gameMusicEnabled;
     }
     return this.sfxEnabled;
+  }
+
+  _volumeMultiplierForSoundClass(soundClass) {
+    if (soundClass === SOUND_CLASS_MUSIC) {
+      return this.gameMusicVolume;
+    }
+    return this.sfxVolume;
   }
 
   _resolveLoopSetting(soundDef) {
@@ -849,12 +876,14 @@ class GameIoController {
   }
 
   _applySoundParams(audio, soundDef, gain) {
+    const soundClass = this._resolveSoundClass(soundDef);
     const shouldLoop = this._resolveLoopSetting(soundDef);
     if (typeof audio.loop === 'boolean' || typeof audio.loop === 'undefined') {
       audio.loop = shouldLoop;
     }
-    if (typeof audio.volume === 'number' && gain !== null && gain !== undefined) {
-      audio.volume = Math.max(0, Math.min(1, gain));
+    if (typeof audio.volume === 'number') {
+      const baseGain = gain === null || gain === undefined ? 1 : Math.max(0, Math.min(1, gain));
+      audio.volume = Math.max(0, Math.min(1, baseGain * this._volumeMultiplierForSoundClass(soundClass)));
     }
   }
 
@@ -957,6 +986,21 @@ class GameIoController {
         }
       }
       this._stopSound(number);
+    }
+  }
+
+  _refreshActiveSoundVolumes(soundClass) {
+    const activeIds = Array.from(this.activeSounds.keys());
+    for (const number of activeIds) {
+      const soundDef = this.soundCatalog[number];
+      if (this._resolveSoundClass(soundDef) !== soundClass) {
+        continue;
+      }
+      const audio = this.activeSounds.get(number);
+      if (!audio || typeof audio.volume !== 'number') {
+        continue;
+      }
+      this._applySoundParams(audio, soundDef, null);
     }
   }
 }

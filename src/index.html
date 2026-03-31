@@ -38,6 +38,14 @@
             <button id="save-slot" class="btn" type="button">Save</button>
             <button id="load-slot" class="btn" type="button">Load</button>
             <button id="commands-button" class="btn" type="button">Commands</button>
+            <label class="volume-control" for="music-volume">
+              <span class="volume-label">Game Music</span>
+              <input id="music-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+            </label>
+            <label class="volume-control" for="sfx-volume">
+              <span class="volume-label">Sound Effects</span>
+              <input id="sfx-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+            </label>
           </aside>
 
           <div class="terminal-stack">
@@ -196,6 +204,8 @@
         const sceneLayerB = document.getElementById('scene-layer-b');
         const sceneLayers = [sceneLayerA, sceneLayerB];
         const commandSheetEl = document.getElementById('command-sheet');
+        const musicVolumeEl = document.getElementById('music-volume');
+        const sfxVolumeEl = document.getElementById('sfx-volume');
         const splashMusic = new Audio('./assets/audio/splash-horror-whirlguy.mp3');
         const splashMusicBaseVolume = 0.36;
         splashMusic.loop = false;
@@ -361,7 +371,7 @@
             return;
           }
           cancelSplashMusicFade(true);
-          splashMusic.volume = splashMusicBaseVolume;
+          splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
           if (!splashMusic.paused) {
             splashMusicStarted = true;
             return;
@@ -385,14 +395,14 @@
         function cancelSplashMusicFade(restoreVolume) {
           if (!splashMusicFadeFrame) {
             if (restoreVolume) {
-              splashMusic.volume = splashMusicBaseVolume;
+              splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
             }
             return;
           }
           cancelAnimationFrame(splashMusicFadeFrame);
           splashMusicFadeFrame = 0;
           if (restoreVolume) {
-            splashMusic.volume = splashMusicBaseVolume;
+            splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
           }
         }
 
@@ -419,7 +429,7 @@
             if (resetToStart && typeof splashMusic.currentTime === 'number') {
               splashMusic.currentTime = 0;
             }
-            splashMusic.volume = startVolume;
+            splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
             splashMusicFadeFrame = 0;
             splashMusicEnded = markEnded;
           }
@@ -482,6 +492,15 @@
         document.getElementById('splash-load-local').addEventListener('click', openLocalPicker);
         document.getElementById('save-slot').addEventListener('click', () => controller.submitCommand('$SAVE'));
         document.getElementById('load-slot').addEventListener('click', () => controller.submitCommand('$LOAD'));
+        musicVolumeEl.addEventListener('input', () => {
+          const volume = Number(musicVolumeEl.value) / 100;
+          controller.setGameMusicVolume(volume);
+          splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+        });
+        sfxVolumeEl.addEventListener('input', () => {
+          const volume = Number(sfxVolumeEl.value) / 100;
+          controller.setSoundEffectsVolume(volume);
+        });
 
         function openCommandSheet() {
           commandSheetEl.hidden = false;

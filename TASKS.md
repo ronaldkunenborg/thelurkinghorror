@@ -140,14 +140,18 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added sidebar `Save`, `Load`, and `Commands` buttons plus a command overview sheet in `src/index.html`
    - Added command-paste support in `src/ui-framework.js` and regression coverage in `tools/test-vm-core.js` and `tools/test-io-controller-output.js`
 
+23. [done] Add a horizontal volume slider for the game music and another for the sound effects to the sidebar buttons.
+   - Added sidebar range sliders for game music and sound effects in `src/index.html`
+   - Added slider styling in `src/modern.css`
+   - Extended `src/io.js` with separate SFX/music volume multipliers and active-audio refresh logic
+   - Added regression coverage for SFX/music volume scaling in `tools/test-io-controller-output.js`
+
 ## Pending Tasks
 
 21. [pending] Wire VM save/restore opcodes to Quetzal local persistence and UI controls
    - Connect VM Quetzal byte generation/restore to `src/quetzal-storage.js`
    - Story-level `save`/`restore` opcodes are still pending; current save/load support is interpreter-level commands and UI
    - Keep compatibility checks (story id/release/serial/checksum) enforced before restore
-
-23. [pending] Add a horizontal volume slider for the game music and another for the sound effects to the sidebar buttons.
 
 24. [pending] Replace the buttons with icons: a gear icon that opens a dialog where you can set volume for game music and sound effects, load/save icons where you can load and save the game (wired to the text inputs for that). The commands button should have a "?"-type icon. I probably have to create an icon set but you can generate a number of placeholders first. The style is scratch art, white lines on black wax paper.
 

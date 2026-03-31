@@ -322,6 +322,68 @@ function testSoundToggleDoesNotDisableMusicClassPlayback() {
   assert.strictEqual(fakeAudio.playCalls, 1, 'turning sound effects off should not block music-class playback');
 }
 
+function testSfxVolumeMultiplierAffectsPlaybackVolume() {
+  const ui = createUi();
+  const fakeAudio = {
+    loop: false,
+    paused: true,
+    currentTime: 0,
+    volume: 1,
+    addEventListener() {},
+    play() {
+      this.paused = false;
+      return Promise.resolve();
+    },
+    pause() {
+      this.paused = true;
+    },
+  };
+  const controller = new GameIoController(ui, {
+    soundCatalog: {
+      7: { src: './sfx.wav', class: 'sfx' },
+    },
+    audioFactory() {
+      return fakeAudio;
+    },
+  });
+
+  controller.setSoundEffectsVolume(0.25);
+  controller._handleVmSoundEffect({ number: 7, effect: 2 });
+
+  assert.strictEqual(fakeAudio.volume, 0.25, 'SFX volume slider should scale active sound playback volume');
+}
+
+function testMusicVolumeMultiplierAffectsPlaybackVolume() {
+  const ui = createUi();
+  const fakeAudio = {
+    loop: false,
+    paused: true,
+    currentTime: 0,
+    volume: 1,
+    addEventListener() {},
+    play() {
+      this.paused = false;
+      return Promise.resolve();
+    },
+    pause() {
+      this.paused = true;
+    },
+  };
+  const controller = new GameIoController(ui, {
+    soundCatalog: {
+      1: { src: './music.mp3', class: 'music' },
+    },
+    audioFactory() {
+      return fakeAudio;
+    },
+  });
+
+  controller.setGameMusicVolume(0.4);
+  controller._handleVmSoundEffect({ number: 1, effect: 2 });
+
+  assert.strictEqual(fakeAudio.volume, 0.4, 'music volume slider should scale active music playback volume');
+}
+
 function testMissingMappedSoundWarnsOnce() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -681,6 +743,8 @@ async function run() {
   testMappedSoundPlaybackRespectsPreference();
   testGameMusicToggleDoesNotDisableSoundEffects();
   testSoundToggleDoesNotDisableMusicClassPlayback();
+  testSfxVolumeMultiplierAffectsPlaybackVolume();
+  testMusicVolumeMultiplierAffectsPlaybackVolume();
   testMissingMappedSoundWarnsOnce();
   testVmStatusSnapshotUpdatesTopbarAndRoomChanges();
   testStartingNewSampleStopsPreviousSample();
