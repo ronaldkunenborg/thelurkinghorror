@@ -241,8 +241,23 @@
         });
 
         let activeSceneIndex = 0;
+        const ROOM_ART_BY_ID = {
+          21: './assets/gfx/lurkinghorror/at_platform_21.jpg',
+          66: './assets/gfx/lurkinghorror/steam_tunnel_66.jpg',
+          78: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          138: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          221: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          227: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+        };
         const ROOM_ART = {
-          'terminal room': './assets/gfx/lurkinghorror/terminal_room.png',
+          'terminal room': './assets/gfx/lurkinghorror/terminal_room_176.jpg',
+          'infinite corridor': './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          'second floor': './assets/gfx/lurkinghorror/second_floor_137.jpg',
+          'kitchen': './assets/gfx/lurkinghorror/kitchen_33.jpg',
+          'smith street': './assets/gfx/lurkinghorror/smith_street_185.jpg',
+          'great dome': './assets/gfx/lurkinghorror/great_dome_249.jpg',
+          'place': './assets/gfx/lurkinghorror/place_dream_threshold_152.jpg',
+          'basalt bowl': './assets/gfx/lurkinghorror/basalt_bowl_134.jpg',
         };
         let currentRoomArt = '';
 
@@ -281,7 +296,10 @@
           return Array.from(new Set(normalized));
         }
 
-        function resolveRoomArt(roomName) {
+        function resolveRoomArt(roomName, roomObjectId) {
+          if (roomObjectId && ROOM_ART_BY_ID[roomObjectId]) {
+            return ROOM_ART_BY_ID[roomObjectId];
+          }
           const candidates = roomKeyCandidates(roomName);
           for (const key of candidates) {
             if (ROOM_ART[key]) {
@@ -302,8 +320,8 @@
           return ((Math.random() * 2 - 1) * 10).toFixed(2);
         }
 
-        function setRoomScene(roomName) {
-          const art = resolveRoomArt(roomName);
+        function setRoomScene(roomName, roomObjectId) {
+          const art = resolveRoomArt(roomName, roomObjectId);
           if (art === currentRoomArt) {
             return;
           }
@@ -350,8 +368,8 @@
             }
             startSplashMusic();
           },
-          onRoomChanged: roomName => {
-            setRoomScene(roomName);
+          onRoomChanged: (roomName, roomObjectId) => {
+            setRoomScene(roomName, roomObjectId);
           },
         });
         ui.appendOutput('Booting interpreter shell...', 'system');

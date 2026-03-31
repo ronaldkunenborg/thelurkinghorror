@@ -37,6 +37,7 @@ class GameIoController {
     this.storyMeta = null;
     this.outputBuffer = '';
     this.currentRoomName = '';
+    this.currentRoomId = 0;
     this.previousVmLine = '';
     this.debugEnabled = false;
     this.sfxEnabled = true;
@@ -87,8 +88,9 @@ class GameIoController {
     this.storyMeta = parsed;
     this.outputBuffer = '';
     this.currentRoomName = '';
+    this.currentRoomId = 0;
     this.previousVmLine = '';
-    this.onRoomChanged('');
+    this.onRoomChanged('', 0);
     this.vm = new window.Z3VM({
       memory: parsed.memory.bytes,
       header: {
@@ -832,10 +834,12 @@ class GameIoController {
       return;
     }
     const snapshot = this.vm.getStatusSnapshot();
+    const roomId = snapshot && Number.isFinite(snapshot.roomObjectId) ? snapshot.roomObjectId : 0;
     const roomName = snapshot && snapshot.roomName ? snapshot.roomName : '';
-    if (roomName && roomName !== this.currentRoomName) {
+    if (roomId !== this.currentRoomId || roomName !== this.currentRoomName) {
+      this.currentRoomId = roomId;
       this.currentRoomName = roomName;
-      this.onRoomChanged(this.currentRoomName);
+      this.onRoomChanged(this.currentRoomName, this.currentRoomId);
     }
     this.ui.setTopbarMeta(
       roomName || '',

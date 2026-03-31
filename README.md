@@ -89,7 +89,7 @@ Important runtime/source assets:
 - [`../data/booklet-page3.png`](../data/booklet-page3.png) - extracted upper/surface boxed-map page used for map reconciliation.
 - [`../data/booklet-page4.png`](../data/booklet-page4.png) - extracted lower/underground boxed-map page used for map reconciliation.
 - [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music used by the startup overlay.
-- [`src/assets/gfx/lurkinghorror/terminal_room.png`](src/assets/gfx/lurkinghorror/terminal_room.png) - current room-art asset used by the scene system.
+- [`src/assets/gfx/lurkinghorror/`](src/assets/gfx/lurkinghorror/) - room-art asset folder used by the scene system (including `terminal_room_176.jpg`, `second_floor_137.jpg`, `kitchen_33.jpg`, and others).
 
 ## Testing
 
@@ -111,3 +111,4 @@ Useful local checks:
 - [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architecture decision record for serverless Quetzal persistence via IndexedDB plus file import/export.
 - [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter-specific quality-of-life features including `$SOUND`, `$GAMESOUND`, `$DEBUG`, save/load commands, HELP/login note extension, and sound debug output.
 - [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - spoiler-heavy technical/reference map reconciling the live engine with the canonical boxed-map PDF/booklet pages.
+- [`docs/LOCATION_IMAGE_BRIEFS.md`](docs/LOCATION_IMAGE_BRIEFS.md) - notable-location title and description briefs intended for image generation workflows.

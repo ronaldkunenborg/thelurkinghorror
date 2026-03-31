@@ -203,9 +203,12 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added atmospheric gradients, framing, and subtle artwork drift animation while preserving existing startup flow and music behavior
    - Removed the splash note text for a cleaner and more focused opening presentation
 
-## Pending Tasks
+34. [done] Create a list of notable locations with decent descriptive text, with title and description, so we can make images for those.
+   - Added `docs/LOCATION_IMAGE_BRIEFS.md` with 20 notable locations, each with an image-focused title and descriptive visual brief
+   - Grouped repeated-location families (for example `Infinite Corridor`, `Steam Tunnel`, and `Wet Tunnel`) into coherent shared art directions
+   - Indexed the new brief document in `README.md` under the documentation list
 
-34. [pending] Create a list of notable locations with decent descriptive text, with title and description, so we can make images for those.
+## Pending Tasks
 
 35. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic
