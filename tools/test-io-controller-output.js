@@ -219,6 +219,34 @@ function testGameSoundAliasWorksWithoutVmInput() {
   assert.deepStrictEqual(musicStates, [false], '$GAMESOUND should notify music preference changes');
 }
 
+function testMapCommandOpensUniversityMap() {
+  const ui = createUi();
+  const mapRequests = [];
+  const controller = new GameIoController(ui, {
+    onMapRequested() {
+      mapRequests.push('open');
+    },
+  });
+  controller.vm = { haltReason: null };
+
+  controller.submitCommand('$MAP');
+
+  assert.deepStrictEqual(
+    mapRequests,
+    ['open'],
+    '$MAP should invoke map-open callback exactly once'
+  );
+  assert.ok(
+    ui.lines.includes('Opened the spoiler-safe university overview map.'),
+    '$MAP should print confirmation output'
+  );
+  assert.deepStrictEqual(
+    ui.statuses.slice(-1)[0],
+    ['Interpreter command', 'Map'],
+    '$MAP should update status line'
+  );
+}
+
 function testPlainLoadShowsRestoreHint() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -995,6 +1023,7 @@ async function run() {
   testDebugCommandTogglesDebugOutput();
   testSoundInterpreterCommandWorksWithoutVmInput();
   testGameSoundAliasWorksWithoutVmInput();
+  testMapCommandOpensUniversityMap();
   testPlainLoadShowsRestoreHint();
   testMappedSoundPlaybackRespectsPreference();
   testGameMusicToggleDoesNotDisableSoundEffects();

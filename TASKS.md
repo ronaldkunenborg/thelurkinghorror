@@ -229,11 +229,18 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
      - Added blood effect scheduler and renderer in `src/index.html`
      - Added `$BLOOD` debug command handling and callback support in `src/io.js`
 
+39. [done] Add a spoiler-safe university overview map (buildings only, no hints).
+   - Added map asset `src/assets/gfx/maps/university_overview_map.jpg` from the provided data folder input.
+   - Added a dedicated map overlay (`#map-sheet`) in `src/index.html` to display the spoiler-safe campus overview.
+   - Added a side-action map icon button to open the same overlay directly for discoverability.
+   - Added interpreter command `$MAP` in `src/io.js`, wired to open the overview map and confirm in output/status.
+   - Added `$MAP` to the commands overview and added controller test coverage in `tools/test-io-controller-output.js`.
+
 ## Pending Tasks
 
-36. [pending] First pickup: implement booklet-hints foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+36. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
-   - Add interpreter command plumbing for `booklet` / consultation entry flow (placeholder output acceptable for first step)
+   - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
 
@@ -249,14 +256,3 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
 
-39. [pending] Add a spoiler-safe university overview map (buildings only, no hints).
-   - Purpose: provide orientation so players do not need to consult hint-heavy booklet content just to understand campus layout.
-   - Scope:
-     - show only high-level campus/building overview
-     - no puzzle clues, no route solutions, no annotation hints
-     - keep it visually distinct from the hint-booklet flow
-   - Access options to evaluate:
-     1. interpreter command `$MAP`
-     2. dedicated UI button (for fast discoverability)
-     3. both command + button (recommended): command for parser-driven users, button for discoverability
-   - First implementation should include option 3 unless UX constraints suggest otherwise.

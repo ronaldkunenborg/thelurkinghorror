@@ -36,6 +36,9 @@
             <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
               <span class="icon-etch icon-help" aria-hidden="true">?</span>
             </button>
+            <button id="map-button" class="icon-btn" type="button" aria-label="University map" title="University map">
+              <span class="icon-etch icon-map" aria-hidden="true"></span>
+            </button>
             <button id="settings-button" class="icon-btn" type="button" aria-label="Audio settings" title="Audio settings">
               <span class="icon-etch icon-gear" aria-hidden="true"></span>
             </button>
@@ -172,12 +175,26 @@
               <button class="btn command-chip" type="button" data-command="$SOUND"><strong>$SOUND</strong><span>Toggle in-game sound effects only.</span></button>
               <button class="btn command-chip" type="button" data-command="$GAMESOUND"><strong>$GAMESOUND</strong><span>Toggle splash and other game music.</span></button>
               <button class="btn command-chip" type="button" data-command="$DEBUG"><strong>$DEBUG</strong><span>Toggle debug-only VM and sound diagnostics.</span></button>
+              <button class="btn command-chip" type="button" data-command="$MAP"><strong>$MAP</strong><span>Open the spoiler-safe university overview map.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD ON"><strong>$BLOOD ON</strong><span>Debug-only: enable low-frequency random blood spatter.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD OFF"><strong>$BLOOD OFF</strong><span>Debug-only: disable blood spatter effect.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD 3"><strong>$BLOOD 1-5</strong><span>Debug-only: force a specific blood splatter variant.</span></button>
               <button class="btn command-chip" type="button" data-command="$SOUNDSTATS"><strong>$SOUNDSTATS</strong><span>Print captured sound-event statistics.</span></button>
             </div>
           </div>
+        </div>
+      </section>
+      <section id="map-sheet" class="map-sheet" aria-label="University overview map" hidden>
+        <div class="map-sheet-panel">
+          <div class="command-sheet-header">
+            <h2 class="command-sheet-title">University Overview Map</h2>
+            <button id="close-map" class="btn" type="button">Close</button>
+          </div>
+          <img
+            class="map-sheet-image"
+            src="./assets/gfx/maps/university_overview_map.jpg"
+            alt="Spoiler-safe overview map of the university campus buildings."
+          />
         </div>
       </section>
       <section id="settings-sheet" class="settings-sheet" aria-label="Audio settings" hidden>
@@ -223,6 +240,7 @@
         const bloodSplatterEl = document.getElementById('blood-splatter');
         const hudGroupEl = document.querySelector('.hud-group');
         const commandSheetEl = document.getElementById('command-sheet');
+        const mapSheetEl = document.getElementById('map-sheet');
         const settingsSheetEl = document.getElementById('settings-sheet');
         const settingsButtonEl = document.getElementById('settings-button');
         const musicVolumeEl = document.getElementById('music-volume');
@@ -645,6 +663,9 @@
           onBloodEffectCommand: state => {
             setBloodEffectState(state);
           },
+          onMapRequested: () => {
+            openMapSheet();
+          },
         });
         ui.appendOutput('Booting interpreter shell...', 'system');
         ui.setStatus('Loading bundled story', 'Booting');
@@ -939,6 +960,23 @@
         window.addEventListener('resize', () => {
           if (!settingsSheetEl.hidden) {
             positionSettingsSheet();
+          }
+        });
+
+        function openMapSheet() {
+          mapSheetEl.hidden = false;
+        }
+
+        function closeMapSheet() {
+          mapSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('map-button').addEventListener('click', openMapSheet);
+        document.getElementById('close-map').addEventListener('click', closeMapSheet);
+        mapSheetEl.addEventListener('click', event => {
+          if (event.target === mapSheetEl) {
+            closeMapSheet();
           }
         });
 

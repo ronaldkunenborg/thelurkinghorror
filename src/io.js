@@ -54,6 +54,8 @@ class GameIoController {
     this.onRoomChanged = typeof opts.onRoomChanged === 'function' ? opts.onRoomChanged : function () {};
     this.onBloodEffectCommand =
       typeof opts.onBloodEffectCommand === 'function' ? opts.onBloodEffectCommand : function () {};
+    this.onMapRequested =
+      typeof opts.onMapRequested === 'function' ? opts.onMapRequested : function () {};
     this.onGameMusicPreferenceChanged =
       typeof opts.onGameMusicPreferenceChanged === 'function'
         ? opts.onGameMusicPreferenceChanged
@@ -266,6 +268,12 @@ class GameIoController {
     }
     if (normalized.startsWith('$SAVES')) {
       this._listSaveSlots();
+      return true;
+    }
+    if (normalized === '$MAP') {
+      this.onMapRequested();
+      this.ui.appendOutput('Opened the spoiler-safe university overview map.', 'system');
+      this.ui.setStatus('Interpreter command', 'Map');
       return true;
     }
     if (normalized.startsWith('$SAVE')) {
