@@ -1,31 +1,34 @@
 # The Lurking Horror Web Interpreter
 
-This project builds a browser-based Z-machine interpreter for Infocom's `The Lurking Horror` (`.z3`).
+This project is now a full browser-first play experience for Infocom's `The Lurking Horror` (`.z3`): a custom Z-machine v3 runtime, layered cinematic UI, room-art scene system, local save ecosystem, sound pipeline, and in-interpreter debugging/tooling for iterative world presentation.
 
 ## Current State
 
 The app currently provides:
 
 - a browser-based Z-machine v3 interpreter focused on `The Lurking Horror`
-- bundled-story startup with a splash screen
-- a styled terminal UI with location artwork, a sidebar action bar, and responsive mobile layout
-- top-bar room, score, and moves display driven from VM status state
+- bundled-story startup with a cinematic splash screen and music handling
+- layered room-art scene rendering keyed to live VM room state (including dark-room suppression)
+- a transparent/blurred HUD (terminal + action rail) over scene art
+- ambient blood-splatter overlay system with debug controls for deterministic testing
+- top-bar room, score, and moves display driven from VM status snapshots
 - in-game sound effects support via `$SOUND`
 - separate splash/game-music control via `$GAMESOUND`
 - local interpreter-level save/load slots via IndexedDB and `.sav` import/export
-- a commands overview sheet with grouped game, control, and meta commands
+- VM-level story `save`/`restore` integrated with local Quetzal slot persistence
+- command overview and audio settings sheets
 - debug output gated behind `$DEBUG`
 
 ## Interpreter Commands
 
-The interpreter adds several non-story commands:
+The interpreter adds non-story commands:
 
 - `$SOUND`
   Toggle in-game sound effects only.
 - `$GAMESOUND`
-  Toggle splash and other interpreter-controlled game music.
+  Toggle splash/interpreter-managed game music.
 - `$DEBUG`
-  Toggle debug-only VM and sound diagnostics.
+  Toggle debug-only VM/sound/light/blood diagnostics.
 - `$SOUNDSTATS`
   Print captured sound-event statistics.
 - `$SAVE`
@@ -44,14 +47,19 @@ The interpreter adds several non-story commands:
   Export a local slot as a `.sav` file.
 - `$IMPORT <slot>`
   Import a `.sav` file into a numbered slot.
+- `$FLASHLIGHT ON|OFF`
+  Temporary visual override for dark-room scene testing (interpreter-side only).
+- `$BLOOD ON|OFF|NOW|RANDOM|<1-5>`
+  Blood effect controls for testing/tuning; guarded by `$DEBUG`.
 
 ## UI Features
 
-- `Save`, `Load`, and `Commands` sidebar buttons for common interpreter actions
-- grouped command overview for movement, observation, inventory, interaction, and system/meta commands
-- room artwork transitions keyed to actual VM room state rather than output heuristics
-- splash music attribution and startup overlay
-- command history on the input field via arrow keys
+- icon-based action rail (`Save`, `Load`, `Commands`, `Settings`)
+- grouped command reference sheet
+- room scene transitions with per-room ID mapping and dark-room handling
+- splash startup flow with music attribution
+- persistent music/SFX sliders in local storage
+- command history on input via arrow keys
 
 ## Verified Single-Letter Game Commands
 
@@ -76,20 +84,34 @@ These were verified against the local interpreter/game, not added by assumption:
 Notes:
 
 - `g` and `o` are contextual and depend on prior input.
-- `x` is accepted as `examine`, though the parser’s prompt text differs slightly from the full-word form.
+- `x` is accepted as `examine`, though parser prompt text differs slightly from the full-word form.
 
-## Data And Assets
+## Data and Assets
 
-Project source now lives under `app/`, while large story/source data assets are expected one level up in `../data/`.
+Project source lives under `app/`.
 
-Important runtime/source assets:
+Large external story/reference assets are intentionally **not committed** to this repository.  
+For local development, provide them separately (for example in `../data/`) and keep them out of version control.
 
-- [`../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`](../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3) - target story file used for parser/VM development and validation.
-- [`../data/lurking.pdf`](../data/lurking.pdf) - canonical boxed-map PDF used as the reference layout for location-map reconciliation.
-- [`../data/booklet-page3.png`](../data/booklet-page3.png) - extracted upper/surface boxed-map page used for map reconciliation.
-- [`../data/booklet-page4.png`](../data/booklet-page4.png) - extracted lower/underground boxed-map page used for map reconciliation.
-- [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music used by the startup overlay.
-- [`src/assets/gfx/lurkinghorror/`](src/assets/gfx/lurkinghorror/) - room-art asset folder used by the scene system (including `terminal_room_176.jpg`, `second_floor_137.jpg`, `kitchen_33.jpg`, and others).
+### Required local asset
+
+- `The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`
+  - Required for parser/VM development and runtime validation.
+  - Expected by local tools/tests at `../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`.
+
+### Optional local references (not committed)
+
+- `lurking.pdf`
+- `booklet-page3.png`
+- `booklet-page4.png`
+
+These are used as map/reference material during location reconciliation work.
+
+### Committed runtime assets
+
+- [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music.
+- [`src/assets/gfx/lurkinghorror/`](src/assets/gfx/lurkinghorror/) - location artwork set.
+- [`src/assets/gfx/blood/`](src/assets/gfx/blood/) - blood-splatter overlays used by the ambient blood effect.
 
 ## Testing
 
@@ -105,10 +127,16 @@ Useful local checks:
 - [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) - phased implementation architecture and delivery plan.
 - [`OPEN_SOURCE_RESEARCH.md`](OPEN_SOURCE_RESEARCH.md) - research summary of existing Z-machine implementations.
 - [`docs/Z3_ENGINE_FORMAT_SUMMARY.md`](docs/Z3_ENGINE_FORMAT_SUMMARY.md) - concise implementation reference for Z3 format, memory map, key data structures, and V3 opcode baseline.
-- [`docs/IFVMS_ARCHITECTURE_ANALYSIS.md`](docs/IFVMS_ARCHITECTURE_ANALYSIS.md) - `ifvms.js` parser/runtime/opcode architecture study with adaptation guidance for our single-file Z3 interpreter.
-- [`docs/PHASE1_FOUNDATION_DESIGN.md`](docs/PHASE1_FOUNDATION_DESIGN.md) - finalized Phase 1 foundation design: parser shape, opcode subset, memory strategy, and implementation architecture diagram.
-- [`docs/QUETZAL_LOCAL_STORAGE.md`](docs/QUETZAL_LOCAL_STORAGE.md) - IndexedDB-based Quetzal slot storage with `.sav` import/export workflow for serverless local save/load.
-- [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architecture decision record for serverless Quetzal persistence via IndexedDB plus file import/export.
-- [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter-specific quality-of-life features including `$SOUND`, `$GAMESOUND`, `$DEBUG`, save/load commands, HELP/login note extension, and sound debug output.
-- [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - spoiler-heavy technical/reference map reconciling the live engine with the canonical boxed-map PDF/booklet pages.
-- [`docs/LOCATION_IMAGE_BRIEFS.md`](docs/LOCATION_IMAGE_BRIEFS.md) - notable-location title and description briefs intended for image generation workflows.
+- [`docs/IFVMS_ARCHITECTURE_ANALYSIS.md`](docs/IFVMS_ARCHITECTURE_ANALYSIS.md) - `ifvms.js` parser/runtime/opcode architecture study with adaptation guidance for this interpreter.
+- [`docs/PHASE1_FOUNDATION_DESIGN.md`](docs/PHASE1_FOUNDATION_DESIGN.md) - finalized Phase 1 design.
+- [`docs/QUETZAL_LOCAL_STORAGE.md`](docs/QUETZAL_LOCAL_STORAGE.md) - IndexedDB-based Quetzal slot storage with `.sav` import/export workflow.
+- [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architectural decision record for Quetzal persistence.
+- [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter QoL extensions and behavior notes.
+- [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - spoiler-heavy technical/reference map.
+- [`docs/LOCATION_IMAGE_BRIEFS.md`](docs/LOCATION_IMAGE_BRIEFS.md) - location title/description briefs for image generation workflows.
+
+## Attribution
+
+- Splash music: `horror` by **Whirlguy** (CC BY-ND 3.0),
+  published on Newgrounds Audio Portal:
+  https://www.newgrounds.com/audio/listen/6630
