@@ -125,7 +125,7 @@ Useful local checks:
 ## Documentation Index
 
 - [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md) - phased implementation architecture and delivery plan.
-- [`OPEN_SOURCE_RESEARCH.md`](OPEN_SOURCE_RESEARCH.md) - research summary of existing Z-machine implementations.
+- [`docs/OPEN_SOURCE_RESEARCH.md`](docs/OPEN_SOURCE_RESEARCH.md) - research summary of existing Z-machine implementations.
 - [`docs/Z3_ENGINE_FORMAT_SUMMARY.md`](docs/Z3_ENGINE_FORMAT_SUMMARY.md) - concise implementation reference for Z3 format, memory map, key data structures, and V3 opcode baseline.
 - [`docs/IFVMS_ARCHITECTURE_ANALYSIS.md`](docs/IFVMS_ARCHITECTURE_ANALYSIS.md) - `ifvms.js` parser/runtime/opcode architecture study with adaptation guidance for this interpreter.
 - [`docs/PHASE1_FOUNDATION_DESIGN.md`](docs/PHASE1_FOUNDATION_DESIGN.md) - finalized Phase 1 design.
