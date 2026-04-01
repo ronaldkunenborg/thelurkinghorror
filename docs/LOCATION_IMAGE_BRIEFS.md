@@ -13,6 +13,8 @@ Literal descriptions below are taken from in-game `look` output in the local sto
 
 ## Done
 
+Using Flux 2 Klein 9B Fast:
+
 1. `Terminal Room (176)`
    - Title: `Terminal Room: Green Cursor in the Dark`
    - Literal description: `This is a large room crammed with computer terminals, small computers, and printers. An exit leads south. Banners, posters, and signs festoon the walls. Most of the tables are covered with waste paper, old pizza boxes, and empty Coke cans. There are usually a lot of people here, but tonight it's almost deserted.`
@@ -28,26 +30,73 @@ Literal descriptions below are taken from in-game `look` output in the local sto
    - Literal description: `This is a filthy kitchen. The exit is to the east. On the wall near a counter are a refrigerator and a microwave.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a filthy kitchen.
 
+6. `Aero Lobby (136)`
+   - Title: `Aero Lobby: Cold Marble Echo`
+   - Literal description: `This is the lobby of the Aeronautical Engineering Building. Stairs lead down and a corridor heads south towards the main building.`
+   - Description: A broad lobby with hard surfaces, sparse fixtures, and dead air. The scene should feel formally designed but emotionally vacant.
+
 34. `Smith Street (185)`
    - Title: `Smith Street: Supplemental Study (185)`
    - Literal description: `Smith Street runs east and west along the north side of the main campus area. At the moment, it is an arctic wasteland of howling wind and drifting snow. On the other side of the street, barely visible, are the lidless eyes of streetlights. The street hasn't been plowed, or if it has been, it did no good.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: Smith Street runs east and west along the north side of the main campus area.
+   - Additional location: `Smith Street (98)`
 
 Using Z-image turbo:
+
+3. `Computer Center (65)`
+   - Title: `Computer Center: Midnight Lab`
+   - Literal description: `This is the lobby of the Computer Center. An elevator and call buttons are to the south. Stairs also lead up and down, for the energetic. To the north is Smith Street.`
+   - Description: A larger technical space with rows of equipment, reflective floors, and rain-muted light from outside. Emphasize old hardware geometry and a tense, after-hours atmosphere.
+
+4. `Temporary Lab (140)`
+   - Title: `Temporary Lab: Improvised Science`
+   - Literal description: `This is a laboratory of some sort. It takes up most of the building on this level, all the interior walls having been knocked down. (One reason these temporary buildings are still here is their flexibility: no one cares if they get more or less destroyed.) A stairway leads down, and a door leads north.`
+   - Description: A makeshift research room with benches, scattered instruments, taped labels, and unfinished setups. It should feel active but abandoned in a hurry.
+
 5. `Infinite Corridor (218/214/210/208/206)`
    - Title: `Infinite Corridor: Vanishing Point`
    - Literal description: `The so-called infinite corridor runs from east to west in the main campus building. This is the west end. Side corridors lead north and south, and a set of doors leads west into the howling blizzard.`
    - Description: A long corridor with repeating lights and doors receding into darkness. Strong perspective lines and slight visual distortion should suggest unnatural depth.
+
+7. `Roof (127)`
+   - Title: `Roof: Storm Exposure`
+   - Literal description: `This is the roof of the Computer Center. A door leads to the stairway. The roof is covered with tarred pea gravel and drifted snow. The wind howls around your ears. To the south and southeast you can dimly see the looming shapes of the Great Dome and the Brown Building.`
+   - Description: Open rooftop at night with rain, wind, and distant city glow. Surfaces are slick and reflective, with strong contrast between darkness and lightning highlights.
 
 8. `Great Dome (249)`
    - Title: `Great Dome: Hollow Monument`
    - Literal description: `Here a walkway circles the base of a huge ornate dome. Below is the Infinite Corridor. From stories of Tech Exploring trips, you recall that there is supposed to be a ladder here. On the other hand, there is a shiny rope-like thing hanging near where the ladder used to be, and leading upward.`
    - Description: A large interior dome chamber where scale is the main emotion. Use towering curvature, sparse light, and deep shadow to imply hidden vertical space.
 
+9. `On the Great Dome (145)`
+   - Title: `On the Great Dome: High and Unstable`
+   - Literal description: `This is the very top of the Great Dome, a favorite place for Tech fraternities to install cows, Volkswagen Beetles, giant birthday candles, and other bizarre objects. The top is flat, round, and about five feet in diameter. It's very windy, which has kept the snow from accumulating here. The only way off is down.`
+   - Description: Exterior high point over the campus in severe weather. The image should communicate height, exposure, and danger, with thin footing and wide voids.
+
 10. `Steam Tunnel (66/78/138/221/227)`
     - Title: `Steam Tunnel: Heat Under Stone`
     - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. A thick bundle of coaxial cable runs east to west along the ceiling.`
     - Description: Utility tunnels with pipes, periodic steam, and claustrophobic industrial decay. Treat the pressure valve as specific to `Steam Tunnel (66)`, not as a shared feature of all steam-tunnel locations.
+
+13. `Steam Tunnel (78)`
+   - Title: `Steam Tunnel: Supplemental Study (78)`
+   - Literal description: `The steam tunnel is narrow here, and its construction is more archaic. It's now mostly brick, although the floor is concrete. The steam pipe and coaxial cable continue along their appointed paths. The tunnel is damp and even a little muddy.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: The steam tunnel is narrow here, and its construction is more archaic.
+
+22. `Steam Tunnel (138)`
+   - Title: `Steam Tunnel: Supplemental Study (138)`
+   - Literal description: `The steam pipe and coaxial cable turn upwards and disappear into the ceiling here. The tunnel itself comes to an end in a grimy, damp, and dripping triad of crumbling brick walls. The south wall looks particularly decrepit.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: The steam pipe and coaxial cable turn upwards and disappear into the ceiling here.
+
+45. `Steam Tunnel (221)`
+   - Title: `Steam Tunnel: Supplemental Study (221)`
+   - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. A bundle of coaxial cable runs along the ceiling, festooned with damp mold and cobwebs. The tunnel continues west.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe.
+
+47. `Steam Tunnel (227)`
+   - Title: `Steam Tunnel: Supplemental Study (227)`
+   - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. You have gone from the arctic to the tropics. The concrete tunnel has odd molds and fungi growing on its walls and ceiling, and the floor is squishy. Torn clots of insulation litter the floor. Along the ceiling runs a thick tangle of coaxial cable. The tunnel heads east and west. A rusty metal ladder leads up.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe.
 
 16. `Basalt Bowl (134)`
     - Title: `Basalt Bowl: Black Stone Basin`
@@ -64,42 +113,7 @@ Using Z-image turbo:
     - Literal description: `You stand before a low rock platform, more like an afterthought of piled rocks or a glacial moraine than a work of artifice. You are pushed against the pile by the crowd around you.`
     - Description: A liminal platform space with implied movement and uncertain destination. Use directional composition and negative space to suggest a one-way threshold.
 
-45. `Steam Tunnel (221)`
-   - Title: `Steam Tunnel: Supplemental Study (221)`
-   - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. A bundle of coaxial cable runs along the ceiling, festooned with damp mold and cobwebs. The tunnel continues west.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe.
-
-47. `Steam Tunnel (227)`
-   - Title: `Steam Tunnel: Supplemental Study (227)`
-   - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. You have gone from the arctic to the tropics. The concrete tunnel has odd molds and fungi growing on its walls and ceiling, and the floor is squishy. Torn clots of insulation litter the floor. Along the ceiling runs a thick tangle of coaxial cable. The tunnel heads east and west. A rusty metal ladder leads up.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe.
-
-## Notable locations
-
-3. `Computer Center (65)`
-   - Title: `Computer Center: Midnight Lab`
-   - Literal description: `This is the lobby of the Computer Center. An elevator and call buttons are to the south. Stairs also lead up and down, for the energetic. To the north is Smith Street.`
-   - Description: A larger technical space with rows of equipment, reflective floors, and rain-muted light from outside. Emphasize old hardware geometry and a tense, after-hours atmosphere.
-
-4. `Temporary Lab (140)`
-   - Title: `Temporary Lab: Improvised Science`
-   - Literal description: `This is a laboratory of some sort. It takes up most of the building on this level, all the interior walls having been knocked down. (One reason these temporary buildings are still here is their flexibility: no one cares if they get more or less destroyed.) A stairway leads down, and a door leads north.`
-   - Description: A makeshift research room with benches, scattered instruments, taped labels, and unfinished setups. It should feel active but abandoned in a hurry.
-
-6. `Aero Lobby (136)`
-   - Title: `Aero Lobby: Cold Marble Echo`
-   - Literal description: `This is the lobby of the Aeronautical Engineering Building. Stairs lead down and a corridor heads south towards the main building.`
-   - Description: A broad lobby with hard surfaces, sparse fixtures, and dead air. The scene should feel formally designed but emotionally vacant.
-
-7. `Roof (127)`
-   - Title: `Roof: Storm Exposure`
-   - Literal description: `This is the roof of the Computer Center. A door leads to the stairway. The roof is covered with tarred pea gravel and drifted snow. The wind howls around your ears. To the south and southeast you can dimly see the looming shapes of the Great Dome and the Brown Building.`
-   - Description: Open rooftop at night with rain, wind, and distant city glow. Surfaces are slick and reflective, with strong contrast between darkness and lightning highlights.
-
-9. `On the Great Dome (145)`
-   - Title: `On the Great Dome: High and Unstable`
-   - Literal description: `This is the very top of the Great Dome, a favorite place for Tech fraternities to install cows, Volkswagen Beetles, giant birthday candles, and other bizarre objects. The top is flat, round, and about five feet in diameter. It's very windy, which has kept the snow from accumulating here. The only way off is down.`
-   - Description: Exterior high point over the campus in severe weather. The image should communicate height, exposure, and danger, with thin footing and wide voids.
+Gemaakt met ChatGPT:
 
 11. `Muddy Tunnel (39)`
     - Title: `Muddy Tunnel: Wet Descent`
@@ -116,11 +130,6 @@ Using Z-image turbo:
     - Literal description: `You are at the bottom of the cave. The huge slab of granite in the center is a sort of altar. It is carved with strange and disturbing symbols, the largest of which looks very familiar. Some of the symbols are obscured by rusty red stains. Nearby is an iron plate set in the concrete of the floor.`
     - Description: A ceremonial-feeling chamber centered on a stark altar form. Use hard symmetry, shadow framing, and restrained highlights for ominous focus.
 
-14. `Wet Tunnel (15/51/87/117/131/161/164/181/184/187/232/234)`
-    - Title: `Wet Tunnels: Numbered Labyrinth`
-    - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-    - Description: Repeating flooded tunnel segments that are intentionally hard to distinguish. Maintain a consistent visual language while allowing minor landmark variation.
-
 15. `Large Chamber (99)`
     - Title: `Large Chamber: Echoing Void`
     - Literal description: `This is a wide spot in the tunnel, just as wet and muddy as elsewhere. The walls are slimy as well. Numerous slots or indentations about two feet wide and a foot high open here and there. Thin, wire or ropelike growths emerge from a hole further down and enter each of the slots. There is background noise here, almost loud enough to hear clearly.`
@@ -135,6 +144,12 @@ Using Z-image turbo:
     - Title: `Tomb: Buried Memory`
     - Literal description: `This is a tiny, narrow, ill-fitting room. It appears to have been a left over space from the joining of two preexisting buildings. It is roughly coffin shaped. The walls are covered by decades of overlaid graffiti, but there is one which is painted in huge fluorescent letters that were apparently impossible for later artists to completely deface. On the floor is a rusty access hatch locked with a huge padlock.`
     - Description: Stone burial chamber with age-worn surfaces, dry dust, and severe stillness. Emphasize historical weight and the sense of disturbing something that should remain sealed.
+
+14. `Wet Tunnel (15/51/87/117/131/161/164/181/184/187/232/234)`
+    - Title: `Wet Tunnels: Numbered Labyrinth`
+    - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
+    - Description: Repeating flooded tunnel segments that are intentionally hard to distinguish. Maintain a consistent visual language while allowing minor landmark variation.
+
 
 ## Additional locations (remaining 51)
 
@@ -195,11 +210,6 @@ These are the remaining mapped locations, in the same brief format.
    - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
 
-13. `Steam Tunnel (78)`
-   - Title: `Steam Tunnel: Supplemental Study (78)`
-   - Literal description: `The steam tunnel is narrow here, and its construction is more archaic. It's now mostly brick, although the floor is concrete. The steam pipe and coaxial cable continue along their appointed paths. The tunnel is damp and even a little muddy.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: The steam tunnel is narrow here, and its construction is more archaic.
-
 14. `Wet Tunnel (87)`
    - Title: `Wet Tunnel: Supplemental Study (87)`
    - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
@@ -239,11 +249,6 @@ These are the remaining mapped locations, in the same brief format.
    - Title: `Wet Tunnel: Supplemental Study (131)`
    - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
-22. `Steam Tunnel (138)`
-   - Title: `Steam Tunnel: Supplemental Study (138)`
-   - Literal description: `The steam pipe and coaxial cable turn upwards and disappear into the ceiling here. The tunnel itself comes to an end in a grimy, damp, and dripping triad of crumbling brick walls. The south wall looks particularly decrepit.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: The steam pipe and coaxial cable turn upwards and disappear into the ceiling here.
 
 23. `Subbasement (142)`
    - Title: `Subbasement: Supplemental Study (142)`
