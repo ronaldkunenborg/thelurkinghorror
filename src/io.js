@@ -38,6 +38,7 @@ class GameIoController {
     this.outputBuffer = '';
     this.currentRoomName = '';
     this.currentRoomId = 0;
+    this.lastTurnWasPitchBlack = false;
     this.previousVmLine = '';
     this.debugEnabled = false;
     this.sfxEnabled = true;
@@ -89,8 +90,9 @@ class GameIoController {
     this.outputBuffer = '';
     this.currentRoomName = '';
     this.currentRoomId = 0;
+    this.lastTurnWasPitchBlack = false;
     this.previousVmLine = '';
-    this.onRoomChanged('', 0);
+    this.onRoomChanged('', 0, { isDark: false });
     this.vm = new window.Z3VM({
       memory: parsed.memory.bytes,
       header: {
@@ -138,6 +140,7 @@ class GameIoController {
     if (!this.vm) {
       return;
     }
+    this.lastTurnWasPitchBlack = false;
     let result;
     try {
       result = this.vm.run(200000);
@@ -706,10 +709,18 @@ class GameIoController {
 
   _appendVmLine(line) {
     this.ui.appendOutput(line);
+    if (this._isPitchBlackLine(line)) {
+      this.lastTurnWasPitchBlack = true;
+    }
     if (this._isComputerHelpHintLine(line)) {
       this.ui.appendOutput(COMPUTER_HELP_NOTE, 'system');
     }
     this.previousVmLine = line;
+  }
+
+  _isPitchBlackLine(line) {
+    const normalized = String(line || '').trim().toLowerCase();
+    return normalized === 'it is pitch black.';
   }
 
   _isComputerHelpHintLine(line) {
@@ -839,7 +850,9 @@ class GameIoController {
     if (roomId !== this.currentRoomId || roomName !== this.currentRoomName) {
       this.currentRoomId = roomId;
       this.currentRoomName = roomName;
-      this.onRoomChanged(this.currentRoomName, this.currentRoomId);
+      this.onRoomChanged(this.currentRoomName, this.currentRoomId, {
+        isDark: this.lastTurnWasPitchBlack,
+      });
     }
     this.ui.setTopbarMeta(
       roomName || '',

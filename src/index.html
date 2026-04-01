@@ -256,22 +256,36 @@
           234: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
           21: './assets/gfx/lurkinghorror/at_platform_21.jpg',
           33: './assets/gfx/lurkinghorror/kitchen_33.jpg',
+          39: './assets/gfx/lurkinghorror/muddy_tunnel_39.jpg',
+          65: './assets/gfx/lurkinghorror/computer_center_65.jpg',
           66: './assets/gfx/lurkinghorror/steam_tunnel_66.jpg',
+          69: './assets/gfx/lurkinghorror/inner_lair_69.jpg',
           78: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
           98: './assets/gfx/lurkinghorror/smith_street_185.jpg',
+          99: './assets/gfx/lurkinghorror/large_chamber_99.jpg',
+          127: './assets/gfx/lurkinghorror/roof_127.jpg',
           134: './assets/gfx/lurkinghorror/basalt_bowl_134.jpg',
+          136: './assets/gfx/lurkinghorror/aero_lobby_136.jpg',
           137: './assets/gfx/lurkinghorror/second_floor_137.jpg',
           138: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          140: './assets/gfx/lurkinghorror/temporary_lab_140.jpg',
+          145: './assets/gfx/lurkinghorror/on_the_great_dome_145.jpg',
+          149: './assets/gfx/lurkinghorror/before_the_altar_149.jpg',
           152: './assets/gfx/lurkinghorror/place_dream_threshold_152.jpg',
           176: './assets/gfx/lurkinghorror/terminal_room_176.jpg',
           185: './assets/gfx/lurkinghorror/smith_street_185.jpg',
+          201: './assets/gfx/lurkinghorror/renovated_cave_201.jpg',
+          206: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          208: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          210: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          214: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          218: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
           221: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
           227: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          9: './assets/gfx/lurkinghorror/tomb_9.jpg',
           249: './assets/gfx/lurkinghorror/great_dome_249.jpg',
         };
-        const ROOM_ART = {
-          'infinite corridor': './assets/gfx/lurkinghorror/infinite_corridor.jpg',
-        };
+        const ROOM_ART = {};
         let currentRoomArt = '';
 
         function roomKey(name) {
@@ -333,8 +347,9 @@
           return ((Math.random() * 2 - 1) * 10).toFixed(2);
         }
 
-        function setRoomScene(roomName, roomObjectId) {
-          const art = resolveRoomArt(roomName, roomObjectId);
+        function setRoomScene(roomName, roomObjectId, options) {
+          const isDark = !!(options && options.isDark);
+          const art = isDark ? '' : resolveRoomArt(roomName, roomObjectId);
           if (art === currentRoomArt) {
             return;
           }
@@ -381,8 +396,8 @@
             }
             startSplashMusic();
           },
-          onRoomChanged: (roomName, roomObjectId) => {
-            setRoomScene(roomName, roomObjectId);
+          onRoomChanged: (roomName, roomObjectId, options) => {
+            setRoomScene(roomName, roomObjectId, options);
           },
         });
         ui.appendOutput('Booting interpreter shell...', 'system');
