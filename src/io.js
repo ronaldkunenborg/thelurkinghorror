@@ -438,8 +438,8 @@ class GameIoController {
     }
 
     if (arg === 'ON' || arg === 'START' || arg === 'RANDOM') {
-      this.onBloodEffectCommand({ enabled: true, mode: 'random', immediate: true });
-      this.ui.appendOutput('Blood effect enabled in random mode.', 'system');
+      this.onBloodEffectCommand({ enabled: true, mode: 'random', immediate: false, firstDelayMs: 60000 });
+      this.ui.appendOutput('Blood effect enabled in random mode (first splatter in about 1 minute).', 'system');
       this.ui.setStatus('Interpreter command', 'Blood random');
       return true;
     }

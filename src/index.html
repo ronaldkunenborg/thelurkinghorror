@@ -262,6 +262,8 @@
         let bloodEffectFixedIndex = 1;
         let bloodEffectTimer = 0;
         let bloodEffectHideTimer = 0;
+        let bloodEffectFirstDelayMs = null;
+        let ambientBloodAutostarted = false;
         const ROOM_ART_BY_ID = {
           15: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
           51: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
@@ -421,7 +423,13 @@
           if (!bloodEffectEnabled) {
             return;
           }
-          const nextDelayMs = 30000 + Math.floor(Math.random() * 45000);
+          let nextDelayMs;
+          if (bloodEffectFirstDelayMs !== null && Number.isFinite(bloodEffectFirstDelayMs)) {
+            nextDelayMs = Math.max(0, Math.floor(bloodEffectFirstDelayMs));
+            bloodEffectFirstDelayMs = null;
+          } else {
+            nextDelayMs = 30000 + Math.floor(Math.random() * 45000);
+          }
           bloodEffectTimer = setTimeout(() => {
             showBloodSplatter();
           }, nextDelayMs);
@@ -592,6 +600,7 @@
           if (Number.isFinite(next.index)) {
             bloodEffectFixedIndex = Math.max(1, Math.min(BLOOD_SPLATTER_ART.length, Number(next.index)));
           }
+          bloodEffectFirstDelayMs = Number.isFinite(next.firstDelayMs) ? Number(next.firstDelayMs) : null;
           clearBloodTimers();
           if (!bloodEffectEnabled) {
             hideBloodSplatter();
@@ -825,6 +834,15 @@
           }
           splashHidden = true;
           shellEl.classList.add('ready');
+          if (!ambientBloodAutostarted) {
+            ambientBloodAutostarted = true;
+            setBloodEffectState({
+              enabled: true,
+              mode: 'random',
+              immediate: false,
+              firstDelayMs: 60000 + Math.floor(Math.random() * 30000),
+            });
+          }
           window.removeEventListener('keydown', handleSplashDismiss);
         }
 
