@@ -1,7 +1,7 @@
 :root {
   --bg-0: #000000;
   --viewport-pad: clamp(10px, 2vw, 20px);
-  --panel: rgba(4, 6, 9, 0.62);
+  --panel: rgba(4, 6, 9, 0.26);
   --panel-border: rgba(190, 214, 234, 0.12);
   --panel-border-top: rgba(220, 236, 250, 0.3);
   --text-main: #e9edf2;
@@ -79,9 +79,9 @@ body {
   border-top-color: var(--panel-border-top);
   border-radius: 16px;
   background:
-    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.04), transparent 22%),
-    linear-gradient(180deg, rgba(7, 10, 14, 0.92), rgba(3, 5, 8, 0.96));
-  backdrop-filter: blur(4px);
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.06), transparent 22%),
+    linear-gradient(180deg, rgba(7, 10, 14, 0.24), rgba(3, 5, 8, 0.34));
+  backdrop-filter: blur(12px) saturate(1.12);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -305,7 +305,7 @@ body {
   border-top-color: var(--panel-border-top);
   border-radius: var(--radius);
   background: var(--panel);
-  backdrop-filter: none;
+  backdrop-filter: blur(14px) saturate(1.1);
   position: relative;
   z-index: 3;
 }
@@ -338,6 +338,14 @@ body {
   transition: opacity 650ms ease, transform 650ms ease;
 }
 
+.blood-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
 .shell.ready .splash {
   opacity: 0;
   filter: blur(14px);
@@ -357,7 +365,8 @@ body {
   gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid var(--panel-border);
-  background: linear-gradient(180deg, rgba(12, 16, 22, 0.8), rgba(8, 12, 16, 0.5));
+  background: linear-gradient(180deg, rgba(12, 16, 22, 0.35), rgba(8, 12, 16, 0.22));
+  backdrop-filter: blur(8px);
 }
 
 .topbar-copy {
@@ -478,6 +487,8 @@ body {
   gap: 12px;
   border-top: 1px solid var(--panel-border);
   border-bottom: 1px solid var(--panel-border);
+  background: rgba(6, 10, 16, 0.2);
+  backdrop-filter: blur(8px);
   padding: 8px 14px;
   font-size: 0.85rem;
   color: var(--text-dim);
@@ -488,6 +499,8 @@ body {
   grid-template-columns: auto 1fr;
   gap: 10px;
   align-items: center;
+  background: rgba(6, 10, 16, 0.14);
+  backdrop-filter: blur(8px);
   padding: 12px 14px 14px;
 }
 
@@ -499,7 +512,7 @@ body {
 .command-input {
   width: 100%;
   border: 1px solid rgba(145, 197, 255, 0.22);
-  background: rgba(5, 10, 17, 0.75);
+  background: rgba(5, 10, 17, 0.24);
   color: var(--text-main);
   border-radius: 10px;
   padding: 10px 12px;
@@ -511,7 +524,23 @@ body {
 .command-input:focus {
   border-color: rgba(140, 247, 214, 0.72);
   box-shadow: 0 0 0 3px rgba(140, 247, 214, 0.16);
-  background: rgba(5, 10, 17, 0.9);
+  background: rgba(5, 10, 17, 0.34);
+}
+
+.blood-splatter {
+  position: absolute;
+  width: clamp(120px, 26%, 280px);
+  height: auto;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 2;
+  transform-origin: center center;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
+  transition: opacity 5000ms ease-out;
+}
+
+.blood-splatter.is-visible {
+  opacity: 0.78;
 }
 
 .splash {

@@ -210,12 +210,33 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 
 ## Pending Tasks
 
-35. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.
+35. [done] Make the action panel and terminal transparent, but blur everything behind it, then build a "blood spatter" effect that will, once in a while, show a random blood spatter on the background. Not very often and not all the time. Make it so that when debugging you can start this effect and it shows a random bloodsplatter unless you choose one (1-5).
+   - Added blood assets under `src/assets/gfx/blood/`: `bloodsplatter_small_1.png`, `bloodsplatter_small_2.png`, `bloodsplatter_mediumlarge.png`, `bloodsplatter_large.png`, `bloodsplatter_double.png`
+   - Implementation plan:
+     1. Make side action panel and terminal stack more transparent and apply backdrop blur so scene art remains visible underneath
+     2. Add a dedicated blood-splatter overlay element in the scene pane with CSS fade behavior
+     3. Implement timed blood effect runtime logic in `src/index.html`:
+        - random splatter selection, random placement/rotation/scale
+        - low-frequency schedule (roughly every 30-75 seconds while enabled)
+        - auto-hide after a short visible window
+     4. Add debug-only interpreter controls in `src/io.js` to drive the effect:
+        - `$BLOOD ON|RANDOM`
+        - `$BLOOD OFF`
+        - `$BLOOD NOW`
+        - `$BLOOD 1`..`$BLOOD 5` for fixed splatter selection
+     5. Wire controller callback (`onBloodEffectCommand`) from `GameIoController` to UI runtime handler
+   - Executed:
+     - Updated transparency/blur treatment in `src/modern.css` for `.side-actions` and `.terminal-stack`
+     - Added `#blood-splatter` overlay in `src/index.html` scene pane
+     - Added blood effect scheduler and renderer in `src/index.html`
+     - Added `$BLOOD` debug command handling and callback support in `src/io.js`
+
+36. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic
    - Include destinations like `Basalt Bowl` where access is not a simple compass move
    - Label these edges with the final meaningful access action, for example `read paper`, rather than every intermediate UI or parser step
 
-36. [pending] Add an in-game map of visited locations while adventuring.
+37. [pending] Add an in-game map of visited locations while adventuring.
    - Track visited locations during play and show them in the live UI rather than only in documentation
    - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model

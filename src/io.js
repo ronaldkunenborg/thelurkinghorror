@@ -41,6 +41,8 @@ class GameIoController {
     this.lastTurnWasPitchBlack = false;
     this.flashlightOverride = null;
     this.lastSceneIsDark = null;
+    this.pendingDarkClearRoomId = null;
+    this.sawPitchBlackThisCycle = false;
     this.previousVmLine = '';
     this.debugEnabled = false;
     this.sfxEnabled = true;
@@ -50,6 +52,8 @@ class GameIoController {
     this.soundCatalog = Object.assign({}, DEFAULT_SOUND_CATALOG, opts.soundCatalog || {});
     this.onSoundEvent = typeof opts.onSoundEvent === 'function' ? opts.onSoundEvent : function () {};
     this.onRoomChanged = typeof opts.onRoomChanged === 'function' ? opts.onRoomChanged : function () {};
+    this.onBloodEffectCommand =
+      typeof opts.onBloodEffectCommand === 'function' ? opts.onBloodEffectCommand : function () {};
     this.onGameMusicPreferenceChanged =
       typeof opts.onGameMusicPreferenceChanged === 'function'
         ? opts.onGameMusicPreferenceChanged
@@ -95,6 +99,8 @@ class GameIoController {
     this.lastTurnWasPitchBlack = false;
     this.flashlightOverride = null;
     this.lastSceneIsDark = null;
+    this.pendingDarkClearRoomId = null;
+    this.sawPitchBlackThisCycle = false;
     this.previousVmLine = '';
     this.onRoomChanged('', 0, { isDark: false });
     this.vm = new window.Z3VM({
@@ -144,7 +150,6 @@ class GameIoController {
     if (!this.vm) {
       return;
     }
-    this.lastTurnWasPitchBlack = false;
     let result;
     try {
       result = this.vm.run(200000);
@@ -156,29 +161,51 @@ class GameIoController {
       this.ui.setStatus('Execution error', 'Stopped');
       return;
     }
+
+    // Clear darkness only with positive evidence from the just-run command cycle:
+    // room changed and this cycle did not report the pitch-black line.
+    if (this.pendingDarkClearRoomId !== null && this.vm && typeof this.vm.getStatusSnapshot === 'function') {
+      const snapshot = this.vm.getStatusSnapshot();
+      const roomId = snapshot && Number.isFinite(snapshot.roomObjectId) ? snapshot.roomObjectId : 0;
+      const roomChanged = roomId !== this.pendingDarkClearRoomId;
+      if (roomChanged && !this.sawPitchBlackThisCycle) {
+        this.lastTurnWasPitchBlack = false;
+      }
+    }
+
     this._flushVmOutputBuffer();
     this._syncStatusDisplays();
     if (result.haltReason !== 'restore') {
       this.restoreAudioTransitionActive = false;
     }
     if (result.haltReason === 'input') {
+      this.pendingDarkClearRoomId = null;
+      this.sawPitchBlackThisCycle = false;
       this.ui.setStatus('Awaiting command', 'Input ready');
       this.ui.focusInput();
       return;
     }
     if (result.haltReason === 'save') {
+      this.pendingDarkClearRoomId = null;
+      this.sawPitchBlackThisCycle = false;
       await this._handleVmSaveOpcode();
       return;
     }
     if (result.haltReason === 'restore') {
+      this.pendingDarkClearRoomId = null;
+      this.sawPitchBlackThisCycle = false;
       await this._handleVmRestoreOpcode();
       return;
     }
     if (result.haltReason === 'quit' || result.quit) {
+      this.pendingDarkClearRoomId = null;
+      this.sawPitchBlackThisCycle = false;
       this.ui.setStatus('Game ended', 'Quit');
       return;
     }
     if (result.haltReason === 'return') {
+      this.pendingDarkClearRoomId = null;
+      this.sawPitchBlackThisCycle = false;
       this.ui.setStatus('Execution halted', 'Returned');
       return;
     }
@@ -204,6 +231,8 @@ class GameIoController {
       this.ui.appendOutput('VM is not waiting for input.', 'error');
       return;
     }
+    this.pendingDarkClearRoomId = this.currentRoomId;
+    this.sawPitchBlackThisCycle = false;
     this.vm.provideInput(command);
     this.runVm();
   }
@@ -231,6 +260,9 @@ class GameIoController {
     }
     if (normalized.startsWith('$FLASHLIGHT')) {
       return this._handleFlashlightCommand(original);
+    }
+    if (normalized.startsWith('$BLOOD')) {
+      return this._handleBloodCommand(original);
     }
     if (normalized.startsWith('$SAVES')) {
       this._listSaveSlots();
@@ -388,6 +420,52 @@ class GameIoController {
     return true;
   }
 
+  _handleBloodCommand(command) {
+    if (!this.debugEnabled) {
+      this.ui.appendOutput('Blood effect debug commands require $DEBUG on.', 'error');
+      this.ui.setStatus('Interpreter command', 'Enable $DEBUG');
+      return true;
+    }
+
+    const parts = String(command || '').trim().split(/\s+/);
+    const arg = (parts[1] || 'ON').toUpperCase();
+
+    if (arg === 'OFF' || arg === 'STOP') {
+      this.onBloodEffectCommand({ enabled: false });
+      this.ui.appendOutput('Blood effect disabled.', 'system');
+      this.ui.setStatus('Interpreter command', 'Blood OFF');
+      return true;
+    }
+
+    if (arg === 'ON' || arg === 'START' || arg === 'RANDOM') {
+      this.onBloodEffectCommand({ enabled: true, mode: 'random', immediate: true });
+      this.ui.appendOutput('Blood effect enabled in random mode.', 'system');
+      this.ui.setStatus('Interpreter command', 'Blood random');
+      return true;
+    }
+
+    if (arg === 'NOW') {
+      this.onBloodEffectCommand({ enabled: true, mode: 'random', immediate: true });
+      this.ui.appendOutput('Blood effect triggered now (random).', 'system');
+      this.ui.setStatus('Interpreter command', 'Blood now');
+      return true;
+    }
+
+    if (/^\d+$/.test(arg)) {
+      const index = Number(arg);
+      if (index >= 1 && index <= 5) {
+        this.onBloodEffectCommand({ enabled: true, mode: 'fixed', index, immediate: true });
+        this.ui.appendOutput('Blood effect enabled with fixed splatter #' + index + '.', 'system');
+        this.ui.setStatus('Interpreter command', 'Blood #' + index);
+        return true;
+      }
+    }
+
+    this.ui.appendOutput('Usage: $BLOOD ON|OFF|NOW|RANDOM|<1-5>', 'error');
+    this.ui.setStatus('Interpreter command', 'Blood usage');
+    return true;
+  }
+
   setSoundEffectsVolume(value) {
     this.sfxVolume = this._clampVolume(value);
     this._refreshActiveSoundVolumes(SOUND_CLASS_SFX);
@@ -519,12 +597,35 @@ class GameIoController {
       const compat = this._getStoryCompatibilityMeta();
       const record = await this.saveStorage.getSave(compat.storyId, slot);
       this._assertCompatibleSaveRecord(record);
+      this._appendLightDebugOutput(
+        '[LightDebug][restore] begin slot=' + slot +
+        ' meta.sceneIsDark=' + String(!!(record && record.sceneIsDark)) +
+        ' prev.lastTurnWasPitchBlack=' + String(!!this.lastTurnWasPitchBlack),
+        'system'
+      );
       this._prepareAudioForRestore();
       this.vm.restoreSaveState(record.quetzalData);
+      this._appendLightDebugOutput(
+        '[LightDebug][restore] vm restored; snapshot room=' +
+        (this.vm.getStatusSnapshot().roomName || 'unknown') +
+        ' (' + String(this.vm.getStatusSnapshot().roomObjectId || 0) + ')',
+        'system'
+      );
       const probedDark = this._probeDarknessFromCurrentState();
       this.lastTurnWasPitchBlack = (probedDark === null) ? !!record.sceneIsDark : probedDark;
+      this._appendLightDebugOutput(
+        '[LightDebug][restore] probe=' + String(probedDark) +
+        ' fallbackMeta=' + String(!!record.sceneIsDark) +
+        ' -> lastTurnWasPitchBlack=' + String(!!this.lastTurnWasPitchBlack),
+        'system'
+      );
       this.lastSceneIsDark = null;
       this._syncStatusDisplays();
+      this._appendLightDebugOutput(
+        '[LightDebug][restore] after _syncStatusDisplays lastSceneIsDark=' +
+        String(this.lastSceneIsDark),
+        'system'
+      );
       this.ui.setStatus('Story restore', 'Loaded slot ' + slot);
     } catch (error) {
       this.restoreAudioTransitionActive = false;
@@ -602,12 +703,35 @@ class GameIoController {
       const compat = this._getStoryCompatibilityMeta();
       const record = await this.saveStorage.getSave(compat.storyId, slot);
       this._assertCompatibleSaveRecord(record);
+      this._appendLightDebugOutput(
+        '[LightDebug][load] begin slot=' + slot +
+        ' meta.sceneIsDark=' + String(!!(record && record.sceneIsDark)) +
+        ' prev.lastTurnWasPitchBlack=' + String(!!this.lastTurnWasPitchBlack),
+        'system'
+      );
       this._prepareAudioForRestore();
       this.vm.restoreSaveState(record.quetzalData);
+      this._appendLightDebugOutput(
+        '[LightDebug][load] vm restored; snapshot room=' +
+        (this.vm.getStatusSnapshot().roomName || 'unknown') +
+        ' (' + String(this.vm.getStatusSnapshot().roomObjectId || 0) + ')',
+        'system'
+      );
       const probedDark = this._probeDarknessFromCurrentState();
       this.lastTurnWasPitchBlack = (probedDark === null) ? !!record.sceneIsDark : probedDark;
+      this._appendLightDebugOutput(
+        '[LightDebug][load] probe=' + String(probedDark) +
+        ' fallbackMeta=' + String(!!record.sceneIsDark) +
+        ' -> lastTurnWasPitchBlack=' + String(!!this.lastTurnWasPitchBlack),
+        'system'
+      );
       this.lastSceneIsDark = null;
       this._syncStatusDisplays();
+      this._appendLightDebugOutput(
+        '[LightDebug][load] after _syncStatusDisplays lastSceneIsDark=' +
+        String(this.lastSceneIsDark),
+        'system'
+      );
       this.ui.appendOutput(
         'Loaded slot ' + slot + ' (' + (record.label || 'saved game') + ').',
         'system'
@@ -752,6 +876,7 @@ class GameIoController {
     this.ui.appendOutput(line);
     if (this._isPitchBlackLine(line)) {
       this.lastTurnWasPitchBlack = true;
+      this.sawPitchBlackThisCycle = true;
     }
     if (this._isComputerHelpHintLine(line)) {
       this.ui.appendOutput(COMPUTER_HELP_NOTE, 'system');
@@ -775,8 +900,7 @@ class GameIoController {
     if (
       !this.vm ||
       typeof this.vm.serializeSaveState !== 'function' ||
-      typeof this.vm.restoreSaveState !== 'function' ||
-      this.vm.haltReason !== 'input'
+      typeof this.vm.restoreSaveState !== 'function'
     ) {
       return null;
     }
@@ -793,6 +917,10 @@ class GameIoController {
     try {
       this.outputBuffer = '';
       this.lastTurnWasPitchBlack = false;
+      this._appendLightDebugOutput(
+        '[LightDebug][probe] start command=look (hidden) haltReason=' + String(this.vm.haltReason),
+        'system'
+      );
       this.vm.onOutput = text => {
         probeOutput += String(text || '');
       };
@@ -800,11 +928,51 @@ class GameIoController {
       this.vm.onUnknownOpcode = function () {};
       this.vm.onInputRequested = function () {};
 
-      this.vm.provideInput('look');
-      this.vm.run(200000);
+      let safety = 0;
+      while (this.vm.haltReason !== 'input' && safety < 8) {
+        const step = this.vm.run(200000);
+        if (step.haltReason === 'input') {
+          break;
+        }
+        if (step.haltReason === 'save' || step.haltReason === 'restore') {
+          this._appendLightDebugOutput(
+            '[LightDebug][probe] aborted pre-look haltReason=' + step.haltReason,
+            'system'
+          );
+          return null;
+        }
+        safety += 1;
+      }
+      if (this.vm.haltReason !== 'input') {
+        this._appendLightDebugOutput('[LightDebug][probe] aborted pre-look no-input');
+        return null;
+      }
 
-      return /\bit is pitch black\./i.test(probeOutput);
+      this.vm.provideInput('look');
+      safety = 0;
+      while (this.vm.haltReason !== 'input' && safety < 8) {
+        const step = this.vm.run(200000);
+        if (step.haltReason === 'input') {
+          break;
+        }
+        if (step.haltReason === 'save' || step.haltReason === 'restore') {
+          this._appendLightDebugOutput(
+            '[LightDebug][probe] aborted post-look haltReason=' + step.haltReason,
+            'system'
+          );
+          return null;
+        }
+        safety += 1;
+      }
+      const detected = /\bit is pitch black\./i.test(probeOutput);
+      this._appendLightDebugOutput(
+        '[LightDebug][probe] detectedPitchBlack=' + String(detected) +
+        ' outputLen=' + String(probeOutput.length),
+        'system'
+      );
+      return detected;
     } catch (error) {
+      this._appendLightDebugOutput('[LightDebug][probe] error=' + error.message);
       return null;
     } finally {
       try {
@@ -937,6 +1105,13 @@ class GameIoController {
     this.ui.appendOutput(text, 'system');
   }
 
+  _appendLightDebugOutput(text) {
+    if (!this.debugEnabled) {
+      return;
+    }
+    this.ui.appendOutput(text, 'system');
+  }
+
   _syncStatusDisplays() {
     if (!this.vm || typeof this.vm.getStatusSnapshot !== 'function') {
       this.ui.setTopbarMeta('', '', '');
@@ -951,6 +1126,13 @@ class GameIoController {
       roomName !== this.currentRoomName ||
       isDark !== this.lastSceneIsDark
     ) {
+      this._appendLightDebugOutput(
+        '[LightDebug][scene] room=' + (roomName || 'unknown') +
+        ' (' + String(roomId || 0) + ')' +
+        ' isDark=' + String(isDark) +
+        ' prevIsDark=' + String(this.lastSceneIsDark),
+        'system'
+      );
       this.currentRoomId = roomId;
       this.currentRoomName = roomName;
       this.lastSceneIsDark = isDark;

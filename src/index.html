@@ -79,6 +79,9 @@
           <div id="scene-layer-a" class="scene-layer"></div>
           <div id="scene-layer-b" class="scene-layer"></div>
         </section>
+        <div id="blood-layer" class="blood-layer" aria-hidden="true">
+          <img id="blood-splatter" class="blood-splatter" alt="" />
+        </div>
       </div>
       <section id="command-sheet" class="command-sheet" aria-label="Commands overview" hidden>
         <div class="command-sheet-panel">
@@ -169,6 +172,9 @@
               <button class="btn command-chip" type="button" data-command="$SOUND"><strong>$SOUND</strong><span>Toggle in-game sound effects only.</span></button>
               <button class="btn command-chip" type="button" data-command="$GAMESOUND"><strong>$GAMESOUND</strong><span>Toggle splash and other game music.</span></button>
               <button class="btn command-chip" type="button" data-command="$DEBUG"><strong>$DEBUG</strong><span>Toggle debug-only VM and sound diagnostics.</span></button>
+              <button class="btn command-chip" type="button" data-command="$BLOOD ON"><strong>$BLOOD ON</strong><span>Debug-only: enable low-frequency random blood spatter.</span></button>
+              <button class="btn command-chip" type="button" data-command="$BLOOD OFF"><strong>$BLOOD OFF</strong><span>Debug-only: disable blood spatter effect.</span></button>
+              <button class="btn command-chip" type="button" data-command="$BLOOD 3"><strong>$BLOOD 1-5</strong><span>Debug-only: force a specific blood splatter variant.</span></button>
               <button class="btn command-chip" type="button" data-command="$SOUNDSTATS"><strong>$SOUNDSTATS</strong><span>Print captured sound-event statistics.</span></button>
             </div>
           </div>
@@ -213,6 +219,9 @@
         const sceneLayerA = document.getElementById('scene-layer-a');
         const sceneLayerB = document.getElementById('scene-layer-b');
         const sceneLayers = [sceneLayerA, sceneLayerB];
+        const scenePaneEl = document.querySelector('.scene-pane');
+        const bloodSplatterEl = document.getElementById('blood-splatter');
+        const hudGroupEl = document.querySelector('.hud-group');
         const commandSheetEl = document.getElementById('command-sheet');
         const settingsSheetEl = document.getElementById('settings-sheet');
         const settingsButtonEl = document.getElementById('settings-button');
@@ -241,6 +250,18 @@
         });
 
         let activeSceneIndex = 0;
+        const BLOOD_SPLATTER_ART = [
+          './assets/gfx/blood/bloodsplatter_small_1.png',
+          './assets/gfx/blood/bloodsplatter_small_2.png',
+          './assets/gfx/blood/bloodsplatter_mediumlarge.png',
+          './assets/gfx/blood/bloodsplatter_large.png',
+          './assets/gfx/blood/bloodsplatter_double.png',
+        ];
+        let bloodEffectEnabled = false;
+        let bloodEffectMode = 'random';
+        let bloodEffectFixedIndex = 1;
+        let bloodEffectTimer = 0;
+        let bloodEffectHideTimer = 0;
         const ROOM_ART_BY_ID = {
           15: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
           51: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
@@ -261,7 +282,7 @@
           66: './assets/gfx/lurkinghorror/steam_tunnel_66.jpg',
           69: './assets/gfx/lurkinghorror/inner_lair_69.jpg',
           78: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
-          98: './assets/gfx/lurkinghorror/smith_street_185.jpg',
+          98: './assets/gfx/lurkinghorror/smith_street_98.jpg',
           99: './assets/gfx/lurkinghorror/large_chamber_99.jpg',
           127: './assets/gfx/lurkinghorror/roof_127.jpg',
           134: './assets/gfx/lurkinghorror/basalt_bowl_134.jpg',
@@ -374,6 +395,219 @@
           activeSceneIndex = nextIndex;
         }
 
+        function clearBloodTimers() {
+          if (bloodEffectTimer) {
+            clearTimeout(bloodEffectTimer);
+            bloodEffectTimer = 0;
+          }
+          if (bloodEffectHideTimer) {
+            clearTimeout(bloodEffectHideTimer);
+            bloodEffectHideTimer = 0;
+          }
+        }
+
+        function hideBloodSplatter() {
+          bloodSplatterEl.classList.remove('is-visible');
+        }
+
+        function pickBloodSplatterIndex() {
+          if (bloodEffectMode === 'fixed') {
+            return Math.max(1, Math.min(BLOOD_SPLATTER_ART.length, bloodEffectFixedIndex));
+          }
+          return Math.floor(Math.random() * BLOOD_SPLATTER_ART.length) + 1;
+        }
+
+        function scheduleNextBloodSplatter() {
+          if (!bloodEffectEnabled) {
+            return;
+          }
+          const nextDelayMs = 30000 + Math.floor(Math.random() * 45000);
+          bloodEffectTimer = setTimeout(() => {
+            showBloodSplatter();
+          }, nextDelayMs);
+        }
+
+        function appendBloodDebug(message) {
+          if (!window.gameController || !window.gameController.debugEnabled) {
+            return;
+          }
+          ui.appendOutput('[BloodDebug] ' + message, 'system');
+        }
+
+        function showBloodSplatter(forcedIndex, options) {
+          if (!bloodEffectEnabled) {
+            return;
+          }
+          const opts = options || {};
+          clearBloodTimers();
+          const selected = forcedIndex || pickBloodSplatterIndex();
+          const clampedIndex = Math.max(1, Math.min(BLOOD_SPLATTER_ART.length, selected));
+          const art = BLOOD_SPLATTER_ART[clampedIndex - 1];
+          const top = 2 + Math.random() * 96;
+          const rotation = (Math.random() * 44) - 22;
+          const left = 2 + Math.random() * 96;
+          const scale = 0.74 + Math.random() * 0.52;
+          let finalLeft = left;
+          let finalTop = top;
+          let corrected = false;
+          let correctionDirection = 'none';
+          let correctionShift = 0;
+          let layerSizeText = 'n/a';
+          let pictureRangeText = 'n/a';
+          let splatterSizeText = 'n/a';
+          let initialPlacementText = '[' + left.toFixed(2) + ',' + top.toFixed(2) + ']';
+
+          if (bloodSplatterEl.parentElement && scenePaneEl) {
+            const layerRect = bloodSplatterEl.parentElement.getBoundingClientRect();
+            const sceneRect = scenePaneEl.getBoundingClientRect();
+            layerSizeText = layerRect.width.toFixed(1) + 'x' + layerRect.height.toFixed(1);
+            if (layerRect.width > 0 && layerRect.height > 0) {
+              const sceneLeft = ((sceneRect.left - layerRect.left) / layerRect.width) * 100;
+              const sceneRight = ((sceneRect.right - layerRect.left) / layerRect.width) * 100;
+              const sceneTop = ((sceneRect.top - layerRect.top) / layerRect.height) * 100;
+              const sceneBottom = ((sceneRect.bottom - layerRect.top) / layerRect.height) * 100;
+
+              // The visible scene image is centered and covers ~50% of scene pane in each axis.
+              const sceneWidth = Math.max(0, sceneRight - sceneLeft);
+              const sceneHeight = Math.max(0, sceneBottom - sceneTop);
+              const pictureLeft = sceneLeft + (sceneWidth * 0.25);
+              const pictureRight = sceneLeft + (sceneWidth * 0.75);
+              const pictureTop = sceneTop + (sceneHeight * 0.25);
+              const pictureBottom = sceneTop + (sceneHeight * 0.75);
+              pictureRangeText =
+                '[' + pictureLeft.toFixed(2) + ',' + pictureRight.toFixed(2) + ',' +
+                pictureTop.toFixed(2) + ',' + pictureBottom.toFixed(2) + ']';
+
+              const baseWidthPx = Math.max(120, Math.min(layerRect.width * 0.26, 280));
+              const splatterWidthPx = baseWidthPx * scale;
+              // Approximate blood PNGs as roughly square for collision math.
+              const splatterHeightPx = splatterWidthPx;
+              const halfW = (splatterWidthPx / layerRect.width) * 50;
+              const halfH = (splatterHeightPx / layerRect.height) * 50;
+              splatterSizeText = '[' + (halfW * 2).toFixed(2) + ',' + (halfH * 2).toFixed(2) + ']';
+
+              const splatterLeft = finalLeft - halfW;
+              const splatterRight = finalLeft + halfW;
+              const splatterTop = finalTop - halfH;
+              const splatterBottom = finalTop + halfH;
+
+              const intersectsPicture =
+                splatterRight > pictureLeft &&
+                splatterLeft < pictureRight &&
+                splatterBottom > pictureTop &&
+                splatterTop < pictureBottom;
+
+              if (intersectsPicture) {
+                const maxOverlap = 0.25;
+                const candidates = [];
+
+                // Keep y, shift x to satisfy overlap constraint at left picture edge.
+                candidates.push({
+                  dir: 'left',
+                  x: pictureLeft - (halfW * (1 - maxOverlap)),
+                  y: finalTop,
+                });
+                // Keep y, shift x to satisfy overlap constraint at right picture edge.
+                candidates.push({
+                  dir: 'right',
+                  x: pictureRight + (halfW * (1 - maxOverlap)),
+                  y: finalTop,
+                });
+                // Keep x, shift y to satisfy overlap constraint at top picture edge.
+                candidates.push({
+                  dir: 'top',
+                  x: finalLeft,
+                  y: pictureTop - (halfH * (1 - maxOverlap)),
+                });
+                // Keep x, shift y to satisfy overlap constraint at bottom picture edge.
+                candidates.push({
+                  dir: 'bottom',
+                  x: finalLeft,
+                  y: pictureBottom + (halfH * (1 - maxOverlap)),
+                });
+
+                let best = null;
+                for (const candidate of candidates) {
+                  const clampedX = Math.max(2, Math.min(98, candidate.x));
+                  const clampedY = Math.max(2, Math.min(98, candidate.y));
+                  const dx = clampedX - finalLeft;
+                  const dy = clampedY - finalTop;
+                  const distance = Math.hypot(dx, dy);
+                  if (!best || distance < best.distance) {
+                    best = {
+                      dir: candidate.dir,
+                      x: clampedX,
+                      y: clampedY,
+                      distance,
+                    };
+                  }
+                }
+
+                if (best) {
+                  correctionDirection = best.dir;
+                  finalLeft = best.x;
+                  finalTop = best.y;
+                  correctionShift = best.distance;
+                }
+                corrected = true;
+              }
+
+              finalLeft = Math.max(2, Math.min(98, finalLeft));
+              finalTop = Math.max(2, Math.min(98, finalTop));
+            }
+          }
+          appendBloodDebug(
+            'area layer=' + layerSizeText +
+            ' picture[L,R,T,B]=' + pictureRangeText +
+            ' splatter[W,H]=' + splatterSizeText +
+            ' initial=' + initialPlacementText +
+            ' corrected=' + String(corrected) +
+            ' dir=' + correctionDirection +
+            ' shift=' + correctionShift.toFixed(2)
+          );
+          bloodSplatterEl.src = art;
+          bloodSplatterEl.style.top = finalTop.toFixed(2) + '%';
+          bloodSplatterEl.style.left = finalLeft.toFixed(2) + '%';
+          bloodSplatterEl.style.transform = 'translate(-50%, -50%) rotate(' + rotation.toFixed(2) + 'deg) scale(' + scale.toFixed(2) + ')';
+          appendBloodDebug(
+            'place art=' + clampedIndex +
+            ' top=' + finalTop.toFixed(2) +
+            ' left=' + finalLeft.toFixed(2) +
+            ' rot=' + rotation.toFixed(2) +
+            ' scale=' + scale.toFixed(2)
+          );
+          bloodSplatterEl.classList.add('is-visible');
+          bloodEffectHideTimer = setTimeout(() => {
+            hideBloodSplatter();
+            scheduleNextBloodSplatter();
+          }, 7000 + Math.floor(Math.random() * 5000));
+        }
+
+        function setBloodEffectState(state) {
+          const next = state || {};
+          bloodEffectEnabled = !!next.enabled;
+          if (next.mode === 'fixed' || next.mode === 'random') {
+            bloodEffectMode = next.mode;
+          }
+          if (Number.isFinite(next.index)) {
+            bloodEffectFixedIndex = Math.max(1, Math.min(BLOOD_SPLATTER_ART.length, Number(next.index)));
+          }
+          clearBloodTimers();
+          if (!bloodEffectEnabled) {
+            hideBloodSplatter();
+            return;
+          }
+          if (next.immediate) {
+            if (bloodEffectMode === 'fixed') {
+              showBloodSplatter(bloodEffectFixedIndex, { forceOverlap: true });
+            } else {
+              showBloodSplatter();
+            }
+            return;
+          }
+          scheduleNextBloodSplatter();
+        }
+
         const controller = new window.GameIoController(ui, {
           onSoundEvent: event => {
             const soundEvent = event || {};
@@ -398,6 +632,9 @@
           },
           onRoomChanged: (roomName, roomObjectId, options) => {
             setRoomScene(roomName, roomObjectId, options);
+          },
+          onBloodEffectCommand: state => {
+            setBloodEffectState(state);
           },
         });
         ui.appendOutput('Booting interpreter shell...', 'system');

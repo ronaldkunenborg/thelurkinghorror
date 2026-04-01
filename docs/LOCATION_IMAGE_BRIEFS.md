@@ -145,10 +145,20 @@ Gemaakt met ChatGPT:
     - Literal description: `This is a tiny, narrow, ill-fitting room. It appears to have been a left over space from the joining of two preexisting buildings. It is roughly coffin shaped. The walls are covered by decades of overlaid graffiti, but there is one which is painted in huge fluorescent letters that were apparently impossible for later artists to completely deface. On the floor is a rusty access hatch locked with a huge padlock.`
     - Description: Stone burial chamber with age-worn surfaces, dry dust, and severe stillness. Emphasize historical weight and the sense of disturbing something that should remain sealed.
 
-14. `Wet Tunnel (15/51/87/117/131/161/164/181/184/187/232/234)`
+14. `Wet Tunnel (15/51/87/117/131/161/164/184/187/232/234)`
     - Title: `Wet Tunnels: Numbered Labyrinth`
     - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
     - Description: Repeating flooded tunnel segments that are intentionally hard to distinguish. Maintain a consistent visual language while allowing minor landmark variation.
+
+32. `Wet Tunnel (181)`
+   - Title: `Wet Tunnel: Supplemental Study (181)`
+   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor. A curtain of moldy slime covers the south wall.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
+
+15. `Smith Street (98)`
+   - Title: `Smith Street: Supplemental Study (98)`
+   - Literal description: `Smith Street runs west towards the computer center here. To the south is a dilapidated grey wooden building. The street is an impassable sea of blowing and drifting snow.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: Smith Street runs west towards the computer center here.
 
 
 ## Additional locations (remaining 51)
@@ -205,20 +215,6 @@ These are the remaining mapped locations, in the same brief format.
    - Literal description: `This is a storage room. It contains an incredible assemblage of discarded junk. Some of it is so old and mouldering that you can't be sure where one bit of junk stops and the next begins. It's piled to the ceiling on ancient, rotting pallets; you can't even see the east wall.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a storage room.
 
-12. `Wet Tunnel (51)`
-   - Title: `Wet Tunnel: Supplemental Study (51)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
-14. `Wet Tunnel (87)`
-   - Title: `Wet Tunnel: Supplemental Study (87)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
-15. `Smith Street (98)`
-   - Title: `Smith Street: Supplemental Study (98)`
-   - Literal description: `Smith Street runs west towards the computer center here. To the south is a dilapidated grey wooden building. The street is an impassable sea of blowing and drifting snow.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: Smith Street runs west towards the computer center here.
 
 16. `Inside Dome (109)`
    - Title: `Inside Dome: Supplemental Study (109)`
@@ -230,11 +226,6 @@ These are the remaining mapped locations, in the same brief format.
    - Literal description: `This is the third floor of the Computer Center. An elevator and call button are on the south side of the hallway. Stairs also lead down, for the energetic. To the north is a glass wall beyond which you can see a computer room crammed with computer equipment. A stairway leads up.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This is the third floor of the Computer Center.
 
-18. `Wet Tunnel (117)`
-   - Title: `Wet Tunnel: Supplemental Study (117)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
 19. `Roof of Great Dome (121)`
    - Title: `Roof of Great Dome: Supplemental Study (121)`
    - Literal description: `You are perched precariously on the roof of the Great Dome. A set of narrow indentations in the dome provides a dangerous route to the very tip-top of the dome.`
@@ -244,11 +235,6 @@ These are the remaining mapped locations, in the same brief format.
    - Title: `Elevator: Supplemental Study (124)`
    - Literal description: `This is a battered, rather dirty elevator. The fake wood walls are scratched and marred with graffiti. The elevator doors are closed. To the right of the doors is an area with floor buttons (B and 1 through 3), an open button, a close button, a stop switch, and an alarm button. Below these is an access panel which is closed.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a battered, rather dirty elevator.
-
-21. `Wet Tunnel (131)`
-   - Title: `Wet Tunnel: Supplemental Study (131)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
 
 23. `Subbasement (142)`
    - Title: `Subbasement: Supplemental Study (142)`
@@ -265,15 +251,6 @@ These are the remaining mapped locations, in the same brief format.
    - Literal description: `This basement level room is made of smooth, damp-seeming concrete. Fluorescent lights cast harsh shadows. To the west is a stairway, and to the east the basement area continues.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This basement level room is made of smooth, damp-seeming concrete.
 
-26. `Wet Tunnel (161)`
-   - Title: `Wet Tunnel: Supplemental Study (161)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
-27. `Wet Tunnel (164)`
-   - Title: `Wet Tunnel: Supplemental Study (164)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
 
 28. `Ancient Storage (171)`
    - Title: `Ancient Storage: Supplemental Study (171)`
@@ -294,21 +271,6 @@ These are the remaining mapped locations, in the same brief format.
    - Title: `Great Court: Supplemental Study (180)`
    - Literal description: `In the spring and summer, this cheery green court is a haven from classwork. Right now, the majestic buildings of the main campus are almost invisible in the howling blizzard. A locked door bars your way to the north.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: In the spring and summer, this cheery green court is a haven from classwork.
-
-32. `Wet Tunnel (181)`
-   - Title: `Wet Tunnel: Supplemental Study (181)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor. A curtain of moldy slime covers the south wall.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
-33. `Wet Tunnel (184)`
-   - Title: `Wet Tunnel: Supplemental Study (184)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
-35. `Wet Tunnel (187)`
-   - Title: `Wet Tunnel: Supplemental Study (187)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
 
 36. `Mass. Ave. (190)`
    - Title: `Mass. Ave.: Supplemental Study (190)`
@@ -359,16 +321,6 @@ These are the remaining mapped locations, in the same brief format.
    - Title: `Skyscraper Roof: Supplemental Study (222)`
    - Literal description: `A low parapet surrounds a small roof here. The air conditioning cooling tower and the small protrusion containing the stairs are dwarfed by a semitransparent dome which towers above you. The blowing snow obscures all detail of the city across the river to the south.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: A low parapet surrounds a small roof here.
-
-48. `Wet Tunnel (232)`
-   - Title: `Wet Tunnel: Supplemental Study (232)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
-
-49. `Wet Tunnel (234)`
-   - Title: `Wet Tunnel: Supplemental Study (234)`
-   - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
 
 50. `Brown Building (240)`
    - Title: `Brown Building: Supplemental Study (240)`
