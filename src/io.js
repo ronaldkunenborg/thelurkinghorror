@@ -39,6 +39,8 @@ class GameIoController {
     this.currentRoomName = '';
     this.currentRoomId = 0;
     this.lastTurnWasPitchBlack = false;
+    this.flashlightOverride = null;
+    this.lastSceneIsDark = null;
     this.previousVmLine = '';
     this.debugEnabled = false;
     this.sfxEnabled = true;
@@ -91,6 +93,8 @@ class GameIoController {
     this.currentRoomName = '';
     this.currentRoomId = 0;
     this.lastTurnWasPitchBlack = false;
+    this.flashlightOverride = null;
+    this.lastSceneIsDark = null;
     this.previousVmLine = '';
     this.onRoomChanged('', 0, { isDark: false });
     this.vm = new window.Z3VM({
@@ -225,6 +229,9 @@ class GameIoController {
       this.ui.setStatus('Interpreter command', this.debugEnabled ? 'Debug on' : 'Debug off');
       return true;
     }
+    if (normalized.startsWith('$FLASHLIGHT')) {
+      return this._handleFlashlightCommand(original);
+    }
     if (normalized.startsWith('$SAVES')) {
       this._listSaveSlots();
       return true;
@@ -355,6 +362,32 @@ class GameIoController {
       return true;
   }
 
+  _handleFlashlightCommand(command) {
+    const parts = String(command || '').trim().split(/\s+/);
+    const mode = (parts[1] || '').toUpperCase();
+    if (mode !== 'ON' && mode !== 'OFF') {
+      this.ui.appendOutput('Usage: $FLASHLIGHT ON|OFF', 'error');
+      this.ui.setStatus('Interpreter command', 'Flashlight usage');
+      return true;
+    }
+
+    // Temporary visual override for testing dark-room art behavior.
+    this.flashlightOverride = mode === 'ON' ? 'on' : null;
+    const active = this.flashlightOverride === 'on';
+    this.ui.appendOutput(
+      'Temporary flashlight override is now ' + (active ? 'ON' : 'OFF') + '.',
+      'system'
+    );
+    this.ui.setStatus('Interpreter command', active ? 'Flashlight ON' : 'Flashlight OFF');
+
+    if (this.currentRoomId || this.currentRoomName) {
+      const isDark = this._isDarkForScene();
+      this.lastSceneIsDark = isDark;
+      this.onRoomChanged(this.currentRoomName, this.currentRoomId, { isDark });
+    }
+    return true;
+  }
+
   setSoundEffectsVolume(value) {
     this.sfxVolume = this._clampVolume(value);
     this._refreshActiveSoundVolumes(SOUND_CLASS_SFX);
@@ -456,6 +489,7 @@ class GameIoController {
         serial: compat.serial,
         release: compat.release,
         checksum: compat.checksum,
+        sceneIsDark: !!this.lastTurnWasPitchBlack,
         quetzalData: this.vm.serializePendingSaveState(),
       });
       this.vm.completePendingSave(true);
@@ -487,6 +521,9 @@ class GameIoController {
       this._assertCompatibleSaveRecord(record);
       this._prepareAudioForRestore();
       this.vm.restoreSaveState(record.quetzalData);
+      const probedDark = this._probeDarknessFromCurrentState();
+      this.lastTurnWasPitchBlack = (probedDark === null) ? !!record.sceneIsDark : probedDark;
+      this.lastSceneIsDark = null;
       this._syncStatusDisplays();
       this.ui.setStatus('Story restore', 'Loaded slot ' + slot);
     } catch (error) {
@@ -516,6 +553,7 @@ class GameIoController {
         serial: compat.serial,
         release: compat.release,
         checksum: compat.checksum,
+        sceneIsDark: !!this.lastTurnWasPitchBlack,
         quetzalData: this.vm.serializeSaveState(),
       });
       this.ui.appendOutput(
@@ -566,6 +604,9 @@ class GameIoController {
       this._assertCompatibleSaveRecord(record);
       this._prepareAudioForRestore();
       this.vm.restoreSaveState(record.quetzalData);
+      const probedDark = this._probeDarknessFromCurrentState();
+      this.lastTurnWasPitchBlack = (probedDark === null) ? !!record.sceneIsDark : probedDark;
+      this.lastSceneIsDark = null;
       this._syncStatusDisplays();
       this.ui.appendOutput(
         'Loaded slot ' + slot + ' (' + (record.label || 'saved game') + ').',
@@ -723,6 +764,63 @@ class GameIoController {
     return normalized === 'it is pitch black.';
   }
 
+  _isDarkForScene() {
+    if (this.flashlightOverride === 'on') {
+      return false;
+    }
+    return this.lastTurnWasPitchBlack;
+  }
+
+  _probeDarknessFromCurrentState() {
+    if (
+      !this.vm ||
+      typeof this.vm.serializeSaveState !== 'function' ||
+      typeof this.vm.restoreSaveState !== 'function' ||
+      this.vm.haltReason !== 'input'
+    ) {
+      return null;
+    }
+
+    const vmSnapshot = this.vm.serializeSaveState();
+    const prevOutputBuffer = this.outputBuffer;
+    const prevPendingDark = this.lastTurnWasPitchBlack;
+    const prevOnOutput = this.vm.onOutput;
+    const prevOnSoundEffect = this.vm.onSoundEffect;
+    const prevOnUnknownOpcode = this.vm.onUnknownOpcode;
+    const prevOnInputRequested = this.vm.onInputRequested;
+    let probeOutput = '';
+
+    try {
+      this.outputBuffer = '';
+      this.lastTurnWasPitchBlack = false;
+      this.vm.onOutput = text => {
+        probeOutput += String(text || '');
+      };
+      this.vm.onSoundEffect = function () {};
+      this.vm.onUnknownOpcode = function () {};
+      this.vm.onInputRequested = function () {};
+
+      this.vm.provideInput('look');
+      this.vm.run(200000);
+
+      return /\bit is pitch black\./i.test(probeOutput);
+    } catch (error) {
+      return null;
+    } finally {
+      try {
+        this.vm.restoreSaveState(vmSnapshot);
+      } catch (restoreError) {
+        // If restore fails, keep going; caller will fall back to metadata/default behavior.
+      }
+      this.vm.onOutput = prevOnOutput;
+      this.vm.onSoundEffect = prevOnSoundEffect;
+      this.vm.onUnknownOpcode = prevOnUnknownOpcode;
+      this.vm.onInputRequested = prevOnInputRequested;
+      this.outputBuffer = prevOutputBuffer;
+      this.lastTurnWasPitchBlack = prevPendingDark;
+    }
+  }
+
   _isComputerHelpHintLine(line) {
     const normalized = String(line || '').toLowerCase();
     return normalized.includes('login your-user-id') && normalized.includes('password your-password');
@@ -847,12 +945,16 @@ class GameIoController {
     const snapshot = this.vm.getStatusSnapshot();
     const roomId = snapshot && Number.isFinite(snapshot.roomObjectId) ? snapshot.roomObjectId : 0;
     const roomName = snapshot && snapshot.roomName ? snapshot.roomName : '';
-    if (roomId !== this.currentRoomId || roomName !== this.currentRoomName) {
+    const isDark = this._isDarkForScene();
+    if (
+      roomId !== this.currentRoomId ||
+      roomName !== this.currentRoomName ||
+      isDark !== this.lastSceneIsDark
+    ) {
       this.currentRoomId = roomId;
       this.currentRoomName = roomName;
-      this.onRoomChanged(this.currentRoomName, this.currentRoomId, {
-        isDark: this.lastTurnWasPitchBlack,
-      });
+      this.lastSceneIsDark = isDark;
+      this.onRoomChanged(this.currentRoomName, this.currentRoomId, { isDark });
     }
     this.ui.setTopbarMeta(
       roomName || '',
