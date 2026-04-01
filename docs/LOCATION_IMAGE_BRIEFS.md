@@ -161,7 +161,7 @@ Gemaakt met ChatGPT:
    - Description: Use the literal room text as the primary layout guide, with emphasis on: Smith Street runs west towards the computer center here.
 
 
-## Additional locations (remaining 51)
+## Additional locations (remaining 33)
 
 These are the remaining mapped locations, in the same brief format.
 
@@ -215,7 +215,6 @@ These are the remaining mapped locations, in the same brief format.
    - Literal description: `This is a storage room. It contains an incredible assemblage of discarded junk. Some of it is so old and mouldering that you can't be sure where one bit of junk stops and the next begins. It's piled to the ceiling on ancient, rotting pallets; you can't even see the east wall.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a storage room.
 
-
 16. `Inside Dome (109)`
    - Title: `Inside Dome: Supplemental Study (109)`
    - Literal description: `You are inside a large domed area. The dome contains equipment that makes it clear it is a weather observation station. For some reason, it also contains a small peach tree. Wind whistles outside, and snow blasts against the semitransparent material of the dome.`
@@ -250,7 +249,6 @@ These are the remaining mapped locations, in the same brief format.
    - Title: `Aero Basement: Supplemental Study (158)`
    - Literal description: `This basement level room is made of smooth, damp-seeming concrete. Fluorescent lights cast harsh shadows. To the west is a stairway, and to the east the basement area continues.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This basement level room is made of smooth, damp-seeming concrete.
-
 
 28. `Ancient Storage (171)`
    - Title: `Ancient Storage: Supplemental Study (171)`
