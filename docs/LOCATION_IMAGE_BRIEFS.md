@@ -13,34 +13,17 @@ Literal descriptions below are taken from in-game `look` output in the local sto
 
 ## prompts
 
-Prefix to all prompts: Scratchart with very thin white etched lines on black paper. Dürer, black and white.
+Prefix to all prompts: Scratchart with very thin white etched lines on black paper. Dürer, black and white. Portrait or square - whatever works best for the composition.
 Prompts are now stored directly under each location entry (`- prompt:`), grouped by source/model section.
 
 Draft prompts for locations that do not yet have a per-location `- prompt:`:
 
-1. `Terminal Room (176)`
-   - prompt: Large cluttered computer room at night with old terminals, printers, cables, pizza boxes, and waste paper under weak monitor glow. The space should feel like a temporary refuge that still carries unease, with dense technical clutter in foreground and deep shadow toward the edges.
-
-3. `Kitchen (33)`
-   - prompt: Filthy staff kitchen with stained surfaces, neglected appliances, and stale grime baked into every corner. Keep the composition tight and unpleasant, with a refrigerator and microwave as clear landmarks and harsh contrast on dirty textures.
-4. `Smith Street (185)`
-   - prompt: Long east-west campus street during blizzard conditions, with howling wind, drifting snow, and dim streetlights reduced to ghostly points. The scene should feel exposed and hostile, with low visibility and frozen emptiness.
 5. `Temporary Lab (140)`
    - prompt: Improvised laboratory occupying a gutted temporary building floor where interior walls were removed, leaving open bays, scattered benches, and ad hoc research setups. Make it functional yet unstable, with makeshift order, abandoned urgency, and cold night lighting.
 6. `Infinite Corridor (218/214/210/208/206)`
    - prompt: Long central campus corridor stretching east-west with repeating doors, office fronts, and perspective lines that push toward a vanishing point. The mood should be geometric and uncanny, with slight visual repetition and oppressive institutional symmetry.
 7. `Great Dome (249)`
    - prompt: Vast interior base of an ornate dome with a circular walkway high above the main corridor and dramatic vertical scale fading into darkness. Emphasize monumental architecture, sparse highlights on curved structure, and a suspended rope-like element where a ladder should be.
-8. `Steam Tunnel (66/78/138/221/227)`
-   - prompt: Hot, damp utility tunnel dominated by a large insulated steam pipe and bundled coaxial cable overhead, with mold, condensation, and industrial decay throughout. The tunnel should feel pressurized and claustrophobic, with wet surfaces and heavy texture.
-9. `Steam Tunnel (78)`
-   - prompt: Narrow archaic steam tunnel section with brick walls, concrete floor, persistent steam pipe and cable run, and muddy damp footing. Stress the older construction style and compressed width compared to other tunnel segments.
-10. `Steam Tunnel (138)`
-   - prompt: Dead-end steam tunnel where pipe and cable turn upward into the ceiling, terminating at crumbling brick walls and a notably decrepit south wall. Compose it as a trapped endpoint with damp drips, grime, and structural exhaustion.
-11. `Steam Tunnel (221)`
-   - prompt: Dank tunnel segment with steam pipe, overhead cable draped in mold and cobwebs, and moisture-stained surfaces leading west. Keep the scene tight, gritty, and oppressive with dense wall texture and low headroom.
-12. `Steam Tunnel (227)`
-   - prompt: Oppressively hot steam tunnel with torn insulation on a squishy floor, heavy cable tangle on the ceiling, and fungi-coated concrete walls. Include a rusty ladder upward as the key navigational landmark in an otherwise horizontal passage.
 13. `Basalt Bowl (134)`
    - prompt: Deeply cut smooth black basalt basin viewed from the bottom, ringed by looming shapes and converging movement toward a rock platform ahead. Keep the space dreamlike and symbolic, with stark forms and minimal visual noise.
 14. `Place (152)`
@@ -53,8 +36,6 @@ Draft prompts for locations that do not yet have a per-location `- prompt:`:
    - prompt: Cinderblock service tunnel with concrete floor and ceiling, metal ladder to a closed ceiling plate, and transition toward older brickwork to the north. Keep it utilitarian, bare, and transit-focused.
 18. `Brick Tunnel (25)`
    - prompt: Ancient long brick-and-stone passage with rough mortar joints and extended north-south continuity disappearing into dark distance. Stress age, persistence, and heavy subterranean stillness.
-19. `Basement (27)`
-   - prompt: Broad concrete basement corridor with wire channels and steam pipes running floor to ceiling, plus elevator and stair access points. Present it as functional infrastructure space with harsh lighting and industrial monotony.
 20. `Tunnel Entrance (34)`
    - prompt: Transition point where finished utility space gives way to narrow muddy tunnel; pipes and coax disappear into the ceiling as temperature visibly drops. Compose it as a threshold from engineered order into organic menace.
 21. `Stairway (35)`
@@ -103,10 +84,10 @@ Draft prompts for locations that do not yet have a per-location `- prompt:`:
    - prompt: Mid-corridor section with locked offices on both sides and repeating fixtures extending in both directions. Keep perspective strict and oppressive, with subtle distortion to suggest unnatural length.
 43. `Infinite Corridor (210)`
    - prompt: Corridor node where the east-west hall continues, stairway rises, and a door opens toward Great Court. Show it as a functional junction with layered routes and institutional severity.
-44. `Top of Dome (213)`
-   - prompt: Interior high catwalk near the top of the great dome, precarious and narrow, with no route higher and a small metal door set into the curved shell. Use steep vertical framing and sparse highlights to stress exposure.
 45. `Infinite Corridor (214)`
    - prompt: Another repeating corridor segment with locked offices and long bidirectional sightlines, visually close to neighboring sections but not identical. Keep the mood monotonous, uncanny, and quietly threatening.
+44. `Top of Dome (213)`
+   - prompt: Interior high catwalk near the top of the great dome, precarious and narrow, with no route higher and a small metal door set into the curved shell. Use steep vertical framing and sparse highlights to stress exposure.
 46. `Skyscraper Roof (222)`
    - prompt: Small roof enclosed by low parapet, with cooling tower and stair protrusion overshadowed by a giant semitransparent dome above, while snow obscures distant city detail to the south. Emphasize scale contrast and weather erosion of visibility.
 47. `Brown Building (240)`
@@ -116,31 +97,7 @@ Draft prompts for locations that do not yet have a per-location `- prompt:`:
 
 ## Done
 
-Using Flux 2 Klein 9B Fast:
-
-1. `Terminal Room (176)`
-   - Title: `Terminal Room: Green Cursor in the Dark`
-   - Literal description: `This is a large room crammed with computer terminals, small computers, and printers. An exit leads south. Banners, posters, and signs festoon the walls. Most of the tables are covered with waste paper, old pizza boxes, and empty Coke cans. There are usually a lot of people here, but tonight it's almost deserted.`
-   - Description: A cramped, old computing room lit by weak monitor glow. The terminal is the focal point, with cables, dust, and hard shadows. The room should feel like a safe point that still carries unease.
-
-5. `Kitchen (33)`
-   - Title: `Kitchen: Supplemental Study (33)`
-   - Literal description: `This is a filthy kitchen. The exit is to the east. On the wall near a counter are a refrigerator and a microwave.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a filthy kitchen.
-
-6. `Aero Lobby (136)`
-   - Title: `Aero Lobby: Cold Marble Echo`
-   - Literal description: `This is the lobby of the Aeronautical Engineering Building. Stairs lead down and a corridor heads south towards the main building.`
-   - Description: A broad lobby with hard surfaces, sparse fixtures, and dead air. The scene should feel formally designed but emotionally vacant.
-   - prompt: Broad, spacious lobby interior in an aeronautical engineering building, with hard polished surfaces, sparse fixtures, and a formally planned architectural layout. Wide floor planes, stone or marble wall sections, clean lines, minimal furniture, and a corridor receding south toward the main building. Stairs descend out of view. The room should feel institutional, expensive, and emotionally vacant, with dead air, wide negative space, faint reflections, and austere lighting. Dramatic contrast, but restrained detail density, so the emptiness dominates.
-
-34. `Smith Street (185)`
-   - Title: `Smith Street: Supplemental Study (185)`
-   - Literal description: `Smith Street runs east and west along the north side of the main campus area. At the moment, it is an arctic wasteland of howling wind and drifting snow. On the other side of the street, barely visible, are the lidless eyes of streetlights. The street hasn't been plowed, or if it has been, it did no good.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: Smith Street runs east and west along the north side of the main campus area.
-   - Additional location: `Smith Street (98)`
-
-Using Z-image turbo:
+### Done with Z-image turbo
 
 3. `Computer Center (65)`
    - Title: `Computer Center: Midnight Lab`
@@ -179,26 +136,31 @@ Using Z-image turbo:
     - Title: `Steam Tunnel: Heat Under Stone`
     - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. A thick bundle of coaxial cable runs east to west along the ceiling.`
     - Description: Utility tunnels with pipes, periodic steam, and claustrophobic industrial decay. Treat the pressure valve as specific to `Steam Tunnel (66)`, not as a shared feature of all steam-tunnel locations.
+    - prompt: Hot, damp utility tunnel dominated by a large insulated steam pipe and bundled coaxial cable overhead, with mold, condensation, and industrial decay throughout. The tunnel should feel pressurized and claustrophobic, with wet surfaces and heavy texture.
 
 13. `Steam Tunnel (78)`
    - Title: `Steam Tunnel: Supplemental Study (78)`
    - Literal description: `The steam tunnel is narrow here, and its construction is more archaic. It's now mostly brick, although the floor is concrete. The steam pipe and coaxial cable continue along their appointed paths. The tunnel is damp and even a little muddy.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: The steam tunnel is narrow here, and its construction is more archaic.
+   - prompt: Narrow archaic steam tunnel section with brick walls, concrete floor, persistent steam pipe and cable run, and muddy damp footing. Stress the older construction style and compressed width compared to other tunnel segments.
 
 22. `Steam Tunnel (138)`
    - Title: `Steam Tunnel: Supplemental Study (138)`
    - Literal description: `The steam pipe and coaxial cable turn upwards and disappear into the ceiling here. The tunnel itself comes to an end in a grimy, damp, and dripping triad of crumbling brick walls. The south wall looks particularly decrepit.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: The steam pipe and coaxial cable turn upwards and disappear into the ceiling here.
+   - prompt: Dead-end steam tunnel where pipe and cable turn upward into the ceiling, terminating at crumbling brick walls and a notably decrepit south wall. Compose it as a trapped endpoint with damp drips, grime, and structural exhaustion.
 
 45. `Steam Tunnel (221)`
    - Title: `Steam Tunnel: Supplemental Study (221)`
    - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. A bundle of coaxial cable runs along the ceiling, festooned with damp mold and cobwebs. The tunnel continues west.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe.
+   - prompt: Dank tunnel segment with steam pipe, overhead cable draped in mold and cobwebs, and moisture-stained surfaces leading west. Keep the scene tight, gritty, and oppressive with dense wall texture and low headroom.
 
 47. `Steam Tunnel (227)`
    - Title: `Steam Tunnel: Supplemental Study (227)`
    - Literal description: `This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe. The tunnel is uncomfortably hot and damp. You have gone from the arctic to the tropics. The concrete tunnel has odd molds and fungi growing on its walls and ceiling, and the floor is squishy. Torn clots of insulation litter the floor. Along the ceiling runs a thick tangle of coaxial cable. The tunnel heads east and west. A rusty metal ladder leads up.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This dank and grimy tunnel is largely filled with an imperfectly insulated steam pipe.
+   - prompt: Oppressively hot steam tunnel with torn insulation on a squishy floor, heavy cable tangle on the ceiling, and fungi-coated concrete walls. Include a rusty ladder upward as the key navigational landmark in an otherwise horizontal passage.
 
 16. `Basalt Bowl (134)`
     - Title: `Basalt Bowl: Black Stone Basin`
@@ -215,13 +177,37 @@ Using Z-image turbo:
     - Literal description: `You stand before a low rock platform, more like an afterthought of piled rocks or a glacial moraine than a work of artifice. You are pushed against the pile by the crowd around you.`
     - Description: A liminal platform space with implied movement and uncertain destination. Use directional composition and negative space to suggest a one-way threshold.
 
-Gemaakt met ChatGPT:
+### Done with ChatGPT
+
+1. `Terminal Room (176)`
+   - Title: `Terminal Room: Green Cursor in the Dark`
+   - Literal description: `This is a large room crammed with computer terminals, small computers, and printers. An exit leads south. Banners, posters, and signs festoon the walls. Most of the tables are covered with waste paper, old pizza boxes, and empty Coke cans. There are usually a lot of people here, but tonight it's almost deserted.`
+   - Description: A cramped, old computing room lit by weak monitor glow. The terminal is the focal point, with cables, dust, and hard shadows. The room should feel like a safe point that still carries unease.
+   - prompt: Please make an image of a cramped, old computing room lit by weak monitor glow. The terminal is the focal point, with cables, dust, and hard shadows. The room should feel like a safe point that still carries unease. Scratch art, int he style of Dürer. It's a large cluttered computer room at night with old terminals, printers, cables, pizza boxes, and waste paper under weak monitor glow. Banners, posters, and signs festoon the walls. Most of the tables are covered with waste paper, old pizza boxes, and empty Coke cans. The space should feel like a temporary refuge that still carries unease, with dense technical clutter in foreground and deep shadow toward the edges.
 
 2. `Second Floor (137)`
    - Title: `Second Floor: Fluorescent Silence`
    - Literal description: `This is the second floor of the Computer Center. An elevator and call buttons are on the south side of the hallway. A large, noisy room is to the north. Stairs also lead up and down, for the energetic. To the west a corridor leads into a smaller room.`
    - Description: A dim institutional hallway with worn tiles, muted signage, and flat fluorescent light. The space feels ordinary at first glance, but too empty and too quiet.
    - prompt: Institutional second-floor hallway in a computer center, with elevator doors and call buttons on the south wall, stairs up and down, and a noisy room visible to the north. Fluorescent lighting should feel flat and sterile, emphasizing emptiness and after-hours silence.
+
+4. `Basement (27)`
+   - Title: `Basement: Supplemental Study (27)`
+   - Literal description: `Bare concrete walls line a wide corridor leading east and west. An elevator and call button are to the south. Stairs also lead up, for the energetic. From floor to ceiling run wire channels and steam pipes.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: Bare concrete walls line a wide corridor leading east and west.
+   - prompt: Broad concrete basement corridor with wire channels and steam pipes running floor to ceiling, plus elevator and stair access points. Present it as functional infrastructure space with harsh lighting and industrial monotony.
+
+5. `Kitchen (33)`
+   - Title: `Kitchen: Supplemental Study (33)`
+   - Literal description: `This is a filthy kitchen. The exit is to the east. On the wall near a counter are a refrigerator and a microwave.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a filthy kitchen.
+   - prompt: Filthy staff kitchen with stained surfaces, neglected appliances, and stale grime baked into every corner. Keep the composition tight and unpleasant, with a refrigerator and microwave as clear landmarks and harsh contrast on dirty textures.
+
+6. `Aero Lobby (136)`
+   - Title: `Aero Lobby: Cold Marble Echo`
+   - Literal description: `This is the lobby of the Aeronautical Engineering Building. Stairs lead down and a corridor heads south towards the main building.`
+   - Description: A broad lobby with hard surfaces, sparse fixtures, and dead air. The scene should feel formally designed but emotionally vacant.
+   - prompt: Broad, spacious lobby interior in an aeronautical engineering building, with hard polished surfaces, sparse fixtures, and a formally planned architectural layout. Wide floor planes, stone or marble wall sections, clean lines, minimal furniture, and a corridor receding south toward the main building. Stairs descend out of view. The room should feel institutional, expensive, and emotionally vacant, with dead air, wide negative space, faint reflections, and austere lighting. Dramatic contrast, but restrained detail density, so the emptiness dominates.
 
 11. `Muddy Tunnel (39)`
     - Title: `Muddy Tunnel: Wet Descent`
@@ -241,31 +227,13 @@ Gemaakt met ChatGPT:
     - Description: A ceremonial-feeling chamber centered on a stark altar form. Use hard symmetry, shadow framing, and restrained highlights for ominous focus.
     - prompt: Symmetrical ceremonial chamber composition, centered on a large flat granite altar slab at the bottom of the cave. The altar is carved with strange disturbing symbols, one much larger than the others, some partly obscured by dark rusty stains. Nearby sits an iron plate embedded in the concrete floor. Use hard symmetry, frontal composition, and shadow framing so the altar becomes the unavoidable focus. The lighting should be sparse and controlled, with restrained highlights along edges and carvings, and heavy darkness around the perimeter. Ominous, ritualistic, precise, and still.
 
-15. `Large Chamber (99)`
-    - Title: `Large Chamber: Echoing Void`
-    - Literal description: `This is a wide spot in the tunnel, just as wet and muddy as elsewhere. The walls are slimy as well. Numerous slots or indentations about two feet wide and a foot high open here and there. Thin, wire or ropelike growths emerge from a hole further down and enter each of the slots. There is background noise here, almost loud enough to hear clearly.`
-    - Description: A broad underground chamber with vertical darkness and unclear boundaries. The scene should feel open yet oppressive, with scale cues fading into black.
-    - prompt: Broad underground chamber opening out from narrow tunnels, with wet muddy ground and slimy walls, but with boundaries that fade into vertical darkness. Numerous rectangular slots or indentations interrupt the walls. Thin wire-like or rope-like growths emerge from deeper darkness and feed into the slots. The chamber should feel larger than the viewer can confidently measure, open in footprint yet oppressive in mood, with scale cues disappearing into blackness overhead and beyond. The composition should balance openness with uncertainty, using deep shadow, sparse highlights, and a sense of audible unseen activity.
-
-19. `Inner Lair (69)`
-    - Title: `Inner Lair: Hidden Core`
-    - Literal description: `The floor here is a stagnant, slime infested pool of water. It feels to your sodden feet to be about six inches deep. Ropes or wires tumble down the slope, where they enter a large whitish mass which takes up much of the chamber. The noise is loud here, and comes from the mass, which undulates in synchrony with the noise. Wan, sourceless light illuminates the chamber.`
-    - Description: A concealed interior den with dense shadow and focused highlights on key structures. It should feel like a destination reached only after sustained descent.
-    - prompt: Interior lair chamber reached after a long descent, with a stagnant slime-infested pool covering the floor to shallow depth. Ropes or wires tumble down a slope and disappear into a large whitish undulating mass occupying much of the chamber. The mass is the focal point, illuminated by wan sourceless light that reveals only selected surfaces while the rest of the chamber remains in dense shadow. The scene should feel like a hidden destination, enclosed and final, with concentrated detail on the water, cables, and pale living structure, and surrounding darkness that suggests much more beyond view.
-
-20. `Tomb (9)`
-    - Title: `Tomb: Buried Memory`
-    - Literal description: `This is a tiny, narrow, ill-fitting room. It appears to have been a left over space from the joining of two preexisting buildings. It is roughly coffin shaped. The walls are covered by decades of overlaid graffiti, but there is one which is painted in huge fluorescent letters that were apparently impossible for later artists to completely deface. On the floor is a rusty access hatch locked with a huge padlock.`
-    - Description: Stone burial chamber with age-worn surfaces, dry dust, and severe stillness. Emphasize historical weight and the sense of disturbing something that should remain sealed.
-    - prompt: Tiny, narrow, coffin-shaped chamber wedged awkwardly between older structures, with close stone walls and a severely cramped footprint. The surfaces are dry, age-worn, dusty, and heavy with stillness. The walls are layered with decades of graffiti, one message standing out in huge letters that remain legible despite later defacement. On the floor sits a rusty access hatch secured by an enormous padlock. Emphasize historical weight, confinement, and the sense of violating something sealed for a reason, with stark composition, dry texture, silent air, and restrained ominous highlights.
-    
 14. `Wet Tunnel (15/51/87/117/131/161/164/184/187/232/234)`
     - Title: `Wet Tunnels: Numbered Labyrinth`
     - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor.`
     - Description: Repeating flooded tunnel segments that are intentionally hard to distinguish. Maintain a consistent visual language while allowing minor landmark variation.
     - prompt: Repeating narrow flooded tunnel segment, one of many almost indistinguishable passages in a wet underground labyrinth. Muddy oily water covers the floor, reflecting dim broken highlights. The walls are slick, irregular, and close, with a consistent visual language from one segment to the next: low ceiling, wet mud, shallow standing water, and swallowed darkness ahead. Include only minor landmark variations such as a slight bend, a cracked wall seam, a small recess, or a hanging strand. Claustrophobic, minimal, and oppressive.
 
-32. `Wet Tunnel (181)`
+14b. `Wet Tunnel (181)`
    - Title: `Wet Tunnel: Supplemental Study (181)`
    - Literal description: `You are lost in narrow, wet tunnels burrowed through the mud. Muddy, oily water covers the floor. A curtain of moldy slime covers the south wall.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: You are lost in narrow, wet tunnels burrowed through the mud.
@@ -277,6 +245,36 @@ Gemaakt met ChatGPT:
    - Description: Use the literal room text as the primary layout guide, with emphasis on: Smith Street runs west towards the computer center here.
    - prompt: Exterior night scene on Smith Street in severe blizzard conditions, with the road running west toward the Computer Center. To the south stands a dilapidated gray wooden building, weathered and unstable. The street is an impassable sea of blowing and drifting snow, with low visibility, wind streaks, and sparse urban lighting swallowed by the storm. Focus on exposure, cold emptiness, and directional weather movement in stark black-and-white etched linework.
 
+15b. `Smith Street (185)`
+   - Title: `Smith Street: Supplemental Study (185)`
+   - Literal description: `Smith Street runs east and west along the north side of the main campus area. At the moment, it is an arctic wasteland of howling wind and drifting snow. On the other side of the street, barely visible, are the lidless eyes of streetlights. The street hasn't been plowed, or if it has been, it did no good.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: Smith Street runs east and west along the north side of the main campus area.
+   - Additional location: `Smith Street (98)`
+   - prompt: Long east-west campus street during blizzard conditions, with howling wind, drifting snow, and dim streetlights reduced to ghostly points. The scene should feel exposed and hostile, with low visibility and frozen emptiness.
+
+16. `Large Chamber (99)`
+    - Title: `Large Chamber: Echoing Void`
+    - Literal description: `This is a wide spot in the tunnel, just as wet and muddy as elsewhere. The walls are slimy as well. Numerous slots or indentations about two feet wide and a foot high open here and there. Thin, wire or ropelike growths emerge from a hole further down and enter each of the slots. There is background noise here, almost loud enough to hear clearly.`
+    - Description: A broad underground chamber with vertical darkness and unclear boundaries. The scene should feel open yet oppressive, with scale cues fading into black.
+    - prompt: Broad underground chamber opening out from narrow tunnels, with wet muddy ground and slimy walls, but with boundaries that fade into vertical darkness. Numerous rectangular slots or indentations interrupt the walls. Thin wire-like or rope-like growths emerge from deeper darkness and feed into the slots. The chamber should feel larger than the viewer can confidently measure, open in footprint yet oppressive in mood, with scale cues disappearing into blackness overhead and beyond. The composition should balance openness with uncertainty, using deep shadow, sparse highlights, and a sense of audible unseen activity.
+
+19. `Inner Lair (69)`
+    - Title: `Inner Lair: Hidden Core`
+    - Literal description: `The floor here is a stagnant, slime infested pool of water. It feels to your sodden feet to be about six inches deep. Ropes or wires tumble down the slope, where they enter a large whitish mass which takes up much of the chamber. The noise is loud here, and comes from the mass, which undulates in synchrony with the noise. Wan, sourceless light illuminates the chamber.`
+    - Description: A concealed interior den with dense shadow and focused highlights on key structures. It should feel like a destination reached only after sustained descent.
+    - prompt: Interior lair chamber reached after a long descent, with a stagnant slime-infested pool covering the floor to shallow depth. Ropes or wires tumble down a slope and disappear into a large whitish undulating mass occupying much of the chamber. The mass is the focal point, illuminated by wan sourceless light that reveals only selected surfaces while the rest of the chamber remains in dense shadow. The scene should feel like a hidden destination, enclosed and final, with concentrated detail on the water, cables, and pale living structure, and surrounding darkness that suggests much more beyond view.
+
+20. `Elevator (124)`
+   - Title: `Elevator: Supplemental Study (124)`
+   - Literal description: `This is a battered, rather dirty elevator. The fake wood walls are scratched and marred with graffiti. The elevator doors are closed. To the right of the doors is an area with floor buttons (B and 1 through 3), an open button, a close button, a stop switch, and an alarm button. Below these is an access panel which is closed.`
+   - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a battered, rather dirty elevator.
+   - prompt: Battered dirty elevator interior with fake wood walls scarred by graffiti, old control panel with floor buttons and switches, and a closed access panel. Focus on worn surfaces, tight framing, and claustrophobic utility.
+
+21. `Tomb (9)`
+    - Title: `Tomb: Buried Memory`
+    - Literal description: `This is a tiny, narrow, ill-fitting room. It appears to have been a left over space from the joining of two preexisting buildings. It is roughly coffin shaped. The walls are covered by decades of overlaid graffiti, but there is one which is painted in huge fluorescent letters that were apparently impossible for later artists to completely deface. On the floor is a rusty access hatch locked with a huge padlock.`
+    - Description: Stone burial chamber with age-worn surfaces, dry dust, and severe stillness. Emphasize historical weight and the sense of disturbing something that should remain sealed.
+    - prompt: Tiny, narrow, coffin-shaped chamber wedged awkwardly between older structures, with close stone walls and a severely cramped footprint. The surfaces are dry, age-worn, dusty, and heavy with stillness. The walls are layered with decades of graffiti, one message standing out in huge letters that remain legible despite later defacement. On the floor sits a rusty access hatch secured by an enormous padlock. Emphasize historical weight, confinement, and the sense of violating something sealed for a reason, with stark composition, dry texture, silent air, and restrained ominous highlights.
 
 ## Additional locations (remaining 33)
 
@@ -296,11 +294,6 @@ These are the remaining mapped locations, in the same brief format.
    - Title: `Brick Tunnel: Supplemental Study (25)`
    - Literal description: `This is an ancient tunnel constructed of roughly mortared bricks and stones. The tunnel continues a long way north and south from here.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: This is an ancient tunnel constructed of roughly mortared bricks and stones.
-
-4. `Basement (27)`
-   - Title: `Basement: Supplemental Study (27)`
-   - Literal description: `Bare concrete walls line a wide corridor leading east and west. An elevator and call button are to the south. Stairs also lead up, for the energetic. From floor to ceiling run wire channels and steam pipes.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: Bare concrete walls line a wide corridor leading east and west.
 
 6. `Tunnel Entrance (34)`
    - Title: `Tunnel Entrance: Supplemental Study (34)`
@@ -346,11 +339,6 @@ These are the remaining mapped locations, in the same brief format.
    - Title: `Roof of Great Dome: Supplemental Study (121)`
    - Literal description: `You are perched precariously on the roof of the Great Dome. A set of narrow indentations in the dome provides a dangerous route to the very tip-top of the dome.`
    - Description: Use the literal room text as the primary layout guide, with emphasis on: You are perched precariously on the roof of the Great Dome.
-
-20. `Elevator (124)`
-   - Title: `Elevator: Supplemental Study (124)`
-   - Literal description: `This is a battered, rather dirty elevator. The fake wood walls are scratched and marred with graffiti. The elevator doors are closed. To the right of the doors is an area with floor buttons (B and 1 through 3), an open button, a close button, a stop switch, and an alarm button. Below these is an access panel which is closed.`
-   - Description: Use the literal room text as the primary layout guide, with emphasis on: This is a battered, rather dirty elevator.
 
 23. `Subbasement (142)`
    - Title: `Subbasement: Supplemental Study (142)`
