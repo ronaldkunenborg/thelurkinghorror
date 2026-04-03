@@ -280,3 +280,6 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
 
+41. [pending] Add random horror items: a new image is offset randomly <10% in any direction. Buttons change into a skull icon once in a while. Sometimes they change into runes with a flicker and then change back.
+
+42. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.

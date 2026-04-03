@@ -46,6 +46,7 @@ class GameIoController {
     this.pendingDarkClearRoomId = null;
     this.sawPitchBlackThisCycle = false;
     this.previousVmLine = '';
+    this.pendingRoomDebugAfterLook = false;
     this.debugEnabled = false;
     this.sfxEnabled = true;
     this.gameMusicEnabled = true;
@@ -101,6 +102,7 @@ class GameIoController {
     };
     this.importFileInput = this._createImportFileInput();
     this.restoreAudioTransitionActive = false;
+    this.pendingRoomDebugAfterLook = false;
 
     this.ui.setCommandHandler(command => this.submitCommand(command));
     this._syncStatusDisplays();
@@ -195,8 +197,12 @@ class GameIoController {
       this.restoreAudioTransitionActive = false;
     }
     if (result.haltReason === 'input') {
+      if (this.pendingRoomDebugAfterLook) {
+        this._appendRoomDebugOutput('look');
+      }
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.pendingRoomDebugAfterLook = false;
       this.ui.setStatus('Awaiting command', 'Input ready');
       this.ui.focusInput();
       return;
@@ -204,24 +210,28 @@ class GameIoController {
     if (result.haltReason === 'save') {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.pendingRoomDebugAfterLook = false;
       await this._handleVmSaveOpcode();
       return;
     }
     if (result.haltReason === 'restore') {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.pendingRoomDebugAfterLook = false;
       await this._handleVmRestoreOpcode();
       return;
     }
     if (result.haltReason === 'quit' || result.quit) {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.pendingRoomDebugAfterLook = false;
       this.ui.setStatus('Game ended', 'Quit');
       return;
     }
     if (result.haltReason === 'return') {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.pendingRoomDebugAfterLook = false;
       this.ui.setStatus('Execution halted', 'Returned');
       return;
     }
@@ -249,8 +259,14 @@ class GameIoController {
     }
     this.pendingDarkClearRoomId = this.currentRoomId;
     this.sawPitchBlackThisCycle = false;
+    this.pendingRoomDebugAfterLook = this._isLookCommand(command);
     this.vm.provideInput(command);
     this.runVm();
+  }
+
+  _isLookCommand(command) {
+    const normalized = String(command || '').trim().toLowerCase();
+    return normalized === 'look' || normalized === 'l';
   }
 
   _handleInterpreterCommand(command) {
@@ -1544,6 +1560,19 @@ class GameIoController {
     this.ui.appendOutput(text, 'system');
   }
 
+  _appendRoomDebugOutput(reason) {
+    if (!this.debugEnabled || !this.vm || typeof this.vm.getStatusSnapshot !== 'function') {
+      return;
+    }
+    const snapshot = this.vm.getStatusSnapshot() || {};
+    const roomId = Number.isFinite(snapshot.roomObjectId) ? snapshot.roomObjectId : 0;
+    const roomName = snapshot.roomName || 'unknown';
+    this.ui.appendOutput(
+      '[RoomDebug][' + String(reason || 'scene') + '] room=' + roomName + ' (' + String(roomId) + ')',
+      'system'
+    );
+  }
+
   _syncStatusDisplays() {
     if (!this.vm || typeof this.vm.getStatusSnapshot !== 'function') {
       this.ui.setTopbarMeta('', '', '');
@@ -1558,6 +1587,10 @@ class GameIoController {
       roomName !== this.currentRoomName ||
       isDark !== this.lastSceneIsDark
     ) {
+      const roomChanged = roomId !== this.currentRoomId || roomName !== this.currentRoomName;
+      if (roomChanged) {
+        this._appendRoomDebugOutput('enter');
+      }
       this._appendLightDebugOutput(
         '[LightDebug][scene] room=' + (roomName || 'unknown') +
         ' (' + String(roomId || 0) + ')' +
