@@ -9,6 +9,8 @@ const SOUND_EFFECT_FINISH = 4;
 const SOUND_CLASS_SFX = 'sfx';
 const SOUND_CLASS_MUSIC = 'music';
 const DEFAULT_SAVE_SLOT = 0;
+const DEFAULT_SLOT_MENU_SIZE = 5;
+const MAX_SAVE_SLOT = DEFAULT_SLOT_MENU_SIZE - 1;
 const DEFAULT_SOUND_CATALOG = {
   3: { src: './assets/soundfx/blorb/s3.wav', class: SOUND_CLASS_SFX },
   4: { src: './assets/soundfx/blorb/s4.wav', class: SOUND_CLASS_SFX },
@@ -56,6 +58,18 @@ class GameIoController {
       typeof opts.onBloodEffectCommand === 'function' ? opts.onBloodEffectCommand : function () {};
     this.onMapRequested =
       typeof opts.onMapRequested === 'function' ? opts.onMapRequested : function () {};
+    this.onSaveLoadMenuRequested =
+      typeof opts.onSaveLoadMenuRequested === 'function'
+        ? opts.onSaveLoadMenuRequested
+        : function () {};
+    this.onSaveSlotsChanged =
+      typeof opts.onSaveSlotsChanged === 'function'
+        ? opts.onSaveSlotsChanged
+        : function () {};
+    this.onConfirmDestructiveAction =
+      typeof opts.onConfirmDestructiveAction === 'function'
+        ? opts.onConfirmDestructiveAction
+        : this._defaultConfirmDestructiveAction;
     this.onGameMusicPreferenceChanged =
       typeof opts.onGameMusicPreferenceChanged === 'function'
         ? opts.onGameMusicPreferenceChanged
@@ -277,12 +291,28 @@ class GameIoController {
       return true;
     }
     if (normalized.startsWith('$SAVE')) {
-      const slot = this._parseSlotCommand(original, DEFAULT_SAVE_SLOT);
+      const slot = this._parseExplicitSlotCommand(original);
+      if (slot === null) {
+        this.requestSaveLoadMenu('save');
+        return true;
+      }
+      if (!this._isValidSaveSlot(slot)) {
+        this._rejectInvalidSaveSlot('Save');
+        return true;
+      }
       this._saveToSlot(slot);
       return true;
     }
     if (normalized.startsWith('$LOAD')) {
-      const slot = this._parseSlotCommand(original, DEFAULT_SAVE_SLOT);
+      const slot = this._parseExplicitSlotCommand(original);
+      if (slot === null) {
+        this.requestSaveLoadMenu('load');
+        return true;
+      }
+      if (!this._isValidSaveSlot(slot)) {
+        this._rejectInvalidSaveSlot('Load');
+        return true;
+      }
       this._loadFromSlot(slot);
       return true;
     }
@@ -516,6 +546,32 @@ class GameIoController {
     return match ? Number(match[1]) : defaultSlot;
   }
 
+  _parseExplicitSlotCommand(command) {
+    const match = String(command || '').trim().match(/^\$\w+\s+(\d+)\s*$/i);
+    return match ? Number(match[1]) : null;
+  }
+
+  _isValidSaveSlot(slot) {
+    return Number.isInteger(slot) && slot >= 0 && slot <= MAX_SAVE_SLOT;
+  }
+
+  _rejectInvalidSaveSlot(actionLabel) {
+    this.ui.appendOutput(
+      (actionLabel || 'Action') + ' failed: slot must be between 0 and ' + MAX_SAVE_SLOT + '.',
+      'error'
+    );
+    this.ui.setStatus('Interpreter command', 'Invalid slot');
+  }
+
+  _defaultConfirmDestructiveAction(payload) {
+    const info = payload || {};
+    const line = info.message || 'This action will overwrite better progress. Continue?';
+    if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
+      return window.confirm(line);
+    }
+    return false;
+  }
+
   _getStoryId() {
     if (!this.storyMeta) {
       return '';
@@ -554,6 +610,242 @@ class GameIoController {
     return 'Slot ' + slot + ' - ' + roomName;
   }
 
+  _notifySaveSlotsChanged(action, slot) {
+    try {
+      this.onSaveSlotsChanged({
+        action: String(action || ''),
+        slot: Number.isFinite(slot) ? Number(slot) : null,
+      });
+    } catch (error) {
+      // Ignore callback errors to keep save/load flow resilient.
+    }
+  }
+
+  _getCurrentProgressSnapshot() {
+    if (!this.vm || typeof this.vm.getStatusSnapshot !== 'function') {
+      return {
+        roomName: this.currentRoomName || '',
+        score: null,
+        moves: null,
+      };
+    }
+    const snapshot = this.vm.getStatusSnapshot() || {};
+    return {
+      roomName: snapshot.roomName || this.currentRoomName || '',
+      score: Number.isFinite(snapshot.score) ? Number(snapshot.score) : null,
+      moves: Number.isFinite(snapshot.moves) ? Number(snapshot.moves) : null,
+    };
+  }
+
+  _normalizeProgressFromRecord(record) {
+    if (!record) {
+      return { score: null, moves: null };
+    }
+    return {
+      score: Number.isFinite(record.score) ? Number(record.score) : null,
+      moves: Number.isFinite(record.moves) ? Number(record.moves) : null,
+    };
+  }
+
+  _isLoadDestructive(record, currentProgress) {
+    const current = currentProgress || this._getCurrentProgressSnapshot();
+    const target = this._normalizeProgressFromRecord(record);
+    if (!Number.isFinite(current.score) || !Number.isFinite(current.moves)) {
+      return false;
+    }
+    if (!Number.isFinite(target.score) || !Number.isFinite(target.moves)) {
+      return false;
+    }
+    return target.score < current.score || (target.score === current.score && target.moves > current.moves);
+  }
+
+  _isSaveDestructive(existingRecord, currentProgress) {
+    if (!existingRecord) {
+      return false;
+    }
+    const current = currentProgress || this._getCurrentProgressSnapshot();
+    const existing = this._normalizeProgressFromRecord(existingRecord);
+    if (!Number.isFinite(current.score) || !Number.isFinite(current.moves)) {
+      return false;
+    }
+    if (!Number.isFinite(existing.score) || !Number.isFinite(existing.moves)) {
+      return false;
+    }
+    return existing.score > current.score || (existing.score === current.score && existing.moves < current.moves);
+  }
+
+  _formatProgressText(progress) {
+    const value = progress || {};
+    const scoreText = Number.isFinite(value.score) ? String(value.score) : '?';
+    const movesText = Number.isFinite(value.moves) ? String(value.moves) : '?';
+    return 'score ' + scoreText + ', moves ' + movesText;
+  }
+
+  async _confirmDestructiveSave(slot, existingRecord, currentProgress) {
+    const current = currentProgress || this._getCurrentProgressSnapshot();
+    const existing = this._normalizeProgressFromRecord(existingRecord);
+    const message =
+      'Saving to slot ' + slot + ' would overwrite better progress (' +
+      this._formatProgressText(existing) + ') with current progress (' +
+      this._formatProgressText(current) + '). Continue?';
+    const result = await Promise.resolve(this.onConfirmDestructiveAction({
+      type: 'save',
+      slot,
+      message,
+      current,
+      existing,
+      existingRecord,
+    }));
+    return !!result;
+  }
+
+  async _confirmDestructiveLoad(slot, record, currentProgress) {
+    const current = currentProgress || this._getCurrentProgressSnapshot();
+    const target = this._normalizeProgressFromRecord(record);
+    const message =
+      'Loading slot ' + slot + ' would replace your current progress (' +
+      this._formatProgressText(current) + ') with lower progress (' +
+      this._formatProgressText(target) + '). Continue?';
+    const result = await Promise.resolve(this.onConfirmDestructiveAction({
+      type: 'load',
+      slot,
+      message,
+      current,
+      target,
+      record,
+    }));
+    return !!result;
+  }
+
+  async _confirmDeleteSlot(slot, record) {
+    const current = this._normalizeProgressFromRecord(record);
+    const message =
+      'Delete slot ' + slot + ' (' +
+      this._formatProgressText(current) +
+      ')? This cannot be undone.';
+    const result = await Promise.resolve(this.onConfirmDestructiveAction({
+      type: 'delete',
+      slot,
+      message,
+      target: current,
+      record,
+    }));
+    return !!result;
+  }
+
+  async _confirmImportOverwrite(slot, existingRecord) {
+    const existing = this._normalizeProgressFromRecord(existingRecord);
+    const message =
+      'Importing into slot ' + slot + ' will overwrite existing save (' +
+      this._formatProgressText(existing) +
+      '). Continue?';
+    const result = await Promise.resolve(this.onConfirmDestructiveAction({
+      type: 'import',
+      slot,
+      message,
+      existing,
+      existingRecord,
+    }));
+    return !!result;
+  }
+
+  _formatSlotTime(timestamp) {
+    if (!timestamp) {
+      return '';
+    }
+    const date = new Date(timestamp);
+    if (Number.isNaN(date.getTime())) {
+      return String(timestamp);
+    }
+    return date.toLocaleString();
+  }
+
+  _buildSlotMenuData(mode, records, currentProgress) {
+    const modeText = mode === 'save' ? 'save' : 'load';
+    const occupiedBySlot = new Map();
+    for (const record of records || []) {
+      occupiedBySlot.set(Number(record.slot), record);
+    }
+    const slotSet = new Set();
+    for (let slot = 0; slot < DEFAULT_SLOT_MENU_SIZE; slot++) {
+      slotSet.add(slot);
+    }
+    const slots = Array.from(slotSet)
+      .sort((a, b) => a - b)
+      .map(slot => {
+        const record = occupiedBySlot.get(slot) || null;
+        const progress = this._normalizeProgressFromRecord(record);
+        return {
+          slot,
+          occupied: !!record,
+          roomName: record && record.roomName ? record.roomName : '',
+          score: progress.score,
+          moves: progress.moves,
+          updatedAt: record && record.updatedAt ? record.updatedAt : '',
+          timeText: this._formatSlotTime(record && record.updatedAt ? record.updatedAt : ''),
+          destructive:
+            modeText === 'save'
+              ? this._isSaveDestructive(record, currentProgress)
+              : this._isLoadDestructive(record, currentProgress),
+          disabled: modeText === 'load' ? !record : false,
+        };
+      });
+    return {
+      mode: modeText,
+      current: currentProgress,
+      slots,
+    };
+  }
+
+  async requestSaveLoadMenu(mode) {
+    const modeText = String(mode || '').toLowerCase() === 'load' ? 'load' : 'save';
+    if (!this._ensureSaveAvailable(modeText === 'save' ? 'Save' : 'Load')) {
+      return;
+    }
+    try {
+      const records = await this.saveStorage.listSaves(this._getStoryId());
+      const payload = this._buildSlotMenuData(modeText, records, this._getCurrentProgressSnapshot());
+      this.onSaveLoadMenuRequested(payload);
+      this.ui.setStatus('Interpreter command', modeText === 'save' ? 'Choose save slot' : 'Choose load slot');
+    } catch (error) {
+      this.ui.appendOutput(
+        (modeText === 'save' ? 'Save' : 'Load') + ' slot list failed: ' + error.message,
+        'error'
+      );
+      this.ui.setStatus('Interpreter command', (modeText === 'save' ? 'Save' : 'Load') + ' list failed');
+    }
+  }
+
+  async executeSaveLoadAction(mode, slot) {
+    const modeText = String(mode || '').toLowerCase() === 'load' ? 'load' : 'save';
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot(modeText === 'save' ? 'Save' : 'Load');
+      return;
+    }
+    if (modeText === 'save') {
+      return this._saveToSlot(slot);
+    }
+    return this._loadFromSlot(slot);
+  }
+
+  async executeSlotToolAction(action, slot) {
+    const kind = String(action || '').toLowerCase();
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot('Action');
+      return;
+    }
+    if (kind === 'delete') {
+      return this._deleteSlot(slot);
+    }
+    if (kind === 'export') {
+      return this._exportSlot(slot);
+    }
+    if (kind === 'import') {
+      return this._importIntoSlot(slot);
+    }
+    this.ui.appendOutput('Unknown slot action: ' + action, 'error');
+  }
+
   async _handleVmSaveOpcode() {
     if (!this.vm || typeof this.vm.completePendingSave !== 'function') {
       this.ui.appendOutput('Story save is not available in this VM build.', 'error');
@@ -568,10 +860,14 @@ class GameIoController {
     try {
       const compat = this._getStoryCompatibilityMeta();
       const slot = DEFAULT_SAVE_SLOT;
+      const current = this._getCurrentProgressSnapshot();
       await this.saveStorage.putSave({
         storyId: compat.storyId,
         slot,
         label: this._buildSaveLabel(slot),
+        roomName: current.roomName || this.currentRoomName || '',
+        score: current.score,
+        moves: current.moves,
         serial: compat.serial,
         release: compat.release,
         checksum: compat.checksum,
@@ -645,6 +941,10 @@ class GameIoController {
   }
 
   async _saveToSlot(slot) {
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot('Save');
+      return;
+    }
     if (!this._ensureSaveAvailable('Save')) {
       return;
     }
@@ -655,10 +955,23 @@ class GameIoController {
     }
     try {
       const compat = this._getStoryCompatibilityMeta();
+      const current = this._getCurrentProgressSnapshot();
+      const existing = await this.saveStorage.getSave(compat.storyId, slot);
+      if (this._isSaveDestructive(existing, current)) {
+        const confirmed = await this._confirmDestructiveSave(slot, existing, current);
+        if (!confirmed) {
+          this.ui.appendOutput('Save cancelled.', 'system');
+          this.ui.setStatus('Interpreter command', 'Save cancelled');
+          return;
+        }
+      }
       const record = await this.saveStorage.putSave({
         storyId: compat.storyId,
         slot,
         label: this._buildSaveLabel(slot),
+        roomName: current.roomName || this.currentRoomName || '',
+        score: current.score,
+        moves: current.moves,
         serial: compat.serial,
         release: compat.release,
         checksum: compat.checksum,
@@ -670,6 +983,7 @@ class GameIoController {
         'system'
       );
       this.ui.setStatus('Interpreter command', 'Saved slot ' + slot);
+      this._notifySaveSlotsChanged('save', slot);
     } catch (error) {
       this.ui.appendOutput('Save failed: ' + error.message, 'error');
       this.ui.setStatus('Interpreter command', 'Save failed');
@@ -699,6 +1013,10 @@ class GameIoController {
   }
 
   async _loadFromSlot(slot) {
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot('Load');
+      return;
+    }
     if (!this._ensureSaveAvailable('Load')) {
       return;
     }
@@ -711,6 +1029,15 @@ class GameIoController {
       const compat = this._getStoryCompatibilityMeta();
       const record = await this.saveStorage.getSave(compat.storyId, slot);
       this._assertCompatibleSaveRecord(record);
+      const current = this._getCurrentProgressSnapshot();
+      if (this._isLoadDestructive(record, current)) {
+        const confirmed = await this._confirmDestructiveLoad(slot, record, current);
+        if (!confirmed) {
+          this.ui.appendOutput('Load cancelled.', 'system');
+          this.ui.setStatus('Interpreter command', 'Load cancelled');
+          return;
+        }
+      }
       this._appendLightDebugOutput(
         '[LightDebug][load] begin slot=' + slot +
         ' meta.sceneIsDark=' + String(!!(record && record.sceneIsDark)) +
@@ -754,16 +1081,32 @@ class GameIoController {
   }
 
   async _deleteSlot(slot) {
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot('Delete');
+      return;
+    }
     if (!this._ensureSaveAvailable('Delete')) {
       return;
     }
     try {
+      const existing = await this.saveStorage.getSave(this._getStoryId(), slot);
+      if (existing) {
+        const confirmed = await this._confirmDeleteSlot(slot, existing);
+        if (!confirmed) {
+          this.ui.appendOutput('Delete cancelled.', 'system');
+          this.ui.setStatus('Interpreter command', 'Delete cancelled');
+          return;
+        }
+      }
       const deleted = await this.saveStorage.deleteSave(this._getStoryId(), slot);
       this.ui.appendOutput(
         deleted ? 'Deleted save slot ' + slot + '.' : 'Save slot ' + slot + ' is already empty.',
         'system'
       );
       this.ui.setStatus('Interpreter command', deleted ? 'Deleted slot ' + slot : 'Slot empty');
+      if (deleted) {
+        this._notifySaveSlotsChanged('delete', slot);
+      }
     } catch (error) {
       this.ui.appendOutput('Delete failed: ' + error.message, 'error');
       this.ui.setStatus('Interpreter command', 'Delete failed');
@@ -785,6 +1128,9 @@ class GameIoController {
         this.ui.appendOutput(
           '[Save slot ' + record.slot + '] ' +
           (record.label || 'saved game') +
+          ' | room ' + (record.roomName || '?') +
+          ' | score ' + (Number.isFinite(record.score) ? record.score : '?') +
+          ' | moves ' + (Number.isFinite(record.moves) ? record.moves : '?') +
           ' | updated ' + record.updatedAt,
           'system'
         );
@@ -797,6 +1143,10 @@ class GameIoController {
   }
 
   async _exportSlot(slot) {
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot('Export');
+      return;
+    }
     if (!this._ensureSaveAvailable('Export')) {
       return;
     }
@@ -817,7 +1167,11 @@ class GameIoController {
     }
   }
 
-  _importIntoSlot(slot) {
+  async _importIntoSlot(slot) {
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot('Import');
+      return;
+    }
     if (!this._ensureSaveAvailable('Import')) {
       return;
     }
@@ -826,14 +1180,33 @@ class GameIoController {
       this.ui.setStatus('Interpreter command', 'Import unavailable');
       return;
     }
+    try {
+      const existing = await this.saveStorage.getSave(this._getStoryId(), slot);
+      if (existing) {
+        const confirmed = await this._confirmImportOverwrite(slot, existing);
+        if (!confirmed) {
+          this.ui.appendOutput('Import cancelled.', 'system');
+          this.ui.setStatus('Interpreter command', 'Import cancelled');
+          return;
+        }
+      }
+    } catch (error) {
+      this.ui.appendOutput('Import precheck failed: ' + error.message, 'error');
+      this.ui.setStatus('Interpreter command', 'Import failed');
+      return;
+    }
     this.importFileInput.dataset.slot = String(slot);
     this.importFileInput.click();
   }
 
   async _importFileIntoSlot(file, slot) {
+    if (!this._isValidSaveSlot(slot)) {
+      this._rejectInvalidSaveSlot('Import');
+      return null;
+    }
     try {
       const compat = this._getStoryCompatibilityMeta();
-      const record = await this.saveImporter(this.saveStorage, file, {
+      let record = await this.saveImporter(this.saveStorage, file, {
         storyId: compat.storyId,
         slot,
         label: 'Imported slot ' + slot,
@@ -841,16 +1214,67 @@ class GameIoController {
         release: compat.release,
         checksum: compat.checksum,
       });
+      const probed = this._probeProgressFromSaveData(record && record.quetzalData ? record.quetzalData : null);
+      if (probed) {
+        record = await this.saveStorage.putSave({
+          storyId: compat.storyId,
+          slot,
+          label: record && record.label ? record.label : ('Imported slot ' + slot),
+          roomName: probed.roomName || '',
+          score: probed.score,
+          moves: probed.moves,
+          serial: compat.serial,
+          release: compat.release,
+          checksum: compat.checksum,
+          sceneIsDark: !!(record && record.sceneIsDark),
+          quetzalData: record.quetzalData,
+        });
+      }
       this.ui.appendOutput(
-        'Imported ' + (file.name || 'save file') + ' into slot ' + slot + '.',
+        'Imported ' + (file.name || 'save file') + ' into slot ' + slot +
+        (probed ? ' (' + this._formatProgressText(probed) + ').' : '.'),
         'system'
       );
       this.ui.setStatus('Interpreter command', 'Imported slot ' + slot);
+      this._notifySaveSlotsChanged('import', slot);
       return record;
     } catch (error) {
       this.ui.appendOutput('Import failed: ' + error.message, 'error');
       this.ui.setStatus('Interpreter command', 'Import failed');
       return null;
+    }
+  }
+
+  _probeProgressFromSaveData(quetzalData) {
+    if (
+      !quetzalData ||
+      !this.vm ||
+      typeof this.vm.serializeSaveState !== 'function' ||
+      typeof this.vm.restoreSaveState !== 'function' ||
+      typeof this.vm.getStatusSnapshot !== 'function'
+    ) {
+      return null;
+    }
+    let baseline = null;
+    try {
+      baseline = this.vm.serializeSaveState();
+      this.vm.restoreSaveState(quetzalData);
+      const snapshot = this.vm.getStatusSnapshot() || {};
+      return {
+        roomName: snapshot.roomName || '',
+        score: Number.isFinite(snapshot.score) ? Number(snapshot.score) : null,
+        moves: Number.isFinite(snapshot.moves) ? Number(snapshot.moves) : null,
+      };
+    } catch (error) {
+      return null;
+    } finally {
+      if (baseline) {
+        try {
+          this.vm.restoreSaveState(baseline);
+        } catch (restoreError) {
+          // Ignore probe restore failures; regular load/save flow remains authoritative.
+        }
+      }
     }
   }
 

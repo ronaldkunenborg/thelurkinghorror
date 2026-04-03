@@ -247,6 +247,57 @@ function testMapCommandOpensUniversityMap() {
   );
 }
 
+async function testSaveAndLoadCommandsWithoutSlotOpenSlotPicker() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const menuRequests = [];
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+    onSaveLoadMenuRequested(payload) {
+      menuRequests.push(payload);
+    },
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.vm = {
+    haltReason: null,
+    getStatusSnapshot() {
+      return { roomName: 'Terminal Room', score: 5, moves: 12 };
+    },
+  };
+
+  controller.submitCommand('$SAVE');
+  controller.submitCommand('$LOAD');
+  await flushAsyncWork();
+
+  assert.strictEqual(menuRequests.length, 2, '$SAVE/$LOAD without slot should open the slot picker');
+  assert.strictEqual(menuRequests[0].mode, 'save', 'first picker request should be save mode');
+  assert.strictEqual(menuRequests[1].mode, 'load', 'second picker request should be load mode');
+}
+
+function testSaveLoadRejectOutOfRangeSlots() {
+  const ui = createUi();
+  const controller = new GameIoController(ui);
+  controller.storyMeta = createStoryMeta();
+  controller.vm = {
+    haltReason: null,
+    getStatusSnapshot() {
+      return { roomName: 'Terminal Room', score: 5, moves: 12 };
+    },
+  };
+
+  controller.submitCommand('$SAVE 9');
+  controller.submitCommand('$LOAD 5');
+
+  assert.ok(
+    ui.lines.some(line => line.includes('Save failed: slot must be between 0 and 4.')),
+    'out-of-range save slot should be rejected'
+  );
+  assert.ok(
+    ui.lines.some(line => line.includes('Load failed: slot must be between 0 and 4.')),
+    'out-of-range load slot should be rejected'
+  );
+}
+
 function testPlainLoadShowsRestoreHint() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -781,6 +832,96 @@ async function testSavesCommandListsSlots() {
   );
 }
 
+async function testDestructiveSaveRequiresConfirmation() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const confirmCalls = [];
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+    onConfirmDestructiveAction(payload) {
+      confirmCalls.push(payload);
+      return false;
+    },
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.currentRoomName = 'Current Room';
+  controller.vm = {
+    serializeSaveState() {
+      return new Uint8Array([1, 2, 3]);
+    },
+    getStatusSnapshot() {
+      return { roomName: 'Current Room', score: 5, moves: 12 };
+    },
+  };
+
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 2,
+    label: 'Slot 2 - Better',
+    roomName: 'Better Room',
+    score: 7,
+    moves: 8,
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([9, 9, 9]),
+  });
+
+  controller.submitCommand('$SAVE 2');
+  await flushAsyncWork();
+
+  const record = await storage.getSave('lurking-horror-r219-870912', 2);
+  assert.deepStrictEqual(Array.from(new Uint8Array(record.quetzalData)), [9, 9, 9], 'destructive save should be cancelled');
+  assert.strictEqual(confirmCalls.length, 1, 'destructive save should ask confirmation');
+  assert.ok(ui.lines.includes('Save cancelled.'), 'cancelling destructive save should print feedback');
+}
+
+async function testDestructiveLoadRequiresConfirmation() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const confirmCalls = [];
+  let restored = null;
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+    onConfirmDestructiveAction(payload) {
+      confirmCalls.push(payload);
+      return false;
+    },
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.vm = {
+    run() {
+      return { haltReason: 'input', quit: false };
+    },
+    restoreSaveState(bytes) {
+      restored = Array.from(new Uint8Array(bytes));
+    },
+    getStatusSnapshot() {
+      return { roomName: 'Current Room', score: 10, moves: 20 };
+    },
+  };
+
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 1,
+    label: 'Slot 1 - Older',
+    roomName: 'Older Room',
+    score: 8,
+    moves: 30,
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([4, 5, 6]),
+  });
+
+  controller.submitCommand('$LOAD 1');
+  await flushAsyncWork();
+
+  assert.strictEqual(restored, null, 'destructive load should be cancelled when not confirmed');
+  assert.strictEqual(confirmCalls.length, 1, 'destructive load should ask confirmation');
+  assert.ok(ui.lines.includes('Load cancelled.'), 'cancelling destructive load should print feedback');
+}
+
 async function testLoadStopsActiveSfxButKeepsMusic() {
   const ui = createUi();
   const storage = createSaveStorage();
@@ -1024,6 +1165,8 @@ async function run() {
   testSoundInterpreterCommandWorksWithoutVmInput();
   testGameSoundAliasWorksWithoutVmInput();
   testMapCommandOpensUniversityMap();
+  await testSaveAndLoadCommandsWithoutSlotOpenSlotPicker();
+  testSaveLoadRejectOutOfRangeSlots();
   testPlainLoadShowsRestoreHint();
   testMappedSoundPlaybackRespectsPreference();
   testGameMusicToggleDoesNotDisableSoundEffects();
@@ -1038,6 +1181,8 @@ async function run() {
   testSoundStatsAllPrintsEventBreakdown();
   testSoundEventCommandTriggersSyntheticPlayback();
   await testSaveCommandStoresVmSnapshot();
+  await testDestructiveSaveRequiresConfirmation();
+  await testDestructiveLoadRequiresConfirmation();
   await testLoadCommandRestoresVmSnapshot();
   await testLoadStopsActiveSfxButKeepsMusic();
   await testSavesCommandListsSlots();

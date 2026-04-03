@@ -236,6 +236,30 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added interpreter command `$MAP` in `src/io.js`, wired to open the overview map and confirm in output/status.
    - Added `$MAP` to the commands overview and added controller test coverage in `tools/test-io-controller-output.js`.
 
+40. [done] Rework interpreter save/load UX around slot picker, destructive checks, and parity between buttons and `$SAVE/$LOAD`.
+   - Added save/load slot picker overlay in `src/index.html` showing slot, location, score, moves, and save time.
+   - Wired save/load buttons to open the slot picker instead of directly targeting slot `0`.
+   - Updated `$SAVE` and `$LOAD` (without slot number) to open the same picker flow as button clicks.
+   - Kept story-native `save`/`restore` opcode path unchanged at slot `0`.
+   - Added destructive action confirmation rules in `src/io.js`:
+     - load confirmation when selected slot has lower progress (or equal score with higher moves) than current state
+     - save confirmation when overwriting occupied slot with better progress (or equal score with fewer moves)
+   - Replaced browser-native confirmation dialog with a custom in-game confirmation panel (`src/index.html` + `src/modern.css`) using transparent panel styling and backdrop blur consistent with the existing UI.
+   - Added a hard 5-slot limit (`0..4`) for interpreter saves/loads:
+     - slot picker shows only five slots
+     - `$SAVE n` / `$LOAD n` reject out-of-range slots
+     - direct action handlers (`save/load/delete/export/import`) enforce the same slot-range guard
+   - Added per-slot action controls in the slot picker for `export`, `import`, and `delete`, including:
+     - delete confirmation for occupied slots
+     - import overwrite confirmation for occupied slots
+     - red danger-styled delete icon button in the existing game visual language
+     - automatic slot-list refresh after successful import/delete/save while the slot panel is open
+     - upgraded delete button to a clean inline SVG trash icon for consistent rendering
+   - Added clear local-storage warning text in the slot picker: saves are local to this browser/device.
+   - Updated left action-rail button order to: `load`, `save`, `map`, `preferences`, `help`.
+   - Extended save metadata persistence in `src/quetzal-storage.js` to store `roomName`, `score`, and `moves`.
+   - Added controller test coverage in `tools/test-io-controller-output.js` for picker routing and destructive confirmations.
+
 ## Pending Tasks
 
 36. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).

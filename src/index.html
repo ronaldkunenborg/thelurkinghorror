@@ -33,14 +33,14 @@
             <button id="save-slot" class="icon-btn" type="button" aria-label="Save game" title="Save game">
               <span class="icon-etch icon-save" aria-hidden="true"></span>
             </button>
-            <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
-              <span class="icon-etch icon-help" aria-hidden="true">?</span>
-            </button>
             <button id="map-button" class="icon-btn" type="button" aria-label="University map" title="University map">
               <span class="icon-etch icon-map" aria-hidden="true"></span>
             </button>
             <button id="settings-button" class="icon-btn" type="button" aria-label="Audio settings" title="Audio settings">
               <span class="icon-etch icon-gear" aria-hidden="true"></span>
+            </button>
+            <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
+              <span class="icon-etch icon-help" aria-hidden="true">?</span>
             </button>
           </aside>
 
@@ -159,8 +159,8 @@
           <div class="command-section">
             <h3>Game Control Commands</h3>
             <div class="command-grid">
-              <button class="btn command-chip" type="button" data-command="$SAVE"><strong>$SAVE</strong><span>Interpreter save to local slot 0. The save button uses this path.</span></button>
-              <button class="btn command-chip" type="button" data-command="$LOAD"><strong>$LOAD</strong><span>Interpreter load from local slot 0. The load button uses this path.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SAVE"><strong>$SAVE</strong><span>Open the slot picker for interpreter save.</span></button>
+              <button class="btn command-chip" type="button" data-command="$LOAD"><strong>$LOAD</strong><span>Open the slot picker for interpreter load.</span></button>
               <button class="btn command-chip" type="button" data-command="$SAVE 1"><strong>$SAVE 1</strong><span>Save into a numbered local slot.</span></button>
               <button class="btn command-chip" type="button" data-command="$LOAD 1"><strong>$LOAD 1</strong><span>Load a numbered local slot.</span></button>
               <button class="btn command-chip" type="button" data-command="$SAVES"><strong>$SAVES</strong><span>List local save slots for this story.</span></button>
@@ -182,6 +182,17 @@
               <button class="btn command-chip" type="button" data-command="$SOUNDSTATS"><strong>$SOUNDSTATS</strong><span>Print captured sound-event statistics.</span></button>
             </div>
           </div>
+        </div>
+      </section>
+      <section id="save-load-sheet" class="save-load-sheet" aria-label="Save and load slots" hidden>
+        <div class="save-load-sheet-panel">
+          <div class="command-sheet-header">
+            <h2 id="save-load-title" class="command-sheet-title">Slots</h2>
+            <button id="close-save-load" class="btn" type="button">Close</button>
+          </div>
+          <p class="save-load-local-note">Saves are stored locally in this browser on this device.</p>
+          <p id="save-load-subtitle" class="settings-copy"></p>
+          <div id="save-load-slot-list" class="save-load-slot-list"></div>
         </div>
       </section>
       <section id="map-sheet" class="map-sheet" aria-label="University overview map" hidden>
@@ -218,6 +229,18 @@
           </p>
         </div>
       </section>
+      <section id="confirm-sheet" class="confirm-sheet" aria-label="Action confirmation" hidden>
+        <div class="confirm-sheet-panel">
+          <div class="command-sheet-header">
+            <h2 class="command-sheet-title">Confirm Action</h2>
+          </div>
+          <p id="confirm-message" class="settings-copy"></p>
+          <div class="confirm-actions">
+            <button id="confirm-cancel" class="btn" type="button">Cancel</button>
+            <button id="confirm-continue" class="btn btn-accent" type="button">Continue</button>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script src="./ui-framework.js"></script>
@@ -240,8 +263,14 @@
         const bloodSplatterEl = document.getElementById('blood-splatter');
         const hudGroupEl = document.querySelector('.hud-group');
         const commandSheetEl = document.getElementById('command-sheet');
+        const saveLoadSheetEl = document.getElementById('save-load-sheet');
+        const saveLoadTitleEl = document.getElementById('save-load-title');
+        const saveLoadSubtitleEl = document.getElementById('save-load-subtitle');
+        const saveLoadSlotListEl = document.getElementById('save-load-slot-list');
         const mapSheetEl = document.getElementById('map-sheet');
         const settingsSheetEl = document.getElementById('settings-sheet');
+        const confirmSheetEl = document.getElementById('confirm-sheet');
+        const confirmMessageEl = document.getElementById('confirm-message');
         const settingsButtonEl = document.getElementById('settings-button');
         const musicVolumeEl = document.getElementById('music-volume');
         const sfxVolumeEl = document.getElementById('sfx-volume');
@@ -266,6 +295,10 @@
           topbarMovesEl: document.getElementById('topbar-moves'),
           prompt: '>',
         });
+        let saveLoadSheetMode = 'save';
+        let confirmResolver = null;
+        let lastSavedSlotFlash = null;
+        let lastSavedSlotFlashTimer = 0;
 
         let activeSceneIndex = 0;
         const BLOOD_SPLATTER_ART = [
@@ -666,6 +699,21 @@
           onMapRequested: () => {
             openMapSheet();
           },
+          onSaveLoadMenuRequested: payload => {
+            openSaveLoadSheet(payload);
+          },
+          onConfirmDestructiveAction: payload => {
+            return openConfirmSheet(payload);
+          },
+          onSaveSlotsChanged: payload => {
+            const info = payload || {};
+            if (info.action === 'save' && Number.isFinite(info.slot)) {
+              flashSavedSlot(info.slot);
+            }
+            if (!saveLoadSheetEl.hidden) {
+              controller.requestSaveLoadMenu(saveLoadSheetMode);
+            }
+          },
         });
         ui.appendOutput('Booting interpreter shell...', 'system');
         ui.setStatus('Loading bundled story', 'Booting');
@@ -901,8 +949,8 @@
             ui.setStatus('Load failed', 'Error');
           }
         }
-        document.getElementById('save-slot').addEventListener('click', () => controller.submitCommand('$SAVE'));
-        document.getElementById('load-slot').addEventListener('click', () => controller.submitCommand('$LOAD'));
+        document.getElementById('save-slot').addEventListener('click', () => controller.requestSaveLoadMenu('save'));
+        document.getElementById('load-slot').addEventListener('click', () => controller.requestSaveLoadMenu('load'));
         musicVolumeEl.addEventListener('input', () => {
           const volume = Number(musicVolumeEl.value) / 100;
           controller.setGameMusicVolume(volume);
@@ -938,6 +986,134 @@
           }
           ui.setInputValue(trigger.dataset.command || '');
           closeCommandSheet();
+        });
+
+        function formatSlotValue(value, fallback) {
+          if (value === null || value === undefined || value === '') {
+            return fallback;
+          }
+          return String(value);
+        }
+
+        function renderSaveLoadSlots(payload) {
+          const data = payload || { mode: 'save', current: null, slots: [] };
+          saveLoadSheetMode = data.mode === 'load' ? 'load' : 'save';
+          saveLoadTitleEl.textContent = saveLoadSheetMode === 'save' ? 'Save Slots' : 'Load Slots';
+          const current = data.current || {};
+          saveLoadSubtitleEl.textContent =
+            'Current: score ' +
+            formatSlotValue(Number.isFinite(current.score) ? current.score : '', '?') +
+            ', moves ' +
+            formatSlotValue(Number.isFinite(current.moves) ? current.moves : '', '?') +
+            '.';
+          saveLoadSlotListEl.innerHTML = '';
+          const slots = Array.isArray(data.slots) ? data.slots : [];
+          for (const slot of slots) {
+            if (slot.slot === 1) {
+              const divider = document.createElement('div');
+              divider.className = 'save-load-slot-divider';
+              saveLoadSlotListEl.appendChild(divider);
+            }
+            const showSavedFlash = lastSavedSlotFlash === slot.slot;
+            const row = document.createElement('div');
+            row.className = 'save-load-slot-row';
+            row.innerHTML =
+              '<button type="button" class="save-load-slot' +
+                (slot.slot === 0 ? ' save-load-slot-primary' : '') +
+                '" data-slot="' + slot.slot + '"' +
+                (slot.disabled ? ' disabled' : '') + '>' +
+                '<span class="save-load-slot-main">Slot ' + slot.slot + (slot.slot === 0 ? ' <span class="save-load-slot-badge">Story save/restore</span>' : '') + '</span>' +
+                '<span class="save-load-slot-meta">' +
+                  (slot.occupied
+                    ? ('loc ' + formatSlotValue(slot.roomName, '?') +
+                      ' | score ' + formatSlotValue(Number.isFinite(slot.score) ? slot.score : '', '?') +
+                      ' | moves ' + formatSlotValue(Number.isFinite(slot.moves) ? slot.moves : '', '?') +
+                      ' | time ' + formatSlotValue(slot.timeText, '?'))
+                    : 'Empty slot') +
+                '</span>' +
+                (slot.destructive ? '<span class="save-load-slot-warning">Destructive action</span>' : '') +
+                (showSavedFlash
+                  ? '<span class="save-load-slot-savecheck" title="Saved"><svg class="slot-icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>'
+                  : '') +
+              '</button>' +
+              '<div class="save-load-slot-tools">' +
+                '<button type="button" class="save-load-slot-tool save-load-slot-tool-icon" data-slot-action="export" data-slot="' + slot.slot + '"' + (!slot.occupied ? ' disabled' : '') + ' title="Export slot" aria-label="Export slot">' +
+                  '<svg class="slot-icon-arrow" viewBox="0 0 24 24" aria-hidden="true">' +
+                    '<path d="M12 3v12"></path>' +
+                    '<path d="M8 7l4-4 4 4"></path>' +
+                    '<path d="M4 15v5h16v-5"></path>' +
+                  '</svg>' +
+                '</button>' +
+                '<button type="button" class="save-load-slot-tool save-load-slot-tool-icon" data-slot-action="import" data-slot="' + slot.slot + '" title="Import into slot" aria-label="Import into slot">' +
+                  '<svg class="slot-icon-arrow" viewBox="0 0 24 24" aria-hidden="true">' +
+                    '<path d="M12 21V9"></path>' +
+                    '<path d="M8 17l4 4 4-4"></path>' +
+                    '<path d="M4 9V4h16v5"></path>' +
+                  '</svg>' +
+                '</button>' +
+                '<button type="button" class="save-load-slot-tool save-load-slot-tool-danger" data-slot-action="delete" data-slot="' + slot.slot + '"' + (!slot.occupied ? ' disabled' : '') + ' title="Delete slot" aria-label="Delete slot">' +
+                  '<svg class="slot-icon-trash" viewBox="0 0 24 24" aria-hidden="true">' +
+                    '<path d="M4 7h16"></path>' +
+                    '<path d="M9 7V5h6v2"></path>' +
+                    '<rect x="7" y="7" width="10" height="12" rx="1.5"></rect>' +
+                    '<path d="M10 10v6"></path>' +
+                    '<path d="M14 10v6"></path>' +
+                  '</svg>' +
+                '</button>' +
+              '</div>';
+            saveLoadSlotListEl.appendChild(row);
+          }
+        }
+
+        function flashSavedSlot(slot) {
+          lastSavedSlotFlash = Number(slot);
+          if (lastSavedSlotFlashTimer) {
+            clearTimeout(lastSavedSlotFlashTimer);
+          }
+          lastSavedSlotFlashTimer = setTimeout(() => {
+            lastSavedSlotFlash = null;
+            lastSavedSlotFlashTimer = 0;
+            if (!saveLoadSheetEl.hidden) {
+              controller.requestSaveLoadMenu(saveLoadSheetMode);
+            }
+          }, 2500);
+        }
+
+        function openSaveLoadSheet(payload) {
+          renderSaveLoadSlots(payload);
+          saveLoadSheetEl.hidden = false;
+        }
+
+        function closeSaveLoadSheet() {
+          saveLoadSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('close-save-load').addEventListener('click', closeSaveLoadSheet);
+        saveLoadSheetEl.addEventListener('click', async event => {
+          if (event.target === saveLoadSheetEl) {
+            closeSaveLoadSheet();
+            return;
+          }
+          const toolButton = event.target.closest('[data-slot-action]');
+          if (toolButton && !toolButton.disabled) {
+            const slot = Number(toolButton.dataset.slot);
+            const action = String(toolButton.dataset.slotAction || '');
+            if (Number.isFinite(slot) && slot >= 0 && action) {
+              await controller.executeSlotToolAction(action, slot);
+            }
+            return;
+          }
+          const slotButton = event.target.closest('.save-load-slot');
+          if (!slotButton || slotButton.disabled) {
+            return;
+          }
+          const slot = Number(slotButton.dataset.slot);
+          if (!Number.isFinite(slot) || slot < 0) {
+            return;
+          }
+          await controller.executeSaveLoadAction(saveLoadSheetMode, slot);
+          closeSaveLoadSheet();
         });
 
         function openSettingsSheet() {
@@ -977,6 +1153,40 @@
         mapSheetEl.addEventListener('click', event => {
           if (event.target === mapSheetEl) {
             closeMapSheet();
+          }
+        });
+
+        function resolveConfirmSheet(value) {
+          if (!confirmResolver) {
+            return;
+          }
+          const resolve = confirmResolver;
+          confirmResolver = null;
+          confirmSheetEl.hidden = true;
+          resolve(!!value);
+        }
+
+        function openConfirmSheet(payload) {
+          const info = payload || {};
+          if (confirmResolver) {
+            resolveConfirmSheet(false);
+          }
+          confirmMessageEl.textContent = info.message || 'This action may overwrite better progress. Continue?';
+          confirmSheetEl.hidden = false;
+          return new Promise(resolve => {
+            confirmResolver = resolve;
+          });
+        }
+
+        document.getElementById('confirm-cancel').addEventListener('click', () => {
+          resolveConfirmSheet(false);
+        });
+        document.getElementById('confirm-continue').addEventListener('click', () => {
+          resolveConfirmSheet(true);
+        });
+        confirmSheetEl.addEventListener('click', event => {
+          if (event.target === confirmSheetEl) {
+            resolveConfirmSheet(false);
           }
         });
 

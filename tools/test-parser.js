@@ -9,6 +9,7 @@ function run() {
   const storyPath = path.resolve(
     __dirname,
     '..',
+    '..',
     'data',
     'The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3'
   );
