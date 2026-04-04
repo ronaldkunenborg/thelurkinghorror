@@ -81,6 +81,7 @@
         <section class="scene-pane" aria-label="Location artwork">
           <div id="scene-layer-a" class="scene-layer"></div>
           <div id="scene-layer-b" class="scene-layer"></div>
+          <div id="horror-vignette" class="horror-vignette" aria-hidden="true"></div>
         </section>
         <div id="blood-layer" class="blood-layer" aria-hidden="true">
           <img id="blood-splatter" class="blood-splatter" alt="" />
@@ -179,6 +180,8 @@
               <button class="btn command-chip" type="button" data-command="$BLOOD ON"><strong>$BLOOD ON</strong><span>Debug-only: enable low-frequency random blood spatter.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD OFF"><strong>$BLOOD OFF</strong><span>Debug-only: disable blood spatter effect.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD 3"><strong>$BLOOD 1-5</strong><span>Debug-only: force a specific blood splatter variant.</span></button>
+              <button class="btn command-chip" type="button" data-command="$HORROR ON"><strong>$HORROR ON</strong><span>Debug-only: enable ambient horror disturbances.</span></button>
+              <button class="btn command-chip" type="button" data-command="$HORROR NOW RUNES"><strong>$HORROR NOW RUNES</strong><span>Debug-only: force a rune flicker now.</span></button>
               <button class="btn command-chip" type="button" data-command="$SOUNDSTATS"><strong>$SOUNDSTATS</strong><span>Print captured sound-event statistics.</span></button>
             </div>
           </div>
@@ -261,6 +264,7 @@
         const sceneLayers = [sceneLayerA, sceneLayerB];
         const scenePaneEl = document.querySelector('.scene-pane');
         const bloodSplatterEl = document.getElementById('blood-splatter');
+        const horrorVignetteEl = document.getElementById('horror-vignette');
         const hudGroupEl = document.querySelector('.hud-group');
         const commandSheetEl = document.getElementById('command-sheet');
         const saveLoadSheetEl = document.getElementById('save-load-sheet');
@@ -272,6 +276,13 @@
         const confirmSheetEl = document.getElementById('confirm-sheet');
         const confirmMessageEl = document.getElementById('confirm-message');
         const settingsButtonEl = document.getElementById('settings-button');
+        const actionIconButtons = [
+          document.getElementById('load-slot'),
+          document.getElementById('save-slot'),
+          document.getElementById('map-button'),
+          document.getElementById('settings-button'),
+          document.getElementById('commands-button'),
+        ].filter(Boolean);
         const musicVolumeEl = document.getElementById('music-volume');
         const sfxVolumeEl = document.getElementById('sfx-volume');
         const settingsStorage =
@@ -315,6 +326,74 @@
         let bloodEffectHideTimer = 0;
         let bloodEffectFirstDelayMs = null;
         let ambientBloodAutostarted = false;
+        const HORROR_GLYPH_ART = [
+          './assets/gfx/glyphs/glyph_forked_spine.svg',
+          './assets/gfx/glyphs/glyph_broken_halo.svg',
+          './assets/gfx/glyphs/glyph_hook_spiral.svg',
+          './assets/gfx/glyphs/glyph_ladder_thorn.svg',
+          './assets/gfx/glyphs/glyph_split_eye.svg',
+          './assets/gfx/glyphs/glyph_crowned_knot.svg',
+          './assets/gfx/glyphs/glyph_bent_trident.svg',
+          './assets/gfx/glyphs/glyph_sealed_door.svg',
+        ];
+        const HORROR_TEXT_MAP = {
+          A: '/\\',
+          E: '[-',
+          H: '][',
+          I: '|',
+          K: '|<',
+          M: '/\\/\\',
+          N: '|\\|',
+          O: '()',
+          R: '|2',
+          S: '5',
+          T: '+',
+          V: '\\/',
+          W: '\\/\\/',
+          X: '><',
+          Y: "'/",
+        };
+        const HORROR_CONFIG = {
+          roomEntryDelayMs: 500,
+          chanceRoomRunes: 0.05,
+          chanceRoomArtJump: 0.03,
+          chanceIdleUiGlyphSwap: 0.015,
+          chanceIdleDimPulse: 0.025,
+          durationRunesMinMs: 240,
+          durationRunesMaxMs: 450,
+          durationArtJumpMinMs: 60,
+          durationArtJumpMaxMs: 120,
+          durationUiSwapMinMs: 1000,
+          durationUiSwapMaxMs: 2000,
+          durationDimMinMs: 980,
+          durationDimMaxMs: 1960,
+          idleRollMinMs: 20000,
+          idleRollMaxMs: 35000,
+          cooldownRunesMs: 90000,
+          cooldownArtMs: 120000,
+          cooldownUiMs: 180000,
+          cooldownDimMs: 150000,
+        };
+        const horrorState = {
+          enabled: true,
+          activeEffect: '',
+          idleRollTimer: 0,
+          roomEntryTimer: 0,
+          activeReleaseTimer: 0,
+          dimTimers: [],
+          lastAt: {
+            runes: 0,
+            art: 0,
+            ui: 0,
+            dim: 0,
+          },
+          counts: {
+            runes: 0,
+            art: 0,
+            ui: 0,
+            dim: 0,
+          },
+        };
         const ROOM_ART_BY_ID = {
           15: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
           51: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
@@ -430,6 +509,407 @@
           return ((Math.random() * 2 - 1) * 10).toFixed(2);
         }
 
+        function randomIntInclusive(min, max) {
+          return min + Math.floor(Math.random() * ((max - min) + 1));
+        }
+
+        function randomIdleRollDelayMs() {
+          return HORROR_CONFIG.idleRollMinMs +
+            Math.floor(Math.random() * (HORROR_CONFIG.idleRollMaxMs - HORROR_CONFIG.idleRollMinMs + 1));
+        }
+
+        function clearHorrorDimTimers() {
+          if (!horrorState.dimTimers.length) {
+            return;
+          }
+          for (const timer of horrorState.dimTimers) {
+            clearTimeout(timer);
+          }
+          horrorState.dimTimers = [];
+        }
+
+        function queueHorrorDimTimer(fn, delayMs) {
+          const timer = setTimeout(fn, Math.max(0, Math.floor(delayMs)));
+          horrorState.dimTimers.push(timer);
+          return timer;
+        }
+
+        function positionHorrorVignetteToImageBounds() {
+          if (!horrorVignetteEl) {
+            return;
+          }
+          // The scene art uses centered background images at ~50% width; we constrain
+          // fluorescent flicker to that visual image region instead of the whole UI.
+          horrorVignetteEl.style.left = '25%';
+          horrorVignetteEl.style.top = '25%';
+          horrorVignetteEl.style.width = '50%';
+          horrorVignetteEl.style.height = '50%';
+        }
+
+        function playHorrorDimFlicker(totalMs) {
+          if (!horrorVignetteEl) {
+            return 0;
+          }
+          clearHorrorDimTimers();
+          positionHorrorVignetteToImageBounds();
+          horrorVignetteEl.classList.add('is-flickering');
+          horrorVignetteEl.style.opacity = '0';
+
+          let t = 0;
+          const burstCount = randomIntInclusive(3, 6);
+          for (let burst = 0; burst < burstCount; burst++) {
+            const attempts = randomIntInclusive(2, 4);
+            for (let step = 0; step < attempts; step++) {
+              t += randomIntInclusive(55, 130);
+              const rampBase = 0.12 + ((step + 1) / attempts) * (0.42 + (Math.random() * 0.18));
+              const rampOpacity = Math.min(0.78, rampBase);
+              queueHorrorDimTimer(() => {
+                horrorVignetteEl.style.opacity = String(rampOpacity);
+              }, t);
+            }
+            t += randomIntInclusive(18, 55);
+            queueHorrorDimTimer(() => {
+              horrorVignetteEl.style.opacity = '1';
+            }, t);
+            t += randomIntInclusive(26, 80);
+            queueHorrorDimTimer(() => {
+              horrorVignetteEl.style.opacity = '0';
+            }, t);
+            if (burst < (burstCount - 1)) {
+              t += randomIntInclusive(90, 260);
+            }
+          }
+
+          const endAt = Math.max(t, totalMs);
+          queueHorrorDimTimer(() => {
+            horrorVignetteEl.style.opacity = '0';
+            horrorVignetteEl.classList.remove('is-flickering');
+            clearHorrorDimTimers();
+          }, endAt + 20);
+
+          return endAt;
+        }
+
+        function isHorrorSuppressed() {
+          if (!splashHidden) {
+            return true;
+          }
+          if (!commandSheetEl.hidden || !saveLoadSheetEl.hidden || !mapSheetEl.hidden || !confirmSheetEl.hidden) {
+            return true;
+          }
+          if (!settingsSheetEl.hidden) {
+            return true;
+          }
+          if (bloodSplatterEl.classList.contains('is-visible')) {
+            return true;
+          }
+          if (String(ui.inputEl.value || '').trim().length > 0) {
+            return true;
+          }
+          return false;
+        }
+
+        function clearHorrorTimers() {
+          if (horrorState.idleRollTimer) {
+            clearTimeout(horrorState.idleRollTimer);
+            horrorState.idleRollTimer = 0;
+          }
+          if (horrorState.roomEntryTimer) {
+            clearTimeout(horrorState.roomEntryTimer);
+            horrorState.roomEntryTimer = 0;
+          }
+          if (horrorState.activeReleaseTimer) {
+            clearTimeout(horrorState.activeReleaseTimer);
+            horrorState.activeReleaseTimer = 0;
+          }
+          clearHorrorDimTimers();
+        }
+
+        function releaseHorrorEffect(effectName) {
+          if (horrorState.activeEffect !== effectName) {
+            return;
+          }
+          horrorState.activeEffect = '';
+          if (horrorState.activeReleaseTimer) {
+            clearTimeout(horrorState.activeReleaseTimer);
+            horrorState.activeReleaseTimer = 0;
+          }
+        }
+
+        function acquireHorrorEffect(effectName, minDurationMs) {
+          if (!horrorState.enabled || horrorState.activeEffect) {
+            return false;
+          }
+          if (isHorrorSuppressed()) {
+            return false;
+          }
+          horrorState.activeEffect = effectName;
+          const durationMs = Math.max(40, Number(minDurationMs) || 40);
+          if (horrorState.activeReleaseTimer) {
+            clearTimeout(horrorState.activeReleaseTimer);
+          }
+          horrorState.activeReleaseTimer = setTimeout(() => {
+            releaseHorrorEffect(effectName);
+          }, durationMs + 40);
+          return true;
+        }
+
+        function isHorrorCooldownReady(effectName, cooldownMs) {
+          const now = Date.now();
+          const previous = horrorState.lastAt[effectName] || 0;
+          return (now - previous) >= cooldownMs;
+        }
+
+        function markHorrorEffectFired(effectName) {
+          horrorState.lastAt[effectName] = Date.now();
+          if (horrorState.counts[effectName] !== undefined) {
+            horrorState.counts[effectName] += 1;
+          }
+        }
+
+        function scheduleHorrorIdleRoll() {
+          if (!horrorState.enabled) {
+            return;
+          }
+          if (horrorState.idleRollTimer) {
+            clearTimeout(horrorState.idleRollTimer);
+          }
+          horrorState.idleRollTimer = setTimeout(() => {
+            horrorState.idleRollTimer = 0;
+            runHorrorIdleRoll();
+          }, randomIdleRollDelayMs());
+        }
+
+        function runeCorruptText(text) {
+          const source = String(text || '');
+          if (!source) {
+            return source;
+          }
+          const chars = source.split('');
+          const candidateIndexes = [];
+          for (let i = 0; i < chars.length; i++) {
+            if (/[A-Za-z]/.test(chars[i])) {
+              candidateIndexes.push(i);
+            }
+          }
+          if (candidateIndexes.length === 0) {
+            return source;
+          }
+          const ratio = 0.15 + (Math.random() * 0.2);
+          const targetCount = Math.max(1, Math.floor(candidateIndexes.length * ratio));
+          for (let pass = 0; pass < targetCount; pass++) {
+            const pick = candidateIndexes[Math.floor(Math.random() * candidateIndexes.length)];
+            const key = chars[pick].toUpperCase();
+            if (!HORROR_TEXT_MAP[key]) {
+              continue;
+            }
+            chars[pick] = HORROR_TEXT_MAP[key];
+          }
+          return chars.join('');
+        }
+
+        function triggerHorrorRuneFlicker(force) {
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('runes', HORROR_CONFIG.cooldownRunesMs)) {
+            return false;
+          }
+          const eligibleLines = Array.from(ui.outputEl.querySelectorAll('.line'))
+            .filter(line => !line.classList.contains('command'));
+          if (eligibleLines.length === 0) {
+            return false;
+          }
+          const focusPool = eligibleLines.slice(Math.max(0, eligibleLines.length - 6));
+          const line = focusPool[Math.floor(Math.random() * focusPool.length)];
+          const originalText = String(line.textContent || '');
+          if (!originalText.trim()) {
+            return false;
+          }
+          const durationMs = randomIntInclusive(HORROR_CONFIG.durationRunesMinMs, HORROR_CONFIG.durationRunesMaxMs);
+          if (!acquireHorrorEffect('runes', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('runes');
+          line.textContent = runeCorruptText(originalText);
+          line.classList.add('horror-rune-flicker');
+          setTimeout(() => {
+            line.textContent = originalText;
+            line.classList.remove('horror-rune-flicker');
+            releaseHorrorEffect('runes');
+          }, durationMs);
+          return true;
+        }
+
+        function triggerHorrorArtMicroJump(layerEl, force) {
+          const layer = layerEl || sceneLayers[activeSceneIndex];
+          if (!layer) {
+            return false;
+          }
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('art', HORROR_CONFIG.cooldownArtMs)) {
+            return false;
+          }
+          const durationMs = randomIntInclusive(HORROR_CONFIG.durationArtJumpMinMs, HORROR_CONFIG.durationArtJumpMaxMs);
+          if (!acquireHorrorEffect('art', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('art');
+          layer.classList.add('scene-layer-horror-jump');
+          setTimeout(() => {
+            layer.classList.remove('scene-layer-horror-jump');
+            releaseHorrorEffect('art');
+          }, durationMs);
+          return true;
+        }
+
+        function triggerHorrorUiGlyphSwap(force) {
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('ui', HORROR_CONFIG.cooldownUiMs)) {
+            return false;
+          }
+          if (actionIconButtons.length === 0 || HORROR_GLYPH_ART.length === 0) {
+            return false;
+          }
+          const button = actionIconButtons[Math.floor(Math.random() * actionIconButtons.length)];
+          const span = button.querySelector('.icon-etch');
+          if (!span) {
+            return false;
+          }
+          const durationMs = randomIntInclusive(HORROR_CONFIG.durationUiSwapMinMs, HORROR_CONFIG.durationUiSwapMaxMs);
+          if (!acquireHorrorEffect('ui', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('ui');
+          const originalClass = span.className;
+          const originalHtml = span.innerHTML;
+          const glyphArt = HORROR_GLYPH_ART[Math.floor(Math.random() * HORROR_GLYPH_ART.length)];
+          span.className = 'icon-etch icon-etch-glyph';
+          span.innerHTML = '<img class="horror-glyph-icon" src="' + glyphArt + '" alt="" />';
+          button.classList.add('icon-btn-horror');
+          setTimeout(() => {
+            span.className = originalClass;
+            span.innerHTML = originalHtml;
+            button.classList.remove('icon-btn-horror');
+            releaseHorrorEffect('ui');
+          }, durationMs);
+          return true;
+        }
+
+        function triggerHorrorDimPulse(force) {
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('dim', HORROR_CONFIG.cooldownDimMs)) {
+            return false;
+          }
+          if (!horrorVignetteEl) {
+            return false;
+          }
+          const durationMs = randomIntInclusive(HORROR_CONFIG.durationDimMinMs, HORROR_CONFIG.durationDimMaxMs);
+          if (!acquireHorrorEffect('dim', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('dim');
+          const actualDurationMs = playHorrorDimFlicker(durationMs);
+          setTimeout(() => {
+            releaseHorrorEffect('dim');
+          }, Math.max(durationMs, actualDurationMs));
+          return true;
+        }
+
+        function runHorrorIdleRoll() {
+          if (!horrorState.enabled) {
+            return;
+          }
+          if (!isHorrorSuppressed() && !horrorState.activeEffect) {
+            const uiRoll = Math.random();
+            if (uiRoll < HORROR_CONFIG.chanceIdleUiGlyphSwap) {
+              triggerHorrorUiGlyphSwap(false);
+            } else {
+              const dimRoll = Math.random();
+              if (dimRoll < HORROR_CONFIG.chanceIdleDimPulse) {
+                triggerHorrorDimPulse(false);
+              }
+            }
+          }
+          scheduleHorrorIdleRoll();
+        }
+
+        function scheduleRoomEntryHorror(layerEl) {
+          if (!horrorState.enabled) {
+            return;
+          }
+          if (horrorState.roomEntryTimer) {
+            clearTimeout(horrorState.roomEntryTimer);
+            horrorState.roomEntryTimer = 0;
+          }
+          horrorState.roomEntryTimer = setTimeout(() => {
+            horrorState.roomEntryTimer = 0;
+            if (isHorrorSuppressed() || horrorState.activeEffect) {
+              return;
+            }
+            const runeRoll = Math.random();
+            if (runeRoll < HORROR_CONFIG.chanceRoomRunes) {
+              triggerHorrorRuneFlicker(false);
+              return;
+            }
+            const artRoll = Math.random();
+            if (artRoll < HORROR_CONFIG.chanceRoomArtJump) {
+              triggerHorrorArtMicroJump(layerEl, false);
+            }
+          }, HORROR_CONFIG.roomEntryDelayMs);
+        }
+
+        function setHorrorEffectState(state) {
+          const next = state || {};
+          const action = String(next.action || '').toLowerCase();
+          if (action === 'set-enabled') {
+            horrorState.enabled = !!next.enabled;
+            if (!horrorState.enabled) {
+              clearHorrorTimers();
+              if (horrorVignetteEl) {
+                horrorVignetteEl.classList.remove('is-flickering');
+                horrorVignetteEl.style.opacity = '0';
+              }
+              horrorState.activeEffect = '';
+              return { enabled: horrorState.enabled };
+            }
+            if (splashHidden) {
+              scheduleHorrorIdleRoll();
+            }
+            return { enabled: horrorState.enabled };
+          }
+          if (action === 'force') {
+            const effect = String(next.effect || '').toLowerCase();
+            let applied = false;
+            if (effect === 'runes') {
+              applied = triggerHorrorRuneFlicker(true);
+            } else if (effect === 'art') {
+              applied = triggerHorrorArtMicroJump(sceneLayers[activeSceneIndex], true);
+            } else if (effect === 'ui') {
+              applied = triggerHorrorUiGlyphSwap(true);
+            } else if (effect === 'dim') {
+              applied = triggerHorrorDimPulse(true);
+            }
+            return {
+              applied,
+              enabled: horrorState.enabled,
+              activeEffect: horrorState.activeEffect,
+            };
+          }
+          if (action === 'stats') {
+            return {
+              enabled: horrorState.enabled,
+              activeEffect: horrorState.activeEffect,
+              countRunes: horrorState.counts.runes,
+              countArt: horrorState.counts.art,
+              countUi: horrorState.counts.ui,
+              countDim: horrorState.counts.dim,
+            };
+          }
+          return {
+            enabled: horrorState.enabled,
+            activeEffect: horrorState.activeEffect,
+          };
+        }
+
         function setRoomScene(roomName, roomObjectId, options) {
           const isDark = !!(options && options.isDark);
           const art = isDark ? '' : resolveRoomArt(roomName, roomObjectId);
@@ -455,6 +935,7 @@
           nextLayer.style.opacity = '1';
           prevLayer.style.opacity = '0';
           activeSceneIndex = nextIndex;
+          scheduleRoomEntryHorror(nextLayer);
         }
 
         function clearBloodTimers() {
@@ -705,6 +1186,9 @@
           onBloodEffectCommand: state => {
             setBloodEffectState(state);
           },
+          onHorrorEffectCommand: state => {
+            return setHorrorEffectState(state);
+          },
           onMapRequested: () => {
             openMapSheet();
           },
@@ -921,6 +1405,7 @@
               firstDelayMs: 60000 + Math.floor(Math.random() * 30000),
             });
           }
+          scheduleHorrorIdleRoll();
           window.removeEventListener('keydown', handleSplashDismiss);
         }
 
@@ -1145,6 +1630,9 @@
         window.addEventListener('resize', () => {
           if (!settingsSheetEl.hidden) {
             positionSettingsSheet();
+          }
+          if (horrorVignetteEl && horrorVignetteEl.classList.contains('is-flickering')) {
+            positionHorrorVignetteToImageBounds();
           }
         });
 

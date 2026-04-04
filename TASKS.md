@@ -280,6 +280,23 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
 
-41. [pending] Add random horror items: a new image is offset randomly <10% in any direction. Buttons change into a skull icon once in a while. Sometimes they change into runes with a flicker and then change back.
+41. [done] Add rare ambient horror disturbances around room-art transitions and idle play.
+   - Added a dedicated horror-effect runtime in `src/index.html` with centralized probabilities, durations, cooldowns, and one-effect-at-a-time locking.
+   - Implemented room-entry disturbances:
+     - rare rune text flicker after room-art transition delay (~500ms)
+     - optional art micro-jump glitch path kept mutually exclusive with rune flicker
+   - Implemented idle disturbances:
+     - rare UI glyph icon swap using new custom glyph assets
+     - rare peripheral dim pulse (`#horror-vignette`) with short animation window
+   - Added and wired an initial 8-glyph SVG set under `src/assets/gfx/glyphs/` matching ids from `docs/HORROR_GLYPH_SET_PLAN.md`.
+   - Added debug controls in `src/io.js`:
+     - `$HORROR ON|OFF`
+     - `$HORROR NOW RUNES|ART|UI|DIM`
+     - `$HORROR STATS`
+   - Added mitigation guardrails:
+     - suppresses horror effects during splash and modal/panel states (commands, slots, settings, map, confirm)
+     - suppresses effects while command input is actively being typed
+     - prevents overlap with other active horror effects and blood-splatter visibility
+     - keeps runtime tuning values centralized for safe iteration
 
 42. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.

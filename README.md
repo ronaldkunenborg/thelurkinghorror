@@ -134,6 +134,7 @@ Useful local checks:
 - [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter QoL extensions and behavior notes.
 - [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - spoiler-heavy technical/reference map.
 - [`docs/LOCATION_IMAGE_BRIEFS.md`](docs/LOCATION_IMAGE_BRIEFS.md) - location title/description briefs for image generation workflows.
+- [`docs/HORROR_GLYPH_SET_PLAN.md`](docs/HORROR_GLYPH_SET_PLAN.md) - initial design plan for custom occult glyphs used in rune/icon glitch effects.
 
 ## Attribution
 

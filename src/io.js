@@ -57,6 +57,8 @@ class GameIoController {
     this.onRoomChanged = typeof opts.onRoomChanged === 'function' ? opts.onRoomChanged : function () {};
     this.onBloodEffectCommand =
       typeof opts.onBloodEffectCommand === 'function' ? opts.onBloodEffectCommand : function () {};
+    this.onHorrorEffectCommand =
+      typeof opts.onHorrorEffectCommand === 'function' ? opts.onHorrorEffectCommand : function () {};
     this.onMapRequested =
       typeof opts.onMapRequested === 'function' ? opts.onMapRequested : function () {};
     this.onSaveLoadMenuRequested =
@@ -296,6 +298,9 @@ class GameIoController {
     if (normalized.startsWith('$BLOOD')) {
       return this._handleBloodCommand(original);
     }
+    if (normalized.startsWith('$HORROR')) {
+      return this._handleHorrorCommand(original);
+    }
     if (normalized.startsWith('$SAVES')) {
       this._listSaveSlots();
       return true;
@@ -517,6 +522,78 @@ class GameIoController {
 
     this.ui.appendOutput('Usage: $BLOOD ON|OFF|NOW|RANDOM|<1-5>', 'error');
     this.ui.setStatus('Interpreter command', 'Blood usage');
+    return true;
+  }
+
+  _handleHorrorCommand(command) {
+    if (!this.debugEnabled) {
+      this.ui.appendOutput('Horror effect debug commands require $DEBUG on.', 'error');
+      this.ui.setStatus('Interpreter command', 'Enable $DEBUG');
+      return true;
+    }
+
+    const parts = String(command || '').trim().split(/\s+/);
+    const arg = (parts[1] || 'ON').toUpperCase();
+    const effectArg = (parts[2] || 'RUNES').toUpperCase();
+
+    if (arg === 'OFF' || arg === 'STOP') {
+      this.onHorrorEffectCommand({ action: 'set-enabled', enabled: false });
+      this.ui.appendOutput('Ambient horror effects disabled.', 'system');
+      this.ui.setStatus('Interpreter command', 'Horror OFF');
+      return true;
+    }
+
+    if (arg === 'ON' || arg === 'START' || arg === 'RANDOM') {
+      this.onHorrorEffectCommand({ action: 'set-enabled', enabled: true });
+      this.ui.appendOutput('Ambient horror effects enabled.', 'system');
+      this.ui.setStatus('Interpreter command', 'Horror ON');
+      return true;
+    }
+
+    if (arg === 'NOW') {
+      const effectMap = {
+        RUNES: 'runes',
+        ART: 'art',
+        UI: 'ui',
+        DIM: 'dim',
+      };
+      const effect = effectMap[effectArg];
+      if (!effect) {
+        this.ui.appendOutput('Usage: $HORROR NOW RUNES|ART|UI|DIM', 'error');
+        this.ui.setStatus('Interpreter command', 'Horror usage');
+        return true;
+      }
+      const result = this.onHorrorEffectCommand({ action: 'force', effect }) || {};
+      if (result.applied) {
+        this.ui.appendOutput('Ambient horror effect forced: ' + effect + '.', 'system');
+        this.ui.setStatus('Interpreter command', 'Horror now');
+      } else {
+        this.ui.appendOutput(
+          'Horror effect was not applied (currently suppressed by UI state or cooldowns).',
+          'system'
+        );
+        this.ui.setStatus('Interpreter command', 'Horror blocked');
+      }
+      return true;
+    }
+
+    if (arg === 'STATS') {
+      const stats = this.onHorrorEffectCommand({ action: 'stats' }) || {};
+      this.ui.appendOutput(
+        '[Horror stats] enabled=' + String(!!stats.enabled) +
+        ' active=' + (stats.activeEffect || 'none') +
+        ' runes=' + String(stats.countRunes || 0) +
+        ' art=' + String(stats.countArt || 0) +
+        ' ui=' + String(stats.countUi || 0) +
+        ' dim=' + String(stats.countDim || 0),
+        'system'
+      );
+      this.ui.setStatus('Interpreter command', 'Horror stats');
+      return true;
+    }
+
+    this.ui.appendOutput('Usage: $HORROR ON|OFF|NOW RUNES|ART|UI|DIM|STATS', 'error');
+    this.ui.setStatus('Interpreter command', 'Horror usage');
     return true;
   }
 
