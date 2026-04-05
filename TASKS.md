@@ -1,4 +1,4 @@
-# Task List
+﻿# Task List
 
 Completed tasks should be moved to ## Recent Completed Context.
 Completed tasks that are no longer needed for day-to-day context have been moved to `TASKS_archived.md`.
@@ -229,14 +229,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
      - Added blood effect scheduler and renderer in `src/index.html`
      - Added `$BLOOD` debug command handling and callback support in `src/io.js`
 
-39. [done] Add a spoiler-safe university overview map (buildings only, no hints).
+36. [done] Add a spoiler-safe university overview map (buildings only, no hints).
    - Added map asset `src/assets/gfx/maps/university_overview_map.jpg` from the provided data folder input.
    - Added a dedicated map overlay (`#map-sheet`) in `src/index.html` to display the spoiler-safe campus overview.
    - Added a side-action map icon button to open the same overlay directly for discoverability.
    - Added interpreter command `$MAP` in `src/io.js`, wired to open the overview map and confirm in output/status.
    - Added `$MAP` to the commands overview and added controller test coverage in `tools/test-io-controller-output.js`.
 
-40. [done] Rework interpreter save/load UX around slot picker, destructive checks, and parity between buttons and `$SAVE/$LOAD`.
+37. [done] Rework interpreter save/load UX around slot picker, destructive checks, and parity between buttons and `$SAVE/$LOAD`.
    - Added save/load slot picker overlay in `src/index.html` showing slot, location, score, moves, and save time.
    - Wired save/load buttons to open the slot picker instead of directly targeting slot `0`.
    - Updated `$SAVE` and `$LOAD` (without slot number) to open the same picker flow as button clicks.
@@ -260,27 +260,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Extended save metadata persistence in `src/quetzal-storage.js` to store `roomName`, `score`, and `moves`.
    - Added controller test coverage in `tools/test-io-controller-output.js` for picker routing and destructive confirmations.
 
-## Pending Tasks
-
-36. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
-   - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
-   - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
-   - Add safe-location gating skeleton and feature flag for consultation availability
-   - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
-
-37. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
-   - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
-   - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic.
-   - Include destinations like `Basalt Bowl` where access is not a simple compass move.
-   - Rewrite labels in player language (for example `read paper`) rather than engine/property wording.
-   - For this phase, exact trigger/condition validation is explicitly out of scope; mark labels as booklet-derived where uncertainty remains.
-
-38. [pending] Add an in-game map of visited locations while adventuring.
-   - Track visited locations during play and show them in the live UI rather than only in documentation
-   - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
-   - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
-
-41. [done] Add rare ambient horror disturbances around room-art transitions and idle play.
+38. [done] Add rare ambient horror disturbances around room-art transitions and idle play.
    - Added a dedicated horror-effect runtime in `src/index.html` with centralized probabilities, durations, cooldowns, and one-effect-at-a-time locking.
    - Implemented room-entry disturbances:
      - rare rune text flicker after room-art transition delay (~500ms)
@@ -299,4 +279,37 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
      - prevents overlap with other active horror effects and blood-splatter visibility
      - keeps runtime tuning values centralized for safe iteration
 
-42. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.
+## Pending Tasks
+
+39. [pending] Priority: fix `$VIEW` preview pause ordering bug (restore must happen only after acknowledgement command).
+   - Debug trace to preserve context:
+     - `> $VIEW 202`
+     - `Temporary Basement` preview text appears, then room snaps back to `Terminal Room (176)` before the pause message.
+     - `[View] Previewing Temporary Basement (202). Press any key/command to return.` appears after restore, which is too late.
+   - Desired behavior: enter preview room, keep preview state active, print pause message immediately, and restore only when next command/keypress is submitted.
+   - Add regression coverage for ordering so preview room does not auto-restore before acknowledgement.
+
+40. [pending] Wire up all room images so every mapped location has a resolved artwork assignment.
+   - Audit `ROOM_ART_BY_ID` and room-name fallbacks against discovered room ids.
+   - Fill missing image mappings and verify no silent fallbacks to blank when art exists.
+   - Add/update coverage or diagnostics so unmapped rooms are reported clearly during debug sessions.
+
+41. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+   - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
+   - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
+   - Add safe-location gating skeleton and feature flag for consultation availability
+   - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
+
+42. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
+   - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
+   - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic.
+   - Include destinations like `Basalt Bowl` where access is not a simple compass move.
+   - Rewrite labels in player language (for example `read paper`) rather than engine/property wording.
+   - For this phase, exact trigger/condition validation is explicitly out of scope; mark labels as booklet-derived where uncertainty remains.
+
+43. [pending] Add an in-game map of visited locations while adventuring.
+   - Track visited locations during play and show them in the live UI rather than only in documentation
+   - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
+   - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
+
+44. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.
