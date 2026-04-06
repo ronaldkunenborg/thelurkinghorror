@@ -29,6 +29,10 @@ The interpreter adds non-story commands:
   Toggle splash/interpreter-managed game music.
 - `$DEBUG`
   Toggle debug-only VM/sound/light/blood diagnostics.
+- `$MAP`
+  Open the spoiler-safe university overview map panel.
+- `$CREDITS`
+  Open the credits panel.
 - `$VIEW <room-id|room-name>`
   Debug-only safe room preview. Shows room text/art for the target, then returns to the exact prior state after your next command keypress.
 - `$SOUNDSTATS`
@@ -56,7 +60,7 @@ The interpreter adds non-story commands:
 
 ## UI Features
 
-- icon-based action rail (`Save`, `Load`, `Commands`, `Settings`)
+- icon-based action rail (`Load`, `Save`, `Map`, `Settings`, `Credits`, `Commands`)
 - grouped command reference sheet
 - room scene transitions with per-room ID mapping and dark-room handling
 - splash startup flow with music attribution

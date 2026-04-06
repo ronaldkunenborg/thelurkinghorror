@@ -247,6 +247,34 @@ function testMapCommandOpensUniversityMap() {
   );
 }
 
+function testCreditsCommandOpensCreditsPanel() {
+  const ui = createUi();
+  const creditRequests = [];
+  const controller = new GameIoController(ui, {
+    onCreditsRequested() {
+      creditRequests.push('open');
+    },
+  });
+  controller.vm = { haltReason: null };
+
+  controller.submitCommand('$CREDITS');
+
+  assert.deepStrictEqual(
+    creditRequests,
+    ['open'],
+    '$CREDITS should invoke credits-open callback exactly once'
+  );
+  assert.ok(
+    ui.lines.includes('Opened the credits panel.'),
+    '$CREDITS should print confirmation output'
+  );
+  assert.deepStrictEqual(
+    ui.statuses.slice(-1)[0],
+    ['Interpreter command', 'Credits'],
+    '$CREDITS should update status line'
+  );
+}
+
 async function testSaveAndLoadCommandsWithoutSlotOpenSlotPicker() {
   const ui = createUi();
   const storage = createSaveStorage();
@@ -1165,6 +1193,7 @@ async function run() {
   testSoundInterpreterCommandWorksWithoutVmInput();
   testGameSoundAliasWorksWithoutVmInput();
   testMapCommandOpensUniversityMap();
+  testCreditsCommandOpensCreditsPanel();
   await testSaveAndLoadCommandsWithoutSlotOpenSlotPicker();
   testSaveLoadRejectOutOfRangeSlots();
   testPlainLoadShowsRestoreHint();

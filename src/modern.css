@@ -327,6 +327,29 @@ body {
   opacity: 0.9;
 }
 
+.icon-credits {
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  top: 2px;
+}
+
+.icon-credits::before {
+  content: "i";
+  font-style: normal;
+  transform: translateY(-1px);
+}
+
+.icon-credits::after {
+  display: none;
+}
+
 .icon-trash::before {
   left: 8px;
   top: 8px;
@@ -1030,6 +1053,54 @@ body {
   height: auto;
   border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 12px;
+}
+
+.credits-sheet[hidden] {
+  display: none;
+}
+
+.credits-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(2, 4, 8, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.credits-sheet-panel {
+  width: min(900px, 100%);
+  max-height: min(84vh, 900px);
+  overflow: auto;
+  border: 1px solid var(--panel-border-top);
+  border-radius: 20px;
+  background: rgba(6, 10, 16, 0.96);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.credits-group {
+  margin-top: 24px;
+}
+
+.credits-group:first-of-type {
+  margin-top: 10px;
+}
+
+.credits-group h3 {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 0.88rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.credits-group p {
+  margin: 0;
+  color: var(--text-dim);
+  line-height: 1.5;
 }
 
 .settings-sheet[hidden] {

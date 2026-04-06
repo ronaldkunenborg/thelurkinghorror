@@ -39,6 +39,9 @@
             <button id="settings-button" class="icon-btn" type="button" aria-label="Audio settings" title="Audio settings">
               <span class="icon-etch icon-gear" aria-hidden="true"></span>
             </button>
+            <button id="credits-button" class="icon-btn" type="button" aria-label="Credits" title="Credits">
+              <span class="icon-etch icon-credits" aria-hidden="true"></span>
+            </button>
             <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
               <span class="icon-etch icon-help" aria-hidden="true">?</span>
             </button>
@@ -177,6 +180,7 @@
               <button class="btn command-chip" type="button" data-command="$GAMESOUND"><strong>$GAMESOUND</strong><span>Toggle splash and other game music.</span></button>
               <button class="btn command-chip" type="button" data-command="$DEBUG"><strong>$DEBUG</strong><span>Toggle debug-only VM and sound diagnostics.</span></button>
               <button class="btn command-chip" type="button" data-command="$MAP"><strong>$MAP</strong><span>Open the spoiler-safe university overview map.</span></button>
+              <button class="btn command-chip" type="button" data-command="$CREDITS"><strong>$CREDITS</strong><span>Open the credits panel.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD ON"><strong>$BLOOD ON</strong><span>Debug-only: enable low-frequency random blood spatter.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD OFF"><strong>$BLOOD OFF</strong><span>Debug-only: disable blood spatter effect.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD 3"><strong>$BLOOD 1-5</strong><span>Debug-only: force a specific blood splatter variant.</span></button>
@@ -210,6 +214,37 @@
             src="./assets/gfx/maps/university_overview_map.jpg"
             alt="Spoiler-safe overview map of the university campus buildings."
           />
+        </div>
+      </section>
+      <section id="credits-sheet" class="credits-sheet" aria-label="Credits" hidden>
+        <div class="credits-sheet-panel">
+          <div class="command-sheet-header">
+            <h2 class="command-sheet-title">Credits</h2>
+            <button id="close-credits" class="btn" type="button">Close</button>
+          </div>
+          <div class="credits-group">
+            <h3>Original Game</h3>
+            <p><strong>The Lurking Horror</strong> by Infocom (1987), release 219, serial 870912.</p>
+          </div>
+          <div class="credits-group">
+            <h3>Idea for the adaptation</h3>
+            <p>Modern web adaptation conceived by Ronald Kunenborg, as a hommage to a classic text adventure I enjoyed playing in 1987.</p>
+          </div>
+          <div class="credits-group">
+            <h3>Web Interpreter</h3>
+            <p>Parser, Engine integration, UX layer, and supplemental tooling created by Codex 5.3, under direction by Ronald Kunenborg.</p>
+          </div>
+          <div class="credits-group">
+            <h3>Audio Attribution</h3>
+            <p>
+              Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
+              <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+            </p>
+          </div>
+          <div class="credits-group">
+            <h3>Visual Assets</h3>
+            <p>Room art and effects art are created by Dall-E 3 using ChatGPT 5.4 for curated prompts. Glyphs were custom-built by Codex 5.3.</p>
+          </div>
         </div>
       </section>
       <section id="settings-sheet" class="settings-sheet" aria-label="Audio settings" hidden>
@@ -273,6 +308,7 @@
         const saveLoadSubtitleEl = document.getElementById('save-load-subtitle');
         const saveLoadSlotListEl = document.getElementById('save-load-slot-list');
         const mapSheetEl = document.getElementById('map-sheet');
+        const creditsSheetEl = document.getElementById('credits-sheet');
         const settingsSheetEl = document.getElementById('settings-sheet');
         const confirmSheetEl = document.getElementById('confirm-sheet');
         const confirmMessageEl = document.getElementById('confirm-message');
@@ -282,6 +318,7 @@
           document.getElementById('save-slot'),
           document.getElementById('map-button'),
           document.getElementById('settings-button'),
+          document.getElementById('credits-button'),
           document.getElementById('commands-button'),
         ].filter(Boolean);
         const musicVolumeEl = document.getElementById('music-volume');
@@ -458,7 +495,7 @@
           210: './assets/gfx/lurkinghorror/infinite_corridor_210.png',
           213: './assets/gfx/lurkinghorror/top_of_dome_213.png',
           // 214: './assets/gfx/lurkinghorror/infinite_corridor_208.png',
-          // 218: './assets/gfx/lurkinghorror/infinite_corridor_208.png',
+          // 218: './assets/gfx/lurkinghorror/infinite_corridor_218.png',
           221: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
           222: './assets/gfx/lurkinghorror/skyscraper_roof_222.png',
           227: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
@@ -491,7 +528,7 @@
           'fruits and nuts': './assets/gfx/lurkinghorror/fruits_and_nuts_150.png',
           'great court': './assets/gfx/lurkinghorror/great_court_180.png',
           'great dome': './assets/gfx/lurkinghorror/great_dome_249.jpg',
-          'infinite corridor': './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          'infinite corridor': './assets/gfx/lurkinghorror/infinite_corridor.png',
           'inner lair': './assets/gfx/lurkinghorror/inner_lair_69.jpg',
           'inside dome': './assets/gfx/lurkinghorror/inside_dome_109.png',
           'kitchen': './assets/gfx/lurkinghorror/kitchen_33.jpg',
@@ -668,7 +705,7 @@
           if (!splashHidden) {
             return true;
           }
-          if (!commandSheetEl.hidden || !saveLoadSheetEl.hidden || !mapSheetEl.hidden || !confirmSheetEl.hidden) {
+          if (!commandSheetEl.hidden || !saveLoadSheetEl.hidden || !mapSheetEl.hidden || !creditsSheetEl.hidden || !confirmSheetEl.hidden) {
             return true;
           }
           if (!settingsSheetEl.hidden) {
@@ -1266,6 +1303,9 @@
           onMapRequested: () => {
             openMapSheet();
           },
+          onCreditsRequested: () => {
+            openCreditsSheet();
+          },
           onSaveLoadMenuRequested: payload => {
             openSaveLoadSheet(payload);
           },
@@ -1754,6 +1794,23 @@
         mapSheetEl.addEventListener('click', event => {
           if (event.target === mapSheetEl) {
             closeMapSheet();
+          }
+        });
+
+        function openCreditsSheet() {
+          creditsSheetEl.hidden = false;
+        }
+
+        function closeCreditsSheet() {
+          creditsSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('credits-button').addEventListener('click', openCreditsSheet);
+        document.getElementById('close-credits').addEventListener('click', closeCreditsSheet);
+        creditsSheetEl.addEventListener('click', event => {
+          if (event.target === creditsSheetEl) {
+            closeCreditsSheet();
           }
         });
 

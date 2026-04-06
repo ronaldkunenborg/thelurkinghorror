@@ -286,6 +286,13 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Fixed scene restoration so side art always returns to the live room after leaving preview.
    - Updated command/docs wiring for `$VIEW` and removed stale `$TELEPORT` references.
 
+40. [done] Add a credits panel with UI/action/command wiring and docs/tests coverage.
+   - Added dedicated `#credits-sheet` overlay with grouped attribution sections and close action in `src/index.html`.
+   - Added side-action `Credits` icon button and wired open/close + backdrop-click behavior.
+   - Added interpreter command `$CREDITS` in `src/io.js`, including `onCreditsRequested` callback support and status/output messaging.
+   - Updated command overview panel and command docs (`README.md`, `docs/INTERPRETER_EXTENSIONS.md`) to include `$CREDITS`.
+   - Added controller regression coverage in `tools/test-io-controller-output.js` for callback/output/status behavior.
+
 ## Pending Tasks
 
 40. [pending] Wire up all room images so every mapped location has a resolved artwork assignment.
@@ -313,4 +320,3 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 
 44. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.
 
-45. [pending] We need a credits panel to show the credits for the game.

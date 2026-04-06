@@ -62,6 +62,8 @@ class GameIoController {
       typeof opts.onHorrorEffectCommand === 'function' ? opts.onHorrorEffectCommand : function () {};
     this.onMapRequested =
       typeof opts.onMapRequested === 'function' ? opts.onMapRequested : function () {};
+    this.onCreditsRequested =
+      typeof opts.onCreditsRequested === 'function' ? opts.onCreditsRequested : function () {};
     this.onSaveLoadMenuRequested =
       typeof opts.onSaveLoadMenuRequested === 'function'
         ? opts.onSaveLoadMenuRequested
@@ -317,6 +319,12 @@ class GameIoController {
       this.onMapRequested();
       this.ui.appendOutput('Opened the spoiler-safe university overview map.', 'system');
       this.ui.setStatus('Interpreter command', 'Map');
+      return true;
+    }
+    if (normalized === '$CREDITS') {
+      this.onCreditsRequested();
+      this.ui.appendOutput('Opened the credits panel.', 'system');
+      this.ui.setStatus('Interpreter command', 'Credits');
       return true;
     }
     if (normalized.startsWith('$SAVE')) {

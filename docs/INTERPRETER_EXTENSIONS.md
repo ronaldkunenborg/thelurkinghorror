@@ -23,6 +23,12 @@ This project adds a few interpreter-level conveniences on top of standard story 
   - Supports either numeric room object id (example: `$VIEW 174`) or room name (example: `$VIEW Department of Alchemy`).
   - Shows the room preview, then waits for your next command keypress and restores the exact prior state.
 
+- `$MAP`
+  - Opens the spoiler-safe university overview map panel.
+
+- `$CREDITS`
+  - Opens the credits panel with game, adaptation, and asset attribution.
+
 ## HELP Note Extension
 
 When the game emits the in-world computer HELP message containing:
