@@ -47,6 +47,7 @@ class GameIoController {
     this.sawPitchBlackThisCycle = false;
     this.previousVmLine = '';
     this.pendingRoomDebugAfterLook = false;
+    this.pendingViewReturn = null;
     this.debugEnabled = false;
     this.sfxEnabled = true;
     this.gameMusicEnabled = true;
@@ -122,6 +123,7 @@ class GameIoController {
     this.pendingDarkClearRoomId = null;
     this.sawPitchBlackThisCycle = false;
     this.previousVmLine = '';
+    this.pendingViewReturn = null;
     this.onRoomChanged('', 0, { isDark: false });
     this.vm = new window.Z3VM({
       memory: parsed.memory.bytes,
@@ -241,6 +243,9 @@ class GameIoController {
   }
 
   submitCommand(command) {
+    if (this.acknowledgeViewPreview()) {
+      return;
+    }
     if (this._handleInterpreterCommand(command)) {
       return;
     }
@@ -300,6 +305,9 @@ class GameIoController {
     }
     if (normalized.startsWith('$HORROR')) {
       return this._handleHorrorCommand(original);
+    }
+    if (normalized.startsWith('$VIEW')) {
+      return this._handleViewCommand(original);
     }
     if (normalized.startsWith('$SAVES')) {
       this._listSaveSlots();
@@ -595,6 +603,357 @@ class GameIoController {
     this.ui.appendOutput('Usage: $HORROR ON|OFF|NOW RUNES|ART|UI|DIM|STATS', 'error');
     this.ui.setStatus('Interpreter command', 'Horror usage');
     return true;
+  }
+
+  _handleViewCommand(command) {
+    if (!this.debugEnabled) {
+      this.ui.appendOutput('View debug command requires $DEBUG on.', 'error');
+      this.ui.setStatus('Interpreter command', 'Enable $DEBUG');
+      return true;
+    }
+    if (!this.vm) {
+      this.ui.appendOutput('No story loaded yet.', 'error');
+      this.ui.setStatus('Interpreter command', 'View unavailable');
+      return true;
+    }
+    if (this.vm.haltReason !== 'input') {
+      this.ui.appendOutput('View is only available while the VM is waiting for input.', 'error');
+      this.ui.setStatus('Interpreter command', 'View unavailable');
+      return true;
+    }
+
+    const targetText = String(command || '').trim().slice('$VIEW'.length).trim();
+    if (!targetText) {
+      this.ui.appendOutput('Usage: $VIEW <room-id|room-name>', 'error');
+      this.ui.setStatus('Interpreter command', 'View usage');
+      return true;
+    }
+
+    const rooms = this._collectTeleportRooms();
+    if (!rooms.length) {
+      this.ui.appendOutput('View failed: could not discover room list from current VM state.', 'error');
+      this.ui.setStatus('Interpreter command', 'View failed');
+      return true;
+    }
+    const resolved = this._resolveTeleportTarget(targetText, rooms);
+    if (!resolved || !resolved.target) {
+      const reason = resolved && resolved.reason ? resolved.reason : 'room not found.';
+      this.ui.appendOutput('View failed: ' + reason, 'error');
+      this.ui.setStatus('Interpreter command', 'View failed');
+      return true;
+    }
+    if (!resolved.target.isRoom) {
+      this.ui.appendOutput(
+        'View failed: id ' + String(resolved.target.id) + ' is not recognized as a room object.',
+        'error'
+      );
+      this.ui.setStatus('Interpreter command', 'View failed');
+      return true;
+    }
+
+    const preview = this._captureViewPreview(resolved.target.id);
+    if (!preview || !preview.ok) {
+      this.ui.appendOutput(
+        'View failed: ' + (preview && preview.reason ? preview.reason : 'preview capture failed.'),
+        'error'
+      );
+      this.ui.setStatus('Interpreter command', 'View failed');
+      return true;
+    }
+
+    const live = this.vm.getStatusSnapshot ? this.vm.getStatusSnapshot() : {};
+    const scoreText = live && Number.isFinite(live.score) ? String(live.score) : '';
+    const movesText = live && Number.isFinite(live.moves) ? String(live.moves) : '';
+    this.ui.setTopbarMeta(resolved.target.name || '', scoreText, movesText);
+    this.onRoomChanged(resolved.target.name || '', resolved.target.id, { isDark: !!preview.isDark });
+
+    const lines = String(preview.output || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+    for (const line of lines) {
+      if (line.trim() === '') {
+        continue;
+      }
+      this.ui.appendOutput(line);
+    }
+
+    this.pendingViewReturn = {
+      active: true,
+    };
+    this.ui.appendOutput(
+      '[View] Previewing ' + resolved.target.name + ' (' + String(resolved.target.id) + '). ' +
+      'Press any key/command to return.',
+      'system'
+    );
+    this.ui.setStatus('Interpreter command', 'View preview');
+    return true;
+  }
+
+  _exitPendingViewPreview() {
+    this.pendingViewReturn = null;
+    // Force a scene/topbar refresh from the live VM snapshot on preview exit.
+    // Without this, if the controller still thinks it is in the original room,
+    // onRoomChanged may not fire and preview art can remain stuck on screen.
+    this.currentRoomId = -1;
+    this.currentRoomName = '';
+    this.lastSceneIsDark = null;
+    this._syncStatusDisplays();
+  }
+
+  isViewPreviewActive() {
+    return !!this.pendingViewReturn;
+  }
+
+  acknowledgeViewPreview() {
+    if (!this.pendingViewReturn) {
+      return false;
+    }
+    this._exitPendingViewPreview();
+    this.ui.appendOutput('[View] Returned to previous game state.', 'system');
+    this.ui.setStatus('Interpreter command', 'View closed');
+    this.ui.focusInput();
+    return true;
+  }
+
+  _captureViewPreview(targetRoomId) {
+    if (
+      !this.vm ||
+      typeof this.vm.serializeSaveState !== 'function' ||
+      typeof this.vm.restoreSaveState !== 'function' ||
+      typeof this.vm.write16 !== 'function'
+    ) {
+      return { ok: false, reason: 'VM snapshot API unavailable.' };
+    }
+    const roomId = Number(targetRoomId);
+    if (!Number.isInteger(roomId) || roomId <= 0) {
+      return { ok: false, reason: 'invalid room id.' };
+    }
+    const baseline = this.vm.serializeSaveState();
+    const prevOnOutput = this.vm.onOutput;
+    const prevOnSoundEffect = this.vm.onSoundEffect;
+    const prevOnUnknownOpcode = this.vm.onUnknownOpcode;
+    const prevOnInputRequested = this.vm.onInputRequested;
+    const prevOutputBuffer = this.outputBuffer;
+    const prevPendingDarkClearRoomId = this.pendingDarkClearRoomId;
+    const prevSawPitchBlackThisCycle = this.sawPitchBlackThisCycle;
+    const prevPendingRoomDebugAfterLook = this.pendingRoomDebugAfterLook;
+    let previewOutput = '';
+    let previewDark = false;
+
+    try {
+      const before = this.vm.getStatusSnapshot ? this.vm.getStatusSnapshot() : {};
+      const fromRoomId = before && Number.isFinite(before.roomObjectId) ? before.roomObjectId : 0;
+
+      this.outputBuffer = '';
+      this.pendingDarkClearRoomId = null;
+      this.sawPitchBlackThisCycle = false;
+      this.pendingRoomDebugAfterLook = false;
+      this.vm.onOutput = text => {
+        previewOutput += String(text || '');
+      };
+      this.vm.onSoundEffect = function () {};
+      this.vm.onUnknownOpcode = function () {};
+      this.vm.onInputRequested = function () {};
+
+      const v = roomId & 0xffff;
+      this.vm.write16(this.vm.globalsAddress, v);
+      this.vm.write16(this.vm.globalsAddress + 66 * 2, v);
+      const playerObjectId = this._findLikelyPlayerObjectId(fromRoomId);
+      if (playerObjectId > 0 && typeof this.vm._insertObject === 'function') {
+        this.vm._insertObject(playerObjectId, roomId);
+      }
+      if (this.vm.haltReason !== 'input') {
+        return { ok: false, reason: 'VM was not awaiting input for preview.' };
+      }
+
+      this.vm.provideInput('look');
+      let safety = 0;
+      while (this.vm.haltReason !== 'input' && safety < 8) {
+        const step = this.vm.run(200000);
+        if (step.haltReason === 'input') {
+          break;
+        }
+        if (step.haltReason === 'save' || step.haltReason === 'restore' || step.haltReason === 'quit') {
+          return { ok: false, reason: 'preview interrupted by VM halt (' + step.haltReason + ').' };
+        }
+        safety += 1;
+      }
+      previewDark = /\bit is pitch black\./i.test(previewOutput);
+      return { ok: true, output: previewOutput, isDark: previewDark };
+    } catch (error) {
+      return { ok: false, reason: error && error.message ? error.message : String(error) };
+    } finally {
+      try {
+        this.vm.restoreSaveState(baseline);
+      } catch (restoreError) {
+        // Keep controller responsive even if restore fails.
+      }
+      this.vm.onOutput = prevOnOutput;
+      this.vm.onSoundEffect = prevOnSoundEffect;
+      this.vm.onUnknownOpcode = prevOnUnknownOpcode;
+      this.vm.onInputRequested = prevOnInputRequested;
+      this.outputBuffer = prevOutputBuffer;
+      this.pendingDarkClearRoomId = prevPendingDarkClearRoomId;
+      this.sawPitchBlackThisCycle = prevSawPitchBlackThisCycle;
+      this.pendingRoomDebugAfterLook = prevPendingRoomDebugAfterLook;
+    }
+  }
+
+  _collectTeleportRooms() {
+    if (
+      !this.vm ||
+      typeof this.vm._readObjectShortName !== 'function' ||
+      typeof this.vm._getObjectParent !== 'function' ||
+      typeof this.vm._findPropertyAddress !== 'function'
+    ) {
+      return [];
+    }
+    const rooms = [];
+    for (let objectId = 1; objectId <= 255; objectId++) {
+      let name = '';
+      let parent = -1;
+      try {
+        name = String(this.vm._readObjectShortName(objectId) || '').trim();
+        parent = Number(this.vm._getObjectParent(objectId));
+      } catch (error) {
+        continue;
+      }
+      if (!name || !this._isLikelyRoomObject(objectId)) {
+        continue;
+      }
+      rooms.push({ id: objectId, name, parent, isRoom: true });
+    }
+    return rooms;
+  }
+
+  _isLikelyRoomObject(objectId) {
+    if (!this.vm || typeof this.vm._findPropertyAddress !== 'function') {
+      return false;
+    }
+    // In this story, room-like objects reliably expose directional properties.
+    const directionalPropertyIds = [20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31];
+    for (const propertyId of directionalPropertyIds) {
+      let addr = 0;
+      try {
+        addr = Number(this.vm._findPropertyAddress(objectId, propertyId));
+      } catch (error) {
+        addr = 0;
+      }
+      if (addr > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  _normalizeTeleportName(value) {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  }
+
+  _resolveTeleportTarget(rawArg, rooms) {
+    const input = String(rawArg || '').trim();
+    if (!input) {
+      return { target: null, reason: 'room argument is required.' };
+    }
+    const byId = Number(input);
+    if (Number.isInteger(byId) && byId > 0) {
+      const exactById = rooms.find(room => room.id === byId) || null;
+      if (exactById) {
+        return { target: exactById };
+      }
+      const anyObject = this._readTeleportObjectInfo(byId);
+      if (anyObject) {
+        return { target: anyObject };
+      }
+      return { target: null, reason: 'room/object id ' + String(byId) + ' was not found.' };
+    }
+
+    const wanted = this._normalizeTeleportName(input);
+    const exactNameMatches = rooms.filter(room => this._normalizeTeleportName(room.name) === wanted);
+    if (exactNameMatches.length === 1) {
+      return { target: exactNameMatches[0] };
+    }
+    if (exactNameMatches.length > 1) {
+      const list = exactNameMatches
+        .slice(0, 6)
+        .map(room => room.name + ' (' + String(room.id) + ')')
+        .join(', ');
+      return { target: null, reason: 'ambiguous room name. Matches: ' + list };
+    }
+
+    const partialMatches = rooms.filter(room => this._normalizeTeleportName(room.name).includes(wanted));
+    if (partialMatches.length === 1) {
+      return { target: partialMatches[0] };
+    }
+    if (partialMatches.length > 1) {
+      const list = partialMatches
+        .slice(0, 6)
+        .map(room => room.name + ' (' + String(room.id) + ')')
+        .join(', ');
+      return { target: null, reason: 'multiple rooms match. Try a room id. Matches: ' + list };
+    }
+    return { target: null, reason: 'no room matched "' + input + '".' };
+  }
+
+  _readTeleportObjectInfo(objectId) {
+    if (
+      !this.vm ||
+      typeof this.vm._readObjectShortName !== 'function' ||
+      typeof this.vm._getObjectParent !== 'function'
+    ) {
+      return null;
+    }
+    let name = '';
+    let parent = 0;
+    try {
+      name = String(this.vm._readObjectShortName(objectId) || '').trim();
+      parent = Number(this.vm._getObjectParent(objectId));
+    } catch (error) {
+      return null;
+    }
+    if (!name) {
+      return null;
+    }
+    return {
+      id: Number(objectId),
+      name,
+      parent,
+      isRoom: this._isLikelyRoomObject(Number(objectId)),
+    };
+  }
+
+  _findLikelyPlayerObjectId(currentRoomId) {
+    if (
+      !this.vm ||
+      typeof this.vm._readObjectShortName !== 'function' ||
+      typeof this.vm._getObjectParent !== 'function'
+    ) {
+      return 0;
+    }
+
+    const actorNames = new Set(['you', 'yourself', 'self']);
+    let fallback = 0;
+    for (let objectId = 1; objectId <= 255; objectId++) {
+      let name = '';
+      let parent = 0;
+      try {
+        name = this._normalizeTeleportName(this.vm._readObjectShortName(objectId));
+        parent = Number(this.vm._getObjectParent(objectId));
+      } catch (error) {
+        continue;
+      }
+      if (!actorNames.has(name)) {
+        continue;
+      }
+      if (parent === currentRoomId) {
+        return objectId;
+      }
+      if (!fallback) {
+        fallback = objectId;
+      }
+    }
+    return fallback;
   }
 
   setSoundEffectsVolume(value) {

@@ -17,6 +17,12 @@ This project adds a few interpreter-level conveniences on top of standard story 
     - `volumeRaw` min/max and distinct values seen
   - Useful for validating volume ranges used by the story and checking whether expected sound IDs fire.
 
+- `$VIEW <room-id|room-name>`
+  - Debug-only safe room preview command.
+  - Requires `$DEBUG` to be enabled first.
+  - Supports either numeric room object id (example: `$VIEW 174`) or room name (example: `$VIEW Department of Alchemy`).
+  - Shows the room preview, then waits for your next command keypress and restores the exact prior state.
+
 ## HELP Note Extension
 
 When the game emits the in-world computer HELP message containing:

@@ -29,6 +29,8 @@ The interpreter adds non-story commands:
   Toggle splash/interpreter-managed game music.
 - `$DEBUG`
   Toggle debug-only VM/sound/light/blood diagnostics.
+- `$VIEW <room-id|room-name>`
+  Debug-only safe room preview. Shows room text/art for the target, then returns to the exact prior state after your next command keypress.
 - `$SOUNDSTATS`
   Print captured sound-event statistics.
 - `$SAVE`

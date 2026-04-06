@@ -275,19 +275,18 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
      - `$HORROR STATS`
    - Added mitigation guardrails:
      - suppresses horror effects during splash and modal/panel states (commands, slots, settings, map, confirm)
-     - suppresses effects while command input is actively being typed
-     - prevents overlap with other active horror effects and blood-splatter visibility
-     - keeps runtime tuning values centralized for safe iteration
+   - suppresses effects while command input is actively being typed
+   - prevents overlap with other active horror effects and blood-splatter visibility
+   - keeps runtime tuning values centralized for safe iteration
+
+39. [done] Replace `$TELEPORT` with safe `$VIEW` preview flow and fix preview pause/restore ordering.
+   - Replaced state-mutating teleport workflow with `$VIEW <room-id|room-name>` preview behavior.
+   - Fixed ordering bug where preview could restore before pause messaging.
+   - Added preview acknowledgement flow: any key/command now exits preview and returns to prior state.
+   - Fixed scene restoration so side art always returns to the live room after leaving preview.
+   - Updated command/docs wiring for `$VIEW` and removed stale `$TELEPORT` references.
 
 ## Pending Tasks
-
-39. [pending] Priority: fix `$VIEW` preview pause ordering bug (restore must happen only after acknowledgement command).
-   - Debug trace to preserve context:
-     - `> $VIEW 202`
-     - `Temporary Basement` preview text appears, then room snaps back to `Terminal Room (176)` before the pause message.
-     - `[View] Previewing Temporary Basement (202). Press any key/command to return.` appears after restore, which is too late.
-   - Desired behavior: enter preview room, keep preview state active, print pause message immediately, and restore only when next command/keypress is submitted.
-   - Add regression coverage for ordering so preview room does not auto-restore before acknowledgement.
 
 40. [pending] Wire up all room images so every mapped location has a resolved artwork assignment.
    - Audit `ROOM_ART_BY_ID` and room-name fallbacks against discovered room ids.
@@ -313,3 +312,5 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
 
 44. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.
+
+45. [pending] We need a credits panel to show the credits for the game.

@@ -182,6 +182,7 @@
               <button class="btn command-chip" type="button" data-command="$BLOOD 3"><strong>$BLOOD 1-5</strong><span>Debug-only: force a specific blood splatter variant.</span></button>
               <button class="btn command-chip" type="button" data-command="$HORROR ON"><strong>$HORROR ON</strong><span>Debug-only: enable ambient horror disturbances.</span></button>
               <button class="btn command-chip" type="button" data-command="$HORROR NOW RUNES"><strong>$HORROR NOW RUNES</strong><span>Debug-only: force a rune flicker now.</span></button>
+              <button class="btn command-chip" type="button" data-command="$VIEW 176"><strong>$VIEW &lt;id|name&gt;</strong><span>Debug-only: safe room preview. Shows room/image, then press any command to return to exact prior state.</span></button>
               <button class="btn command-chip" type="button" data-command="$SOUNDSTATS"><strong>$SOUNDSTATS</strong><span>Print captured sound-event statistics.</span></button>
             </div>
           </div>
@@ -395,22 +396,11 @@
           },
         };
         const ROOM_ART_BY_ID = {
+          9: './assets/gfx/lurkinghorror/tomb_9.jpg',
           15: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-          51: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-          87: './assets/gfx/lurkinghorror/tunnel_bend.jpg',
-          117: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-          124: './assets/gfx/lurkinghorror/elevator_124.jpg',
-          131: './assets/gfx/lurkinghorror/tunnel_bend.jpg',
-          161: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-          164: './assets/gfx/lurkinghorror/tunnel_crackedseam.jpg',
-          181: './assets/gfx/lurkinghorror/tunnel_slimemold.jpg',
-          184: './assets/gfx/lurkinghorror/tunnel_recess.jpg',
-          187: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-          232: './assets/gfx/lurkinghorror/tunnel_strand.jpg',
-          234: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-          21: './assets/gfx/lurkinghorror/at_platform_21.jpg',
           16: './assets/gfx/lurkinghorror/small_courtyard_16.jpg',
           17: './assets/gfx/lurkinghorror/cinderblock_tunnel_17.jpg',
+          21: './assets/gfx/lurkinghorror/at_platform_21.jpg',
           25: './assets/gfx/lurkinghorror/brick_tunnel_25.jpg',
           27: './assets/gfx/lurkinghorror/basement_27.jpg',
           33: './assets/gfx/lurkinghorror/kitchen_33.jpg',
@@ -421,16 +411,21 @@
           39: './assets/gfx/lurkinghorror/muddy_tunnel_39.jpg',
           42: './assets/gfx/lurkinghorror/lab_42.jpg',
           47: './assets/gfx/lurkinghorror/dead_storage_47.jpg',
+          51: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
           65: './assets/gfx/lurkinghorror/computer_center_65.jpg',
           66: './assets/gfx/lurkinghorror/steam_tunnel_66.jpg',
           69: './assets/gfx/lurkinghorror/inner_lair_69.jpg',
           78: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          87: './assets/gfx/lurkinghorror/tunnel_bend.jpg',
           98: './assets/gfx/lurkinghorror/smith_street_98.jpg',
           99: './assets/gfx/lurkinghorror/large_chamber_99.jpg',
           109: './assets/gfx/lurkinghorror/inside_dome_109.png',
           110: './assets/gfx/lurkinghorror/third_floor_110.png',
+          117: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
           121: './assets/gfx/lurkinghorror/roof_of_great_dome_121.png',
+          124: './assets/gfx/lurkinghorror/elevator_124.jpg',
           127: './assets/gfx/lurkinghorror/roof_127.jpg',
+          131: './assets/gfx/lurkinghorror/tunnel_bend.jpg',
           134: './assets/gfx/lurkinghorror/basalt_bowl_134.jpg',
           136: './assets/gfx/lurkinghorror/aero_lobby_136.jpg',
           137: './assets/gfx/lurkinghorror/second_floor_137.jpg',
@@ -442,20 +437,91 @@
           150: './assets/gfx/lurkinghorror/fruits_and_nuts_150.png',
           152: './assets/gfx/lurkinghorror/place_dream_threshold_152.jpg',
           158: './assets/gfx/lurkinghorror/aero_basement_158.png',
+          161: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          164: './assets/gfx/lurkinghorror/tunnel_crackedseam.jpg',
+          171: './assets/gfx/lurkinghorror/ancient_storage_171.png',
+          174: './assets/gfx/lurkinghorror/department_of_alchemy_174.png',
           176: './assets/gfx/lurkinghorror/terminal_room_176.jpg',
+          179: './assets/gfx/lurkinghorror/cluttered_passage_179.png',
+          180: './assets/gfx/lurkinghorror/great_court_180.png',
+          181: './assets/gfx/lurkinghorror/tunnel_slimemold.jpg',
+          184: './assets/gfx/lurkinghorror/tunnel_recess.jpg',
           185: './assets/gfx/lurkinghorror/smith_street_185.jpg',
+          187: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          190: './assets/gfx/lurkinghorror/mass_ave_190.png',
+          195: './assets/gfx/lurkinghorror/top_floor_195.png',
+          200: './assets/gfx/lurkinghorror/brown_basement_200.png',
           201: './assets/gfx/lurkinghorror/renovated_cave_201.jpg',
-          206: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
-          208: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
-          210: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
-          214: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
-          218: './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          202: './assets/gfx/lurkinghorror/temporary_basement_202.png',
+          // 206: './assets/gfx/lurkinghorror/infinite_corridor_208.png',
+          208: './assets/gfx/lurkinghorror/infinite_corridor_208.png',
+          210: './assets/gfx/lurkinghorror/infinite_corridor_210.png',
+          213: './assets/gfx/lurkinghorror/top_of_dome_213.png',
+          // 214: './assets/gfx/lurkinghorror/infinite_corridor_208.png',
+          // 218: './assets/gfx/lurkinghorror/infinite_corridor_208.png',
           221: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          222: './assets/gfx/lurkinghorror/skyscraper_roof_222.png',
           227: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
-          9: './assets/gfx/lurkinghorror/tomb_9.jpg',
+          232: './assets/gfx/lurkinghorror/tunnel_strand.jpg',
+          234: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          240: './assets/gfx/lurkinghorror/brown_building_240.png',
+          248: './assets/gfx/lurkinghorror/chemistry_building_248.png',
           249: './assets/gfx/lurkinghorror/great_dome_249.jpg',
         };
-        const ROOM_ART = {};
+        const ROOM_ART = {
+          'aero basement': './assets/gfx/lurkinghorror/aero_basement_158.png',
+          'aero lobby': './assets/gfx/lurkinghorror/aero_lobby_136.jpg',
+          'ancient storage': './assets/gfx/lurkinghorror/ancient_storage_171.png',
+          'at platform': './assets/gfx/lurkinghorror/at_platform_21.jpg',
+          'basalt bowl': './assets/gfx/lurkinghorror/basalt_bowl_134.jpg',
+          'basement': './assets/gfx/lurkinghorror/basement_27.jpg',
+          'before the altar': './assets/gfx/lurkinghorror/before_the_altar_149.jpg',
+          'brick tunnel': './assets/gfx/lurkinghorror/brick_tunnel_25.jpg',
+          'brown basement': './assets/gfx/lurkinghorror/brown_basement_200.png',
+          'brown building': './assets/gfx/lurkinghorror/brown_building_240.png',
+          'chemistry building': './assets/gfx/lurkinghorror/chemistry_building_248.png',
+          'cinderblock tunnel': './assets/gfx/lurkinghorror/cinderblock_tunnel_17.jpg',
+          'cluttered passage': './assets/gfx/lurkinghorror/cluttered_passage_179.png',
+          'computer center': './assets/gfx/lurkinghorror/computer_center_65.jpg',
+          'concrete box': './assets/gfx/lurkinghorror/concrete_box_37.jpg',
+          'dead storage': './assets/gfx/lurkinghorror/dead_storage_47.jpg',
+          'department of alchemy': './assets/gfx/lurkinghorror/department_of_alchemy_174.png',
+          'elevator': './assets/gfx/lurkinghorror/elevator_124.jpg',
+          'engineering building': './assets/gfx/lurkinghorror/engineering_building_38.jpg',
+          'fruits and nuts': './assets/gfx/lurkinghorror/fruits_and_nuts_150.png',
+          'great court': './assets/gfx/lurkinghorror/great_court_180.png',
+          'great dome': './assets/gfx/lurkinghorror/great_dome_249.jpg',
+          'infinite corridor': './assets/gfx/lurkinghorror/infinite_corridor.jpg',
+          'inner lair': './assets/gfx/lurkinghorror/inner_lair_69.jpg',
+          'inside dome': './assets/gfx/lurkinghorror/inside_dome_109.png',
+          'kitchen': './assets/gfx/lurkinghorror/kitchen_33.jpg',
+          'lab': './assets/gfx/lurkinghorror/lab_42.jpg',
+          'large chamber': './assets/gfx/lurkinghorror/large_chamber_99.jpg',
+          'mass. ave.': './assets/gfx/lurkinghorror/mass_ave_190.png',
+          'mass ave': './assets/gfx/lurkinghorror/mass_ave_190.png',
+          'muddy tunnel': './assets/gfx/lurkinghorror/muddy_tunnel_39.jpg',
+          'on the great dome': './assets/gfx/lurkinghorror/on_the_great_dome_145.jpg',
+          'place': './assets/gfx/lurkinghorror/place_dream_threshold_152.jpg',
+          'renovated cave': './assets/gfx/lurkinghorror/renovated_cave_201.jpg',
+          'roof': './assets/gfx/lurkinghorror/roof_127.jpg',
+          'roof of great dome': './assets/gfx/lurkinghorror/roof_of_great_dome_121.png',
+          'second floor': './assets/gfx/lurkinghorror/second_floor_137.jpg',
+          'skyscraper roof': './assets/gfx/lurkinghorror/skyscraper_roof_222.png',
+          'small courtyard': './assets/gfx/lurkinghorror/small_courtyard_16.jpg',
+          'smith street': './assets/gfx/lurkinghorror/smith_street_185.jpg',
+          'stairway': './assets/gfx/lurkinghorror/stairway_35.jpg',
+          'steam tunnel': './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          'subbasement': './assets/gfx/lurkinghorror/subbasement_142.png',
+          'temporary basement': './assets/gfx/lurkinghorror/temporary_basement_202.png',
+          'temporary lab': './assets/gfx/lurkinghorror/temporary_lab_140.jpg',
+          'terminal room': './assets/gfx/lurkinghorror/terminal_room_176.jpg',
+          'third floor': './assets/gfx/lurkinghorror/third_floor_110.png',
+          'tomb': './assets/gfx/lurkinghorror/tomb_9.jpg',
+          'top floor': './assets/gfx/lurkinghorror/top_floor_195.png',
+          'top of dome': './assets/gfx/lurkinghorror/top_of_dome_213.png',
+          'tunnel': './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          'wet tunnel': './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+        };
         let currentRoomArt = '';
 
         function roomKey(name) {
@@ -1222,6 +1288,36 @@
         ui.focusInput();
         window.appUi = ui;
         window.gameController = controller;
+
+        window.addEventListener(
+          'keydown',
+          event => {
+            if (!controller || typeof controller.isViewPreviewActive !== 'function') {
+              return;
+            }
+            if (!controller.isViewPreviewActive()) {
+              return;
+            }
+            const ignored = new Set([
+              'Shift',
+              'Control',
+              'Alt',
+              'Meta',
+              'CapsLock',
+              'NumLock',
+              'ScrollLock',
+            ]);
+            if (ignored.has(String(event.key || ''))) {
+              return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof controller.acknowledgeViewPreview === 'function') {
+              controller.acknowledgeViewPreview();
+            }
+          },
+          true
+        );
 
         function clampVolume(value, fallback) {
           const numeric = Number(value);
