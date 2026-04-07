@@ -1268,6 +1268,10 @@ body {
   margin-top: 18px;
 }
 
+.settings-actions[hidden] {
+  display: none !important;
+}
+
 .settings-attribution {
   margin: 16px 0 0;
   color: var(--text-dim);
