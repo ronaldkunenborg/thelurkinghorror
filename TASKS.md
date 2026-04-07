@@ -298,15 +298,26 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Removed room-name fallback resolution in `src/index.html`; room art is now resolved by room id mapping only.
    - Corrected `ROOM_ART_BY_ID[140]` to the existing asset (`temporary_lab_140.png`) and added one-time console diagnostics for any future unmapped room id.
 
-## Pending Tasks
+42. [done] Create new art for the splash screen that shows the university in the blizzard with a transparant blob similar to the copyrighted art hovering over it (similar to the radome failed images).
+   - Switched splash art to `src/assets/gfx/splash/splash-screen.png` while keeping `box-art.png` bundled for later reuse.
+   - Reworked the splash into a portrait-focused full-height artwork layout with overlaid readable text/status messaging.
+   - Removed the "Interactive Horror" kicker and styled the ready prompt ("Press any key to enter") as a distinct state.
 
-42. [pending] Create new art for the splash screen that shows the university in the blizzard with a transparant blob similar to the copyrighted art hovering over it (similar to the radome failed images).
+46. [done] Implement a selection option for the various additions we made from "Classic Experience" to "Modern" with settings persistence and first-run onboarding.
+   - Added persisted experience settings in `src/quetzal-storage.js` (`get/put/clearExperienceSettings`) separate from audio settings.
+   - Added experience slider + option checkmarks in `src/index.html`/`src/modern.css` and synchronized profile/checkbox behavior for `Classic`, `Classic+`, `Enhanced`, and `Modern`.
+   - Updated startup flow so first run shows experience onboarding before loading the bundled story; game load starts only after confirming selection.
+   - Applied runtime toggles for music enablement, save-slot count (1 vs 5), horror extras (ambient + blood effects), and image visibility.
+   - Added debug command support to clear the experience setting: `$DEBUG CLEAR EXPERIENCE`.
+
+## Pending Tasks
 
 43. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
+   - Keep booklet/hint handling separate from Task 46 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
 
 44. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
    - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
@@ -324,4 +335,8 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-46. [pending] Implement a slider for the various additions we made from "Classic Experience" (no color, images, music, etc.) to "Ultra-modern" with everything we can give.
+47. [pending] Extend modern-vs-classic experience settings with optional UX depth controls.
+   - Consider adding `UI intensity` (minimal overlays/animations vs full effects).
+   - Consider adding `Command assistance` level (help visibility and command-chip verbosity).
+   - Consider adding `Spoiler protection` switch for advanced helpers/hints entry points.
+

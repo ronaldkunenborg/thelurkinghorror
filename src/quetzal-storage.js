@@ -301,6 +301,49 @@ class InterpreterSettingsStorage {
     await transactionCompletePromise(tx);
     return this.getAudioSettings();
   }
+
+  async getExperienceSettings() {
+    const db = await this.open();
+    const tx = db.transaction(this.storeName, 'readonly');
+    const store = tx.objectStore(this.storeName);
+    const record = await requestToPromise(store.get('experience'));
+    await transactionCompletePromise(tx);
+    if (!record || typeof record.value !== 'object' || !record.value) {
+      return null;
+    }
+    return Object.assign({}, record.value);
+  }
+
+  async putExperienceSettings(settings) {
+    const input = settings || {};
+    const db = await this.open();
+    const tx = db.transaction(this.storeName, 'readwrite');
+    const store = tx.objectStore(this.storeName);
+    await requestToPromise(
+      store.put({
+        key: 'experience',
+        value: {
+          level: input.level || '',
+          musicEnabled: !!input.musicEnabled,
+          extraSlotsEnabled: !!input.extraSlotsEnabled,
+          horrorExtrasEnabled: !!input.horrorExtrasEnabled,
+          imagesEnabled: !!input.imagesEnabled,
+          updatedAt: new Date().toISOString(),
+        },
+      })
+    );
+    await transactionCompletePromise(tx);
+    return this.getExperienceSettings();
+  }
+
+  async clearExperienceSettings() {
+    const db = await this.open();
+    const tx = db.transaction(this.storeName, 'readwrite');
+    const store = tx.objectStore(this.storeName);
+    await requestToPromise(store.delete('experience'));
+    await transactionCompletePromise(tx);
+    return true;
+  }
 }
 
 function createSaveBlob(record) {

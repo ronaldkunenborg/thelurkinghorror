@@ -10,7 +10,6 @@ const SOUND_CLASS_SFX = 'sfx';
 const SOUND_CLASS_MUSIC = 'music';
 const DEFAULT_SAVE_SLOT = 0;
 const DEFAULT_SLOT_MENU_SIZE = 5;
-const MAX_SAVE_SLOT = DEFAULT_SLOT_MENU_SIZE - 1;
 const ROOM_EXIT_PROPERTY_COMMANDS = [
   { propertyId: 20, command: 'exit' },
   { propertyId: 21, command: 'enter' },
@@ -67,6 +66,7 @@ class GameIoController {
     this.gameMusicEnabled = true;
     this.sfxVolume = 1;
     this.gameMusicVolume = 1;
+    this.saveSlotCount = this._coerceSaveSlotCount(opts.saveSlotCount);
     this.soundCatalog = Object.assign({}, DEFAULT_SOUND_CATALOG, opts.soundCatalog || {});
     this.onSoundEvent = typeof opts.onSoundEvent === 'function' ? opts.onSoundEvent : function () {};
     this.onRoomChanged = typeof opts.onRoomChanged === 'function' ? opts.onRoomChanged : function () {};
@@ -86,6 +86,10 @@ class GameIoController {
       typeof opts.onSaveSlotsChanged === 'function'
         ? opts.onSaveSlotsChanged
         : function () {};
+    this.onClearExperienceRequested =
+      typeof opts.onClearExperienceRequested === 'function'
+        ? opts.onClearExperienceRequested
+        : function () { return false; };
     this.onConfirmDestructiveAction =
       typeof opts.onConfirmDestructiveAction === 'function'
         ? opts.onConfirmDestructiveAction
@@ -303,6 +307,45 @@ class GameIoController {
     }
     if (normalized === '$GAMESOUND') {
       return this._toggleGameMusic();
+    }
+    if (normalized === '$DEBUG CLEAR EXPERIENCE') {
+      if (!this.debugEnabled) {
+        this.ui.appendOutput('This command requires $DEBUG on.', 'error');
+        this.ui.setStatus('Interpreter command', 'Enable $DEBUG');
+        return true;
+      }
+      try {
+        const result = this.onClearExperienceRequested();
+        if (result && typeof result.then === 'function') {
+          result
+            .then(cleared => {
+              this.ui.appendOutput(
+                cleared
+                  ? 'Experience settings cleared. Restart to run first-time experience selection.'
+                  : 'Experience settings could not be cleared.',
+                cleared ? 'system' : 'error'
+              );
+              this.ui.setStatus('Interpreter command', cleared ? 'Experience cleared' : 'Experience clear failed');
+            })
+            .catch(error => {
+              this.ui.appendOutput('Failed to clear experience settings: ' + (error && error.message ? error.message : String(error)), 'error');
+              this.ui.setStatus('Interpreter command', 'Experience clear failed');
+            });
+        } else {
+          const cleared = !!result;
+          this.ui.appendOutput(
+            cleared
+              ? 'Experience settings cleared. Restart to run first-time experience selection.'
+              : 'Experience settings could not be cleared.',
+            cleared ? 'system' : 'error'
+          );
+          this.ui.setStatus('Interpreter command', cleared ? 'Experience cleared' : 'Experience clear failed');
+        }
+      } catch (error) {
+        this.ui.appendOutput('Failed to clear experience settings: ' + (error && error.message ? error.message : String(error)), 'error');
+        this.ui.setStatus('Interpreter command', 'Experience clear failed');
+      }
+      return true;
     }
     if (normalized === '$DEBUG') {
       this.debugEnabled = !this.debugEnabled;
@@ -983,9 +1026,24 @@ class GameIoController {
     this._refreshActiveSoundVolumes(SOUND_CLASS_SFX);
   }
 
+  setSoundEffectsEnabled(enabled) {
+    this.sfxEnabled = !!enabled;
+    if (!this.sfxEnabled) {
+      this._stopAllSoundsByClass(SOUND_CLASS_SFX);
+    }
+  }
+
   setGameMusicVolume(value) {
     this.gameMusicVolume = this._clampVolume(value);
     this._refreshActiveSoundVolumes(SOUND_CLASS_MUSIC);
+  }
+
+  setGameMusicEnabled(enabled) {
+    this.gameMusicEnabled = !!enabled;
+    if (!this.gameMusicEnabled) {
+      this._stopAllSoundsByClass(SOUND_CLASS_MUSIC);
+    }
+    this.onGameMusicPreferenceChanged(this.gameMusicEnabled);
   }
 
   _createDefaultSaveStorage() {
@@ -1025,13 +1083,30 @@ class GameIoController {
     return match ? Number(match[1]) : null;
   }
 
+  _coerceSaveSlotCount(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+      return DEFAULT_SLOT_MENU_SIZE;
+    }
+    const integer = Math.floor(numeric);
+    return Math.max(1, Math.min(20, integer));
+  }
+
+  _maxSaveSlot() {
+    return this.saveSlotCount - 1;
+  }
+
+  setSaveSlotCount(count) {
+    this.saveSlotCount = this._coerceSaveSlotCount(count);
+  }
+
   _isValidSaveSlot(slot) {
-    return Number.isInteger(slot) && slot >= 0 && slot <= MAX_SAVE_SLOT;
+    return Number.isInteger(slot) && slot >= 0 && slot <= this._maxSaveSlot();
   }
 
   _rejectInvalidSaveSlot(actionLabel) {
     this.ui.appendOutput(
-      (actionLabel || 'Action') + ' failed: slot must be between 0 and ' + MAX_SAVE_SLOT + '.',
+      (actionLabel || 'Action') + ' failed: slot must be between 0 and ' + this._maxSaveSlot() + '.',
       'error'
     );
     this.ui.setStatus('Interpreter command', 'Invalid slot');
@@ -1241,7 +1316,7 @@ class GameIoController {
       occupiedBySlot.set(Number(record.slot), record);
     }
     const slotSet = new Set();
-    for (let slot = 0; slot < DEFAULT_SLOT_MENU_SIZE; slot++) {
+    for (let slot = 0; slot < this.saveSlotCount; slot++) {
       slotSet.add(slot);
     }
     const slots = Array.from(slotSet)

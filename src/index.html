@@ -249,22 +249,50 @@
       <section id="settings-sheet" class="settings-sheet" aria-label="Audio settings" hidden>
         <div class="settings-sheet-panel" role="dialog" aria-modal="false" aria-labelledby="settings-title">
           <div class="command-sheet-header">
-            <h2 id="settings-title" class="command-sheet-title">Audio Settings</h2>
+            <h2 id="settings-title" class="command-sheet-title">Experience & Audio Settings</h2>
             <button id="close-settings" class="btn" type="button">Close</button>
           </div>
-          <p class="settings-copy">Set splash/game music and in-game sound effect volume separately.</p>
-          <label class="settings-control" for="music-volume">
-            <span class="volume-label">Game Music</span>
-            <input id="music-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+          <p id="experience-onboarding-copy" class="settings-copy" hidden>Choose your preferred experience before entering the game.</p>
+          <p class="settings-copy">Set experience level from classic to modern, then fine-tune individual options.</p>
+          <label class="settings-control" for="experience-level">
+            <span class="volume-label">Experience Level</span>
+            <input id="experience-level" class="volume-slider" type="range" min="0" max="3" step="1" value="3" />
           </label>
-          <label class="settings-control" for="sfx-volume">
-            <span class="volume-label">Sound Effects</span>
-            <input id="sfx-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+          <p id="experience-level-label" class="settings-copy settings-inline-copy">Profile: Modern</p>
+          <label class="settings-toggle" for="exp-music-enabled">
+            <input id="exp-music-enabled" type="checkbox" />
+            <span>Music enabled</span>
           </label>
-          <p class="settings-attribution">
+          <label class="settings-toggle" for="exp-extra-slots-enabled">
+            <input id="exp-extra-slots-enabled" type="checkbox" />
+            <span>More save/load slots</span>
+          </label>
+          <label class="settings-toggle" for="exp-horror-enabled">
+            <input id="exp-horror-enabled" type="checkbox" />
+            <span>Extra horror effects</span>
+          </label>
+          <label class="settings-toggle" for="exp-images-enabled">
+            <input id="exp-images-enabled" type="checkbox" />
+            <span>Images enabled</span>
+          </label>
+          <div id="audio-settings-group" class="audio-settings-group">
+            <p class="settings-copy settings-section-title">Audio Mix</p>
+            <label class="settings-control" for="music-volume">
+              <span class="volume-label">Game Music</span>
+              <input id="music-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+            </label>
+            <label class="settings-control" for="sfx-volume">
+              <span class="volume-label">Sound Effects</span>
+              <input id="sfx-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+            </label>
+          </div>
+          <p class="settings-attribution" id="audio-attribution">
             Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
             <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
           </p>
+          <div id="experience-onboarding-actions" class="settings-actions" hidden>
+            <button id="experience-continue" class="btn btn-accent" type="button">Enter Game</button>
+          </div>
         </div>
       </section>
       <section id="confirm-sheet" class="confirm-sheet" aria-label="Action confirmation" hidden>
@@ -322,6 +350,18 @@
         ].filter(Boolean);
         const musicVolumeEl = document.getElementById('music-volume');
         const sfxVolumeEl = document.getElementById('sfx-volume');
+        const experienceLevelEl = document.getElementById('experience-level');
+        const experienceLevelLabelEl = document.getElementById('experience-level-label');
+        const experienceMusicEnabledEl = document.getElementById('exp-music-enabled');
+        const experienceExtraSlotsEnabledEl = document.getElementById('exp-extra-slots-enabled');
+        const experienceHorrorEnabledEl = document.getElementById('exp-horror-enabled');
+        const experienceImagesEnabledEl = document.getElementById('exp-images-enabled');
+        const experienceOnboardingCopyEl = document.getElementById('experience-onboarding-copy');
+        const experienceOnboardingActionsEl = document.getElementById('experience-onboarding-actions');
+        const experienceContinueEl = document.getElementById('experience-continue');
+        const closeSettingsEl = document.getElementById('close-settings');
+        const audioSettingsGroupEl = document.getElementById('audio-settings-group');
+        const audioAttributionEl = document.getElementById('audio-attribution');
         const settingsStorage =
           typeof window.InterpreterSettingsStorage === 'function'
             ? new window.InterpreterSettingsStorage()
@@ -331,6 +371,12 @@
         splashMusic.loop = false;
         splashMusic.volume = splashMusicBaseVolume;
         splashMusic.preload = 'auto';
+        const EXPERIENCE_PROFILES = [
+          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false },
+          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false },
+          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false },
+          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: true, imagesEnabled: true },
+        ];
 
         const ui = new window.UiFramework({
           outputEl: document.getElementById('output'),
@@ -1227,6 +1273,13 @@
               controller.requestSaveLoadMenu(saveLoadSheetMode);
             }
           },
+          onClearExperienceRequested: async () => {
+            if (!settingsStorage || typeof settingsStorage.clearExperienceSettings !== 'function') {
+              return false;
+            }
+            await settingsStorage.clearExperienceSettings();
+            return true;
+          },
         });
         ui.appendOutput('Booting interpreter shell...', 'system');
         ui.setStatus('Loading bundled story', 'Booting');
@@ -1271,6 +1324,139 @@
             return fallback;
           }
           return Math.max(0, Math.min(1, numeric));
+        }
+
+        function clampProfileLevel(value, fallback) {
+          const numeric = Number(value);
+          if (!Number.isFinite(numeric)) {
+            return fallback;
+          }
+          return Math.max(0, Math.min(EXPERIENCE_PROFILES.length - 1, Math.round(numeric)));
+        }
+
+        function getProfile(level) {
+          const index = clampProfileLevel(level, EXPERIENCE_PROFILES.length - 1);
+          return EXPERIENCE_PROFILES[index];
+        }
+
+        function normalizeExperienceSettings(input) {
+          const fallback = getProfile(EXPERIENCE_PROFILES.length - 1);
+          const level = clampProfileLevel(input && input.level, fallback.level);
+          const profile = getProfile(level);
+          const source = input || {};
+          return {
+            level,
+            musicEnabled: typeof source.musicEnabled === 'boolean' ? source.musicEnabled : profile.musicEnabled,
+            extraSlotsEnabled: typeof source.extraSlotsEnabled === 'boolean' ? source.extraSlotsEnabled : profile.extraSlotsEnabled,
+            horrorExtrasEnabled: typeof source.horrorExtrasEnabled === 'boolean' ? source.horrorExtrasEnabled : profile.horrorExtrasEnabled,
+            imagesEnabled: typeof source.imagesEnabled === 'boolean' ? source.imagesEnabled : profile.imagesEnabled,
+          };
+        }
+
+        function countProfileMatches(profile, settings) {
+          let count = 0;
+          if (!!profile.musicEnabled === !!settings.musicEnabled) count += 1;
+          if (!!profile.extraSlotsEnabled === !!settings.extraSlotsEnabled) count += 1;
+          if (!!profile.horrorExtrasEnabled === !!settings.horrorExtrasEnabled) count += 1;
+          if (!!profile.imagesEnabled === !!settings.imagesEnabled) count += 1;
+          return count;
+        }
+
+        function inferBestProfileLevel(settings) {
+          let best = EXPERIENCE_PROFILES[0];
+          let bestCount = -1;
+          for (const profile of EXPERIENCE_PROFILES) {
+            const count = countProfileMatches(profile, settings);
+            if (count > bestCount || (count === bestCount && profile.level > best.level)) {
+              best = profile;
+              bestCount = count;
+            }
+          }
+          return best.level;
+        }
+
+        let experienceSettings = normalizeExperienceSettings(null);
+        let experienceSelectionRequired = false;
+        let settingsOnboardingMode = false;
+        let syncingExperienceUi = false;
+
+        function updateExperienceLevelLabel(settings) {
+          const normalized = normalizeExperienceSettings(settings);
+          const profile = getProfile(normalized.level);
+          const exact =
+            normalized.musicEnabled === profile.musicEnabled &&
+            normalized.extraSlotsEnabled === profile.extraSlotsEnabled &&
+            normalized.horrorExtrasEnabled === profile.horrorExtrasEnabled &&
+            normalized.imagesEnabled === profile.imagesEnabled;
+          experienceLevelLabelEl.textContent = exact ? 'Profile: ' + profile.label : 'Profile: Custom (' + profile.label + ' base)';
+        }
+
+        function syncExperienceControls(settings) {
+          const normalized = normalizeExperienceSettings(settings);
+          syncingExperienceUi = true;
+          experienceLevelEl.value = String(normalized.level);
+          experienceMusicEnabledEl.checked = !!normalized.musicEnabled;
+          experienceExtraSlotsEnabledEl.checked = !!normalized.extraSlotsEnabled;
+          experienceHorrorEnabledEl.checked = !!normalized.horrorExtrasEnabled;
+          experienceImagesEnabledEl.checked = !!normalized.imagesEnabled;
+          updateExperienceLevelLabel(normalized);
+          syncingExperienceUi = false;
+        }
+
+        function applyExperienceSettings(settings) {
+          const normalized = normalizeExperienceSettings(settings);
+          experienceSettings = normalized;
+          controller.setSaveSlotCount(normalized.extraSlotsEnabled ? 5 : 1);
+          if (typeof controller.setGameMusicEnabled === 'function') {
+            controller.setGameMusicEnabled(normalized.musicEnabled);
+          }
+          setHorrorEffectState({ enabled: normalized.horrorExtrasEnabled });
+          if (!normalized.horrorExtrasEnabled) {
+            setBloodEffectState({ enabled: false });
+          } else if (splashHidden && !ambientBloodAutostarted) {
+            ambientBloodAutostarted = true;
+            setBloodEffectState({
+              enabled: true,
+              mode: 'random',
+              immediate: false,
+              firstDelayMs: 60000 + Math.floor(Math.random() * 30000),
+            });
+          }
+          shellEl.classList.toggle('images-disabled', !normalized.imagesEnabled);
+          syncExperienceControls(normalized);
+        }
+
+        async function persistExperienceSettings() {
+          if (!settingsStorage || typeof settingsStorage.putExperienceSettings !== 'function') {
+            return;
+          }
+          try {
+            await settingsStorage.putExperienceSettings(experienceSettings);
+          } catch (error) {
+            ui.appendOutput('Experience settings could not be saved locally: ' + error.message, 'error');
+          }
+        }
+
+        async function loadExperienceSettings() {
+          if (!settingsStorage || typeof settingsStorage.getExperienceSettings !== 'function') {
+            applyExperienceSettings(normalizeExperienceSettings(null));
+            experienceSelectionRequired = true;
+            return;
+          }
+          try {
+            const saved = await settingsStorage.getExperienceSettings();
+            if (!saved) {
+              applyExperienceSettings(normalizeExperienceSettings(null));
+              experienceSelectionRequired = true;
+              return;
+            }
+            applyExperienceSettings(saved);
+            experienceSelectionRequired = false;
+          } catch (error) {
+            ui.appendOutput('Experience settings could not be loaded locally: ' + error.message, 'error');
+            applyExperienceSettings(normalizeExperienceSettings(null));
+            experienceSelectionRequired = true;
+          }
         }
 
         function updateVolumeSliders() {
@@ -1340,14 +1526,25 @@
           );
         }
 
+        function setSettingsSheetMode(onboarding) {
+          settingsOnboardingMode = !!onboarding;
+          settingsSheetEl.classList.toggle('is-onboarding', settingsOnboardingMode);
+          experienceOnboardingCopyEl.hidden = !settingsOnboardingMode;
+          experienceOnboardingActionsEl.hidden = !settingsOnboardingMode;
+          audioSettingsGroupEl.hidden = settingsOnboardingMode;
+          audioAttributionEl.hidden = settingsOnboardingMode;
+          closeSettingsEl.hidden = settingsOnboardingMode;
+        }
+
         function setSplashStatus(message, isError) {
           splashStatusEl.textContent = message;
-          const isReadyPrompt = !isError && message === 'Press any key to enter';
+          const isReadyPrompt = !isError && /^Press any key to /i.test(String(message || ''));
           splashStatusEl.className = isError ? 'splash-status error' : isReadyPrompt ? 'splash-status ready' : 'splash-status';
         }
 
         let splashDismissReady = false;
         let splashHidden = false;
+        let bundledStartupStarted = false;
         let splashMusicStarted = false;
         let splashMusicEnded = false;
         let splashMusicFadeFrame = 0;
@@ -1447,7 +1644,7 @@
           }
           splashHidden = true;
           shellEl.classList.add('ready');
-          if (!ambientBloodAutostarted) {
+          if (!ambientBloodAutostarted && experienceSettings.horrorExtrasEnabled) {
             ambientBloodAutostarted = true;
             setBloodEffectState({
               enabled: true,
@@ -1467,6 +1664,12 @@
           if (event.type === 'keydown' && event.key === 'Tab') {
             return;
           }
+          if (experienceSelectionRequired) {
+            splashDismissReady = false;
+            window.removeEventListener('keydown', handleSplashDismiss);
+            openSettingsSheet({ onboarding: true });
+            return;
+          }
           hideSplash();
           ui.focusInput();
         }
@@ -1476,11 +1679,19 @@
             return;
           }
           splashDismissReady = true;
-          setSplashStatus('Press any key to enter', false);
+          if (experienceSelectionRequired) {
+            setSplashStatus('Press any key to choose experience', false);
+          } else {
+            setSplashStatus('Press any key to enter', false);
+          }
           window.addEventListener('keydown', handleSplashDismiss);
         }
 
         async function loadBundledStoryAtStartup() {
+          if (bundledStartupStarted) {
+            return;
+          }
+          bundledStartupStarted = true;
           setSplashStatus('Loading...', false);
           startSplashMusic();
           try {
@@ -1488,6 +1699,7 @@
             const remaining = Math.max(0, minimumSplashMs - (Date.now() - splashShownAt));
             window.setTimeout(armSplashDismiss, remaining);
           } catch (error) {
+            bundledStartupStarted = false;
             const message = error && error.message ? error.message : 'Unknown load error.';
             setSplashStatus('Load error: ' + message, true);
             ui.appendOutput('Failed to load bundled story: ' + message, 'error');
@@ -1661,26 +1873,69 @@
           closeSaveLoadSheet();
         });
 
-        function openSettingsSheet() {
-          positionSettingsSheet();
+        function openSettingsSheet(options) {
+          const onboarding = !!(options && options.onboarding);
+          setSettingsSheetMode(onboarding);
+          if (!onboarding) {
+            positionSettingsSheet();
+          }
           settingsSheetEl.hidden = false;
         }
 
         function closeSettingsSheet() {
+          if (settingsOnboardingMode) {
+            return;
+          }
           settingsSheetEl.hidden = true;
           ui.focusInput();
         }
 
-        settingsButtonEl.addEventListener('click', openSettingsSheet);
-        document.getElementById('close-settings').addEventListener('click', closeSettingsSheet);
+        settingsButtonEl.addEventListener('click', () => openSettingsSheet({ onboarding: false }));
+        closeSettingsEl.addEventListener('click', closeSettingsSheet);
         settingsSheetEl.addEventListener('click', event => {
-          if (event.target === settingsSheetEl) {
+          if (event.target === settingsSheetEl && !settingsOnboardingMode) {
             closeSettingsSheet();
           }
         });
+        experienceLevelEl.addEventListener('input', () => {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const profile = getProfile(Number(experienceLevelEl.value));
+          applyExperienceSettings(profile);
+          persistExperienceSettings();
+        });
+        function handleExperienceToggleChange() {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const next = normalizeExperienceSettings({
+            level: Number(experienceLevelEl.value),
+            musicEnabled: !!experienceMusicEnabledEl.checked,
+            extraSlotsEnabled: !!experienceExtraSlotsEnabledEl.checked,
+            horrorExtrasEnabled: !!experienceHorrorEnabledEl.checked,
+            imagesEnabled: !!experienceImagesEnabledEl.checked,
+          });
+          next.level = inferBestProfileLevel(next);
+          applyExperienceSettings(next);
+          persistExperienceSettings();
+        }
+        experienceMusicEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceExtraSlotsEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceHorrorEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceImagesEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceContinueEl.addEventListener('click', async () => {
+          experienceSelectionRequired = false;
+          await persistExperienceSettings();
+          settingsSheetEl.hidden = true;
+          setSettingsSheetMode(false);
+          loadBundledStoryAtStartup();
+        });
         window.addEventListener('resize', () => {
           if (!settingsSheetEl.hidden) {
-            positionSettingsSheet();
+            if (!settingsOnboardingMode) {
+              positionSettingsSheet();
+            }
           }
           if (horrorVignetteEl && horrorVignetteEl.classList.contains('is-flickering')) {
             positionHorrorVignetteToImageBounds();
@@ -1755,8 +2010,16 @@
           }
         });
 
-        loadAudioSettings();
-        loadBundledStoryAtStartup();
+        (async () => {
+          await loadExperienceSettings();
+          await loadAudioSettings();
+          if (experienceSelectionRequired) {
+            setSplashStatus('Choose your experience to begin', false);
+            openSettingsSheet({ onboarding: true });
+          } else {
+            loadBundledStoryAtStartup();
+          }
+        })();
       })();
     </script>
   </body>
