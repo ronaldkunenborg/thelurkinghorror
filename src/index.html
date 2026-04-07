@@ -11,10 +11,9 @@
       <section id="splash" class="splash" aria-live="polite">
         <div class="splash-stage">
           <div class="splash-art-panel" aria-hidden="true">
-            <img class="splash-art" src="./assets/gfx/splash/box-art.png" alt="" />
+            <img class="splash-art" src="./assets/gfx/splash/splash-screen.png" alt="" />
           </div>
           <div class="splash-panel">
-            <p class="splash-kicker">Interactive Horror</p>
             <p class="splash-copy">
               The storm is already bad. The campus is almost empty. Somewhere in the old Comp Center, something
               is waiting.
@@ -1343,7 +1342,8 @@
 
         function setSplashStatus(message, isError) {
           splashStatusEl.textContent = message;
-          splashStatusEl.className = isError ? 'splash-status error' : 'splash-status';
+          const isReadyPrompt = !isError && message === 'Press any key to enter';
+          splashStatusEl.className = isError ? 'splash-status error' : isReadyPrompt ? 'splash-status ready' : 'splash-status';
         }
 
         let splashDismissReady = false;

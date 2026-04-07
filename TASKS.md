@@ -300,26 +300,28 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 
 ## Pending Tasks
 
-42. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+42. [pending] Create new art for the splash screen that shows the university in the blizzard with a transparant blob similar to the copyrighted art hovering over it (similar to the radome failed images).
+
+43. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
 
-43. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
+44. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
    - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic.
    - Include destinations like `Basalt Bowl` where access is not a simple compass move.
    - Rewrite labels in player language (for example `read paper`) rather than engine/property wording.
    - For this phase, exact trigger/condition validation is explicitly out of scope; mark labels as booklet-derived where uncertainty remains.
 
-44. [pending] Add an in-game map of visited locations while adventuring.
+45. [pending] Add an in-game map of visited locations while adventuring.
    - Track visited locations during play and show them in the live UI rather than only in documentation
    - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
    - The map should likely be isometric, and with different layers for height, and 8 directions for exits for each room.
    - The distinct areas should be distinct when showing the map: if you are in one integrated area, you don't see the other areas unless you've been there.
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
+   - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-45. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.
-
+46. [pending] Implement a slider for the various additions we made from "Classic Experience" (no color, images, music, etc.) to "Ultra-modern" with everything we can give.
