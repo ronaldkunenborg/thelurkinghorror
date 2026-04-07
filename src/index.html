@@ -467,7 +467,7 @@
           136: './assets/gfx/lurkinghorror/aero_lobby_136.png',
           137: './assets/gfx/lurkinghorror/second_floor_137.jpg',
           138: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
-          140: './assets/gfx/lurkinghorror/temporary_lab_140.jpg',
+          140: './assets/gfx/lurkinghorror/temporary_lab_140.png',
           142: './assets/gfx/lurkinghorror/subbasement_142.png',
           145: './assets/gfx/lurkinghorror/on_the_great_dome_145.jpg',
           149: './assets/gfx/lurkinghorror/before_the_altar_149.jpg',
@@ -505,113 +505,20 @@
           248: './assets/gfx/lurkinghorror/chemistry_building_248.png',
           249: './assets/gfx/lurkinghorror/great_dome_249.jpg',
         };
-        const ROOM_ART = {
-          'aero basement': './assets/gfx/lurkinghorror/aero_basement_158.png',
-          'aero lobby': './assets/gfx/lurkinghorror/aero_lobby_136.jpg',
-          'ancient storage': './assets/gfx/lurkinghorror/ancient_storage_171.png',
-          'at platform': './assets/gfx/lurkinghorror/at_platform_21.jpg',
-          'basalt bowl': './assets/gfx/lurkinghorror/basalt_bowl_134.jpg',
-          'basement': './assets/gfx/lurkinghorror/basement_27.jpg',
-          'before the altar': './assets/gfx/lurkinghorror/before_the_altar_149.jpg',
-          'brick tunnel': './assets/gfx/lurkinghorror/brick_tunnel_25.jpg',
-          'brown basement': './assets/gfx/lurkinghorror/brown_basement_200.png',
-          'brown building': './assets/gfx/lurkinghorror/brown_building_240.png',
-          'chemistry building': './assets/gfx/lurkinghorror/chemistry_building_248.png',
-          'cinderblock tunnel': './assets/gfx/lurkinghorror/cinderblock_tunnel_17.jpg',
-          'cluttered passage': './assets/gfx/lurkinghorror/cluttered_passage_179.png',
-          'computer center': './assets/gfx/lurkinghorror/computer_center_65.jpg',
-          'concrete box': './assets/gfx/lurkinghorror/concrete_box_37.jpg',
-          'dead storage': './assets/gfx/lurkinghorror/dead_storage_47.jpg',
-          'department of alchemy': './assets/gfx/lurkinghorror/department_of_alchemy_174.png',
-          'elevator': './assets/gfx/lurkinghorror/elevator_124.jpg',
-          'engineering building': './assets/gfx/lurkinghorror/engineering_building_38.jpg',
-          'fruits and nuts': './assets/gfx/lurkinghorror/fruits_and_nuts_150.png',
-          'great court': './assets/gfx/lurkinghorror/great_court_180.png',
-          'great dome': './assets/gfx/lurkinghorror/great_dome_249.jpg',
-          'infinite corridor': './assets/gfx/lurkinghorror/infinite_corridor.png',
-          'inner lair': './assets/gfx/lurkinghorror/inner_lair_69.jpg',
-          'inside dome': './assets/gfx/lurkinghorror/inside_dome_109.png',
-          'kitchen': './assets/gfx/lurkinghorror/kitchen_33.jpg',
-          'lab': './assets/gfx/lurkinghorror/lab_42.jpg',
-          'large chamber': './assets/gfx/lurkinghorror/large_chamber_99.jpg',
-          'mass. ave.': './assets/gfx/lurkinghorror/mass_ave_190.png',
-          'mass ave': './assets/gfx/lurkinghorror/mass_ave_190.png',
-          'muddy tunnel': './assets/gfx/lurkinghorror/muddy_tunnel_39.jpg',
-          'on the great dome': './assets/gfx/lurkinghorror/on_the_great_dome_145.jpg',
-          'place': './assets/gfx/lurkinghorror/place_dream_threshold_152.jpg',
-          'renovated cave': './assets/gfx/lurkinghorror/renovated_cave_201.jpg',
-          'roof': './assets/gfx/lurkinghorror/roof_127.jpg',
-          'roof of great dome': './assets/gfx/lurkinghorror/roof_of_great_dome_121.png',
-          'second floor': './assets/gfx/lurkinghorror/second_floor_137.jpg',
-          'skyscraper roof': './assets/gfx/lurkinghorror/skyscraper_roof_222.png',
-          'small courtyard': './assets/gfx/lurkinghorror/small_courtyard_16.jpg',
-          'smith street': './assets/gfx/lurkinghorror/smith_street_185.jpg',
-          'stairway': './assets/gfx/lurkinghorror/stairway_35.jpg',
-          'steam tunnel': './assets/gfx/lurkinghorror/steam_tunnel.jpg',
-          'subbasement': './assets/gfx/lurkinghorror/subbasement_142.png',
-          'temporary basement': './assets/gfx/lurkinghorror/temporary_basement_202.png',
-          'temporary lab': './assets/gfx/lurkinghorror/temporary_lab_140.jpg',
-          'terminal room': './assets/gfx/lurkinghorror/terminal_room_176.jpg',
-          'third floor': './assets/gfx/lurkinghorror/third_floor_110.png',
-          'tomb': './assets/gfx/lurkinghorror/tomb_9.jpg',
-          'top floor': './assets/gfx/lurkinghorror/top_floor_195.png',
-          'top of dome': './assets/gfx/lurkinghorror/top_of_dome_213.png',
-          'tunnel': './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-          'wet tunnel': './assets/gfx/lurkinghorror/tunnel_standard.jpg',
-        };
+        const roomArtMissingIds = new Set();
         let currentRoomArt = '';
-
-        function roomKey(name) {
-          return String(name || '').trim().toLowerCase().replace(/\s+/g, ' ');
-        }
-
-        function roomKeyCandidates(name) {
-          const base = roomKey(name);
-          if (!base) {
-            return [];
-          }
-          const candidates = new Set();
-          candidates.add(base);
-
-          const withoutParen = base.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
-          if (withoutParen) {
-            candidates.add(withoutParen);
-          }
-
-          const withoutCommaClause = base.replace(/,\s*.*$/, '').trim();
-          if (withoutCommaClause) {
-            candidates.add(withoutCommaClause);
-          }
-
-          const strippedState = base
-            .replace(/,\s*(on|in|at|inside|outside|under|over)\b.*$/, '')
-            .trim();
-          if (strippedState) {
-            candidates.add(strippedState);
-          }
-
-          const normalized = Array.from(candidates)
-            .map(text => text.replace(/^the\s+/, '').trim())
-            .filter(Boolean);
-          return Array.from(new Set(normalized));
-        }
 
         function resolveRoomArt(roomName, roomObjectId) {
           if (roomObjectId && ROOM_ART_BY_ID[roomObjectId]) {
             return ROOM_ART_BY_ID[roomObjectId];
           }
-          const candidates = roomKeyCandidates(roomName);
-          for (const key of candidates) {
-            if (ROOM_ART[key]) {
-              return ROOM_ART[key];
-            }
-          }
-          for (const knownKey of Object.keys(ROOM_ART)) {
-            for (const candidate of candidates) {
-              if (candidate.startsWith(knownKey)) {
-                return ROOM_ART[knownKey];
-              }
-            }
+          if (Number.isFinite(roomObjectId) && !roomArtMissingIds.has(roomObjectId)) {
+            roomArtMissingIds.add(roomObjectId);
+            console.warn(
+              '[RoomArt] No mapped artwork for room id',
+              roomObjectId,
+              roomName ? '(' + roomName + ')' : ''
+            );
           }
           return '';
         }

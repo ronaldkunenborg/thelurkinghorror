@@ -11,6 +11,20 @@ const SOUND_CLASS_MUSIC = 'music';
 const DEFAULT_SAVE_SLOT = 0;
 const DEFAULT_SLOT_MENU_SIZE = 5;
 const MAX_SAVE_SLOT = DEFAULT_SLOT_MENU_SIZE - 1;
+const ROOM_EXIT_PROPERTY_COMMANDS = [
+  { propertyId: 20, command: 'exit' },
+  { propertyId: 21, command: 'enter' },
+  { propertyId: 22, command: 'down' },
+  { propertyId: 23, command: 'up' },
+  { propertyId: 24, command: 'northwest' },
+  { propertyId: 25, command: 'west' },
+  { propertyId: 26, command: 'southwest' },
+  { propertyId: 27, command: 'south' },
+  { propertyId: 28, command: 'southeast' },
+  { propertyId: 29, command: 'east' },
+  { propertyId: 30, command: 'northeast' },
+  { propertyId: 31, command: 'north' },
+];
 const DEFAULT_SOUND_CATALOG = {
   3: { src: './assets/soundfx/blorb/s3.wav', class: SOUND_CLASS_SFX },
   4: { src: './assets/soundfx/blorb/s4.wav', class: SOUND_CLASS_SFX },
@@ -2011,10 +2025,36 @@ class GameIoController {
     const snapshot = this.vm.getStatusSnapshot() || {};
     const roomId = Number.isFinite(snapshot.roomObjectId) ? snapshot.roomObjectId : 0;
     const roomName = snapshot.roomName || 'unknown';
+    const exits = this._listRoomExits(roomId);
     this.ui.appendOutput(
-      '[RoomDebug][' + String(reason || 'scene') + '] room=' + roomName + ' (' + String(roomId) + ')',
+      '[RoomDebug][' + String(reason || 'scene') + '] room=' + roomName + ' (' + String(roomId) + ')' +
+      ' exits=' + (exits.length ? exits.join(',') : 'none'),
       'system'
     );
+  }
+
+  _listRoomExits(roomObjectId) {
+    if (
+      !this.vm ||
+      !Number.isInteger(roomObjectId) ||
+      roomObjectId <= 0 ||
+      typeof this.vm._findPropertyAddress !== 'function'
+    ) {
+      return [];
+    }
+    const exits = [];
+    for (const mapping of ROOM_EXIT_PROPERTY_COMMANDS) {
+      let address = 0;
+      try {
+        address = Number(this.vm._findPropertyAddress(roomObjectId, mapping.propertyId));
+      } catch (error) {
+        address = 0;
+      }
+      if (address > 0) {
+        exits.push(mapping.command);
+      }
+    }
+    return exits;
   }
 
   _syncStatusDisplays() {

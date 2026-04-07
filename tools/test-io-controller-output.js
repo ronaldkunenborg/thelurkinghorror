@@ -176,6 +176,35 @@ function testDebugCommandTogglesDebugOutput() {
   );
 }
 
+function testRoomDebugLookIncludesExits() {
+  const ui = createUi();
+  const controller = new GameIoController(ui);
+  controller.debugEnabled = true;
+  controller.vm = {
+    getStatusSnapshot() {
+      return { roomObjectId: 176, roomName: 'Terminal Room' };
+    },
+    _findPropertyAddress(objectId, propertyId) {
+      if (objectId !== 176) {
+        return 0;
+      }
+      if (propertyId === 22 || propertyId === 29 || propertyId === 31) {
+        return 100 + propertyId;
+      }
+      return 0;
+    },
+  };
+
+  controller._appendRoomDebugOutput('look');
+
+  assert.ok(
+    ui.lines.some(line =>
+      line === '[RoomDebug][look] room=Terminal Room (176) exits=down,east,north'
+    ),
+    'Room debug output for look should include resolved exits'
+  );
+}
+
 function testSoundInterpreterCommandWorksWithoutVmInput() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -1190,6 +1219,7 @@ async function run() {
   testComputerHelpAddsManualNote();
   testComputerHelpAddsManualNoteRegardlessOfRoomState();
   testDebugCommandTogglesDebugOutput();
+  testRoomDebugLookIncludesExits();
   testSoundInterpreterCommandWorksWithoutVmInput();
   testGameSoundAliasWorksWithoutVmInput();
   testMapCommandOpensUniversityMap();

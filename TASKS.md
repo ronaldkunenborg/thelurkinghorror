@@ -293,30 +293,33 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Updated command overview panel and command docs (`README.md`, `docs/INTERPRETER_EXTENSIONS.md`) to include `$CREDITS`.
    - Added controller regression coverage in `tools/test-io-controller-output.js` for callback/output/status behavior.
 
+41. [done] Wire up all room images so every mapped location has a resolved artwork assignment.
+   - Audited `ROOM_ART_BY_ID` against discovered room ids (`docs/LOCATION_MAP.md` inventory): all 71 rooms are mapped, with no missing or orphan room ids.
+   - Removed room-name fallback resolution in `src/index.html`; room art is now resolved by room id mapping only.
+   - Corrected `ROOM_ART_BY_ID[140]` to the existing asset (`temporary_lab_140.png`) and added one-time console diagnostics for any future unmapped room id.
+
 ## Pending Tasks
 
-40. [pending] Wire up all room images so every mapped location has a resolved artwork assignment.
-   - Audit `ROOM_ART_BY_ID` and room-name fallbacks against discovered room ids.
-   - Fill missing image mappings and verify no silent fallbacks to blank when art exists.
-   - Add/update coverage or diagnostics so unmapped rooms are reported clearly during debug sessions.
-
-41. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+42. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
 
-42. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
+43. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
    - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic.
    - Include destinations like `Basalt Bowl` where access is not a simple compass move.
    - Rewrite labels in player language (for example `read paper`) rather than engine/property wording.
    - For this phase, exact trigger/condition validation is explicitly out of scope; mark labels as booklet-derived where uncertainty remains.
 
-43. [pending] Add an in-game map of visited locations while adventuring.
+44. [pending] Add an in-game map of visited locations while adventuring.
    - Track visited locations during play and show them in the live UI rather than only in documentation
    - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
    - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
+   - The map should likely be isometric, and with different layers for height, and 8 directions for exits for each room.
+   - The distinct areas should be distinct when showing the map: if you are in one integrated area, you don't see the other areas unless you've been there.
+   - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
 
-44. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.
+45. [pending] The in-game map needs space at the right, we need to integrate the images more into the main text. Needs brainstorming.
 
