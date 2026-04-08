@@ -79,6 +79,8 @@ class GameIoController {
       typeof opts.onMapRequested === 'function' ? opts.onMapRequested : function () {};
     this.onCreditsRequested =
       typeof opts.onCreditsRequested === 'function' ? opts.onCreditsRequested : function () {};
+    this.onStoryQuit =
+      typeof opts.onStoryQuit === 'function' ? opts.onStoryQuit : function () {};
     this.onSaveLoadMenuRequested =
       typeof opts.onSaveLoadMenuRequested === 'function'
         ? opts.onSaveLoadMenuRequested
@@ -259,6 +261,13 @@ class GameIoController {
       this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
       this.ui.setStatus('Game ended', 'Quit');
+      try {
+        this.onStoryQuit({
+          haltReason: result.haltReason || 'quit',
+        });
+      } catch (error) {
+        this.ui.appendOutput('Post-quit handler failed: ' + error.message, 'error');
+      }
       return;
     }
     if (result.haltReason === 'return') {

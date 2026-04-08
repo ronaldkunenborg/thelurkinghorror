@@ -322,6 +322,16 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added regression coverage in `tools/test-io-controller-output.js` to assert the new equal-score/higher-moves wording.
    - Verified test run passes: `node app/tools/test-io-controller-output.js`.
 
+49. [done] Return to splash flow after story `quit` so input can continue from a clean restart path.
+   - Added `onStoryQuit` callback plumbing in `src/io.js` and trigger on VM quit halt.
+   - Wired `src/index.html` quit handling to reopen splash, clear active overlays/effect timers, and reload bundled story startup flow.
+   - Added regression coverage in `tools/test-io-controller-output.js` for quit callback invocation.
+   - Verified test runs pass: `node tools/test-io-controller-output.js` and `node tools/test-integration.js`.
+
+50. [done] Improve clarity of load/save/map action icons.
+   - Redesigned `icon-load`, `icon-save`, and `icon-map` in `src/modern.css` to use clearer etched silhouettes while keeping the established scratch art style.
+   - Kept existing action wiring and control layout unchanged (`src/index.html`), so this is a visual-only clarity improvement.
+
 ## Pending Tasks
 
 43. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
@@ -354,6 +364,3 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
    - Keep booklet/hint handling separate from Task 46 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
 
-49. [pending] if you type "quit" the VM shuts down. But then we have no way to get input going again. Any suggestions to fix this?
-
-50. [pending] The load, save and map icons are not very clear in meaning. We need better icons.

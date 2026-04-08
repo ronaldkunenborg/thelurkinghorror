@@ -889,6 +889,31 @@ async function testSavesCommandListsSlots() {
   );
 }
 
+function testQuitHaltInvokesStoryQuitCallback() {
+  const ui = createUi();
+  const quitEvents = [];
+  const controller = new GameIoController(ui, {
+    onStoryQuit(payload) {
+      quitEvents.push(payload || {});
+    },
+  });
+  controller.vm = {
+    run() {
+      return { haltReason: 'quit', quit: true };
+    },
+  };
+
+  controller.runVm();
+
+  assert.strictEqual(quitEvents.length, 1, 'quit halt should invoke onStoryQuit exactly once');
+  assert.strictEqual(quitEvents[0].haltReason, 'quit', 'quit payload should include haltReason');
+  assert.deepStrictEqual(
+    ui.statuses.slice(-1)[0],
+    ['Game ended', 'Quit'],
+    'quit halt should update status line'
+  );
+}
+
 function testSameRoomLightRecoveryClearsDarkScene() {
   const ui = createUi();
   const roomChanges = [];
@@ -1317,6 +1342,7 @@ async function run() {
   testMusicVolumeMultiplierAffectsPlaybackVolume();
   testMissingMappedSoundWarnsOnce();
   testVmStatusSnapshotUpdatesTopbarAndRoomChanges();
+  testQuitHaltInvokesStoryQuitCallback();
   testSameRoomLightRecoveryClearsDarkScene();
   testStartingNewSampleStopsPreviousSample();
   testDefaultSfxLoopsUntilExplicitStop();

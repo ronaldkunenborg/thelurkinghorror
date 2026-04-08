@@ -1259,6 +1259,9 @@
           onCreditsRequested: () => {
             openCreditsSheet();
           },
+          onStoryQuit: () => {
+            returnToSplashAfterQuit();
+          },
           onSaveLoadMenuRequested: payload => {
             openSaveLoadSheet(payload);
           },
@@ -1706,6 +1709,42 @@
             ui.appendOutput('Failed to load bundled story: ' + message, 'error');
             ui.setStatus('Load failed', 'Error');
           }
+        }
+
+        function returnToSplashAfterQuit() {
+          splashDismissReady = false;
+          splashHidden = false;
+          bundledStartupStarted = false;
+          shellEl.classList.remove('ready');
+
+          // Close open overlays so splash is the only active surface after quit.
+          commandSheetEl.hidden = true;
+          saveLoadSheetEl.hidden = true;
+          mapSheetEl.hidden = true;
+          creditsSheetEl.hidden = true;
+          confirmSheetEl.hidden = true;
+          if (!settingsOnboardingMode) {
+            settingsSheetEl.hidden = true;
+          }
+
+          clearBloodTimers();
+          hideBloodSplatter();
+          clearHorrorTimers();
+          if (horrorVignetteEl) {
+            horrorVignetteEl.classList.remove('is-flickering');
+            horrorVignetteEl.style.opacity = '0';
+          }
+
+          // Re-arm splash music for a fresh splash cycle.
+          splashMusicEnded = false;
+          splashMusicNeedsGesture = false;
+          cancelSplashMusicFade(true);
+          if (typeof splashMusic.currentTime === 'number') {
+            splashMusic.currentTime = 0;
+          }
+
+          setSplashStatus('Loading...', false);
+          loadBundledStoryAtStartup();
         }
         document.getElementById('save-slot').addEventListener('click', () => controller.requestSaveLoadMenu('save'));
         document.getElementById('load-slot').addEventListener('click', () => controller.requestSaveLoadMenu('load'));
