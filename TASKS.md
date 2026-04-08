@@ -310,33 +310,50 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Applied runtime toggles for music enablement, save-slot count (1 vs 5), horror extras (ambient + blood effects), and image visibility.
    - Added debug command support to clear the experience setting: `$DEBUG CLEAR EXPERIENCE`.
 
+48. [done] Fix same-room darkness recovery so room artwork returns after light is restored (for example in Dead Storage).
+   - Updated darkness recovery logic in `src/io.js` to clear stale dark-scene state when same-room heading evidence is seen without a pitch-black line.
+   - Added controller regression coverage in `tools/test-io-controller-output.js` for same-room light recovery (`isDark` flips to `false`).
+   - Added real-story integration coverage in `tools/test-integration.js` for same-room stale-dark recovery.
+   - Verified test runs pass: `node app/tools/test-io-controller-output.js` and `node app/tools/test-integration.js`.
+
+47. [done] Clarify destructive load confirmation wording when score is tied but move count is higher.
+   - Updated `src/io.js` load confirmation messaging so equal-score/higher-moves cases use `possibly less progress` instead of `lower progress`.
+   - Kept `lower progress` wording for strictly lower-score load targets.
+   - Added regression coverage in `tools/test-io-controller-output.js` to assert the new equal-score/higher-moves wording.
+   - Verified test run passes: `node app/tools/test-io-controller-output.js`.
+
 ## Pending Tasks
 
-43. [pending] First pickup: implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
-   - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
-   - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
-   - Add safe-location gating skeleton and feature flag for consultation availability
-   - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
-   - Keep booklet/hint handling separate from Task 46 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
-
-44. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
+43. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
    - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic.
    - Include destinations like `Basalt Bowl` where access is not a simple compass move.
    - Rewrite labels in player language (for example `read paper`) rather than engine/property wording.
    - For this phase, exact trigger/condition validation is explicitly out of scope; mark labels as booklet-derived where uncertainty remains.
 
-45. [pending] Add an in-game map of visited locations while adventuring.
-   - Track visited locations during play and show them in the live UI rather than only in documentation
-   - Reuse or derive data from the location-map work where possible instead of maintaining a second unrelated map definition
-   - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model
+44. [pending] Add an in-game map of visited locations while adventuring.
+   - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
+   - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
+   - Before UI implementation, determine structural map constraints:
+     - how many vertical levels are present in the university map
+     - what distinct area groupings should be modeled (for example main building, brown building/computer lab, temporary lab, and other separable clusters)
+   - Booklet-pages 3/4 discovery pass completed:
+     - vertical model baseline: 6 practical level bands (`L+2`, `L+1`, `L0`, `L-1`, `L-2`, `L-3`)
+     - area model baseline: 9 groups (including separate `Wet Tunnels + Inner Lair` and special `Dream` inset)
+     - full rationale and section diagrams documented in `docs/LOCATION_MAP.md`
+   - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model.
    - The map should likely be isometric, and with different layers for height, and 8 directions for exits for each room.
    - The distinct areas should be distinct when showing the map: if you are in one integrated area, you don't see the other areas unless you've been there.
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-47. [pending] Extend modern-vs-classic experience settings with optional UX depth controls.
-   - Consider adding `UI intensity` (minimal overlays/animations vs full effects).
-   - Consider adding `Command assistance` level (help visibility and command-chip verbosity).
-   - Consider adding `Spoiler protection` switch for advanced helpers/hints entry points.
+45. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+   - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
+   - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
+   - Add safe-location gating skeleton and feature flag for consultation availability
+   - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
+   - Keep booklet/hint handling separate from Task 46 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
 
+49. [pending] if you type "quit" the VM shuts down. But then we have no way to get input going again. Any suggestions to fix this?
+
+50. [pending] The load, save and map icons are not very clear in meaning. We need better icons.

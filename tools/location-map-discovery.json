@@ -715,6 +715,14 @@
   ],
   "propertyCommands": [
     {
+      "propertyId": 20,
+      "command": "exit"
+    },
+    {
+      "propertyId": 21,
+      "command": "enter"
+    },
+    {
       "propertyId": 22,
       "command": "down"
     },
@@ -723,16 +731,32 @@
       "command": "up"
     },
     {
+      "propertyId": 24,
+      "command": "northwest"
+    },
+    {
       "propertyId": 25,
       "command": "west"
+    },
+    {
+      "propertyId": 26,
+      "command": "southwest"
     },
     {
       "propertyId": 27,
       "command": "south"
     },
     {
+      "propertyId": 28,
+      "command": "southeast"
+    },
+    {
       "propertyId": 29,
       "command": "east"
+    },
+    {
+      "propertyId": 30,
+      "command": "northeast"
     },
     {
       "propertyId": 31,
@@ -772,6 +796,13 @@
       "command": "west",
       "kind": "static-direct",
       "propertyId": 25
+    },
+    {
+      "from": 16,
+      "to": 240,
+      "command": "enter",
+      "kind": "static-direct",
+      "propertyId": 21
     },
     {
       "from": 16,
@@ -842,6 +873,13 @@
       "command": "east",
       "kind": "static-direct",
       "propertyId": 29
+    },
+    {
+      "from": 34,
+      "to": 39,
+      "command": "enter",
+      "kind": "static-direct",
+      "propertyId": 21
     },
     {
       "from": 34,
@@ -1008,7 +1046,8 @@
       "from": 98,
       "to": 140,
       "command": "enter",
-      "kind": "dynamic"
+      "kind": "static-direct",
+      "propertyId": 21
     },
     {
       "from": 98,
@@ -1042,7 +1081,8 @@
       "from": 110,
       "to": 127,
       "command": "exit",
-      "kind": "dynamic"
+      "kind": "static-direct",
+      "propertyId": 20
     },
     {
       "from": 110,
@@ -1083,7 +1123,8 @@
       "from": 127,
       "to": 110,
       "command": "enter",
-      "kind": "dynamic"
+      "kind": "static-direct",
+      "propertyId": 21
     },
     {
       "from": 131,
@@ -1119,6 +1160,13 @@
       "command": "down",
       "kind": "static-direct",
       "propertyId": 22
+    },
+    {
+      "from": 134,
+      "to": 21,
+      "command": "enter",
+      "kind": "static-direct",
+      "propertyId": 21
     },
     {
       "from": 134,
@@ -1180,7 +1228,8 @@
       "from": 140,
       "to": 98,
       "command": "exit",
-      "kind": "dynamic"
+      "kind": "static-direct",
+      "propertyId": 20
     },
     {
       "from": 140,
@@ -1328,6 +1377,13 @@
     },
     {
       "from": 179,
+      "to": 200,
+      "command": "southeast",
+      "kind": "static-direct",
+      "propertyId": 28
+    },
+    {
+      "from": 179,
       "to": 150,
       "command": "up",
       "kind": "static-direct",
@@ -1372,7 +1428,8 @@
       "from": 185,
       "to": 65,
       "command": "enter",
-      "kind": "dynamic"
+      "kind": "static-direct",
+      "propertyId": 21
     },
     {
       "from": 185,
@@ -1413,7 +1470,8 @@
       "from": 190,
       "to": 218,
       "command": "enter",
-      "kind": "dynamic"
+      "kind": "static-direct",
+      "propertyId": 21
     },
     {
       "from": 195,
@@ -1421,6 +1479,13 @@
       "command": "down",
       "kind": "static-direct",
       "propertyId": 22
+    },
+    {
+      "from": 200,
+      "to": 179,
+      "command": "northwest",
+      "kind": "static-direct",
+      "propertyId": 24
     },
     {
       "from": 200,
@@ -1509,7 +1574,8 @@
       "from": 218,
       "to": 190,
       "command": "exit",
-      "kind": "dynamic"
+      "kind": "static-direct",
+      "propertyId": 20
     },
     {
       "from": 218,
@@ -1591,6 +1657,13 @@
     {
       "from": 240,
       "to": 16,
+      "command": "exit",
+      "kind": "static-direct",
+      "propertyId": 20
+    },
+    {
+      "from": 240,
+      "to": 16,
       "command": "south",
       "kind": "static-direct",
       "propertyId": 27
@@ -1622,7 +1695,7 @@
       "from": 9,
       "propertyId": 20,
       "length": 3,
-      "command": null,
+      "command": "exit",
       "rawValue": 29237
     },
     {
@@ -1636,7 +1709,7 @@
       "from": 9,
       "propertyId": 28,
       "length": 3,
-      "command": null,
+      "command": "southeast",
       "rawValue": 29237
     },
     {
@@ -1657,7 +1730,7 @@
       "from": 27,
       "propertyId": 21,
       "length": 3,
-      "command": null,
+      "command": "enter",
       "rawValue": 29114
     },
     {
@@ -1678,7 +1751,7 @@
       "from": 37,
       "propertyId": 20,
       "length": 3,
-      "command": null,
+      "command": "exit",
       "rawValue": 32026
     },
     {
@@ -1734,7 +1807,7 @@
       "from": 47,
       "propertyId": 21,
       "length": 3,
-      "command": null,
+      "command": "enter",
       "rawValue": 23724
     },
     {
@@ -1748,7 +1821,7 @@
       "from": 65,
       "propertyId": 21,
       "length": 3,
-      "command": null,
+      "command": "enter",
       "rawValue": 29114
     },
     {
@@ -1797,7 +1870,7 @@
       "from": 109,
       "propertyId": 20,
       "length": 3,
-      "command": null,
+      "command": "exit",
       "rawValue": 51938
     },
     {
@@ -1811,7 +1884,7 @@
       "from": 110,
       "propertyId": 21,
       "length": 3,
-      "command": null,
+      "command": "enter",
       "rawValue": 29114
     },
     {
@@ -1832,7 +1905,7 @@
       "from": 121,
       "propertyId": 21,
       "length": 5,
-      "command": null,
+      "command": "enter",
       "rawValue": 54612
     },
     {
@@ -1846,7 +1919,7 @@
       "from": 124,
       "propertyId": 20,
       "length": 3,
-      "command": null,
+      "command": "exit",
       "rawValue": 29187
     },
     {
@@ -1860,7 +1933,7 @@
       "from": 137,
       "propertyId": 21,
       "length": 3,
-      "command": null,
+      "command": "enter",
       "rawValue": 29114
     },
     {
@@ -1895,7 +1968,7 @@
       "from": 142,
       "propertyId": 24,
       "length": 3,
-      "command": null,
+      "command": "northwest",
       "rawValue": 29237
     },
     {
@@ -1923,7 +1996,7 @@
       "from": 176,
       "propertyId": 20,
       "length": 3,
-      "command": null,
+      "command": "exit",
       "rawValue": 22935
     },
     {
@@ -1944,7 +2017,7 @@
       "from": 181,
       "propertyId": 21,
       "length": 5,
-      "command": null,
+      "command": "enter",
       "rawValue": 17775
     },
     {
@@ -1965,7 +2038,7 @@
       "from": 195,
       "propertyId": 20,
       "length": 5,
-      "command": null,
+      "command": "exit",
       "rawValue": 56995
     },
     {
@@ -2014,7 +2087,7 @@
       "from": 210,
       "propertyId": 20,
       "length": 3,
-      "command": null,
+      "command": "exit",
       "rawValue": 40536
     },
     {
@@ -2035,7 +2108,7 @@
       "from": 213,
       "propertyId": 20,
       "length": 5,
-      "command": null,
+      "command": "exit",
       "rawValue": 31060
     },
     {
@@ -2084,7 +2157,7 @@
       "from": 222,
       "propertyId": 21,
       "length": 3,
-      "command": null,
+      "command": "enter",
       "rawValue": 51702
     },
     {

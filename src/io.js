@@ -58,6 +58,7 @@ class GameIoController {
     this.lastSceneIsDark = null;
     this.pendingDarkClearRoomId = null;
     this.sawPitchBlackThisCycle = false;
+    this.sawCurrentRoomHeadingThisCycle = false;
     this.previousVmLine = '';
     this.pendingRoomDebugAfterLook = false;
     this.pendingViewReturn = null;
@@ -142,6 +143,7 @@ class GameIoController {
     this.lastSceneIsDark = null;
     this.pendingDarkClearRoomId = null;
     this.sawPitchBlackThisCycle = false;
+    this.sawCurrentRoomHeadingThisCycle = false;
     this.previousVmLine = '';
     this.pendingViewReturn = null;
     this.onRoomChanged('', 0, { isDark: false });
@@ -204,13 +206,16 @@ class GameIoController {
       return;
     }
 
-    // Clear darkness only with positive evidence from the just-run command cycle:
-    // room changed and this cycle did not report the pitch-black line.
+    // Clear darkness only with positive evidence from the just-run command cycle.
+    // Evidence can be either:
+    // - a room change without a pitch-black line, or
+    // - a same-room heading line (full room title) without a pitch-black line.
     if (this.pendingDarkClearRoomId !== null && this.vm && typeof this.vm.getStatusSnapshot === 'function') {
       const snapshot = this.vm.getStatusSnapshot();
       const roomId = snapshot && Number.isFinite(snapshot.roomObjectId) ? snapshot.roomObjectId : 0;
       const roomChanged = roomId !== this.pendingDarkClearRoomId;
-      if (roomChanged && !this.sawPitchBlackThisCycle) {
+      const sameRoomLightEvidence = !roomChanged && this.sawCurrentRoomHeadingThisCycle;
+      if ((roomChanged || sameRoomLightEvidence) && !this.sawPitchBlackThisCycle) {
         this.lastTurnWasPitchBlack = false;
       }
     }
@@ -226,6 +231,7 @@ class GameIoController {
       }
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
       this.ui.setStatus('Awaiting command', 'Input ready');
       this.ui.focusInput();
@@ -234,6 +240,7 @@ class GameIoController {
     if (result.haltReason === 'save') {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
       await this._handleVmSaveOpcode();
       return;
@@ -241,6 +248,7 @@ class GameIoController {
     if (result.haltReason === 'restore') {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
       await this._handleVmRestoreOpcode();
       return;
@@ -248,6 +256,7 @@ class GameIoController {
     if (result.haltReason === 'quit' || result.quit) {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
       this.ui.setStatus('Game ended', 'Quit');
       return;
@@ -255,6 +264,7 @@ class GameIoController {
     if (result.haltReason === 'return') {
       this.pendingDarkClearRoomId = null;
       this.sawPitchBlackThisCycle = false;
+      this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
       this.ui.setStatus('Execution halted', 'Returned');
       return;
@@ -286,6 +296,7 @@ class GameIoController {
     }
     this.pendingDarkClearRoomId = this.currentRoomId;
     this.sawPitchBlackThisCycle = false;
+    this.sawCurrentRoomHeadingThisCycle = false;
     this.pendingRoomDebugAfterLook = this._isLookCommand(command);
     this.vm.provideInput(command);
     this.runVm();
@@ -1251,9 +1262,22 @@ class GameIoController {
   async _confirmDestructiveLoad(slot, record, currentProgress) {
     const current = currentProgress || this._getCurrentProgressSnapshot();
     const target = this._normalizeProgressFromRecord(record);
+    let riskText = 'lower progress';
+    if (
+      Number.isFinite(current.score) &&
+      Number.isFinite(current.moves) &&
+      Number.isFinite(target.score) &&
+      Number.isFinite(target.moves)
+    ) {
+      if (target.score < current.score) {
+        riskText = 'lower progress';
+      } else if (target.score === current.score && target.moves > current.moves) {
+        riskText = 'possibly less progress';
+      }
+    }
     const message =
       'Loading slot ' + slot + ' would replace your current progress (' +
-      this._formatProgressText(current) + ') with lower progress (' +
+      this._formatProgressText(current) + ') with ' + riskText + ' (' +
       this._formatProgressText(target) + '). Continue?';
     const result = await Promise.resolve(this.onConfirmDestructiveAction({
       type: 'load',
@@ -1859,6 +1883,9 @@ class GameIoController {
       this.lastTurnWasPitchBlack = true;
       this.sawPitchBlackThisCycle = true;
     }
+    if (this._isCurrentRoomHeadingLine(line)) {
+      this.sawCurrentRoomHeadingThisCycle = true;
+    }
     if (this._isComputerHelpHintLine(line)) {
       this.ui.appendOutput(COMPUTER_HELP_NOTE, 'system');
     }
@@ -1868,6 +1895,15 @@ class GameIoController {
   _isPitchBlackLine(line) {
     const normalized = String(line || '').trim().toLowerCase();
     return normalized === 'it is pitch black.';
+  }
+
+  _isCurrentRoomHeadingLine(line) {
+    const currentRoomName = String(this.currentRoomName || '').trim().toLowerCase();
+    if (!currentRoomName) {
+      return false;
+    }
+    const normalized = String(line || '').trim().toLowerCase();
+    return normalized === currentRoomName;
   }
 
   _isDarkForScene() {

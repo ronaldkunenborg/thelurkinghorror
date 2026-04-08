@@ -2,13 +2,21 @@
 
 const assert = require('assert');
 const fs = require('fs');
+const path = require('path');
 const { parseZ3Story } = require('../src/parser.js');
 const { Z3VM } = require('../src/vm-core.js');
+const { GameIoController } = require('../src/io.js');
+
+const STORY_PATH = path.join(
+  __dirname,
+  '..',
+  '..',
+  'data',
+  'The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3'
+);
 
 function run() {
-  const bytes = fs.readFileSync(
-    '../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3'
-  );
+  const bytes = fs.readFileSync(STORY_PATH);
   const parsed = parseZ3Story(bytes);
 
   let output = '';
@@ -79,4 +87,91 @@ function run() {
   console.log('Integration smoke test passed.');
 }
 
+function createUiStub() {
+  return {
+    lines: [],
+    statuses: [],
+    topbarMeta: [],
+    commandHandler: null,
+    appendOutput(text) {
+      this.lines.push(String(text || ''));
+    },
+    clearOutput() {
+      this.lines = [];
+    },
+    setStatus(left, right) {
+      this.statuses.push([left, right]);
+    },
+    setTopbarMeta(room, score, moves) {
+      this.topbarMeta.push([room, score, moves]);
+    },
+    setCommandHandler(handler) {
+      this.commandHandler = handler;
+    },
+    focusInput() {},
+  };
+}
+
+function createRealVmForController(controller, storyBytes) {
+  const parsed = parseZ3Story(storyBytes);
+  const vm = new Z3VM({
+    memory: parsed.memory.bytes,
+    header: {
+      highMemoryBase: parsed.header.highMemoryBase,
+      initialPc: parsed.header.initialPc,
+      globalsAddress: parsed.header.globalsAddress,
+      staticBase: parsed.header.staticBase,
+      objectTableAddress: parsed.header.objectTableAddress,
+      abbreviationsAddress: parsed.header.abbreviationsAddress,
+      dictionaryAddress: parsed.header.dictionaryAddress,
+    },
+    io: {
+      onOutput: text => controller._handleVmOutput(text),
+      onInputRequested: () => controller._handleInputRequested(),
+      onSoundEffect: event => controller._handleVmSoundEffect(event),
+      onUnknownOpcode: event => controller._handleUnknownOpcode(event),
+    },
+  });
+  return { parsed, vm };
+}
+
+function testSameRoomHeadingClearsStaleDarkState() {
+  const bytes = fs.readFileSync(STORY_PATH);
+  const ui = createUiStub();
+  const roomEvents = [];
+  const controller = new GameIoController(ui, {
+    onRoomChanged(roomName, roomObjectId, options) {
+      roomEvents.push({
+        roomName: String(roomName || ''),
+        roomObjectId: Number(roomObjectId) || 0,
+        isDark: !!(options && options.isDark),
+      });
+    },
+  });
+  const vmSetup = createRealVmForController(controller, bytes);
+  controller.storyMeta = vmSetup.parsed;
+  controller.vm = vmSetup.vm;
+
+  controller.runVm();
+
+  // Simulate a stale-dark scene flag while staying in the same lit room.
+  // This mirrors the bug class where visual darkness could persist without
+  // a room transition, and validates that same-room heading evidence clears it.
+  controller.lastTurnWasPitchBlack = true;
+  controller.lastSceneIsDark = true;
+  controller.submitCommand('look');
+
+  assert.ok(
+    ui.lines.some(line => line.includes('Terminal Room')),
+    'look should emit current-room heading in the same room'
+  );
+  assert.ok(
+    roomEvents.some(event => event.roomObjectId === 176 && event.isDark === false),
+    'same-room heading should clear stale dark state and emit isDark=false for Terminal Room'
+  );
+
+  console.log('Integration same-room stale-dark recovery test passed.');
+}
+
 run();
+testSameRoomHeadingClearsStaleDarkState();

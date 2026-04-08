@@ -21,7 +21,21 @@ const COMMANDS = [
   'enter',
   'exit',
 ];
-const CANDIDATE_EXIT_PROPERTIES = [20, 21, 22, 23, 24, 25, 27, 28, 29, 31];
+const PROPERTY_COMMANDS = new Map([
+  [20, 'exit'],
+  [21, 'enter'],
+  [22, 'down'],
+  [23, 'up'],
+  [24, 'northwest'],
+  [25, 'west'],
+  [26, 'southwest'],
+  [27, 'south'],
+  [28, 'southeast'],
+  [29, 'east'],
+  [30, 'northeast'],
+  [31, 'north'],
+]);
+const CANDIDATE_EXIT_PROPERTIES = Array.from(PROPERTY_COMMANDS.keys());
 
 function createVm() {
   const bytes = fs.readFileSync(STORY_PATH);
@@ -162,7 +176,7 @@ function discoverNavigation(roomsById) {
 }
 
 function inferPropertyCommands(vm, dynamicEdges) {
-  const inferred = new Map();
+  const inferred = new Map(PROPERTY_COMMANDS);
   for (const edge of dynamicEdges) {
     for (const propertyId of CANDIDATE_EXIT_PROPERTIES) {
       const propertyAddress = vm._findPropertyAddress(edge.from, propertyId);
@@ -175,19 +189,11 @@ function inferPropertyCommands(vm, dynamicEdges) {
       if (vm._getPropertyValue(edge.from, propertyId) !== edge.to) {
         continue;
       }
-      const existing = inferred.get(propertyId);
-      if (!existing) {
-        inferred.set(propertyId, edge.command);
+      const expected = PROPERTY_COMMANDS.get(propertyId) || null;
+      if (expected && edge.command !== expected) {
+        // Keep canonical mapping when runtime exploration is ambiguous.
         continue;
       }
-      if (existing !== edge.command) {
-        inferred.set(propertyId, null);
-      }
-    }
-  }
-  for (const [propertyId, command] of Array.from(inferred.entries())) {
-    if (!command) {
-      inferred.delete(propertyId);
     }
   }
   return inferred;

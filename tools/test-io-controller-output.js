@@ -889,6 +889,44 @@ async function testSavesCommandListsSlots() {
   );
 }
 
+function testSameRoomLightRecoveryClearsDarkScene() {
+  const ui = createUi();
+  const roomChanges = [];
+  const controller = new GameIoController(ui, {
+    onRoomChanged(roomName, roomId, options) {
+      roomChanges.push({ roomName, roomId, isDark: !!(options && options.isDark) });
+    },
+  });
+  controller.currentRoomName = 'Dead Storage';
+  controller.currentRoomId = 47;
+  controller.lastTurnWasPitchBlack = true;
+  controller.lastSceneIsDark = true;
+  controller.vm = {
+    haltReason: 'input',
+    provideInput() {
+      this.haltReason = 'running';
+    },
+    run() {
+      controller._handleVmOutput('The flashlight clicks on.\n');
+      controller._handleVmOutput('Dead Storage\n');
+      controller._handleVmOutput('This is a storage room.\n');
+      this.haltReason = 'input';
+      return { haltReason: 'input', quit: false };
+    },
+    getStatusSnapshot() {
+      return { roomObjectId: 47, roomName: 'Dead Storage', score: 0, moves: 0 };
+    },
+  };
+
+  controller.submitCommand('turn flashlight on');
+
+  assert.strictEqual(controller.lastTurnWasPitchBlack, false, 'same-room light evidence should clear dark-scene state');
+  assert.ok(
+    roomChanges.some(change => change.roomId === 47 && change.isDark === false),
+    'same-room lighting recovery should notify onRoomChanged with isDark=false'
+  );
+}
+
 async function testDestructiveSaveRequiresConfirmation() {
   const ui = createUi();
   const storage = createSaveStorage();
@@ -977,6 +1015,51 @@ async function testDestructiveLoadRequiresConfirmation() {
   assert.strictEqual(restored, null, 'destructive load should be cancelled when not confirmed');
   assert.strictEqual(confirmCalls.length, 1, 'destructive load should ask confirmation');
   assert.ok(ui.lines.includes('Load cancelled.'), 'cancelling destructive load should print feedback');
+}
+
+async function testDestructiveLoadEqualScoreHigherMovesUsesCautiousWording() {
+  const ui = createUi();
+  const storage = createSaveStorage();
+  const confirmCalls = [];
+  const controller = new GameIoController(ui, {
+    saveStorage: storage,
+    onConfirmDestructiveAction(payload) {
+      confirmCalls.push(payload);
+      return false;
+    },
+  });
+  controller.storyMeta = createStoryMeta();
+  controller.vm = {
+    run() {
+      return { haltReason: 'input', quit: false };
+    },
+    restoreSaveState() {},
+    getStatusSnapshot() {
+      return { roomName: 'Current Room', score: 10, moves: 63 };
+    },
+  };
+
+  await storage.putSave({
+    storyId: 'lurking-horror-r219-870912',
+    slot: 2,
+    label: 'Slot 2 - Later',
+    roomName: 'Later Room',
+    score: 10,
+    moves: 82,
+    serial: '870912',
+    release: 219,
+    checksum: 0x747a,
+    quetzalData: new Uint8Array([1, 2, 3]),
+  });
+
+  controller.submitCommand('$LOAD 2');
+  await flushAsyncWork();
+
+  assert.strictEqual(confirmCalls.length, 1, 'destructive load should ask confirmation');
+  assert.ok(
+    String(confirmCalls[0].message || '').includes('possibly less progress'),
+    'equal-score higher-moves destructive load should use cautious "possibly less progress" wording'
+  );
 }
 
 async function testLoadStopsActiveSfxButKeepsMusic() {
@@ -1234,6 +1317,7 @@ async function run() {
   testMusicVolumeMultiplierAffectsPlaybackVolume();
   testMissingMappedSoundWarnsOnce();
   testVmStatusSnapshotUpdatesTopbarAndRoomChanges();
+  testSameRoomLightRecoveryClearsDarkScene();
   testStartingNewSampleStopsPreviousSample();
   testDefaultSfxLoopsUntilExplicitStop();
   testMusicAndSfxUseSeparateReplacementGroups();
@@ -1242,6 +1326,7 @@ async function run() {
   await testSaveCommandStoresVmSnapshot();
   await testDestructiveSaveRequiresConfirmation();
   await testDestructiveLoadRequiresConfirmation();
+  await testDestructiveLoadEqualScoreHigherMovesUsesCautiousWording();
   await testLoadCommandRestoresVmSnapshot();
   await testLoadStopsActiveSfxButKeepsMusic();
   await testSavesCommandListsSlots();
