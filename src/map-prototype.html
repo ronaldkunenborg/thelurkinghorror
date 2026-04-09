@@ -1250,11 +1250,30 @@
 
       function setInitialView() {
         const rect = svg.getBoundingClientRect();
-        const focus = roomById.get("terminal");
-        if (!focus) return;
-        panZoom.scale = 0.42;
-        panZoom.tx = rect.width / 2 - focus.x * panZoom.scale;
-        panZoom.ty = rect.height * 0.36 - 920 * panZoom.scale;
+        if (!MAP_MODEL.rooms.length) return;
+
+        // Fit the full prototype map on open (instead of focusing a single room),
+        // with a slight top bias to match the desired overview framing.
+        const minX = Math.min(...MAP_MODEL.rooms.map((room) => room.x - ROOM_W / 2)) - SECTION_FRAME_MARGIN_X - 30;
+        const maxX = Math.max(...MAP_MODEL.rooms.map((room) => room.x + ROOM_W / 2)) + SECTION_FRAME_MARGIN_X + 30;
+        const minY = Math.min(...MAP_MODEL.rooms.map((room) => room.y - ROOM_H / 2)) - SECTION_FRAME_MARGIN_Y - 24;
+        const maxY = Math.max(...MAP_MODEL.rooms.map((room) => room.y + ROOM_H / 2)) + SECTION_FRAME_MARGIN_Y + 24;
+        const mapW = Math.max(1, maxX - minX);
+        const mapH = Math.max(1, maxY - minY);
+
+        const outerPadX = 24;
+        const outerPadTop = 16;
+        const outerPadBottom = 20;
+        const usableW = Math.max(1, rect.width - outerPadX * 2);
+        const usableH = Math.max(1, rect.height - outerPadTop - outerPadBottom);
+
+        const fitScale = Math.min(usableW / mapW, usableH / mapH);
+        panZoom.scale = clamp(fitScale, panZoom.minScale, panZoom.maxScale);
+
+        const freeW = usableW - mapW * panZoom.scale;
+        const freeH = usableH - mapH * panZoom.scale;
+        panZoom.tx = outerPadX + freeW / 2 - minX * panZoom.scale;
+        panZoom.ty = outerPadTop + freeH * 0.18 - minY * panZoom.scale;
         applyTransform();
       }
 
