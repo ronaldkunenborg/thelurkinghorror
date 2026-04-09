@@ -1688,6 +1688,13 @@
       "command": "down",
       "kind": "static-direct",
       "propertyId": 22
+    },
+    {
+      "from": 66,
+      "to": 34,
+      "command": "west",
+      "kind": "puzzle",
+      "propertyId": 25
     }
   ],
   "unresolvedExitProperties": [
@@ -1830,13 +1837,6 @@
       "length": 3,
       "command": "south",
       "rawValue": 29114
-    },
-    {
-      "from": 66,
-      "propertyId": 25,
-      "length": 3,
-      "command": "west",
-      "rawValue": 30282
     },
     {
       "from": 69,

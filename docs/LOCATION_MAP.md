@@ -346,9 +346,9 @@ This crosswalk records how the current engine-discovered rooms line up with the 
 - Total routine/custom exits tracked: `73`
 - `Inferred reverse-links` (high confidence): `22`
 - `Known conditional transitions` (understood behavior): `10`
-- `Confirmed puzzle exits`: `6`
-- `Truly unresolved` (likely puzzle/state-driven): `35`
-- By property length: `len2=13`, `len3=46`, `len4=1`, `len5=13`
+- `Confirmed puzzle exits`: `7`
+- `Truly unresolved` (likely puzzle/state-driven): `34`
+- By property length: `len2=13`, `len3=45`, `len4=1`, `len5=13`
 
 ### Inferred reverse-links (high confidence)
 
@@ -405,6 +405,7 @@ Inference rule used here: if a routine-driven `exit` has exactly one standard in
 - `17` Cinderblock Tunnel: `up` (p23, len 3)
 - `25` Brick Tunnel: `up` (p23, len 3) -> `171` Ancient Storage; puzzle-gated initially, then unlocked for return travel after solve state changes.
 - `47` Dead Storage: `enter` (p21, len 3)
+- `66` Steam Tunnel: `west` (p25, len 3) -> `34` Tunnel Entrance (booklet-reconciled puzzle/restricted passage)
 - `110` Third Floor: `north` (p31, len 2)
 - `171` Ancient Storage: `down` (p22, len 3)
 
@@ -414,7 +415,6 @@ Inference rule used here: if a routine-driven `exit` has exactly one standard in
 - `37` Concrete Box: `exit` (p20, len 3); `up` (p23, len 3); `north` (p31, len 4)
 - `38` Engineering Building: `west` (p25, len 2); `south` (p27, len 2); `east` (p29, len 2)
 - `42` Lab: `down` (p22, len 3); `north` (p31, len 3)
-- `66` Steam Tunnel: `west` (p25, len 3)
 - `69` Inner Lair: `up` (p23, len 5)
 - `121` Roof of Great Dome: `enter` (p21, len 5); `south` (p27, len 5)
 - `138` Steam Tunnel: `south` (p27, len 3); `east` (p29, len 2)

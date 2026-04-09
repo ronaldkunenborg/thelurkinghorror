@@ -332,22 +332,34 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Redesigned `icon-load`, `icon-save`, and `icon-map` in `src/modern.css` to use clearer etched silhouettes while keeping the established scratch art style.
    - Kept existing action wiring and control layout unchanged (`src/index.html`), so this is a visual-only clarity improvement.
 
-## Pending Tasks
-
-48. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
+48. [done] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
    - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic.
    - Include destinations like `Basalt Bowl` where access is not a simple compass move.
    - Rewrite labels in player language (for example `read paper`) rather than engine/property wording.
    - For this phase, exact trigger/condition validation is explicitly out of scope; mark labels as booklet-derived where uncertainty remains.
 
-49. [pending] Build a standalone map prototype page (no library) for rapid layout iteration before runtime integration.
-   - Add a separate prototype page under `src/` that renders a fixed-position Section C map in SVG/HTML.
-   - Support direct map interaction in the prototype: left-mouse drag to pan and mouse wheel to zoom.
-   - Keep prototype data-model-driven (`room id`, `layer`, `x/y`, `edges`) so it can become the base for the in-game visited map.
-   - Treat this prototype as the visual calibration stage for room placement before wiring into `src/index.html`.
+49. [done] Build a standalone map prototype page (no library) for rapid layout iteration before runtime integration.
+   - Added and refined standalone prototype page at `src/map-prototype.html` with a fixed-position Section C SVG map for layout calibration.
+   - Implemented direct interaction: left-mouse drag panning and mouse-wheel zooming with cursor-centered scaling.
+   - Reworked the prototype to be model-driven from one map source (`layers` + `rooms` containing `room id`, `layer`, `x/y`, and `edges`) and added reference validation for unknown room/layer ids.
+   - Kept this page independent from `src/index.html` so map iteration can continue without runtime coupling.
 
-50. [pending] Add an in-game map of visited locations while adventuring.
+## Pending Tasks
+
+50. [pending] Refine de prototype kaart tot deze volledig is.
+   - Huidige baseline in `src/map-prototype.html`: geïntegreerde secties `B/C/D/F/E` staan op één kaart met model-gedreven data (`section`, `room id`, `layer`, `x/y`, `edges`) en werkende pan/zoom + toggles.
+   - ID coverage update: alle 71 canonieke locatie-IDs uit `tools/location-map-discovery.json` staan nu op de prototypekaart; elke room-label toont zijn ID.
+   - Onzekere Wet Tunnel nummering staat tijdelijk in `Section U - Unknown Locations` (links), zodat we geen onjuiste definitieve ID->positie mapping vastleggen voordat die reconciliatie klaar is.
+   - Rond de ruimtelijke calibratie af per sectie op basis van booklet pages 3/4 (`../data/booklet-page3.png`, `../data/booklet-page4.png`), met focus op onderlinge afstanden en leesbare edge-richtingen.
+   - Werk ontbrekende of twijfelachtige integratieverbindingen uit tussen secties (inclusief conditionele/puzzelroutes als gelabelde prototype-edges waar relevant).
+   - Voeg richting aan edge-weergave toe voor diagonale exits (`nw`, `ne`, `sw`, `se`) en verbeter overlap-afhandeling van edge-labels in drukke clusters.
+   - Normaliseer repeated-name rooms voor prototype-weergave (bijv. `Infinite Corridor`, `Steam Tunnel`, `Wet Tunnel`) met consistente suffix/nummer-strategie.
+   - Voeg eenvoudige section-visibility filters toe (per sectie aan/uit) zodat layout-iteratie sneller kan per gebied.
+   - Voeg een compacte legenda toe voor edge-types (`normal`, `enter`, `puzzle/conditional`, `cross-section`) zodat visuele review eenduidig is.
+   - Documenteer na afronding in korte notities welke placement/labeling-keuzes definitief genoeg zijn voor runtime-integratie in taak 51.
+
+51. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -363,7 +375,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-51. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+52. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
