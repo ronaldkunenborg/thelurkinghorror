@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TLH Map Prototype - Section C</title>
+    <style>
+      :root {
+        --bg: #0d0c0a;
+        --panel: #1a1814;
+        --panel-line: #4d4638;
+        --ink: #ece3c9;
+        --muted: #b6ab8b;
+        --room-fill: #262319;
+        --room-line: #a3966f;
+        --edge: #d8cfb3;
+        --edge-enter: #93b7ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background: radial-gradient(circle at 20% 10%, #1f1a14 0%, var(--bg) 55%);
+        color: var(--ink);
+      }
+
+      .page {
+        max-width: 1480px;
+        margin: 20px auto;
+        padding: 0 16px 24px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      p {
+        margin: 0 0 12px;
+        color: var(--muted);
+      }
+
+      .controls {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 14px;
+        color: var(--muted);
+      }
+
+      .controls label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .frame {
+        border: 1px solid var(--panel-line);
+        background: linear-gradient(180deg, #17140f 0%, #13110d 100%);
+        overflow: hidden;
+        height: calc(100vh - 190px);
+        min-height: 620px;
+      }
+
+      svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+        cursor: grab;
+        user-select: none;
+      }
+
+      svg.dragging {
+        cursor: grabbing;
+      }
+
+      .layer {
+        fill: #191611;
+        stroke: var(--panel-line);
+        stroke-width: 1;
+      }
+
+      .layer-title {
+        fill: var(--muted);
+        font-size: 18px;
+        text-anchor: middle;
+      }
+
+      .room {
+        fill: var(--room-fill);
+        stroke: var(--room-line);
+        stroke-width: 1.3;
+        rx: 8;
+      }
+
+      .room-label {
+        fill: var(--ink);
+        font-size: 18px;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+
+      .edge {
+        stroke: var(--edge);
+        stroke-width: 2;
+        fill: none;
+        marker-end: url(#arrow);
+      }
+
+      .edge-enter {
+        stroke: var(--edge-enter);
+        stroke-width: 3;
+        stroke-dasharray: 6 5;
+        marker-end: url(#arrow-enter);
+      }
+
+      .edge-label-bg {
+        fill: rgba(16, 14, 11, 0.88);
+        stroke: var(--panel-line);
+        stroke-width: 0.8;
+        rx: 4;
+      }
+
+      .edge-label {
+        fill: var(--ink);
+        font-size: 15px;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>The Lurking Horror - Section C Prototype</h1>
+      <p>Standalone map prototype with fixed room positions (no Mermaid, no graph library).</p>
+      <div class="controls">
+        <label><input id="toggle-labels" type="checkbox" checked /> Show edge labels</label>
+        <label><input id="toggle-enter" type="checkbox" checked /> Show south/enter edges</label>
+      </div>
+      <div class="frame">
+        <svg id="map" viewBox="0 0 1400 900" aria-label="Section C map prototype"></svg>
+      </div>
+    </div>
+
+    <script>
+      const ROOM_W = 170;
+      const ROOM_H = 56;
+      const WORLD_W = 3000;
+      const WORLD_H = 2500;
+      const LAYER_X = 80;
+      const LAYER_W = 2840;
+      const svg = document.getElementById("map");
+      let viewport = null;
+      const panZoom = {
+        scale: 0.75,
+        tx: 20,
+        ty: 20,
+        minScale: 0.35,
+        maxScale: 3.5,
+        dragging: false,
+        lastX: 0,
+        lastY: 0,
+        hasUserMoved: false
+      };
+
+      const layers = [
+        { id: "L+3", y: 20, h: 190 },
+        { id: "L+2", y: 290, h: 210 },
+        { id: "L+1", y: 580, h: 250 },
+        { id: "L0", y: 910, h: 320 },
+        { id: "L-1", y: 1310, h: 300 },
+        { id: "L-2", y: 1690, h: 760 }
+      ];
+
+      const rooms = [
+        { id: "roof", label: "Roof", x: 1450, y: 120 },
+        { id: "third", label: "Third Floor", x: 1450, y: 390 },
+        { id: "elev_l2", label: "Elevator", x: 1260, y: 520 },
+
+        { id: "second", label: "Second Floor", x: 1450, y: 700 },
+        { id: "kitchen", label: "Kitchen", x: 1050, y: 700 },
+        { id: "terminal", label: "Terminal Room", x: 1450, y: 620 },
+        { id: "elev_l1", label: "Elevator", x: 1260, y: 810 },
+
+        { id: "computer", label: "Computer Center", x: 1450, y: 1110 },
+        { id: "smith1", label: "Smith Street", x: 1450, y: 990 },
+        { id: "smith2", label: "Smith Street", x: 1800, y: 990 },
+        { id: "temp_lab", label: "Temporary Lab", x: 1800, y: 1200 },
+        { id: "elev_l0", label: "Elevator", x: 1260, y: 1210 },
+
+        { id: "aero_b", label: "Aero Basement", x: 1050, y: 1430 },
+        { id: "base", label: "Basement", x: 1450, y: 1430 },
+        { id: "temp_b", label: "Temporary Basement", x: 1850, y: 1430 },
+        { id: "dead", label: "Dead Storage", x: 2200, y: 1430 },
+        { id: "ancient", label: "Ancient Storage", x: 2550, y: 1430 },
+        { id: "elev_lm1", label: "Elevator", x: 1260, y: 1560 },
+
+        { id: "stair", label: "Stairway", x: 650, y: 1430 },
+        { id: "brick", label: "Brick Tunnel", x: 2550, y: 1980 },
+        { id: "reno", label: "Renovated Cave", x: 2550, y: 1790 },
+        { id: "cinder", label: "Cinderblock Tunnel", x: 2550, y: 2180 },
+        { id: "altar", label: "Before the Altar [SFX]", x: 2280, y: 1880 }
+      ];
+
+      const edges = [
+        { from: "roof", to: "third", label: "down" },
+        { from: "third", to: "second", label: "down" },
+        { from: "second", to: "computer", label: "down" },
+        { from: "computer", to: "base", label: "down" },
+
+        { from: "kitchen", to: "second", label: "east" },
+        { from: "second", to: "terminal", label: "north" },
+        { from: "computer", to: "smith1", label: "north" },
+        { from: "smith1", to: "smith2", label: "east" },
+        { from: "smith2", to: "temp_lab", label: "south" },
+
+        { from: "aero_b", to: "base", label: "east" },
+        { from: "base", to: "temp_b", label: "east" },
+        { from: "temp_b", to: "dead", label: "east" },
+        { from: "dead", to: "ancient", label: "east" },
+        { from: "temp_b", to: "temp_lab", label: "up" },
+        { from: "aero_b", to: "stair", label: "west" },
+        { from: "ancient", to: "brick", label: "down" },
+        { from: "brick", to: "reno", label: "north" },
+        { from: "brick", to: "cinder", label: "south" },
+        { from: "reno", to: "altar", label: "down" },
+
+        { from: "third", to: "elev_l2", label: "south/enter", type: "enter" },
+        { from: "second", to: "elev_l1", label: "south/enter", type: "enter" },
+        { from: "computer", to: "elev_l0", label: "south/enter", type: "enter" },
+        { from: "base", to: "elev_lm1", label: "south/enter", type: "enter" }
+      ];
+
+      const roomById = new Map(rooms.map((r) => [r.id, r]));
+
+      function add(tag, attrs, text) {
+        const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        Object.entries(attrs || {}).forEach(([k, v]) => el.setAttribute(k, String(v)));
+        if (text != null) el.textContent = text;
+        (viewport || svg).appendChild(el);
+        return el;
+      }
+
+      function roomRect(room) {
+        return {
+          x: room.x - ROOM_W / 2,
+          y: room.y - ROOM_H / 2,
+          w: ROOM_W,
+          h: ROOM_H
+        };
+      }
+
+      function edgeEndpoints(from, to) {
+        const a = roomRect(from);
+        const b = roomRect(to);
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        if (Math.abs(dx) > Math.abs(dy)) {
+          if (dx > 0) return { x1: a.x + a.w, y1: from.y, x2: b.x, y2: to.y };
+          return { x1: a.x, y1: from.y, x2: b.x + b.w, y2: to.y };
+        }
+        if (dy > 0) return { x1: from.x, y1: a.y + a.h, x2: to.x, y2: b.y };
+        return { x1: from.x, y1: a.y, x2: to.x, y2: b.y + b.h };
+      }
+
+      function draw() {
+        svg.innerHTML = "";
+        add("defs", null);
+        const defs = svg.querySelector("defs");
+        viewport = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        viewport.setAttribute("id", "viewport");
+        svg.appendChild(viewport);
+
+        const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+        marker.setAttribute("id", "arrow");
+        marker.setAttribute("viewBox", "0 0 10 10");
+        marker.setAttribute("refX", "9");
+        marker.setAttribute("refY", "5");
+        marker.setAttribute("markerWidth", "8");
+        marker.setAttribute("markerHeight", "8");
+        marker.setAttribute("orient", "auto-start-reverse");
+        defs.appendChild(marker);
+        const arrowPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        arrowPath.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+        arrowPath.setAttribute("fill", "#d8cfb3");
+        marker.appendChild(arrowPath);
+
+        const enterMarker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+        enterMarker.setAttribute("id", "arrow-enter");
+        enterMarker.setAttribute("viewBox", "0 0 10 10");
+        enterMarker.setAttribute("refX", "9");
+        enterMarker.setAttribute("refY", "5");
+        enterMarker.setAttribute("markerWidth", "8");
+        enterMarker.setAttribute("markerHeight", "8");
+        enterMarker.setAttribute("orient", "auto-start-reverse");
+        defs.appendChild(enterMarker);
+        const enterPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        enterPath.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+        enterPath.setAttribute("fill", "#93b7ff");
+        enterMarker.appendChild(enterPath);
+
+        add("rect", { x: 0, y: 0, width: WORLD_W, height: WORLD_H, fill: "transparent" });
+
+        for (const layer of layers) {
+          add("rect", { class: "layer", x: LAYER_X, y: layer.y, width: LAYER_W, height: layer.h });
+          add("text", { class: "layer-title", x: LAYER_X + LAYER_W / 2, y: layer.y + 28 }, layer.id);
+        }
+
+        const labelsOn = document.getElementById("toggle-labels").checked;
+        const showEnter = document.getElementById("toggle-enter").checked;
+
+        for (const edge of edges.filter((e) => e.type !== "enter")) {
+          const from = roomById.get(edge.from);
+          const to = roomById.get(edge.to);
+          if (!from || !to) continue;
+
+          const p = edgeEndpoints(from, to);
+          add("line", { class: "edge", x1: p.x1, y1: p.y1, x2: p.x2, y2: p.y2 });
+
+          if (labelsOn) {
+            const mx = (p.x1 + p.x2) / 2;
+            const my = (p.y1 + p.y2) / 2;
+            add("rect", { class: "edge-label-bg", x: mx - 36, y: my - 12, width: 72, height: 24 });
+            add("text", { class: "edge-label", x: mx, y: my + 1 }, edge.label);
+          }
+        }
+
+        for (const edge of edges.filter((e) => e.type === "enter")) {
+          if (edge.type === "enter" && !showEnter) continue;
+          const from = roomById.get(edge.from);
+          const to = roomById.get(edge.to);
+          if (!from || !to) continue;
+
+          const p = edgeEndpoints(from, to);
+          add("line", { class: "edge edge-enter", x1: p.x1, y1: p.y1, x2: p.x2, y2: p.y2 });
+
+          if (labelsOn) {
+            const mx = (p.x1 + p.x2) / 2;
+            const my = (p.y1 + p.y2) / 2;
+            add("rect", { class: "edge-label-bg", x: mx - 36, y: my - 12, width: 72, height: 24 });
+            add("text", { class: "edge-label", x: mx, y: my + 1 }, edge.label);
+          }
+        }
+
+        for (const room of rooms) {
+          const r = roomRect(room);
+          add("rect", { class: "room", x: r.x, y: r.y, width: r.w, height: r.h });
+          add("text", { class: "room-label", x: room.x, y: room.y + 1 }, room.label);
+        }
+
+        if (!panZoom.hasUserMoved) {
+          setInitialView();
+        } else {
+          applyTransform();
+        }
+      }
+
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function applyTransform() {
+        if (!viewport) return;
+        viewport.setAttribute(
+          "transform",
+          "translate(" + panZoom.tx.toFixed(2) + " " + panZoom.ty.toFixed(2) + ") scale(" + panZoom.scale.toFixed(4) + ")"
+        );
+      }
+
+      function setInitialView() {
+        const rect = svg.getBoundingClientRect();
+        const focus = roomById.get("terminal");
+        if (!focus) return;
+        panZoom.scale = 0.75;
+        panZoom.tx = rect.width / 2 - focus.x * panZoom.scale;
+        // Bias slightly downward so L+1 and L0 are both in comfortable view at startup.
+        panZoom.ty = rect.height * 0.30 - 860 * panZoom.scale;
+        applyTransform();
+      }
+
+      function onPointerDown(event) {
+        if (event.button !== 0) return;
+        panZoom.dragging = true;
+        panZoom.lastX = event.clientX;
+        panZoom.lastY = event.clientY;
+        svg.classList.add("dragging");
+      }
+
+      function onPointerMove(event) {
+        if (!panZoom.dragging) return;
+        const dx = event.clientX - panZoom.lastX;
+        const dy = event.clientY - panZoom.lastY;
+        panZoom.lastX = event.clientX;
+        panZoom.lastY = event.clientY;
+        panZoom.tx += dx;
+        panZoom.ty += dy;
+        panZoom.hasUserMoved = true;
+        applyTransform();
+      }
+
+      function onPointerUp() {
+        if (!panZoom.dragging) return;
+        panZoom.dragging = false;
+        svg.classList.remove("dragging");
+      }
+
+      function onWheel(event) {
+        event.preventDefault();
+        const rect = svg.getBoundingClientRect();
+        const sx = event.clientX - rect.left;
+        const sy = event.clientY - rect.top;
+        const zoomFactor = event.deltaY < 0 ? 1.1 : 0.9;
+        const nextScale = clamp(panZoom.scale * zoomFactor, panZoom.minScale, panZoom.maxScale);
+        const wx = (sx - panZoom.tx) / panZoom.scale;
+        const wy = (sy - panZoom.ty) / panZoom.scale;
+        panZoom.scale = nextScale;
+        panZoom.tx = sx - wx * panZoom.scale;
+        panZoom.ty = sy - wy * panZoom.scale;
+        panZoom.hasUserMoved = true;
+        applyTransform();
+      }
+
+      document.getElementById("toggle-labels").addEventListener("change", draw);
+      document.getElementById("toggle-enter").addEventListener("change", draw);
+      svg.addEventListener("mousedown", onPointerDown);
+      window.addEventListener("mousemove", onPointerMove);
+      window.addEventListener("mouseup", onPointerUp);
+      svg.addEventListener("mouseleave", onPointerUp);
+      svg.addEventListener("wheel", onWheel, { passive: false });
+      window.addEventListener("resize", () => {
+        if (!panZoom.hasUserMoved) {
+          setInitialView();
+        } else {
+          applyTransform();
+        }
+      });
+      draw();
+    </script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-﻿# Task List
+# Task List
 
 Completed tasks should be moved to ## Recent Completed Context.
 Completed tasks that are no longer needed for day-to-day context have been moved to `TASKS_archived.md`.
@@ -303,45 +303,51 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Reworked the splash into a portrait-focused full-height artwork layout with overlaid readable text/status messaging.
    - Removed the "Interactive Horror" kicker and styled the ready prompt ("Press any key to enter") as a distinct state.
 
-46. [done] Implement a selection option for the various additions we made from "Classic Experience" to "Modern" with settings persistence and first-run onboarding.
+43. [done] Implement a selection option for the various additions we made from "Classic Experience" to "Modern" with settings persistence and first-run onboarding.
    - Added persisted experience settings in `src/quetzal-storage.js` (`get/put/clearExperienceSettings`) separate from audio settings.
    - Added experience slider + option checkmarks in `src/index.html`/`src/modern.css` and synchronized profile/checkbox behavior for `Classic`, `Classic+`, `Enhanced`, and `Modern`.
    - Updated startup flow so first run shows experience onboarding before loading the bundled story; game load starts only after confirming selection.
    - Applied runtime toggles for music enablement, save-slot count (1 vs 5), horror extras (ambient + blood effects), and image visibility.
    - Added debug command support to clear the experience setting: `$DEBUG CLEAR EXPERIENCE`.
 
-48. [done] Fix same-room darkness recovery so room artwork returns after light is restored (for example in Dead Storage).
+44. [done] Fix same-room darkness recovery so room artwork returns after light is restored (for example in Dead Storage).
    - Updated darkness recovery logic in `src/io.js` to clear stale dark-scene state when same-room heading evidence is seen without a pitch-black line.
    - Added controller regression coverage in `tools/test-io-controller-output.js` for same-room light recovery (`isDark` flips to `false`).
    - Added real-story integration coverage in `tools/test-integration.js` for same-room stale-dark recovery.
    - Verified test runs pass: `node app/tools/test-io-controller-output.js` and `node app/tools/test-integration.js`.
 
-47. [done] Clarify destructive load confirmation wording when score is tied but move count is higher.
+45. [done] Clarify destructive load confirmation wording when score is tied but move count is higher.
    - Updated `src/io.js` load confirmation messaging so equal-score/higher-moves cases use `possibly less progress` instead of `lower progress`.
    - Kept `lower progress` wording for strictly lower-score load targets.
    - Added regression coverage in `tools/test-io-controller-output.js` to assert the new equal-score/higher-moves wording.
    - Verified test run passes: `node app/tools/test-io-controller-output.js`.
 
-49. [done] Return to splash flow after story `quit` so input can continue from a clean restart path.
+46. [done] Return to splash flow after story `quit` so input can continue from a clean restart path.
    - Added `onStoryQuit` callback plumbing in `src/io.js` and trigger on VM quit halt.
    - Wired `src/index.html` quit handling to reopen splash, clear active overlays/effect timers, and reload bundled story startup flow.
    - Added regression coverage in `tools/test-io-controller-output.js` for quit callback invocation.
    - Verified test runs pass: `node tools/test-io-controller-output.js` and `node tools/test-integration.js`.
 
-50. [done] Improve clarity of load/save/map action icons.
+47. [done] Improve clarity of load/save/map action icons.
    - Redesigned `icon-load`, `icon-save`, and `icon-map` in `src/modern.css` to use clearer etched silhouettes while keeping the established scratch art style.
    - Kept existing action wiring and control layout unchanged (`src/index.html`), so this is a visual-only clarity improvement.
 
 ## Pending Tasks
 
-43. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
+48. [pending] Refine `docs/LOCATION_MAP.md` so routine-driven exits and puzzle-only transitions get cleaner player-facing edge labels (phase 1: booklet-derived labeling only).
    - Use booklet map pages `../data/booklet-page3.png` and `../data/booklet-page4.png` as the primary source for initial player-facing transition labels.
    - Focus first on locations already identified by the discovery script but still marked unresolved due to routine-based exit logic.
    - Include destinations like `Basalt Bowl` where access is not a simple compass move.
    - Rewrite labels in player language (for example `read paper`) rather than engine/property wording.
    - For this phase, exact trigger/condition validation is explicitly out of scope; mark labels as booklet-derived where uncertainty remains.
 
-44. [pending] Add an in-game map of visited locations while adventuring.
+49. [pending] Build a standalone map prototype page (no library) for rapid layout iteration before runtime integration.
+   - Add a separate prototype page under `src/` that renders a fixed-position Section C map in SVG/HTML.
+   - Support direct map interaction in the prototype: left-mouse drag to pan and mouse wheel to zoom.
+   - Keep prototype data-model-driven (`room id`, `layer`, `x/y`, `edges`) so it can become the base for the in-game visited map.
+   - Treat this prototype as the visual calibration stage for room placement before wiring into `src/index.html`.
+
+50. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -357,10 +363,10 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-45. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+51. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
-   - Keep booklet/hint handling separate from Task 46 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
+   - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
 

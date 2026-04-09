@@ -210,7 +210,7 @@ flowchart TB
   AB -- "west" --> SW["Stairway"]
   TB -- "east" --> DS["Dead Storage"]
   DS -- "east" --> AS["Ancient Storage"]
-  AS -- "south" --> BT["Brick Tunnel"]
+  AS -- "down" --> BT["Brick Tunnel"]
   BT -- "north" --> RC["Renovated Cave"]
   RC -- "down" --> BA["Before the Altar [SFX]"]
   BT -- "south" --> CT["Cinderblock Tunnel"]
