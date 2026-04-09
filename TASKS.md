@@ -345,19 +345,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Reworked the prototype to be model-driven from one map source (`layers` + `rooms` containing `room id`, `layer`, `x/y`, and `edges`) and added reference validation for unknown room/layer ids.
    - Kept this page independent from `src/index.html` so map iteration can continue without runtime coupling.
 
-## Pending Tasks
+50. [done] Refine de prototype kaart tot deze volledig is.
+   - Doorgevoerde calibratie in `src/map-prototype.html`: secties `B/C/D/F/E/U` geïntegreerd met stabiele room-IDs, directionele/puzzle/restricted edges en duidelijke section-frames.
+   - Ruimtelijke herverdeling afgerond voor drukke clusters (o.a. `Brown`, `Steam Tunnels`, `Wet Tunnels`) inclusief specifieke uitlijningen zoals `39 -> 99 -> Wet Tunnel [Inset 1]`.
+   - Layout gemaakt met deterministische room-positions (`DETERMINISTIC_ROOM_POSITIONS`) zodat handmatige room-tweaks niet meer onbedoeld verschuiven door chained transforms.
+   - Repeated-name normalisatie doorgevoerd voor leesbaarheid (`Infinite Corridor [W1..W5]`, `Steam Tunnel [S1..S5]`, `Wet Tunnel [Inset ...]`, `Smith Street [W/E]`).
+   - Layer- en section-uitlijning gefinaliseerd: dynamische layer-bounds volgen nu de kaartinhoud en houden section-frame marges links/rechts correct binnen de hoogtelagen.
 
-50. [pending] Refine de prototype kaart tot deze volledig is.
-   - Huidige baseline in `src/map-prototype.html`: geïntegreerde secties `B/C/D/F/E` staan op één kaart met model-gedreven data (`section`, `room id`, `layer`, `x/y`, `edges`) en werkende pan/zoom + toggles.
-   - ID coverage update: alle 71 canonieke locatie-IDs uit `tools/location-map-discovery.json` staan nu op de prototypekaart; elke room-label toont zijn ID.
-   - Onzekere Wet Tunnel nummering staat tijdelijk in `Section U - Unknown Locations` (links), zodat we geen onjuiste definitieve ID->positie mapping vastleggen voordat die reconciliatie klaar is.
-   - Rond de ruimtelijke calibratie af per sectie op basis van booklet pages 3/4 (`../data/booklet-page3.png`, `../data/booklet-page4.png`), met focus op onderlinge afstanden en leesbare edge-richtingen.
-   - Werk ontbrekende of twijfelachtige integratieverbindingen uit tussen secties (inclusief conditionele/puzzelroutes als gelabelde prototype-edges waar relevant).
-   - Voeg richting aan edge-weergave toe voor diagonale exits (`nw`, `ne`, `sw`, `se`) en verbeter overlap-afhandeling van edge-labels in drukke clusters.
-   - Normaliseer repeated-name rooms voor prototype-weergave (bijv. `Infinite Corridor`, `Steam Tunnel`, `Wet Tunnel`) met consistente suffix/nummer-strategie.
-   - Voeg eenvoudige section-visibility filters toe (per sectie aan/uit) zodat layout-iteratie sneller kan per gebied.
-   - Voeg een compacte legenda toe voor edge-types (`normal`, `enter`, `puzzle/conditional`, `cross-section`) zodat visuele review eenduidig is.
-   - Documenteer na afronding in korte notities welke placement/labeling-keuzes definitief genoeg zijn voor runtime-integratie in taak 51.
+## Pending Tasks
 
 51. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
