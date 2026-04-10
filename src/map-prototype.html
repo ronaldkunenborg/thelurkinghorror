@@ -774,7 +774,11 @@
       };
 
       // Wet-tunnel inset numbering is now mapped to concrete engine ids in this prototype.
-      const PRESERVE_CUSTOM_LABEL_IDS = new Set([66, 78, 98, 138, 185, 206, 208, 210, 214, 218, 221, 227]);
+      const PRESERVE_CUSTOM_LABEL_IDS = new Set([
+        66, 78, 98, 138, 185, 206, 208, 210, 214, 218, 221, 227,
+        // Wet-tunnel mapping labels from task 50 (keep inset/outer names instead of canonical "Wet Tunnel")
+        15, 51, 87, 117, 131, 161, 164, 181, 184, 187, 232, 234
+      ]);
 
       const CANONICAL_NAME_BY_ID = new Map(CANONICAL_LOCATIONS.map((location) => [location.id, location.name]));
 

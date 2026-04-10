@@ -13,8 +13,6 @@
         --muted: #b6ab8b;
         --room-fill: #262319;
         --room-line: #a3966f;
-        --edge: #d8cfb3;
-        --edge-enter: #93b7ff;
       }
 
       * {
@@ -137,44 +135,6 @@
         dominant-baseline: central;
       }
 
-      .edge {
-        stroke: var(--edge);
-        stroke-width: 2;
-        fill: none;
-        marker-end: url(#arrow);
-      }
-
-      .edge-enter {
-        stroke: var(--edge-enter);
-        stroke-width: 3;
-        stroke-dasharray: 6 5;
-        marker-end: url(#arrow-enter);
-      }
-
-      .edge-puzzle {
-        stroke-dasharray: 7 5;
-        opacity: 0.9;
-      }
-
-      .edge-restricted {
-        stroke-dasharray: 2 6;
-        opacity: 0.95;
-      }
-
-      .edge-label-bg {
-        fill: rgba(16, 14, 11, 0.88);
-        stroke: var(--panel-line);
-        stroke-width: 0.8;
-        rx: 4;
-      }
-
-      .edge-label {
-        fill: var(--ink);
-        font-size: 15px;
-        text-anchor: middle;
-        dominant-baseline: central;
-      }
-
       .building-frame {
         fill: rgba(43, 38, 29, 0.24);
         stroke: rgba(203, 189, 151, 0.45);
@@ -211,15 +171,6 @@
         fill: #d7cbab;
         font-size: 14px;
         font-weight: 700;
-      }
-
-      .edge-cross {
-        stroke: #e7b977;
-        stroke-dasharray: 10 6;
-      }
-
-      .edge-label-compass {
-        fill: #b8d3ff;
       }
 
       .campus-road {
@@ -295,16 +246,67 @@
         font-weight: 700;
         text-anchor: middle;
       }
+
+      .floor-select {
+        background: #17140f;
+        color: var(--ink);
+        border: 1px solid var(--panel-line);
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+
+      .room-node {
+        fill: rgba(143, 185, 207, 0.22);
+        stroke: rgba(143, 185, 207, 0.92);
+        stroke-width: 1.2;
+      }
+
+      .room-node-brown {
+        fill: rgba(198, 170, 120, 0.22);
+        stroke: rgba(198, 170, 120, 0.92);
+      }
+
+      .room-node-main {
+        fill: rgba(143, 185, 207, 0.22);
+        stroke: rgba(143, 185, 207, 0.92);
+      }
+
+      .room-node-other {
+        fill: rgba(185, 175, 150, 0.2);
+        stroke: rgba(185, 175, 150, 0.8);
+      }
+
+      .room-node-label {
+        fill: #efe6c8;
+        font-size: 10px;
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
     <div class="page">
       <h1>The Lurking Horror - Map Prototype v2 (Building/Isometric)</h1>
-      <p>Campus-first layout pass. Building zones are positioned against the university map; room-level nodes are hidden for now.</p>
+      <p>Campus-first layout pass with room-layer overlay: each room has building, layer, and tile metadata and can be filtered per floor.</p>
       <div class="controls">
         <label><input id="toggle-roads" type="checkbox" checked /> Show roads</label>
         <label><input id="toggle-legend" type="checkbox" checked /> Show legend</label>
         <label><input id="toggle-grid" type="checkbox" checked /> Show tile grid</label>
+        <label>
+          Floor layer
+          <select id="floor-filter" class="floor-select">
+            <option value="all">All</option>
+            <option value="L+3">L+3</option>
+            <option value="L+2">L+2</option>
+            <option value="L+1">L+1</option>
+            <option value="L0" selected>L0</option>
+            <option value="L-1">L-1</option>
+            <option value="L-2">L-2</option>
+            <option value="L-3">L-3</option>
+            <option value="L-4">L-4</option>
+          </select>
+        </label>
       </div>
       <div class="frame">
         <svg id="map" viewBox="0 0 1600 980" aria-label="Integrated map prototype"></svg>
@@ -316,10 +318,6 @@
       const ROOM_H = 56;
       const WORLD_W = 5900;
       const WORLD_H = 4200;
-      const SECTION_FRAME_MARGIN_X = 125;
-      const SECTION_FRAME_MARGIN_Y = 60;
-      let LAYER_X = 70;
-      let LAYER_W = 5760;
       const svg = document.getElementById("map");
       let viewport = null;
       const panZoom = {
@@ -524,18 +522,18 @@
           { id: "ogd", label: "On the Great Dome", section: "B", layer: "L+2", x: 1280, y: 180, edges: [] },
           { id: "great_court", label: "Great Court", section: "B", layer: "L0", x: 1080, y: 860, edges: [] },
           { id: "chem", label: "Chemistry Building", section: "B", layer: "L0", x: 1480, y: 860, edges: [{ to: "alc", label: "south" }] },
-          { id: "alc", label: "Dept. of Alchemy", section: "B", layer: "L-1", x: 1480, y: 1000, edges: [{ to: "lab", label: "south" }] },
+          { id: "alc", label: "Dept. of Alchemy", section: "B", layer: "L0", x: 1480, y: 1000, edges: [{ to: "lab", label: "south" }] },
           {
             id: "lab",
             label: "Lab",
             section: "B",
-            layer: "L-1",
+            layer: "L0",
             x: 1480,
             y: 1140,
             edges: []
           },
           { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "cp", label: "east" }] },
-          { id: "cp", label: "Cluttered Passage", section: "R", layer: "L0", x: 1940, y: 670, edges: [{ to: "brown", label: "east" }] },
+          { id: "cp", label: "Cluttered Passage", section: "R", layer: "L-1", x: 1940, y: 670, edges: [{ to: "brown", label: "east" }] },
           {
             id: "brown",
             label: "Brown Building",
@@ -883,30 +881,9 @@
         }
       }
 
-      const knownLocationIds = new Set(
-        MAP_MODEL.rooms.filter((room) => typeof room.locationId === "number").map((room) => room.locationId)
-      );
-      const missingLocations = CANONICAL_LOCATIONS.filter((location) => !knownLocationIds.has(location.id));
-      const unknownStartX = 3500;
-      const unknownStartY = 3450;
-      const unknownGapX = 230;
-      const unknownGapY = 76;
-      const unknownColumns = 4;
-      for (let index = 0; index < missingLocations.length; index += 1) {
-        const location = missingLocations[index];
-        const column = index % unknownColumns;
-        const row = Math.floor(index / unknownColumns);
-        MAP_MODEL.rooms.push({
-          id: "unknown_" + location.id,
-          label: location.name,
-          locationId: location.id,
-          section: "U",
-          layer: "L0",
-          x: unknownStartX + column * unknownGapX,
-          y: unknownStartY + row * unknownGapY,
-          edges: []
-        });
-      }
+      // NOTE:
+      // Unknown-location parking was removed for prototype-v2.
+      // All map entities are now placed through explicit mapped room ids.
 
       // Align Subbasement (Section D) directly under Stairway and move linked lower sections with it.
       const sectionShiftX = {
@@ -1088,18 +1065,6 @@
         tomb: { x: 600, y: 1840 },
         top_floor: { x: 1760, y: 820 },
         tunnel_entry: { x: 0, y: 2140 },
-        unknown_117: { x: 470, y: 3450 },
-        unknown_131: { x: -220, y: 3526 },
-        unknown_15: { x: -220, y: 3450 },
-        unknown_161: { x: 10, y: 3526 },
-        unknown_164: { x: 240, y: 3526 },
-        unknown_181: { x: 470, y: 3526 },
-        unknown_184: { x: -220, y: 3602 },
-        unknown_187: { x: 10, y: 3602 },
-        unknown_232: { x: 240, y: 3602 },
-        unknown_234: { x: 470, y: 3602 },
-        unknown_51: { x: 10, y: 3450 },
-        unknown_87: { x: 240, y: 3450 },
         wet_lair_link: { x: 1140, y: 3120 },
         wet1: { x: -270, y: 2920 },
         wet10: { x: 530, y: 3280 },
@@ -1154,21 +1119,21 @@
       };
 
       const ROOM_BUILDING = {
-        place: "dream",
-        basalt: "dream",
-        platform: "dream",
-        rgd: "dome",
-        ogd: "dome",
-        td: "dome",
-        gd: "dome",
-        mass: "corridor",
-        ic1: "corridor",
-        ic2: "corridor",
-        ic3: "corridor",
-        ic4: "corridor",
-        ic5: "corridor",
-        fn: "corridor",
-        great_court: "corridor",
+        place: "central",
+        basalt: "central",
+        platform: "central",
+        rgd: "central",
+        ogd: "central",
+        td: "central",
+        gd: "central",
+        mass: "central",
+        ic1: "central",
+        ic2: "central",
+        ic3: "central",
+        ic4: "central",
+        ic5: "central",
+        fn: "central",
+        great_court: "central",
         cp: "brown",
         brown: "brown",
         small_court: "brown",
@@ -1176,35 +1141,35 @@
         top_floor: "brown",
         sky_roof: "brown",
         inside_dome: "brown",
-        chem: "brown",
-        alc: "brown",
-        lab: "brown",
-        roof: "main",
-        terminal: "main",
-        third: "main",
-        second: "main",
-        kitchen: "main",
-        computer: "main",
-        smith1: "main",
-        smith2: "main",
-        temp_lab: "main",
-        temp_b: "main",
-        dead: "main",
-        ancient: "main",
-        brick: "main",
-        reno: "main",
-        cinder: "main",
-        altar: "main",
-        elev_l2: "main",
-        elev_l1: "main",
-        elev_l0: "main",
-        elev_lm1: "main",
-        base: "main",
-        aero_lobby: "aero",
-        eng: "aero",
-        stair: "aero",
-        sub: "aero",
-        aero_b: "aero",
+        chem: "central",
+        alc: "central",
+        lab: "central",
+        roof: "computer",
+        terminal: "computer",
+        third: "computer",
+        second: "computer",
+        kitchen: "computer",
+        computer: "computer",
+        smith1: "computer",
+        smith2: "computer",
+        elev_l2: "computer",
+        elev_l1: "computer",
+        elev_l0: "computer",
+        elev_lm1: "computer",
+        base: "computer",
+        temp_lab: "temp",
+        temp_b: "temp",
+        dead: "temp",
+        ancient: "temp",
+        brick: "brick",
+        reno: "brick",
+        cinder: "brick",
+        altar: "brick",
+        aero_lobby: "central",
+        eng: "central",
+        stair: "central",
+        sub: "central",
+        aero_b: "central",
         muddy: "steam",
         tunnel_entry: "steam",
         steam1: "steam",
@@ -1230,7 +1195,7 @@
         inner_lair: "wet"
       };
       for (const room of MAP_MODEL.rooms) {
-        room.building = ROOM_BUILDING[room.id] || (room.id.startsWith("unknown_") ? "unknown" : "main");
+        room.building = ROOM_BUILDING[room.id] || "central";
       }
 
       const LAYER_ORDER = ["L+2", "L+1", "L0", "L-1", "L-2", "L-3"];
@@ -1256,23 +1221,9 @@
         }
       }
 
-      // Refit horizontal layer bands to actual room spread so layers align with map content.
-      // This prevents the "rooms far left inside huge layer boxes" effect.
-      if (MAP_MODEL.rooms.length > 0) {
-        const minRoomLeft = Math.min(...MAP_MODEL.rooms.map((room) => room.x - ROOM_W / 2));
-        const maxRoomRight = Math.max(...MAP_MODEL.rooms.map((room) => room.x + ROOM_W / 2));
-        // Include section-frame margins in layer coverage so no section falls outside the bands.
-        const sidePad = Math.max(260, SECTION_FRAME_MARGIN_X + 40);
-        const left = Math.floor(minRoomLeft - sidePad);
-        const right = Math.ceil(maxRoomRight + sidePad);
-        LAYER_X = left;
-        LAYER_W = Math.max(800, right - left);
-      }
-
       const roomById = new Map(MAP_MODEL.rooms.map((room) => [room.id, room]));
       const layerIds = new Set(MAP_MODEL.layers.map((layer) => layer.id));
       const sectionIds = new Set(MAP_MODEL.sections.map((section) => section.id));
-      const edges = [];
 
       for (const room of MAP_MODEL.rooms) {
         if (!layerIds.has(room.layer)) {
@@ -1282,21 +1233,9 @@
           throw new Error("Unknown section '" + room.section + "' for room '" + room.id + "'.");
         }
         for (const edge of room.edges) {
-          const targetRoom = roomById.get(edge.to);
-          edges.push({
-            from: room.id,
-            to: edge.to,
-            label: edge.label,
-            type: edge.type || "normal",
-            section: room.section,
-            crossBuilding: !!targetRoom && targetRoom.building !== room.building
-          });
-        }
-      }
-
-      for (const edge of edges) {
-        if (!roomById.has(edge.from) || !roomById.has(edge.to)) {
-          throw new Error("Unknown room id in edge " + edge.from + " -> " + edge.to + ".");
+          if (!roomById.has(edge.to)) {
+            throw new Error("Unknown room id in edge " + room.id + " -> " + edge.to + ".");
+          }
         }
       }
 
@@ -1306,50 +1245,6 @@
         if (text != null) el.textContent = text;
         (viewport || svg).appendChild(el);
         return el;
-      }
-
-      function roomRect(room) {
-        return {
-          x: room.x - ROOM_W / 2,
-          y: room.y - ROOM_H / 2,
-          w: ROOM_W,
-          h: ROOM_H
-        };
-      }
-
-      function edgeEndpoints(from, to) {
-        const a = roomRect(from);
-        const b = roomRect(to);
-        const dx = to.x - from.x;
-        const dy = to.y - from.y;
-        if (Math.abs(dx) > Math.abs(dy)) {
-          if (dx > 0) return { x1: a.x + a.w, y1: from.y, x2: b.x, y2: to.y };
-          return { x1: a.x, y1: from.y, x2: b.x + b.w, y2: to.y };
-        }
-        if (dy > 0) return { x1: from.x, y1: a.y + a.h, x2: to.x, y2: b.y };
-        return { x1: from.x, y1: a.y, x2: to.x, y2: b.y + b.h };
-      }
-
-      function drawEdgeLabel(mx, my, label) {
-        const pad = 10;
-        const width = Math.max(52, Math.min(140, label.length * 7 + pad * 2));
-        add("rect", { class: "edge-label-bg", x: mx - width / 2, y: my - 12, width, height: 24 });
-        const isCompass =
-          /^(north|south|east|west|up|down|northeast|northwest|southeast|southwest|enter|exit)$/i.test(
-            String(label).trim()
-          );
-        const className = isCompass ? "edge-label edge-label-compass" : "edge-label";
-        add("text", { class: className, x: mx, y: my + 1 }, label);
-      }
-
-      function roomIsoPoints(room) {
-        const r = roomRect(room);
-        const skew = 24;
-        const p1 = [r.x + skew, r.y];
-        const p2 = [r.x + r.w, r.y];
-        const p3 = [r.x + r.w - skew, r.y + r.h];
-        const p4 = [r.x, r.y + r.h];
-        return [p1, p2, p3, p4].map((p) => p[0] + "," + p[1]).join(" ");
       }
 
       const CAMPUS_BLOCKS = [
@@ -1367,7 +1262,11 @@
           sub: "Great Dome + Aero + Engineering + Chemistry",
           bounds: { tl: { c: 1, rank: 8 }, br: { c: 7, rank: 4 } }
         },
-        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 10, rank: 6 }, br: { c: 10, rank: 5 } } }
+        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 10, rank: 6 }, br: { c: 10, rank: 5 } } },
+        // Hidden placement zones for underground grouping.
+        { id: "steam", type: "placement-zone", hidden: true, bounds: { tl: { c: 1, rank: 3 }, br: { c: 7, rank: 2 } } },
+        { id: "wet", type: "placement-zone", hidden: true, bounds: { tl: { c: 1, rank: 1 }, br: { c: 7, rank: 1 } } },
+        { id: "brick", type: "placement-zone", hidden: true, bounds: { tl: { c: 6, rank: 9 }, br: { c: 8, rank: 8 } } }
       ];
 
       // Booklet-inspired placement grid:
@@ -1475,6 +1374,383 @@
         return { x, y, w, h };
       }
 
+      function colToLetters(index) {
+        let n = index + 1;
+        let s = "";
+        while (n > 0) {
+          const rem = (n - 1) % 26;
+          s = String.fromCharCode(65 + rem) + s;
+          n = Math.floor((n - 1) / 26);
+        }
+        return s;
+      }
+
+      function lettersToCol(letters) {
+        let n = 0;
+        const s = String(letters || "").toUpperCase();
+        for (let i = 0; i < s.length; i += 1) {
+          const code = s.charCodeAt(i);
+          if (code < 65 || code > 90) continue;
+          n = n * 26 + (code - 64);
+        }
+        return Math.max(0, n - 1);
+      }
+
+      function parseTileLabel(tileLabel) {
+        const m = /^([A-Za-z]+)(\d+)$/.exec(String(tileLabel || "").trim());
+        if (!m) return null;
+        const c = lettersToCol(m[1]);
+        const rank = Number(m[2]);
+        if (!Number.isFinite(rank)) return null;
+        return { c, rank };
+      }
+
+      function tileCenter(c, rank) {
+        const p0 = anchorAtTile(c, rank);
+        return {
+          x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
+          y: p0.y + (ISO_BASIS_E.dy + ISO_BASIS_S.dy) * 0.5
+        };
+      }
+
+      function tilesInBounds(bounds) {
+        const c0 = Math.min(bounds.tl.c, bounds.br.c);
+        const c1 = Math.max(bounds.tl.c, bounds.br.c);
+        const rankBottom = Math.min(bounds.tl.rank, bounds.br.rank);
+        const rankTop = Math.max(bounds.tl.rank, bounds.br.rank);
+        const tiles = [];
+        for (let rank = rankTop; rank >= rankBottom; rank -= 1) {
+          for (let c = c0; c <= c1; c += 1) {
+            tiles.push({ c, rank });
+          }
+        }
+        return tiles;
+      }
+
+      function parseCardinal(label) {
+        const s = String(label || "").toLowerCase();
+        if (s.includes("west")) return "west";
+        if (s.includes("east")) return "east";
+        if (s.includes("north")) return "north";
+        if (s.includes("south")) return "south";
+        return null;
+      }
+
+      function parseVertical(label) {
+        const s = String(label || "").toLowerCase();
+        if (s.includes("up")) return "up";
+        if (s.includes("down")) return "down";
+        return null;
+      }
+
+      function layerIdToLevel(layerId) {
+        if (layerId === "L0") return 0;
+        const m = /^L([+-])(\d+)$/.exec(String(layerId || ""));
+        if (!m) return 0;
+        const sign = m[1] === "+" ? 1 : -1;
+        return sign * Number(m[2] || 0);
+      }
+
+      function levelToLayerId(level) {
+        if (level === 0) return "L0";
+        return level > 0 ? "L+" + level : "L" + level;
+      }
+
+      const DIR_DELTA = {
+        west: { dc: -1, dr: 0 },
+        east: { dc: 1, dr: 0 },
+        north: { dc: 0, dr: 1 },
+        south: { dc: 0, dr: -1 }
+      };
+
+      function inverseDir(dir) {
+        if (dir === "west") return "east";
+        if (dir === "east") return "west";
+        if (dir === "north") return "south";
+        if (dir === "south") return "north";
+        return dir;
+      }
+
+      // Resolve room layers from vertical connectivity relative to L0 anchors.
+      // Each up/down changes level by +/-1; cardinal/same-plane links keep level.
+      const ROOM_LAYER_LEVEL = new Map();
+      const layerGraph = new Map();
+      const addLevelEdge = (from, to, delta) => {
+        const list = layerGraph.get(from) || [];
+        list.push({ to, delta });
+        layerGraph.set(from, list);
+      };
+      for (const room of MAP_MODEL.rooms) {
+        for (const edge of room.edges || []) {
+          const vert = parseVertical(edge.label);
+          const delta = vert === "up" ? 1 : vert === "down" ? -1 : 0;
+          addLevelEdge(room.id, edge.to, delta);
+          addLevelEdge(edge.to, room.id, -delta);
+        }
+      }
+      const levelQueue = [];
+      for (const room of MAP_MODEL.rooms) {
+        if (room.layer === "L0") {
+          ROOM_LAYER_LEVEL.set(room.id, 0);
+          levelQueue.push(room.id);
+        }
+      }
+      while (levelQueue.length > 0) {
+        const id = levelQueue.shift();
+        const base = ROOM_LAYER_LEVEL.get(id);
+        const neighbors = layerGraph.get(id) || [];
+        for (const n of neighbors) {
+          const candidate = base + n.delta;
+          if (!ROOM_LAYER_LEVEL.has(n.to)) {
+            ROOM_LAYER_LEVEL.set(n.to, candidate);
+            levelQueue.push(n.to);
+          }
+        }
+      }
+      // Fallback for disconnected nodes: keep their declared prototype layer level.
+      for (const room of MAP_MODEL.rooms) {
+        if (!ROOM_LAYER_LEVEL.has(room.id)) {
+          ROOM_LAYER_LEVEL.set(room.id, layerIdToLevel(room.layer));
+        }
+      }
+      const ROOM_LAYER_RESOLVED = new Map(
+        MAP_MODEL.rooms.map((room) => [room.id, levelToLayerId(ROOM_LAYER_LEVEL.get(room.id) || 0)])
+      );
+
+      // Manual rule set requested:
+      // central L0 anchored at room 210 on E7, then compass-driven spreading.
+      const ROOM_TILE_OVERRIDES = new Map();
+      const setTileOverride = (roomId, tileLabel) => {
+        const t = parseTileLabel(tileLabel);
+        if (t) ROOM_TILE_OVERRIDES.set(roomId, t);
+      };
+      // Street anchor points:
+      // - Smith Street [W] at E9, Smith Street [E] at H9
+      // - Building connection points at E10 (Computer Center) and H10 (Temporary Lab)
+      setTileOverride("smith1", "E9");
+      setTileOverride("smith2", "H9");
+      setTileOverride("computer", "E10");
+      setTileOverride("temp_lab", "H10");
+      // Vertical alignment pair: Engineering (38) and Stairway (35) should stack on the same tile.
+      setTileOverride("eng", "C6");
+      setTileOverride("stair", "C6");
+
+      const center210 = MAP_MODEL.rooms.find((room) => room.locationId === 210) || MAP_MODEL.rooms.find((room) => room.id === "ic3");
+      if (center210) {
+        setTileOverride(center210.id, "E7");
+
+        const centralL0 = MAP_MODEL.rooms.filter(
+          (room) => room.building === "central" && (ROOM_LAYER_RESOLVED.get(room.id) || room.layer) === "L0"
+        );
+        const centralL0Ids = new Set(centralL0.map((room) => room.id));
+
+        let changed = true;
+        while (changed) {
+          changed = false;
+          for (const room of centralL0) {
+            for (const edge of room.edges || []) {
+              if (!centralL0Ids.has(edge.to)) continue;
+              const dir = parseCardinal(edge.label);
+              if (!dir) continue;
+              const src = ROOM_TILE_OVERRIDES.get(room.id);
+              const dst = ROOM_TILE_OVERRIDES.get(edge.to);
+              if (src && !dst) {
+                const d = DIR_DELTA[dir];
+                ROOM_TILE_OVERRIDES.set(edge.to, { c: src.c + d.dc, rank: src.rank + d.dr });
+                changed = true;
+              } else if (!src && dst) {
+                const back = DIR_DELTA[inverseDir(dir)];
+                ROOM_TILE_OVERRIDES.set(room.id, { c: dst.c + back.dc, rank: dst.rank + back.dr });
+                changed = true;
+              }
+            }
+          }
+        }
+
+        // Vertical stack rule: rooms directly above/below 210 via up/down can share E7 in their own layer.
+        const verticalVisited = new Set([center210.id]);
+        const queue = [center210.id];
+        while (queue.length > 0) {
+          const id = queue.shift();
+          const room = roomById.get(id);
+          if (!room) continue;
+          const pos = ROOM_TILE_OVERRIDES.get(id) || { c: 4, rank: 7 };
+          ROOM_TILE_OVERRIDES.set(id, { c: pos.c, rank: pos.rank });
+          for (const edge of room.edges || []) {
+            if (!parseVertical(edge.label)) continue;
+            const target = roomById.get(edge.to);
+            if (!target || target.building !== "central") continue;
+            if (!ROOM_TILE_OVERRIDES.has(target.id)) {
+              ROOM_TILE_OVERRIDES.set(target.id, { c: 4, rank: 7 });
+            }
+            if (!verticalVisited.has(target.id)) {
+              verticalVisited.add(target.id);
+              queue.push(target.id);
+            }
+          }
+        }
+      }
+
+      // Explicit room placement metadata used by prototype-v2 room overlays.
+      // Every room carries building, layer and tile.
+      const GROUP_TO_BLOCK_ID = {
+        brown: "brown",
+        central: "central",
+        computer: "computer",
+        temp: "temp",
+        brick: "brick",
+        steam: "steam",
+        wet: "wet",
+        main: "central",
+        corridor: "central",
+        dome: "central",
+        aero: "central"
+      };
+      const blockById = new Map(CAMPUS_BLOCKS.map((block) => [block.id, block]));
+      const roomGroups = new Map();
+      for (const room of MAP_MODEL.rooms) {
+        const key = (room.building || "main") + "|" + (ROOM_LAYER_RESOLVED.get(room.id) || room.layer);
+        const list = roomGroups.get(key) || [];
+        list.push(room);
+        roomGroups.set(key, list);
+      }
+
+      const ROOM_TILE_METADATA = [];
+      for (const rooms of roomGroups.values()) {
+        rooms.sort((a, b) => {
+          const aid = typeof a.locationId === "number" ? a.locationId : Number.POSITIVE_INFINITY;
+          const bid = typeof b.locationId === "number" ? b.locationId : Number.POSITIVE_INFINITY;
+          if (aid !== bid) return aid - bid;
+          return String(a.id).localeCompare(String(b.id));
+        });
+        const buildingGroup = rooms[0].building || "main";
+        const blockId = GROUP_TO_BLOCK_ID[buildingGroup] || "central";
+        const block = blockById.get(blockId);
+        const tilePool = block && block.bounds ? tilesInBounds(block.bounds) : [];
+        for (let i = 0; i < rooms.length; i += 1) {
+          const room = rooms[i];
+          const override = ROOM_TILE_OVERRIDES.get(room.id);
+          const tile = override || (tilePool.length > 0 ? tilePool[i % tilePool.length] : { c: 0, rank: 1 });
+          ROOM_TILE_METADATA.push({
+            id: room.id,
+            label: room.label,
+            locationId: room.locationId,
+            building: room.building || "main",
+            layer: ROOM_LAYER_RESOLVED.get(room.id) || room.layer,
+            tile,
+            tileLabel: colToLetters(tile.c) + tile.rank
+          });
+        }
+      }
+
+      // Global vertical alignment rule:
+      // any room connected via up/down to an L0 room (directly or through a vertical chain)
+      // is pinned to the same plan tile as that L0 anchor.
+      const verticalAdj = new Map();
+      const addVerticalLink = (a, b) => {
+        const listA = verticalAdj.get(a) || [];
+        listA.push(b);
+        verticalAdj.set(a, listA);
+      };
+      for (const room of MAP_MODEL.rooms) {
+        for (const edge of room.edges || []) {
+          if (!parseVertical(edge.label)) continue;
+          addVerticalLink(room.id, edge.to);
+          addVerticalLink(edge.to, room.id);
+        }
+      }
+
+      const metaById = new Map(ROOM_TILE_METADATA.map((room) => [room.id, room]));
+      const alignedToL0 = new Set();
+      const queue = [];
+      for (const room of ROOM_TILE_METADATA) {
+        if (room.layer === "L0") {
+          alignedToL0.add(room.id);
+          queue.push(room.id);
+        }
+      }
+      while (queue.length > 0) {
+        const id = queue.shift();
+        const base = metaById.get(id);
+        if (!base) continue;
+        const neighbors = verticalAdj.get(id) || [];
+        for (const nid of neighbors) {
+          const target = metaById.get(nid);
+          if (!target) continue;
+          const sameTile = target.tile.c === base.tile.c && target.tile.rank === base.tile.rank;
+          if (!sameTile || !alignedToL0.has(nid)) {
+            target.tile = { c: base.tile.c, rank: base.tile.rank };
+            target.tileLabel = colToLetters(target.tile.c) + target.tile.rank;
+            if (!alignedToL0.has(nid)) {
+              alignedToL0.add(nid);
+              queue.push(nid);
+            }
+          }
+        }
+      }
+
+      window.ROOM_TILE_METADATA = ROOM_TILE_METADATA;
+
+      function drawRoomLayer(layerFilter) {
+        const visibleRooms = ROOM_TILE_METADATA
+          // Wet tunnels are temporarily excluded from layout rendering:
+          // their traversal labels are non-compass and need dedicated routing logic later.
+          .filter((room) => room.building !== "wet")
+          .filter((room) => layerFilter === "all" || room.layer === layerFilter)
+          .map((room) => ({ ...room }));
+
+        const occupancyByTile = new Map();
+        for (const room of visibleRooms) {
+          const key = room.tile.c + ":" + room.tile.rank;
+          const next = occupancyByTile.get(key) || 0;
+          occupancyByTile.set(key, next + 1);
+          room._stackIndex = next;
+        }
+
+        for (const room of visibleRooms) {
+          const center = tileCenter(room.tile.c, room.tile.rank);
+          const key = room.tile.c + ":" + room.tile.rank;
+          const stackCount = occupancyByTile.get(key) || 1;
+          const idx = room._stackIndex || 0;
+          const angle = (Math.PI * 2 * idx) / Math.max(1, stackCount);
+          const spread = stackCount > 1 ? 12 : 0;
+          const roomYOffset = 24;
+          const cx = center.x + Math.cos(angle) * spread;
+          const cy = center.y + roomYOffset + Math.sin(angle) * spread;
+          const nodeClass =
+            room.building === "brown"
+              ? "room-node room-node-brown"
+              : room.building === "central" ||
+                  room.building === "computer" ||
+                  room.building === "temp" ||
+                  room.building === "main" ||
+                  room.building === "corridor" ||
+                  room.building === "dome"
+                ? "room-node room-node-main"
+                : "room-node room-node-other";
+
+          const node = add("circle", { class: nodeClass, cx, cy, r: 10 });
+          const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+          title.textContent =
+            room.label +
+            " [" +
+            (room.locationId || room.id) +
+            "] | building=" +
+            room.building +
+            " | layer=" +
+            room.layer +
+            " | tile=" +
+            room.tileLabel;
+          node.appendChild(title);
+
+          add(
+            "text",
+            { class: "room-node-label", x: cx, y: cy + 0.5 },
+            typeof room.locationId === "number" ? String(room.locationId) : room.id
+          );
+        }
+      }
+
       function blockPoints(block) {
         if (block.bounds) {
           const c0 = Math.min(block.bounds.tl.c, block.bounds.br.c);
@@ -1526,6 +1802,7 @@
 
       function drawCampusLayout(showRoads) {
         for (const block of CAMPUS_BLOCKS) {
+          if (block.hidden) continue;
           if ((block.type === "road-h" || block.type === "road-v") && !showRoads) continue;
           const pts = blockPoints(block);
           if (!pts.length) continue;
@@ -1568,7 +1845,7 @@
         add("text", { class: "legend-item-label", x: x + 92, y: y + 78 }, "standalone building");
         add("rect", { class: "campus-road", x: x + 16, y: y + 94, width: 36, height: 12, rx: 5 });
         add("text", { class: "legend-item-label", x: x + 92, y: y + 102 }, "street/road");
-        add("text", { class: "legend-item-label", x: x + 300, y: y + 78 }, "rooms/edges temporarily hidden");
+        add("text", { class: "legend-item-label", x: x + 300, y: y + 78 }, "room nodes filtered by floor layer");
       }
 
       function drawDirectionArrow(x, y, dx, dy, label, stroke) {
@@ -1583,16 +1860,6 @@
           x: gridX0 + c * STEP_E.dx + r * STEP_S.dx,
           y: gridY0 + c * STEP_E.dy + r * STEP_S.dy
         });
-        const colToLetters = (index) => {
-          let n = index + 1;
-          let s = "";
-          while (n > 0) {
-            const rem = (n - 1) % 26;
-            s = String.fromCharCode(65 + rem) + s;
-            n = Math.floor((n - 1) / 26);
-          }
-          return s;
-        };
 
         for (let c = 0; c < TILE_GRID.cols; c += 1) {
           for (let r = 0; r < TILE_GRID.rows; r += 1) {
@@ -1728,7 +1995,9 @@
         const showRoads = document.getElementById("toggle-roads").checked;
         const showLegend = document.getElementById("toggle-legend").checked;
         const showGrid = document.getElementById("toggle-grid").checked;
+        const floorFilter = document.getElementById("floor-filter").value;
         drawCampusLayout(showRoads);
+        drawRoomLayer(floorFilter);
         if (showLegend) drawLegend();
         if (showGrid) drawPlacementGridAndLegend(showLegend);
 
@@ -1844,6 +2113,7 @@
       document.getElementById("toggle-roads").addEventListener("change", draw);
       document.getElementById("toggle-legend").addEventListener("change", draw);
       document.getElementById("toggle-grid").addEventListener("change", draw);
+      document.getElementById("floor-filter").addEventListener("change", draw);
       svg.addEventListener("mousedown", onPointerDown);
       window.addEventListener("mousemove", onPointerMove);
       window.addEventListener("mouseup", onPointerUp);
