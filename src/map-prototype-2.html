@@ -26,12 +26,16 @@
         font-family: Georgia, "Times New Roman", serif;
         background: radial-gradient(circle at 20% 10%, #1f1a14 0%, var(--bg) 55%);
         color: var(--ink);
+        min-height: 100vh;
       }
 
       .page {
-        max-width: 1480px;
-        margin: 20px auto;
-        padding: 0 16px 24px;
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
       }
 
       h1 {
@@ -63,8 +67,8 @@
         border: 1px solid var(--panel-line);
         background: linear-gradient(180deg, #17140f 0%, #13110d 100%);
         overflow: hidden;
-        height: calc(100vh - 190px);
-        min-height: 620px;
+        flex: 1;
+        min-height: 0;
       }
 
       svg {
@@ -203,17 +207,90 @@
       .edge-label-compass {
         fill: #b8d3ff;
       }
+
+      .campus-road {
+        fill: rgba(161, 145, 110, 0.22);
+        stroke: rgba(194, 178, 142, 0.55);
+        stroke-width: 1.2;
+      }
+
+      .campus-building {
+        fill: rgba(42, 37, 28, 0.72);
+        stroke: rgba(203, 189, 151, 0.8);
+        stroke-width: 1.5;
+        rx: 16;
+      }
+
+      .campus-central {
+        fill: rgba(54, 45, 32, 0.8);
+      }
+
+      .campus-accent {
+        stroke: rgba(143, 185, 207, 0.85);
+      }
+
+      .campus-label {
+        fill: #f0e6c9;
+        font-size: 24px;
+        font-weight: 700;
+        text-anchor: middle;
+      }
+
+      .campus-sub {
+        fill: #bfb290;
+        font-size: 13px;
+        text-anchor: middle;
+      }
+
+      .tile-grid-line {
+        stroke: rgba(150, 140, 120, 0.2);
+        stroke-width: 1;
+      }
+
+      .tile-grid-major {
+        stroke: rgba(187, 172, 138, 0.3);
+        stroke-width: 1.2;
+      }
+
+      .tile-grid-point {
+        fill: rgba(206, 191, 156, 0.42);
+      }
+
+      .tile-grid-cell {
+        fill: rgba(92, 84, 66, 0.08);
+        stroke: rgba(176, 162, 128, 0.35);
+        stroke-width: 1;
+      }
+
+      .tile-grid-coord {
+        fill: rgba(230, 220, 192, 0.72);
+        font-size: 11px;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+
+      .dir-line {
+        stroke-width: 2.2;
+        fill: none;
+        marker-end: url(#arrow-grid);
+      }
+
+      .dir-label {
+        fill: #e8ddbf;
+        font-size: 14px;
+        font-weight: 700;
+        text-anchor: middle;
+      }
     </style>
   </head>
   <body>
     <div class="page">
       <h1>The Lurking Horror - Map Prototype v2 (Building/Isometric)</h1>
-      <p>Standalone SVG prototype with building-based grouping, local level bands, and isometric room cards.</p>
+      <p>Campus-first layout pass. Building zones are positioned against the university map; room-level nodes are hidden for now.</p>
       <div class="controls">
-        <label><input id="toggle-labels" type="checkbox" checked /> Show edge labels</label>
-        <label><input id="toggle-enter" type="checkbox" checked /> Show south/enter edges</label>
-        <label><input id="toggle-buildings" type="checkbox" checked /> Show building frames</label>
-        <label><input id="toggle-bands" type="checkbox" checked /> Show local level bands</label>
+        <label><input id="toggle-roads" type="checkbox" checked /> Show roads</label>
+        <label><input id="toggle-legend" type="checkbox" checked /> Show legend</label>
+        <label><input id="toggle-grid" type="checkbox" checked /> Show tile grid + direction legend</label>
       </div>
       <div class="frame">
         <svg id="map" viewBox="0 0 1600 980" aria-label="Integrated map prototype"></svg>
@@ -1261,81 +1338,233 @@
         return [p1, p2, p3, p4].map((p) => p[0] + "," + p[1]).join(" ");
       }
 
-      function drawBuildingFrames() {
-        const marginX = SECTION_FRAME_MARGIN_X;
-        const marginY = SECTION_FRAME_MARGIN_Y;
-        for (const [buildingId, buildingCfg] of Object.entries(BUILDING_LAYOUT)) {
-          const buildingRooms = MAP_MODEL.rooms.filter((room) => room.building === buildingId);
-          if (!buildingRooms.length) continue;
-          let minX = Infinity;
-          let maxX = -Infinity;
-          let minY = Infinity;
-          let maxY = -Infinity;
-          for (const room of buildingRooms) {
-            const r = roomRect(room);
-            minX = Math.min(minX, r.x);
-            maxX = Math.max(maxX, r.x + r.w);
-            minY = Math.min(minY, r.y);
-            maxY = Math.max(maxY, r.y + r.h);
+      const CAMPUS_BLOCKS = [
+        // Anchored to grid tiles:
+        // - Mass Ave spans A1..A11 on the N-axis
+        // - other blocks placed in relative positions from that same grid
+        { id: "mass", type: "road-v", orient: "N", label: "Mass. Ave.", x: 2920, y: 3617.691453624, w: 3780, h: 220 },
+        { id: "smith", type: "road-h", orient: "E", label: "Smith Street", x: 2360, y: 1123.5382907248, w: 3300, h: 180 },
+        { id: "computer", type: "building", orient: "E", label: "Computer Center", sub: "start area", x: 2620, y: 811.7691453624, w: 748, h: 324 },
+        { id: "temp", type: "building", orient: "E", label: "Temporary Lab", sub: "separate wing", x: 3940, y: 811.7691453624, w: 748, h: 324 },
+        {
+          id: "central",
+          type: "building-central",
+          orient: "E",
+          label: "Central Complex",
+          sub: "Great Dome + Aero + Engineering + Chemistry",
+          x: 2900,
+          y: 2058.845726812,
+          w: 2332,
+          h: 972
+        },
+        { id: "brown", type: "building", orient: "N", label: "Brown Building", sub: "18-floor skyscraper", x: 5200, y: 2994.1531628992, w: 1188, h: 352 }
+      ];
+
+      // Booklet-inspired placement grid:
+      // - orthogonal cardinals as the primary placement axis
+      // - diagonals as combined horizontal/vertical tile deltas
+      // - up/down as level deltas (separate from planar compass movement)
+      const TILE_GRID = {
+        originX: 1120,
+        originY: 500,
+        cellW: 220,
+        axisStep: 180,
+        northTiltFromVerticalDeg: 30,
+        levelY: 260,
+        cols: 14,
+        rows: 11
+      };
+
+      const northTiltRad = (TILE_GRID.northTiltFromVerticalDeg * Math.PI) / 180;
+      const axisDx = Math.sin(northTiltRad) * TILE_GRID.axisStep;
+      const axisDy = Math.cos(northTiltRad) * TILE_GRID.axisStep;
+
+      // Parallelogram tile basis:
+      // - E axis: horizontal tile top/bottom
+      // - S axis: down-right vector so side edges go up-left (booklet-like)
+      const ISO_BASIS_E = { dx: TILE_GRID.cellW, dy: 0 };
+      const ISO_BASIS_S = { dx: axisDx, dy: axisDy };
+
+      // Half-tile free space on each side of every tile.
+      // Effective center-to-center spacing becomes exactly one full tile in both basis directions.
+      const TILE_GUTTER_SIDE = 0.5;
+      const TILE_STEP_FACTOR = 1 + TILE_GUTTER_SIDE * 2;
+      const STEP_E = {
+        dx: ISO_BASIS_E.dx * TILE_STEP_FACTOR,
+        dy: ISO_BASIS_E.dy * TILE_STEP_FACTOR
+      };
+      const STEP_S = {
+        dx: ISO_BASIS_S.dx * TILE_STEP_FACTOR,
+        dy: ISO_BASIS_S.dy * TILE_STEP_FACTOR
+      };
+
+      // Compass is derived from the same isometric lattice vectors as the grid.
+      // This keeps direction arrows and tile placement orientation perfectly aligned.
+      const COMPASS_SCALE = 1.1;
+      const N_BASE = { dx: -ISO_BASIS_S.dx * COMPASS_SCALE, dy: -ISO_BASIS_S.dy * COMPASS_SCALE };
+      const E_BASE = { dx: ISO_BASIS_E.dx * COMPASS_SCALE, dy: ISO_BASIS_E.dy * COMPASS_SCALE };
+
+      const DIRECTION_VECTORS = {
+        N: { dx: N_BASE.dx, dy: N_BASE.dy },
+        S: { dx: -N_BASE.dx, dy: -N_BASE.dy },
+        E: { dx: E_BASE.dx, dy: E_BASE.dy },
+        W: { dx: -E_BASE.dx, dy: -E_BASE.dy },
+        NE: { dx: (N_BASE.dx + E_BASE.dx) * 0.72, dy: (N_BASE.dy + E_BASE.dy) * 0.72 },
+        SE: { dx: (-N_BASE.dx + E_BASE.dx) * 0.72, dy: (-N_BASE.dy + E_BASE.dy) * 0.72 },
+        SW: { dx: (-N_BASE.dx - E_BASE.dx) * 0.72, dy: (-N_BASE.dy - E_BASE.dy) * 0.72 },
+        NW: { dx: (N_BASE.dx - E_BASE.dx) * 0.72, dy: (N_BASE.dy - E_BASE.dy) * 0.72 },
+        UP: { dx: 0, dy: -TILE_GRID.levelY },
+        DOWN: { dx: 0, dy: TILE_GRID.levelY }
+      };
+
+      function drawCampusLayout(showRoads) {
+        const len = (v) => Math.hypot(v.dx, v.dy) || 1;
+        const UNIT_E = { dx: ISO_BASIS_E.dx / len(ISO_BASIS_E), dy: ISO_BASIS_E.dy / len(ISO_BASIS_E) };
+        const N_AXIS = { dx: -ISO_BASIS_S.dx, dy: -ISO_BASIS_S.dy };
+        const UNIT_N = { dx: N_AXIS.dx / len(N_AXIS), dy: N_AXIS.dy / len(N_AXIS) };
+        const pointsFor = (block) => {
+          const u = block.orient === "N" ? UNIT_N : UNIT_E;
+          const v = block.orient === "N" ? UNIT_E : UNIT_N;
+          const p0 = { x: block.x, y: block.y };
+          const p1 = { x: p0.x + u.dx * block.w, y: p0.y + u.dy * block.w };
+          const p3 = { x: p0.x + v.dx * block.h, y: p0.y + v.dy * block.h };
+          const p2 = { x: p1.x + v.dx * block.h, y: p1.y + v.dy * block.h };
+          return [p0, p1, p2, p3];
+        };
+
+        for (const block of CAMPUS_BLOCKS) {
+          if ((block.type === "road-h" || block.type === "road-v") && !showRoads) continue;
+          const pts = pointsFor(block);
+          const points = pts.map((p) => p.x + "," + p.y).join(" ");
+          const cx = (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4;
+          const cy = (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4;
+
+          if (block.type === "road-h" || block.type === "road-v") {
+            add("polygon", { class: "campus-road", points });
+            add("text", { class: "campus-label", x: cx, y: cy + 6 }, block.label);
+            continue;
           }
-          const toneClass =
-            buildingCfg.tone === "campus"
-              ? "building-frame-campus"
-              : buildingCfg.tone === "underground"
-                ? "building-frame-underground"
-                : "building-frame-main";
-          const frameClass = "building-frame " + toneClass;
-          add("rect", {
-            class: frameClass,
-            x: minX - marginX,
-            y: minY - marginY,
-            width: maxX - minX + marginX * 2,
-            height: maxY - minY + marginY * 2
-          });
 
-          add("text", { class: "section-title", x: minX - marginX + 16, y: minY - marginY + 28 }, buildingCfg.label);
-
-          const layers = [...new Set(buildingRooms.map((room) => room.layer))].sort(
-            (a, b) => (layerIndexById.get(a) || 0) - (layerIndexById.get(b) || 0)
-          );
-          for (const layerId of layers) {
-            const layerRooms = buildingRooms.filter((room) => room.layer === layerId);
-            if (!layerRooms.length) continue;
-            const bandMinY = Math.min(...layerRooms.map((room) => roomRect(room).y)) - 18;
-            const bandMaxY = Math.max(...layerRooms.map((room) => roomRect(room).y + roomRect(room).h)) + 18;
-            add("rect", {
-              class: "building-layer-band",
-              x: minX - marginX + 14,
-              y: bandMinY,
-              width: maxX - minX + marginX * 2 - 28,
-              height: bandMaxY - bandMinY
-            });
-            add("text", { class: "room-label-id", x: maxX + marginX - 34, y: bandMinY + 14 }, layerId);
+          const className =
+            block.type === "building-central" ? "campus-building campus-central campus-accent" : "campus-building";
+          add("polygon", { class: className, points });
+          add("text", { class: "campus-label", x: cx, y: cy - 10 }, block.label);
+          if (block.sub) {
+            add("text", { class: "campus-sub", x: cx, y: cy + 16 }, block.sub);
           }
         }
       }
 
       function drawLegend() {
-        const x = LAYER_X + 30;
+        const x = 30;
         const y = 60;
         add("rect", {
           class: "building-frame",
           x,
           y,
-          width: 360,
-          height: 158
+          width: 470,
+          height: 122
         });
         add("text", { class: "legend-title", x: x + 16, y: y + 24 }, "Legend");
-        add("line", { class: "edge", x1: x + 18, y1: y + 44, x2: x + 108, y2: y + 44 });
-        add("text", { class: "room-label-id", x: x + 180, y: y + 44 }, "normal route");
-        add("line", { class: "edge edge-enter", x1: x + 18, y1: y + 66, x2: x + 108, y2: y + 66 });
-        add("text", { class: "room-label-id", x: x + 200, y: y + 66 }, "enter/special action");
-        add("line", { class: "edge edge-puzzle", x1: x + 18, y1: y + 88, x2: x + 108, y2: y + 88 });
-        add("text", { class: "room-label-id", x: x + 170, y: y + 88 }, "puzzle-gated path");
-        add("line", { class: "edge edge-restricted", x1: x + 18, y1: y + 110, x2: x + 108, y2: y + 110 });
-        add("text", { class: "room-label-id", x: x + 180, y: y + 110 }, "restricted path");
-        add("line", { class: "edge edge-cross", x1: x + 18, y1: y + 132, x2: x + 108, y2: y + 132 });
-        add("text", { class: "room-label-id", x: x + 205, y: y + 132 }, "cross-building connection");
+        add("rect", { class: "campus-building campus-central", x: x + 16, y: y + 38, width: 36, height: 20 });
+        add("text", { class: "room-label-id", x: x + 160, y: y + 50 }, "central complex building");
+        add("rect", { class: "campus-building", x: x + 16, y: y + 66, width: 36, height: 20 });
+        add("text", { class: "room-label-id", x: x + 130, y: y + 78 }, "standalone building");
+        add("rect", { class: "campus-road", x: x + 16, y: y + 94, width: 36, height: 12, rx: 5 });
+        add("text", { class: "room-label-id", x: x + 112, y: y + 102 }, "street/road");
+        add("text", { class: "room-label-id", x: x + 338, y: y + 78 }, "rooms/edges temporarily hidden");
+      }
+
+      function drawDirectionArrow(x, y, dx, dy, label, stroke) {
+        add("line", { class: "dir-line", x1: x, y1: y, x2: x + dx, y2: y + dy, stroke });
+        add("text", { class: "dir-label", x: x + dx + Math.sign(dx || 1) * 18, y: y + dy + (dy < 0 ? -8 : 14) }, label);
+      }
+
+      function drawPlacementGridAndLegend() {
+        const gridX0 = TILE_GRID.originX;
+        const gridY0 = TILE_GRID.originY;
+        const anchorAt = (c, r) => ({
+          x: gridX0 + c * STEP_E.dx + r * STEP_S.dx,
+          y: gridY0 + c * STEP_E.dy + r * STEP_S.dy
+        });
+        const colToLetters = (index) => {
+          let n = index + 1;
+          let s = "";
+          while (n > 0) {
+            const rem = (n - 1) % 26;
+            s = String.fromCharCode(65 + rem) + s;
+            n = Math.floor((n - 1) / 26);
+          }
+          return s;
+        };
+
+        for (let c = 0; c < TILE_GRID.cols; c += 1) {
+          for (let r = 0; r < TILE_GRID.rows; r += 1) {
+            const p0 = anchorAt(c, r);
+            const p1 = { x: p0.x + ISO_BASIS_E.dx, y: p0.y + ISO_BASIS_E.dy };
+            const p3 = { x: p0.x + ISO_BASIS_S.dx, y: p0.y + ISO_BASIS_S.dy };
+            const p2 = { x: p1.x + ISO_BASIS_S.dx, y: p1.y + ISO_BASIS_S.dy };
+            const className = "tile-grid-cell";
+            add("polygon", {
+              class: className,
+              points: p0.x + "," + p0.y + " " + p1.x + "," + p1.y + " " + p2.x + "," + p2.y + " " + p3.x + "," + p3.y
+            });
+
+            const center = {
+              x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
+              y: p0.y + (ISO_BASIS_E.dy + ISO_BASIS_S.dy) * 0.5
+            };
+            const file = colToLetters(c);
+            const rank = TILE_GRID.rows - r; // A1 = bottom-left
+            add("text", { class: "tile-grid-coord", x: center.x, y: center.y }, file + rank);
+          }
+        }
+        for (let c = 0; c <= TILE_GRID.cols; c += 1) {
+          for (let r = 0; r <= TILE_GRID.rows; r += 1) {
+            const p = anchorAt(c, r);
+            add("circle", {
+              class: "tile-grid-point",
+              cx: p.x,
+              cy: p.y,
+              r: 2.2
+            });
+          }
+        }
+
+        const vx = 4950;
+        const vy = 620;
+        add("rect", { class: "building-frame", x: 4620, y: 310, width: 1170, height: 520 });
+        add("text", { class: "legend-title", x: 4640, y: 336 }, "Tile Direction Grid");
+        add(
+          "text",
+          { class: "room-label-id", x: 4780, y: 360 },
+            "iso tile basis: E(" +
+            ISO_BASIS_E.dx +
+            "," +
+            ISO_BASIS_E.dy +
+            "), S(" +
+            ISO_BASIS_S.dx +
+            "," +
+            ISO_BASIS_S.dy +
+            "), N tilt=" +
+            TILE_GRID.northTiltFromVerticalDeg +
+            "deg, gutter=0.5 tile/side (step=2.0x), level=" +
+            TILE_GRID.levelY
+        );
+        add("circle", { class: "tile-grid-point", cx: vx, cy: vy, r: 4 });
+        add("text", { class: "room-label-id", x: vx + 52, y: vy + 4 }, "origin");
+
+        const scale = 0.55;
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.N.dx * scale, DIRECTION_VECTORS.N.dy * scale, "N", "#8fb9cf");
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NE.dx * scale, DIRECTION_VECTORS.NE.dy * scale, "NE", "#8fb9cf");
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.E.dx * scale, DIRECTION_VECTORS.E.dy * scale, "E", "#8fb9cf");
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SE.dx * scale, DIRECTION_VECTORS.SE.dy * scale, "SE", "#8fb9cf");
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.S.dx * scale, DIRECTION_VECTORS.S.dy * scale, "S", "#8fb9cf");
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SW.dx * scale, DIRECTION_VECTORS.SW.dy * scale, "SW", "#8fb9cf");
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.W.dx * scale, DIRECTION_VECTORS.W.dy * scale, "W", "#8fb9cf");
+        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NW.dx * scale, DIRECTION_VECTORS.NW.dy * scale, "NW", "#8fb9cf");
+        drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.UP.dx, DIRECTION_VECTORS.UP.dy * 0.55, "UP", "#d8cfb3");
+        drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.DOWN.dx, DIRECTION_VECTORS.DOWN.dy * 0.55, "DOWN", "#d8cfb3");
       }
 
       function draw() {
@@ -1375,74 +1604,28 @@
         enterPath.setAttribute("fill", "#93b7ff");
         enterMarker.appendChild(enterPath);
 
+        const gridMarker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+        gridMarker.setAttribute("id", "arrow-grid");
+        gridMarker.setAttribute("viewBox", "0 0 10 10");
+        gridMarker.setAttribute("refX", "9");
+        gridMarker.setAttribute("refY", "5");
+        gridMarker.setAttribute("markerWidth", "7");
+        gridMarker.setAttribute("markerHeight", "7");
+        gridMarker.setAttribute("orient", "auto-start-reverse");
+        defs.appendChild(gridMarker);
+        const gridPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        gridPath.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+        gridPath.setAttribute("fill", "#d8cfb3");
+        gridMarker.appendChild(gridPath);
+
         add("rect", { x: 0, y: 0, width: WORLD_W, height: WORLD_H, fill: "transparent" });
 
-        for (const layer of MAP_MODEL.layers) {
-          add("rect", { class: "layer", x: LAYER_X, y: layer.y, width: LAYER_W, height: layer.h });
-          add("text", { class: "layer-title", x: LAYER_X + LAYER_W / 2, y: layer.y + 28 }, layer.id);
-        }
-
-        const labelsOn = document.getElementById("toggle-labels").checked;
-        const showEnter = document.getElementById("toggle-enter").checked;
-        const showBuildings = document.getElementById("toggle-buildings").checked;
-        const showBands = document.getElementById("toggle-bands").checked;
-
-        if (showBuildings) {
-          drawBuildingFrames();
-        }
-        if (!showBands) {
-          const bands = viewport.querySelectorAll(".building-layer-band, .room-label-id");
-          for (const el of bands) {
-            if (el.textContent && /^L[+\-0-9]+$/.test(el.textContent)) {
-              el.remove();
-            }
-          }
-        }
-
-        drawLegend();
-
-        for (const edge of edges.filter((e) => e.type !== "enter")) {
-          const from = roomById.get(edge.from);
-          const to = roomById.get(edge.to);
-          if (!from || !to) continue;
-
-          const p = edgeEndpoints(from, to);
-          let edgeClass =
-            edge.type === "puzzle" ? "edge edge-puzzle" : edge.type === "restricted" ? "edge edge-restricted" : "edge";
-          if (edge.crossBuilding) edgeClass += " edge-cross";
-          add("line", { class: edgeClass, x1: p.x1, y1: p.y1, x2: p.x2, y2: p.y2 });
-
-          if (labelsOn) {
-            const mx = (p.x1 + p.x2) / 2;
-            const my = (p.y1 + p.y2) / 2;
-            drawEdgeLabel(mx, my, edge.label);
-          }
-        }
-
-        for (const edge of edges.filter((e) => e.type === "enter")) {
-          if (edge.type === "enter" && !showEnter) continue;
-          const from = roomById.get(edge.from);
-          const to = roomById.get(edge.to);
-          if (!from || !to) continue;
-
-          const p = edgeEndpoints(from, to);
-          add("line", { class: "edge edge-enter", x1: p.x1, y1: p.y1, x2: p.x2, y2: p.y2 });
-
-          if (labelsOn) {
-            const mx = (p.x1 + p.x2) / 2;
-            const my = (p.y1 + p.y2) / 2;
-            drawEdgeLabel(mx, my, edge.label);
-          }
-        }
-
-        for (const room of MAP_MODEL.rooms) {
-          const roomClass = "room room-section-" + room.section.toLowerCase();
-          add("polygon", { class: roomClass, points: roomIsoPoints(room) });
-          add("text", { class: "room-label", x: room.x, y: room.y - 7 }, room.label);
-          if (typeof room.locationId === "number") {
-            add("text", { class: "room-label-id", x: room.x, y: room.y + 10 }, "[" + String(room.locationId) + "]");
-          }
-        }
+        const showRoads = document.getElementById("toggle-roads").checked;
+        const showLegend = document.getElementById("toggle-legend").checked;
+        const showGrid = document.getElementById("toggle-grid").checked;
+        drawCampusLayout(showRoads);
+        if (showLegend) drawLegend();
+        if (showGrid) drawPlacementGridAndLegend();
 
         if (!panZoom.hasUserMoved) {
           setInitialView();
@@ -1465,14 +1648,12 @@
 
       function setInitialView() {
         const rect = svg.getBoundingClientRect();
-        if (!MAP_MODEL.rooms.length) return;
+        if (!CAMPUS_BLOCKS.length) return;
 
-        // Fit the full prototype map on open (instead of focusing a single room),
-        // with a slight top bias to match the desired overview framing.
-        const minX = Math.min(...MAP_MODEL.rooms.map((room) => room.x - ROOM_W / 2)) - SECTION_FRAME_MARGIN_X - 30;
-        const maxX = Math.max(...MAP_MODEL.rooms.map((room) => room.x + ROOM_W / 2)) + SECTION_FRAME_MARGIN_X + 30;
-        const minY = Math.min(...MAP_MODEL.rooms.map((room) => room.y - ROOM_H / 2)) - SECTION_FRAME_MARGIN_Y - 24;
-        const maxY = Math.max(...MAP_MODEL.rooms.map((room) => room.y + ROOM_H / 2)) + SECTION_FRAME_MARGIN_Y + 24;
+        const minX = Math.min(...CAMPUS_BLOCKS.map((block) => block.x)) - 180;
+        const maxX = Math.max(...CAMPUS_BLOCKS.map((block) => block.x + block.w)) + 180;
+        const minY = Math.min(...CAMPUS_BLOCKS.map((block) => block.y)) - 140;
+        const maxY = Math.max(...CAMPUS_BLOCKS.map((block) => block.y + block.h)) + 160;
         const mapW = Math.max(1, maxX - minX);
         const mapH = Math.max(1, maxY - minY);
 
@@ -1485,10 +1666,28 @@
         const fitScale = Math.min(usableW / mapW, usableH / mapH);
         panZoom.scale = clamp(fitScale, panZoom.minScale, panZoom.maxScale);
 
-        const freeW = usableW - mapW * panZoom.scale;
-        const freeH = usableH - mapH * panZoom.scale;
-        panZoom.tx = outerPadX + freeW / 2 - minX * panZoom.scale;
-        panZoom.ty = outerPadTop + freeH * 0.18 - minY * panZoom.scale;
+        const anchorAt = (col, rowFromTop) => ({
+          x: TILE_GRID.originX + col * STEP_E.dx + rowFromTop * STEP_S.dx,
+          y: TILE_GRID.originY + col * STEP_E.dy + rowFromTop * STEP_S.dy
+        });
+        const tileCenter = (fileIndex, rank) => {
+          const rowFromTop = TILE_GRID.rows - rank;
+          const p0 = anchorAt(fileIndex, rowFromTop);
+          return {
+            x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
+            y: p0.y + (ISO_BASIS_E.dy + ISO_BASIS_S.dy) * 0.5
+          };
+        };
+        // Focus start view on midpoint between G6 and H6.
+        const g6 = tileCenter(6, 6);
+        const h6 = tileCenter(7, 6);
+        const target = {
+          x: (g6.x + h6.x) / 2,
+          y: (g6.y + h6.y) / 2
+        };
+
+        panZoom.tx = rect.width / 2 - target.x * panZoom.scale;
+        panZoom.ty = rect.height / 2 - target.y * panZoom.scale;
         applyTransform();
       }
 
@@ -1534,10 +1733,9 @@
         applyTransform();
       }
 
-      document.getElementById("toggle-labels").addEventListener("change", draw);
-      document.getElementById("toggle-enter").addEventListener("change", draw);
-      document.getElementById("toggle-buildings").addEventListener("change", draw);
-      document.getElementById("toggle-bands").addEventListener("change", draw);
+      document.getElementById("toggle-roads").addEventListener("change", draw);
+      document.getElementById("toggle-legend").addEventListener("change", draw);
+      document.getElementById("toggle-grid").addEventListener("change", draw);
       svg.addEventListener("mousedown", onPointerDown);
       window.addEventListener("mousemove", onPointerMove);
       window.addEventListener("mouseup", onPointerUp);
