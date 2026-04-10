@@ -202,31 +202,25 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Repeated-name normalisatie doorgevoerd voor leesbaarheid (`Infinite Corridor [W1..W5]`, `Steam Tunnel [S1..S5]`, `Wet Tunnel [Inset ...]`, `Smith Street [W/E]`).
    - Layer- en section-uitlijning gefinaliseerd: dynamische layer-bounds volgen nu de kaartinhoud en houden section-frame marges links/rechts correct binnen de hoogtelagen.
 
+51. [done] Synchronize map-locations documentation with the current prototype.
+   - Added `docs/MAP_LOCATIONS.md` as a prototype-synced index for room/location mapping and prototype entry points.
+   - Linked canonical map reference (`docs/LOCATION_MAP.md`) and both prototype pages (`src/map-prototype.html`, `src/map-prototype-2.html`).
+   - Captured synchronized naming/ID conventions and area-group baseline for the next prototype cycle.
+
+52. [done] Update `README.md` with installation/start instructions and map prototype links.
+   - Added a dedicated **Installation** section with static-server startup flow and direct local URLs.
+   - Added explicit links to prototype map v1/v2 and `docs/MAP_LOCATIONS.md`.
+   - Extended the documentation index with `docs/MAP_LOCATIONS.md`.
+
+53. [done] Refine de prototype kaart verder in een tweede prototype.
+   - Added `src/map-prototype-2.html` as a separate building-first prototype track.
+   - Implemented isometric room cards (parallelogram geometry) and building-based clustering.
+   - Added per-building local level bands/layer labels and a map legend for edge semantics.
+   - Kept 8-direction edge labels visible and highlighted cross-building links for readability.
+
 ## Pending Tasks
 
-51. [pending] Synchronize the MAP_LOCATIONS.Md with our current map prototype.
-
-52. [pending] Update readme: add installation section and a link to the map prototype in the MAP_LOCATIONS.md
-
-53. [pending] Refine de prototype kaart verder in een tweede prototype.
-   - Deliverable: nieuw prototypebestand `src/map-prototype-2.html` voor iteratie los van `src/map-prototype.html`.
-   - Scopegrens t.o.v. taak 52: alleen prototype/layout en visualisatie; geen runtime player-truth/visited-state/logica.
-   - Definition of done:
-     - isometrische room-weergave (parallellogram-stijl) toegepast
-     - indeling op gebouwniveau i.p.v. sectieblokken
-     - per gebouw eigen hoogtebanden/layers (niet globaal voor hele kaart)
-     - 8-richtingen exits zichtbaar in edge-labels/verbindingen
-     - zichtbare legenda voor verbindingstypes en kaartnotatie
-   - isometrische weergave testen
-   - kaart indelen niet in secties maar in "gebouwen"
-   - Bepaal en documenteer de concrete area-groupings (bijv. main building, brown building/computer lab, temporary lab en andere scheidbare clusters) op basis van de bestaande university overview map (`src/assets/gfx/maps/university_overview_map.jpg`).
-   - binnen "gebouwsecties" de kaart indelen in vast stramien: uiterlijk gebruiken we paralellogrammen (isometrisch, zie booklet) maar voor plaatsing doen we dat op een grid van standaard rechthoeken met standaard ruimte er tussen. De plaatsing van de gebouwsecties op de kaart kunnen we wel vrij indelen.
-   - Gridformaat en spacing bepalen op basis van de verhoudingen/leesbaarheid uit het eerste prototype (`src/map-prototype.html`) en daarna consistent toepassen.
-   - The map should be isometric, and with different layers for height within each building (so the layers are not the same for every building), and 8 directions for exits for each room.
-   - Achtergrondstijl per gebouw (bijv. blauwdruk vs buitenaanzicht) is uitgesteld naar een vervolgstap en valt niet binnen de eerste oplevering van deze taak.
-   - legenda voor de verbindingen en voor de kaartweergave zelf maken. Bekijk booklet-page3.png voor de twee legenda.
-
-54. [pending] Add an in-game map of visited locations while adventuring.
+51. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -242,7 +236,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-55. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+52. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability

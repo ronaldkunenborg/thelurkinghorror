@@ -119,6 +119,23 @@ These are used as map/reference material during location reconciliation work.
 - [`src/assets/gfx/lurkinghorror/`](src/assets/gfx/lurkinghorror/) - location artwork set.
 - [`src/assets/gfx/blood/`](src/assets/gfx/blood/) - blood-splatter overlays used by the ambient blood effect.
 
+## Installation
+
+No build step is required for the current app/prototype pages.
+
+1. Ensure you have a local copy of the required story asset:
+   - `../data/The_Lurking_Horror_Infocom_Release_219_Serial_870912.z3`
+2. Start a local static file server from `app/` (example):
+   - `python -m http.server 8080`
+3. Open in your browser:
+   - Main interpreter: `http://localhost:8080/src/index.html`
+   - Prototype map v1: `http://localhost:8080/src/map-prototype.html`
+   - Prototype map v2: `http://localhost:8080/src/map-prototype-2.html`
+
+Map-location sync index:
+
+- [`docs/MAP_LOCATIONS.md`](docs/MAP_LOCATIONS.md)
+
 ## Testing
 
 Useful local checks:
@@ -139,6 +156,7 @@ Useful local checks:
 - [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architectural decision record for Quetzal persistence.
 - [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter QoL extensions and behavior notes.
 - [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - spoiler-heavy technical/reference map.
+- [`docs/MAP_LOCATIONS.md`](docs/MAP_LOCATIONS.md) - prototype-synced map-location index and prototype entry points.
 - [`docs/LOCATION_IMAGE_BRIEFS.md`](docs/LOCATION_IMAGE_BRIEFS.md) - location title/description briefs for image generation workflows.
 - [`docs/HORROR_GLYPH_SET_PLAN.md`](docs/HORROR_GLYPH_SET_PLAN.md) - initial design plan for custom occult glyphs used in rune/icon glitch effects.
 

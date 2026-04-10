@@ -2,6 +2,8 @@
 
 This document is the working reconciliation layer between the local game engine and the canonical boxed map.
 
+For prototype-synced room/location indexing and direct prototype links, see [`MAP_LOCATIONS.md`](./MAP_LOCATIONS.md).
+
 Canonical map sources:
 
 - [`../data/lurking.pdf`](../data/lurking.pdf) - boxed-map PDF
