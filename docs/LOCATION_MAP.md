@@ -61,13 +61,13 @@ The current engine-derived room inventory lines up well with the boxed map's maj
 - duplicated room names should be presented as canonical groups rather than as isolated object ids
 - the world is better understood as page-level sections, not as one flat technical adjacency dump
 - the Dream area is a distinct boxed subsection, not just three loose nodes
-- the Wet Tunnels are a numbered inset on the boxed map and should eventually be reconciled to a player-facing numbering scheme rather than repeated generic `Wet Tunnel` labels
+- Wet Tunnels are represented in prototype v1 as explicit numbered inset nodes (`Inset 1..11`) plus an `Outer` connector to `Inner Lair`
 - the boxed map legend distinguishes one-way, puzzle-gated, restricted, and cross-section passages; the current Mermaid graph does not yet encode all of those distinctions cleanly
 
 Known mismatches or still-open reconciliation points:
 
 - the Mermaid graph still uses engine object ids to disambiguate repeated room names
-- the numbered Wet Tunnels inset has not yet been fully mapped from booklet numbering to specific engine room ids
+- discovery JSON still exposes raw repeated `Wet Tunnel` room-id connectivity; prototype v1 intentionally normalizes this into booklet-style inset nodes for readability
 - several puzzle-only or routine-driven links are known from the booklet, but still need cleaner player-facing labels in this doc
 
 ## Spoiler policy
@@ -236,7 +236,7 @@ flowchart TB
   BT -- "south" --> CT["Cinderblock Tunnel"]
 ```
 
-### D) Utility underground (`booklet-page4.png`)
+### D) Utility underground (`booklet-page4.png`, prototype-v1 synced)
 
 ```mermaid
 flowchart LR
@@ -252,8 +252,9 @@ flowchart LR
   SW -- "up" --> AL["Aero Lobby"]
   SUB -- "northwest" --> TOMB["Tomb"]
   ST1 -- "down" --> LC["Large Chamber"]
-  LC -- "down" --> WT["Wet Tunnels"]
-  WT -- "east" --> IL["Inner Lair"]
+  LC -- "down" --> W1["Wet Tunnel [Inset 1]"]
+  ST5 -- "down" --> WO["Wet Tunnel [Outer]"]
+  WO -- "east" --> IL["Inner Lair"]
 ```
 
 ### E) Dream inset (`booklet-page4.png`, special)
@@ -264,34 +265,59 @@ flowchart TB
   BB -- "down" --> AP["At Platform [SFX]"]
 ```
 
-### F) Wet tunnels inset (`booklet-page4.png`, abstracted)
+### F) Wet tunnels inset (`booklet-page4.png`, prototype-v1 synced)
 
 ```mermaid
 flowchart TD
-  W1["Wet Tunnel 1"]
-  W2["Wet Tunnel 2"]
-  W3["Wet Tunnel 3"]
-  W4["Wet Tunnel 4"]
-  W5["Wet Tunnel 5"]
-  W6["Wet Tunnel 6"]
-  W7["Wet Tunnel 7"]
-  W8["Wet Tunnel 8"]
-  W9["Wet Tunnel 9"]
-  W10["Wet Tunnel 10"]
-  W11["Wet Tunnel 11"]
+  W1["Wet Tunnel [Inset 1]"]
+  W2["Wet Tunnel [Inset 2]"]
+  W3["Wet Tunnel [Inset 3]"]
+  W4["Wet Tunnel [Inset 4]"]
+  W5["Wet Tunnel [Inset 5]"]
+  W6["Wet Tunnel [Inset 6]"]
+  W7["Wet Tunnel [Inset 7]"]
+  W8["Wet Tunnel [Inset 8]"]
+  W9["Wet Tunnel [Inset 9]"]
+  W10["Wet Tunnel [Inset 10]"]
+  W11["Wet Tunnel [Inset 11]"]
+  WO["Wet Tunnel [Outer]"]
+  IL["Inner Lair"]
 
-  W1 ---|passage| W2
-  W2 ---|passage| W3
-  W3 ---|passage| W4
-  W4 ---|passage| W5
-  W2 ---|passage| W6
-  W2 ---|passage| W7
-  W3 ---|passage| W7
-  W4 ---|passage| W10
-  W5 ---|passage| W11
-  W6 ---|passage| W9
-  W9 ---|passage| W11
+  W1 -->|passage| W2
+  W2 -->|passage| W3
+  W2 -->|passage| W6
+  W2 -->|passage| W7
+  W2 -->|passage| W8
+  W3 -->|passage| W4
+  W3 -->|passage| W7
+  W4 -->|passage| W5
+  W5 -->|passage| W11
+  W5 -->|down| WO
+  W6 -->|passage| W8
+  W6 -->|puzzle| W9
+  W8 -->|passage| W9
+  W9 -->|passage| W11
+  WO -->|east| IL
 ```
+
+Prototype-v1 wet-tunnel inset node-to-id mapping (current calibration):
+
+- `Inset 1 -> 187`
+- `Inset 2 -> 164`
+- `Inset 3 -> 15`
+- `Inset 4 -> 131`
+- `Inset 5 -> 234`
+- `Inset 6 -> 117`
+- `Inset 7 -> 87`
+- `Inset 8 -> 51`
+- `Inset 9 -> 232`
+- `Inset 10 -> 161`
+- `Inset 11 -> 184`
+- `Outer -> 181`
+
+Note:
+
+- In prototype v1 these IDs are intentionally also shown in `Section U - Unknown Locations` for debugging/ID-tracing, while spatial wet-tunnel layout is driven by the inset labels above.
 
 ## Canonical grouping crosswalk
 
@@ -317,7 +343,7 @@ This crosswalk records how the current engine-discovered rooms line up with the 
 - `Muddy Tunnel (39)`, `Tunnel Entrance (34)`, `Steam Tunnel (66, 78, 138, 221, 227)`, `Concrete Box (37)` -> main tunnel chain
 - `Renovated Cave (201)`, `Before the Altar (149)`, `Brick Tunnel (25)`, `Lab (42)`, `Cinderblock Tunnel (17)` -> east underground branch
 - `Place (152)`, `Basalt Bowl (134)`, `At Platform (21)` -> Dream inset
-- `Large Chamber (99)`, `Inner Lair (69)`, and the repeated `Wet Tunnel` rooms (`15`, `51`, `87`, `117`, `131`, `161`, `164`, `181`, `184`, `187`, `232`, `234`) -> Wet Tunnels section still awaiting numbered reconciliation
+- `Large Chamber (99)`, `Inner Lair (69)`, and repeated `Wet Tunnel` rooms (`15`, `51`, `87`, `117`, `131`, `161`, `164`, `181`, `184`, `187`, `232`, `234`) -> represented in prototype v1 as `Wet Tunnel [Inset 1..11]` + `Wet Tunnel [Outer]` with the mapping listed above
 
 ## Location inventory
 
@@ -408,7 +434,7 @@ Inference rule used here: if a routine-driven `exit` has exactly one standard in
   - `Infinite Corridor <-> Chemistry Building` (`206`/`248`)
   - `Infinite Corridor <-> Fruits and Nuts` (`206`/`150`)
 - Consistent with booklet, but room-id-specific confirmation is limited by repeated labels/inset numbering:
-  - `Large Chamber down -> Wet Tunnel` (`99 -> 187`) matches the `Large Chamber -> Wet Tunnels` descent, but booklet uses numbered wet-tunnel nodes rather than engine ids.
+  - `Large Chamber down -> Wet Tunnel [Inset 1]` (`99 -> 187`) is now explicitly represented in prototype v1 as the entry into the inset chain.
   - Steam-tunnel chain inferences (`78 -> 66`, `138 -> 78`, `221 -> 34`, `227 -> 221`) are consistent with the linear Steam Tunnel sequence, but identical `Steam Tunnel` labels limit exact per-id validation from the booklet alone.
   - Infinite-corridor east-links (`208 -> 206`, `210 -> 208`, `214 -> 210`, `218 -> 214`) are consistent with the five-node corridor spine ordering, though booklet labels these nodes generically as `Infinite Corridor`.
 - No inferred reverse-link currently contradicts the booklet maps.
