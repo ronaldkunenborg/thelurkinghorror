@@ -221,6 +221,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 ## Pending Tasks
 
 54. [pending] Refine `src/map-prototype-2.html` layout until fully aligned with the campus map.
+   - steam-keten moet opnieuw worden bekeken.
    - Keep connection topology as-is unless a mismatch with prototype v1 or `tools/location-map-discovery.json` is confirmed.
    - Refine per-building internal layout so room spacing/readability is stable and consistent with building-specific structure.
    - Refine global inter-building placement so the relative building arrangement matches the university campus map.
