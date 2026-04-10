@@ -2,7 +2,25 @@
 
 This document is the working reconciliation layer between the local game engine and the canonical boxed map.
 
-For prototype-synced room/location indexing and direct prototype links, see [`MAP_LOCATIONS.md`](./MAP_LOCATIONS.md).
+## Prototype sync index
+
+This document is also the quick-reference bridge between room-location documentation and the live prototype map pages.
+
+Primary prototype pages:
+
+- Integrated calibrated prototype (v1): [`../src/map-prototype.html`](../src/map-prototype.html)
+- Building-first/isometric experiment track (v2): [`../src/map-prototype-2.html`](../src/map-prototype-2.html)
+
+Synchronization status:
+
+- Last synchronized against prototype content on: `2026-04-10`
+- All known location IDs are rendered in prototype room labels as `[id]`
+- Repeated room names are disambiguated in prototype labels:
+  - `Infinite Corridor [W1..W5]`
+  - `Steam Tunnel [S1..S5]`
+  - `Wet Tunnel [Inset 1..11]` + `Wet Tunnel [Outer]`
+  - `Smith Street [W]` and `Smith Street [E]`
+- Puzzle/restricted paths use distinct line styles while retaining explicit direction labels.
 
 Canonical map sources:
 

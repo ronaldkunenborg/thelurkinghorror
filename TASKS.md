@@ -203,14 +203,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Layer- en section-uitlijning gefinaliseerd: dynamische layer-bounds volgen nu de kaartinhoud en houden section-frame marges links/rechts correct binnen de hoogtelagen.
 
 51. [done] Synchronize map-locations documentation with the current prototype.
-   - Added `docs/MAP_LOCATIONS.md` as a prototype-synced index for room/location mapping and prototype entry points.
-   - Linked canonical map reference (`docs/LOCATION_MAP.md`) and both prototype pages (`src/map-prototype.html`, `src/map-prototype-2.html`).
+   - Integrated prototype-synced index content directly into `docs/LOCATION_MAP.md`.
+   - Linked both prototype pages (`src/map-prototype.html`, `src/map-prototype-2.html`) from `docs/LOCATION_MAP.md`.
    - Captured synchronized naming/ID conventions and area-group baseline for the next prototype cycle.
 
 52. [done] Update `README.md` with installation/start instructions and map prototype links.
-   - Added a dedicated **Installation** section with static-server startup flow and direct local URLs.
-   - Added explicit links to prototype map v1/v2 and `docs/MAP_LOCATIONS.md`.
-   - Extended the documentation index with `docs/MAP_LOCATIONS.md`.
+   - Added a dedicated **Installation** section with `git clone` + direct browser-open workflow.
+   - Added explicit links to prototype map v1/v2 and `docs/LOCATION_MAP.md`.
+   - Kept documentation index aligned with `docs/LOCATION_MAP.md` as the single map reference document.
 
 53. [done] Refine de prototype kaart verder in een tweede prototype.
    - Added `src/map-prototype-2.html` as a separate building-first prototype track.
