@@ -220,7 +220,16 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 
 ## Pending Tasks
 
-51. [pending] Add an in-game map of visited locations while adventuring.
+54. [pending] Refine `src/map-prototype-2.html` layout until fully aligned with the campus map.
+   - Keep connection topology as-is unless a mismatch with prototype v1 or `tools/location-map-discovery.json` is confirmed.
+   - Refine per-building internal layout so room spacing/readability is stable and consistent with building-specific structure.
+   - Refine global inter-building placement so the relative building arrangement matches the university campus map.
+   - Add/refine background graphics per building zone (visual style, placement, opacity) without reducing route readability.
+   - Ensure local layer bands per building are visually coherent and do not clash with room labels/edge labels.
+   - Preserve clear distinction of edge types (`normal`, `enter`, `puzzle`, `restricted`, `cross-building`) and keep compass labels readable.
+   - Use `src/map-prototype.html` as canonical fallback for route correctness and `tools/location-map-discovery.json` for ID/edge verification when conflicts appear.
+
+55. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -236,10 +245,9 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-52. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+56. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
    - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
-

@@ -123,6 +123,20 @@
         dominant-baseline: central;
       }
 
+      .legend-item-label {
+        fill: var(--muted);
+        font-size: 11px;
+        text-anchor: start;
+        dominant-baseline: central;
+      }
+
+      .grid-meta-label {
+        fill: var(--muted);
+        font-size: 11px;
+        text-anchor: start;
+        dominant-baseline: central;
+      }
+
       .edge {
         stroke: var(--edge);
         stroke-width: 2;
@@ -290,7 +304,7 @@
       <div class="controls">
         <label><input id="toggle-roads" type="checkbox" checked /> Show roads</label>
         <label><input id="toggle-legend" type="checkbox" checked /> Show legend</label>
-        <label><input id="toggle-grid" type="checkbox" checked /> Show tile grid + direction legend</label>
+        <label><input id="toggle-grid" type="checkbox" checked /> Show tile grid</label>
       </div>
       <div class="frame">
         <svg id="map" viewBox="0 0 1600 980" aria-label="Integrated map prototype"></svg>
@@ -1339,25 +1353,21 @@
       }
 
       const CAMPUS_BLOCKS = [
-        // Anchored to grid tiles:
-        // - Mass Ave spans A1..A11 on the N-axis
-        // - other blocks placed in relative positions from that same grid
-        { id: "mass", type: "road-v", orient: "N", label: "Mass. Ave.", x: 2920, y: 3617.691453624, w: 3780, h: 220 },
-        { id: "smith", type: "road-h", orient: "E", label: "Smith Street", x: 2360, y: 1123.5382907248, w: 3300, h: 180 },
-        { id: "computer", type: "building", orient: "E", label: "Computer Center", sub: "start area", x: 2620, y: 811.7691453624, w: 748, h: 324 },
-        { id: "temp", type: "building", orient: "E", label: "Temporary Lab", sub: "separate wing", x: 3940, y: 811.7691453624, w: 748, h: 324 },
+        // Every block is defined by inclusive tile bounds:
+        // top-left (tl) and bottom-right (br), using grid coordinates (c/rank).
+        // A1 is bottom-left.
+        { id: "mass", type: "road-v", label: "Mass. Ave.", bounds: { tl: { c: 0, rank: 11 }, br: { c: 0, rank: 1 } } },
+        { id: "smith", type: "road-h", label: "Smith Street", bounds: { tl: { c: 0, rank: 9 }, br: { c: 13, rank: 9 } } },
+        { id: "computer", type: "building", label: "Computer Center", sub: "start area", bounds: { tl: { c: 3, rank: 11 }, br: { c: 5, rank: 10 } } },
+        { id: "temp", type: "building", label: "Temporary Lab", sub: "separate wing", bounds: { tl: { c: 6, rank: 11 }, br: { c: 8, rank: 10 } } },
         {
           id: "central",
           type: "building-central",
-          orient: "E",
           label: "Central Complex",
           sub: "Great Dome + Aero + Engineering + Chemistry",
-          x: 2900,
-          y: 2058.845726812,
-          w: 2332,
-          h: 972
+          bounds: { tl: { c: 1, rank: 8 }, br: { c: 7, rank: 4 } }
         },
-        { id: "brown", type: "building", orient: "N", label: "Brown Building", sub: "18-floor skyscraper", x: 5200, y: 2994.1531628992, w: 1188, h: 352 }
+        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 10, rank: 6 }, br: { c: 10, rank: 5 } } }
       ];
 
       // Booklet-inspired placement grid:
@@ -1374,6 +1384,18 @@
         cols: 14,
         rows: 11
       };
+
+      // Keep road spans tied to current grid dimensions.
+      // - Vertical road: full rank span (1..rows)
+      // - Horizontal road: full file span (A..last column)
+      const massRoad = CAMPUS_BLOCKS.find((b) => b.id === "mass");
+      if (massRoad) {
+        massRoad.bounds = { tl: { c: 0, rank: TILE_GRID.rows }, br: { c: 0, rank: 1 } };
+      }
+      const smithRoad = CAMPUS_BLOCKS.find((b) => b.id === "smith");
+      if (smithRoad) {
+        smithRoad.bounds = { tl: { c: 0, rank: 9 }, br: { c: TILE_GRID.cols - 1, rank: 9 } };
+      }
 
       const northTiltRad = (TILE_GRID.northTiltFromVerticalDeg * Math.PI) / 180;
       const axisDx = Math.sin(northTiltRad) * TILE_GRID.axisStep;
@@ -1417,24 +1439,96 @@
         DOWN: { dx: 0, dy: TILE_GRID.levelY }
       };
 
-      function drawCampusLayout(showRoads) {
+      function anchorAtTile(c, rank) {
+        const r = TILE_GRID.rows - rank;
+        return {
+          x: TILE_GRID.originX + c * STEP_E.dx + r * STEP_S.dx,
+          y: TILE_GRID.originY + c * STEP_E.dy + r * STEP_S.dy
+        };
+      }
+
+      function gridAnchor(c, rFromTop) {
+        return {
+          x: TILE_GRID.originX + c * STEP_E.dx + rFromTop * STEP_S.dx,
+          y: TILE_GRID.originY + c * STEP_E.dy + rFromTop * STEP_S.dy
+        };
+      }
+
+      function tileLegendFrame() {
+        const gridCorners = [
+          gridAnchor(0, 0),
+          gridAnchor(TILE_GRID.cols, 0),
+          gridAnchor(0, TILE_GRID.rows),
+          gridAnchor(TILE_GRID.cols, TILE_GRID.rows)
+        ];
+        const gridMinX = Math.min(...gridCorners.map((p) => p.x));
+        const a1Anchor = anchorAtTile(0, 1);
+        const a1P1 = { x: a1Anchor.x + ISO_BASIS_E.dx, y: a1Anchor.y + ISO_BASIS_E.dy };
+        const a1P3 = { x: a1Anchor.x + ISO_BASIS_S.dx, y: a1Anchor.y + ISO_BASIS_S.dy };
+        const a1P2 = { x: a1P1.x + ISO_BASIS_S.dx, y: a1P1.y + ISO_BASIS_S.dy };
+        const a1BottomY = Math.max(a1Anchor.y, a1P1.y, a1P2.y, a1P3.y);
+
+        const w = 1170;
+        const h = 520;
+        const x = Math.max(30, gridMinX - 120);
+        const y = a1BottomY - h;
+        return { x, y, w, h };
+      }
+
+      function blockPoints(block) {
+        if (block.bounds) {
+          const c0 = Math.min(block.bounds.tl.c, block.bounds.br.c);
+          const c1 = Math.max(block.bounds.tl.c, block.bounds.br.c);
+          const rankTop = Math.max(block.bounds.tl.rank, block.bounds.br.rank);
+          const rankBottom = Math.min(block.bounds.tl.rank, block.bounds.br.rank);
+          const spanCols = c1 - c0;
+          const spanRows = rankTop - rankBottom;
+
+          const p0 = anchorAtTile(c0, rankTop);
+          // Include both:
+          // - tile footprint (ISO_BASIS_*)
+          // - gutter spacing between adjacent tile anchors (STEP_*)
+          const p1 = {
+            x: p0.x + spanCols * STEP_E.dx + ISO_BASIS_E.dx,
+            y: p0.y + spanCols * STEP_E.dy + ISO_BASIS_E.dy
+          };
+          const p3 = {
+            x: p0.x + spanRows * STEP_S.dx + ISO_BASIS_S.dx,
+            y: p0.y + spanRows * STEP_S.dy + ISO_BASIS_S.dy
+          };
+          const p2 = {
+            x: p1.x + spanRows * STEP_S.dx + ISO_BASIS_S.dx,
+            y: p1.y + spanRows * STEP_S.dy + ISO_BASIS_S.dy
+          };
+          return [p0, p1, p2, p3];
+        }
+
         const len = (v) => Math.hypot(v.dx, v.dy) || 1;
         const UNIT_E = { dx: ISO_BASIS_E.dx / len(ISO_BASIS_E), dy: ISO_BASIS_E.dy / len(ISO_BASIS_E) };
         const N_AXIS = { dx: -ISO_BASIS_S.dx, dy: -ISO_BASIS_S.dy };
         const UNIT_N = { dx: N_AXIS.dx / len(N_AXIS), dy: N_AXIS.dy / len(N_AXIS) };
-        const pointsFor = (block) => {
-          const u = block.orient === "N" ? UNIT_N : UNIT_E;
-          const v = block.orient === "N" ? UNIT_E : UNIT_N;
-          const p0 = { x: block.x, y: block.y };
-          const p1 = { x: p0.x + u.dx * block.w, y: p0.y + u.dy * block.w };
-          const p3 = { x: p0.x + v.dx * block.h, y: p0.y + v.dy * block.h };
-          const p2 = { x: p1.x + v.dx * block.h, y: p1.y + v.dy * block.h };
-          return [p0, p1, p2, p3];
-        };
+        if (
+          !Number.isFinite(block.x) ||
+          !Number.isFinite(block.y) ||
+          !Number.isFinite(block.w) ||
+          !Number.isFinite(block.h)
+        ) {
+          return [];
+        }
+        const u = block.orient === "N" ? UNIT_N : UNIT_E;
+        const v = block.orient === "N" ? UNIT_E : UNIT_N;
+        const p0 = { x: block.x, y: block.y };
+        const p1 = { x: p0.x + u.dx * block.w, y: p0.y + u.dy * block.w };
+        const p3 = { x: p0.x + v.dx * block.h, y: p0.y + v.dy * block.h };
+        const p2 = { x: p1.x + v.dx * block.h, y: p1.y + v.dy * block.h };
+        return [p0, p1, p2, p3];
+      }
 
+      function drawCampusLayout(showRoads) {
         for (const block of CAMPUS_BLOCKS) {
           if ((block.type === "road-h" || block.type === "road-v") && !showRoads) continue;
-          const pts = pointsFor(block);
+          const pts = blockPoints(block);
+          if (!pts.length) continue;
           const points = pts.map((p) => p.x + "," + p.y).join(" ");
           const cx = (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4;
           const cy = (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4;
@@ -1456,8 +1550,10 @@
       }
 
       function drawLegend() {
-        const x = 30;
-        const y = 60;
+        const frame = tileLegendFrame();
+        const gutterPx = TILE_GUTTER_SIDE * TILE_GRID.cellW;
+        const x = frame.x;
+        const y = frame.y - gutterPx - 122;
         add("rect", {
           class: "building-frame",
           x,
@@ -1467,12 +1563,12 @@
         });
         add("text", { class: "legend-title", x: x + 16, y: y + 24 }, "Legend");
         add("rect", { class: "campus-building campus-central", x: x + 16, y: y + 38, width: 36, height: 20 });
-        add("text", { class: "room-label-id", x: x + 160, y: y + 50 }, "central complex building");
+        add("text", { class: "legend-item-label", x: x + 92, y: y + 50 }, "central complex building");
         add("rect", { class: "campus-building", x: x + 16, y: y + 66, width: 36, height: 20 });
-        add("text", { class: "room-label-id", x: x + 130, y: y + 78 }, "standalone building");
+        add("text", { class: "legend-item-label", x: x + 92, y: y + 78 }, "standalone building");
         add("rect", { class: "campus-road", x: x + 16, y: y + 94, width: 36, height: 12, rx: 5 });
-        add("text", { class: "room-label-id", x: x + 112, y: y + 102 }, "street/road");
-        add("text", { class: "room-label-id", x: x + 338, y: y + 78 }, "rooms/edges temporarily hidden");
+        add("text", { class: "legend-item-label", x: x + 92, y: y + 102 }, "street/road");
+        add("text", { class: "legend-item-label", x: x + 300, y: y + 78 }, "rooms/edges temporarily hidden");
       }
 
       function drawDirectionArrow(x, y, dx, dy, label, stroke) {
@@ -1480,7 +1576,7 @@
         add("text", { class: "dir-label", x: x + dx + Math.sign(dx || 1) * 18, y: y + dy + (dy < 0 ? -8 : 14) }, label);
       }
 
-      function drawPlacementGridAndLegend() {
+      function drawPlacementGridAndLegend(showLegend) {
         const gridX0 = TILE_GRID.originX;
         const gridY0 = TILE_GRID.originY;
         const anchorAt = (c, r) => ({
@@ -1531,40 +1627,49 @@
           }
         }
 
-        const vx = 4950;
-        const vy = 620;
-        add("rect", { class: "building-frame", x: 4620, y: 310, width: 1170, height: 520 });
-        add("text", { class: "legend-title", x: 4640, y: 336 }, "Tile Direction Grid");
-        add(
-          "text",
-          { class: "room-label-id", x: 4780, y: 360 },
-            "iso tile basis: E(" +
-            ISO_BASIS_E.dx +
-            "," +
-            ISO_BASIS_E.dy +
-            "), S(" +
-            ISO_BASIS_S.dx +
-            "," +
-            ISO_BASIS_S.dy +
-            "), N tilt=" +
-            TILE_GRID.northTiltFromVerticalDeg +
-            "deg, gutter=0.5 tile/side (step=2.0x), level=" +
-            TILE_GRID.levelY
-        );
-        add("circle", { class: "tile-grid-point", cx: vx, cy: vy, r: 4 });
-        add("text", { class: "room-label-id", x: vx + 52, y: vy + 4 }, "origin");
+        const frame = tileLegendFrame();
+        const legendW = frame.w;
+        const legendH = frame.h;
+        const legendX = frame.x;
+        const legendY = frame.y;
+        const vx = legendX + 330;
+        const vy = legendY + 310;
 
-        const scale = 0.55;
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.N.dx * scale, DIRECTION_VECTORS.N.dy * scale, "N", "#8fb9cf");
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NE.dx * scale, DIRECTION_VECTORS.NE.dy * scale, "NE", "#8fb9cf");
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.E.dx * scale, DIRECTION_VECTORS.E.dy * scale, "E", "#8fb9cf");
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SE.dx * scale, DIRECTION_VECTORS.SE.dy * scale, "SE", "#8fb9cf");
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.S.dx * scale, DIRECTION_VECTORS.S.dy * scale, "S", "#8fb9cf");
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SW.dx * scale, DIRECTION_VECTORS.SW.dy * scale, "SW", "#8fb9cf");
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.W.dx * scale, DIRECTION_VECTORS.W.dy * scale, "W", "#8fb9cf");
-        drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NW.dx * scale, DIRECTION_VECTORS.NW.dy * scale, "NW", "#8fb9cf");
-        drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.UP.dx, DIRECTION_VECTORS.UP.dy * 0.55, "UP", "#d8cfb3");
-        drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.DOWN.dx, DIRECTION_VECTORS.DOWN.dy * 0.55, "DOWN", "#d8cfb3");
+        if (showLegend) {
+          const fmt = (n) => Number(n).toFixed(2);
+          add("rect", { class: "building-frame", x: legendX, y: legendY, width: legendW, height: legendH });
+          add("text", { class: "legend-title", x: legendX + 20, y: legendY + 26 }, "Tile Direction Grid");
+          add(
+            "text",
+            { class: "grid-meta-label", x: legendX + 20, y: legendY + 50 },
+              "iso tile basis: E(" +
+              fmt(ISO_BASIS_E.dx) +
+              "," +
+              fmt(ISO_BASIS_E.dy) +
+              "), S(" +
+              fmt(ISO_BASIS_S.dx) +
+              "," +
+              fmt(ISO_BASIS_S.dy) +
+              "), N tilt=" +
+              TILE_GRID.northTiltFromVerticalDeg +
+              "deg, gutter=0.5 tile/side (step=2.0x), level=" +
+              TILE_GRID.levelY
+          );
+          add("circle", { class: "tile-grid-point", cx: vx, cy: vy, r: 4 });
+          add("text", { class: "grid-meta-label", x: vx + 52, y: vy + 4 }, "origin");
+
+          const scale = 0.55;
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.N.dx * scale, DIRECTION_VECTORS.N.dy * scale, "N", "#8fb9cf");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NE.dx * scale, DIRECTION_VECTORS.NE.dy * scale, "NE", "#8fb9cf");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.E.dx * scale, DIRECTION_VECTORS.E.dy * scale, "E", "#8fb9cf");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SE.dx * scale, DIRECTION_VECTORS.SE.dy * scale, "SE", "#8fb9cf");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.S.dx * scale, DIRECTION_VECTORS.S.dy * scale, "S", "#8fb9cf");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SW.dx * scale, DIRECTION_VECTORS.SW.dy * scale, "SW", "#8fb9cf");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.W.dx * scale, DIRECTION_VECTORS.W.dy * scale, "W", "#8fb9cf");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NW.dx * scale, DIRECTION_VECTORS.NW.dy * scale, "NW", "#8fb9cf");
+          drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.UP.dx, DIRECTION_VECTORS.UP.dy * 0.55, "UP", "#d8cfb3");
+          drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.DOWN.dx, DIRECTION_VECTORS.DOWN.dy * 0.55, "DOWN", "#d8cfb3");
+        }
       }
 
       function draw() {
@@ -1625,7 +1730,7 @@
         const showGrid = document.getElementById("toggle-grid").checked;
         drawCampusLayout(showRoads);
         if (showLegend) drawLegend();
-        if (showGrid) drawPlacementGridAndLegend();
+        if (showGrid) drawPlacementGridAndLegend(showLegend);
 
         if (!panZoom.hasUserMoved) {
           setInitialView();
@@ -1640,6 +1745,7 @@
 
       function applyTransform() {
         if (!viewport) return;
+        if (!Number.isFinite(panZoom.tx) || !Number.isFinite(panZoom.ty) || !Number.isFinite(panZoom.scale)) return;
         viewport.setAttribute(
           "transform",
           "translate(" + panZoom.tx.toFixed(2) + " " + panZoom.ty.toFixed(2) + ") scale(" + panZoom.scale.toFixed(4) + ")"
@@ -1649,11 +1755,13 @@
       function setInitialView() {
         const rect = svg.getBoundingClientRect();
         if (!CAMPUS_BLOCKS.length) return;
+        const allPoints = CAMPUS_BLOCKS.flatMap((block) => blockPoints(block));
+        if (!allPoints.length) return;
 
-        const minX = Math.min(...CAMPUS_BLOCKS.map((block) => block.x)) - 180;
-        const maxX = Math.max(...CAMPUS_BLOCKS.map((block) => block.x + block.w)) + 180;
-        const minY = Math.min(...CAMPUS_BLOCKS.map((block) => block.y)) - 140;
-        const maxY = Math.max(...CAMPUS_BLOCKS.map((block) => block.y + block.h)) + 160;
+        const minX = Math.min(...allPoints.map((p) => p.x)) - 180;
+        const maxX = Math.max(...allPoints.map((p) => p.x)) + 180;
+        const minY = Math.min(...allPoints.map((p) => p.y)) - 140;
+        const maxY = Math.max(...allPoints.map((p) => p.y)) + 160;
         const mapW = Math.max(1, maxX - minX);
         const mapH = Math.max(1, maxY - minY);
 
@@ -1666,13 +1774,13 @@
         const fitScale = Math.min(usableW / mapW, usableH / mapH);
         panZoom.scale = clamp(fitScale, panZoom.minScale, panZoom.maxScale);
 
-        const anchorAt = (col, rowFromTop) => ({
+        const anchorAtByRow = (col, rowFromTop) => ({
           x: TILE_GRID.originX + col * STEP_E.dx + rowFromTop * STEP_S.dx,
           y: TILE_GRID.originY + col * STEP_E.dy + rowFromTop * STEP_S.dy
         });
         const tileCenter = (fileIndex, rank) => {
           const rowFromTop = TILE_GRID.rows - rank;
-          const p0 = anchorAt(fileIndex, rowFromTop);
+          const p0 = anchorAtByRow(fileIndex, rowFromTop);
           return {
             x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
             y: p0.y + (ISO_BASIS_E.dy + ISO_BASIS_S.dy) * 0.5

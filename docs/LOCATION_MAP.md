@@ -194,12 +194,14 @@ flowchart LR
   IC4 -- "south" --> CHEM["Chemistry Building"]
   CHEM -- "south" --> ALC["Department of Alchemy"]
   ALC -- "south" --> LAB["Lab"]
-  LAB -- "south" --> CT["Cinderblock Tunnel"]
 
   IC4 -. puzzle/route .-> FN["Fruits and Nuts"]
-  FN -- "east" --> CP["Cluttered Passage"]
-  CP -- "east" --> BB["Brown Building"]
+  FN -- "down" --> CP["Cluttered Passage"]
+  CP -- "up" --> FN
+  CP -- "east" --> BF["Brown Basement"]
+  BF -- "west" --> CP
   BB -- "down" --> BF["Brown Basement"]
+  BF -- "up" --> BB
   BB -- "up" --> TF["Top Floor"]
   TF -- "up" --> SR["Skyscraper Roof"]
   SR -- "up" --> ID["Inside Dome"]

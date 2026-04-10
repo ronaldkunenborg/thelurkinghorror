@@ -408,18 +408,29 @@
           { id: "ogd", label: "On the Great Dome", section: "B", layer: "L+2", x: 1280, y: 180, edges: [] },
           { id: "great_court", label: "Great Court", section: "B", layer: "L0", x: 1080, y: 860, edges: [] },
           { id: "chem", label: "Chemistry Building", section: "B", layer: "L0", x: 1480, y: 860, edges: [{ to: "alc", label: "south" }] },
-          { id: "alc", label: "Dept. of Alchemy", section: "B", layer: "L-1", x: 1480, y: 1000, edges: [{ to: "lab", label: "south" }] },
+          { id: "alc", label: "Dept. of Alchemy", section: "B", layer: "L0", x: 1480, y: 1000, edges: [{ to: "lab", label: "south" }] },
           {
             id: "lab",
             label: "Lab",
             section: "B",
-            layer: "L-1",
+            layer: "L0",
             x: 1480,
             y: 1140,
             edges: []
           },
-          { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "cp", label: "east" }] },
-          { id: "cp", label: "Cluttered Passage", section: "R", layer: "L0", x: 1940, y: 670, edges: [{ to: "brown", label: "east" }] },
+          { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "cp", label: "down" }] },
+          {
+            id: "cp",
+            label: "Cluttered Passage",
+            section: "R",
+            layer: "L-1",
+            x: 1480,
+            y: 1040,
+            edges: [
+              { to: "fn", label: "up" },
+              { to: "brown_b", label: "east" }
+            ]
+          },
           {
             id: "brown",
             label: "Brown Building",
@@ -433,11 +444,22 @@
               { to: "small_court", label: "south" }
             ]
           },
-          { id: "brown_b", label: "Brown Basement", section: "R", layer: "L-1", x: 1760, y: 1140, edges: [] },
+          {
+            id: "brown_b",
+            label: "Brown Basement",
+            section: "R",
+            layer: "L-1",
+            x: 1760,
+            y: 1140,
+            edges: [
+              { to: "cp", label: "west" },
+              { to: "brown", label: "up" }
+            ]
+          },
           { id: "top_floor", label: "Top Floor", section: "R", layer: "L+1", x: 1760, y: 520, edges: [{ to: "sky_roof", label: "up" }] },
           { id: "sky_roof", label: "Skyscraper Roof", section: "R", layer: "L+2", x: 1760, y: 240, edges: [{ to: "inside_dome", label: "up" }] },
-          { id: "inside_dome", label: "Inside Dome", section: "R", layer: "L+2", x: 1980, y: 240, edges: [] },
-          { id: "small_court", label: "Small Courtyard", section: "R", layer: "L0", x: 1760, y: 980, edges: [] },
+          { id: "inside_dome", label: "Inside Dome", section: "R", layer: "L+2", x: 1760, y: 170, edges: [] },
+          { id: "small_court", label: "Small Courtyard", section: "R", layer: "L0", x: 1760, y: 920, edges: [] },
 
           // Section D
           {
@@ -918,13 +940,13 @@
         basalt: { x: 220, y: 310 },
         base: { x: 2740, y: 1605 },
         brick: { x: 3590, y: 2140 },
-        brown: { x: 1760, y: 1310 },
-        brown_b: { x: 1760, y: 1695 },
+        brown: { x: 1760, y: 1080 },
+        brown_b: { x: 1760, y: 1485 },
         chem: { x: 1480, y: 1310 },
         cinder: { x: 3590, y: 2305 },
         computer: { x: 2740, y: 1160 },
-        concrete_box: { x: 2520, y: 2520 },
-        cp: { x: 1940, y: 1025 },
+        concrete_box: { x: 2780, y: 2520 },
+        cp: { x: 1480, y: 1485 },
         dead: { x: 3320, y: 1605 },
         elev_l0: { x: 2520, y: 1250 },
         elev_l1: { x: 2520, y: 900 },
@@ -940,7 +962,7 @@
         ic4: { x: 1280, y: 1160 },
         ic5: { x: 1480, y: 1160 },
         inner_lair: { x: 1340, y: 3120 },
-        inside_dome: { x: 1980, y: 340 },
+        inside_dome: { x: 1760, y: 205 },
         kitchen: { x: 2240, y: 780 },
         lab: { x: 1480, y: 1695 },
         large_chamber: { x: -270, y: 2520 },
@@ -954,7 +976,7 @@
         roof: { x: 2740, y: 205 },
         second: { x: 2740, y: 780 },
         sky_roof: { x: 1760, y: 340 },
-        small_court: { x: 1760, y: 1490 },
+        small_court: { x: 1760, y: 1210 },
         smith1: { x: 2740, y: 1025 },
         smith2: { x: 3060, y: 1025 },
         stair: { x: 680, y: 1605 },
@@ -962,7 +984,7 @@
         steam2: { x: 600, y: 2140 },
         steam3: { x: 1120, y: 2140 },
         steam4: { x: 1820, y: 2140 },
-        steam5: { x: 2740, y: 2140 },
+        steam5: { x: 3000, y: 2140 },
         sub: { x: 680, y: 1990 },
         td: { x: 1080, y: 560 },
         temp_b: { x: 3060, y: 1605 },
@@ -970,7 +992,7 @@
         terminal: { x: 2740, y: 470 },
         third: { x: 2740, y: 590 },
         tomb: { x: 600, y: 1840 },
-        top_floor: { x: 1760, y: 820 },
+        top_floor: { x: 1760, y: 560 },
         tunnel_entry: { x: 0, y: 2140 },
         unknown_117: { x: 470, y: 3450 },
         unknown_131: { x: -220, y: 3526 },
@@ -1021,6 +1043,51 @@
         const shiftX = FINAL_SECTION_SHIFT_X[room.section];
         if (typeof shiftX === "number") {
           room.x += shiftX;
+        }
+      }
+
+      // Fine nudge requested for the entire Brown cluster (Section R).
+      const SECTION_R_EXTRA_SHIFT_X = ROOM_W / 2;
+      for (const room of MAP_MODEL.rooms) {
+        if (room.section === "R") {
+          room.x += SECTION_R_EXTRA_SHIFT_X;
+        }
+      }
+
+      // Extra spacing pass:
+      // move the full Brown-building cluster to the right,
+      // and keep the far-right central stack aligned by shifting it as well.
+      const BROWN_CLUSTER_EXTRA_SHIFT_X = 260;
+      for (const room of MAP_MODEL.rooms) {
+        const isBrownCluster = room.section === "R";
+        const isRightCentralStack = room.section === "C" && room.x >= 2520;
+        if (isBrownCluster || isRightCentralStack) {
+          room.x += BROWN_CLUSTER_EXTRA_SHIFT_X;
+        }
+      }
+
+      // Vertical rebalance:
+      // expand L0 so its bottom reaches where L-1 bottom currently is,
+      // then move L-1 and deeper layers (and their rooms) down by the same delta.
+      const layerL0 = MAP_MODEL.layers.find((layer) => layer.id === "L0");
+      const layerLm1 = MAP_MODEL.layers.find((layer) => layer.id === "L-1");
+      if (layerL0 && layerLm1) {
+        const oldL0Bottom = layerL0.y + layerL0.h;
+        const targetL0Bottom = layerLm1.y + layerLm1.h;
+        const deltaY = targetL0Bottom - oldL0Bottom;
+        if (deltaY > 0) {
+          layerL0.h += deltaY;
+          const shiftedLayerIds = new Set(["L-1", "L-2", "L-3"]);
+          for (const layer of MAP_MODEL.layers) {
+            if (shiftedLayerIds.has(layer.id)) {
+              layer.y += deltaY;
+            }
+          }
+          for (const room of MAP_MODEL.rooms) {
+            if (shiftedLayerIds.has(room.layer)) {
+              room.y += deltaY;
+            }
+          }
         }
       }
 
