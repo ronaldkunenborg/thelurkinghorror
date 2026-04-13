@@ -89,7 +89,7 @@
 
       .layer-title {
         fill: var(--muted);
-        font-size: 18px;
+        font-size: 36px;
         text-anchor: middle;
       }
 
@@ -109,28 +109,28 @@
 
       .room-label {
         fill: var(--ink);
-        font-size: 14px;
+        font-size: 28px;
         text-anchor: middle;
         dominant-baseline: central;
       }
 
       .room-label-id {
         fill: var(--muted);
-        font-size: 11px;
+        font-size: 22px;
         text-anchor: middle;
         dominant-baseline: central;
       }
 
       .legend-item-label {
         fill: var(--muted);
-        font-size: 11px;
+        font-size: 22px;
         text-anchor: start;
         dominant-baseline: central;
       }
 
       .grid-meta-label {
         fill: var(--muted);
-        font-size: 11px;
+        font-size: 22px;
         text-anchor: start;
         dominant-baseline: central;
       }
@@ -163,13 +163,13 @@
 
       .section-title {
         fill: #d7cbab;
-        font-size: 16px;
+        font-size: 32px;
         font-weight: 700;
       }
 
       .legend-title {
         fill: #d7cbab;
-        font-size: 14px;
+        font-size: 28px;
         font-weight: 700;
       }
 
@@ -196,14 +196,14 @@
 
       .campus-label {
         fill: #f0e6c9;
-        font-size: 24px;
+        font-size: 48px;
         font-weight: 700;
         text-anchor: middle;
       }
 
       .campus-sub {
         fill: #bfb290;
-        font-size: 13px;
+        font-size: 26px;
         text-anchor: middle;
       }
 
@@ -235,7 +235,7 @@
 
       .tile-room-title {
         fill: #ffffff;
-        font-size: 11px;
+        font-size: 22px;
         font-weight: 700;
         text-anchor: middle;
         dominant-baseline: central;
@@ -244,7 +244,7 @@
 
       .tile-grid-coord {
         fill: rgba(230, 220, 192, 0.72);
-        font-size: 11px;
+        font-size: 22px;
         text-anchor: middle;
         dominant-baseline: central;
       }
@@ -257,7 +257,7 @@
 
       .dir-label {
         fill: #e8ddbf;
-        font-size: 14px;
+        font-size: 28px;
         font-weight: 700;
         text-anchor: middle;
       }
@@ -293,7 +293,7 @@
 
       .room-node-label {
         fill: #efe6c8;
-        font-size: 10px;
+        font-size: 20px;
         text-anchor: middle;
         dominant-baseline: central;
         pointer-events: none;
@@ -301,7 +301,7 @@
 
       .room-node-title {
         fill: #f2ead1;
-        font-size: 10px;
+        font-size: 20px;
         font-weight: 700;
         text-anchor: middle;
         dominant-baseline: central;
@@ -340,6 +340,7 @@
           Floor layer
           <select id="floor-filter" class="floor-select">
             <option value="all">All</option>
+            <option value="L+4">L+4</option>
             <option value="L+3">L+3</option>
             <option value="L+2">L+2</option>
             <option value="L+1">L+1</option>
@@ -358,6 +359,7 @@
       </div>
     </div>
 
+    <script src="./map-prototype-2-data.js"></script>
     <script>
       const ROOM_W = 190;
       const ROOM_H = 56;
@@ -396,367 +398,7 @@
           { id: "L-2", y: 1300, h: 320 },
           { id: "L-3", y: 1690, h: 1220 }
         ],
-        rooms: [
-          // Section C
-          { id: "roof", label: "Roof", section: "C", layer: "L+2", x: 2520, y: 150, edges: [{ to: "third", label: "down" }] },
-          {
-            id: "third",
-            label: "Third Floor",
-            section: "C",
-            layer: "L+1",
-            x: 2520,
-            y: 410,
-            edges: [
-              { to: "second", label: "down" },
-              { to: "elev_l2", label: "south/enter", type: "enter" }
-            ]
-          },
-          { id: "elev_l2", label: "Elevator", section: "C", layer: "L+1", x: 2300, y: 470, edges: [] },
-          {
-            id: "second",
-            label: "Second Floor",
-            section: "C",
-            layer: "L+1",
-            x: 2520,
-            y: 500,
-            edges: [
-              { to: "computer", label: "down" },
-              { to: "terminal", label: "north" },
-              { to: "elev_l1", label: "south/enter", type: "enter" }
-            ]
-          },
-          { id: "kitchen", label: "Kitchen", section: "C", layer: "L+1", x: 2240, y: 500, edges: [{ to: "second", label: "east" }] },
-          { id: "terminal", label: "Terminal Room", section: "C", layer: "L+1", x: 2520, y: 370, edges: [] },
-          { id: "elev_l1", label: "Elevator", section: "C", layer: "L+1", x: 2300, y: 560, edges: [] },
-          {
-            id: "computer",
-            label: "Computer Center",
-            section: "C",
-            layer: "L0",
-            x: 2520,
-            y: 760,
-            edges: [
-              { to: "base", label: "down" },
-              { to: "smith1", label: "north" },
-              { to: "elev_l0", label: "south/enter", type: "enter" }
-            ]
-          },
-          { id: "smith1", label: "Smith Street [W]", section: "C", layer: "L0", x: 2520, y: 670, edges: [{ to: "smith2", label: "east" }] },
-          { id: "smith2", label: "Smith Street [E]", section: "C", layer: "L0", x: 2840, y: 670, edges: [{ to: "temp_lab", label: "south" }] },
-          { id: "temp_lab", label: "Temporary Lab", section: "C", layer: "L0", x: 2840, y: 820, edges: [] },
-          { id: "elev_l0", label: "Elevator", section: "C", layer: "L0", x: 2300, y: 820, edges: [] },
-          {
-            id: "aero_b",
-            label: "Aero Basement",
-            section: "C",
-            layer: "L-1",
-            x: 1080,
-            y: 1080,
-            edges: [
-              { to: "base", label: "east" },
-              { to: "stair", label: "west" }
-            ]
-          },
-          {
-            id: "base",
-            label: "Basement",
-            section: "C",
-            layer: "L-1",
-            x: 2520,
-            y: 1080,
-            edges: [
-              { to: "temp_b", label: "east" },
-              { to: "elev_lm1", label: "south/enter", type: "enter" }
-            ]
-          },
-          {
-            id: "temp_b",
-            label: "Temporary Basement",
-            section: "C",
-            layer: "L-1",
-            x: 2840,
-            y: 1080,
-            edges: [
-              { to: "dead", label: "east" },
-              { to: "temp_lab", label: "up" }
-            ]
-          },
-          { id: "dead", label: "Dead Storage", section: "C", layer: "L-1", x: 3100, y: 1080, edges: [{ to: "ancient", label: "east" }] },
-          { id: "ancient", label: "Ancient Storage", section: "C", layer: "L-1", x: 3370, y: 1080, edges: [{ to: "brick", label: "down" }] },
-          {
-            id: "elev_lm1",
-            label: "Elevator",
-            section: "C",
-            layer: "L-1",
-            x: 2300,
-            y: 1170,
-            edges: [{ to: "concrete_box", label: "puzzle", type: "puzzle" }]
-          },
-          { id: "stair", label: "Stairway", section: "C", layer: "L-1", x: 680, y: 1080, edges: [{ to: "aero_lobby", label: "up" }] },
-          {
-            id: "brick",
-            label: "Brick Tunnel",
-            section: "C",
-            layer: "L-2",
-            x: 3370,
-            y: 1460,
-            edges: [
-              { to: "reno", label: "north" },
-              { to: "cinder", label: "south" }
-            ]
-          },
-          { id: "reno", label: "Renovated Cave", section: "C", layer: "L-2", x: 3370, y: 1360, edges: [{ to: "altar", label: "down" }] },
-          { id: "cinder", label: "Cinderblock Tunnel", section: "C", layer: "L-2", x: 3370, y: 1570, edges: [] },
-          { id: "altar", label: "Before the Altar [SFX]", section: "C", layer: "L-2", x: 3130, y: 1460, edges: [] },
-
-          // Section B
-          { id: "mass", label: "Mass. Ave.", section: "B", layer: "L0", x: 480, y: 760, edges: [{ to: "ic1", label: "east" }] },
-          {
-            id: "ic1",
-            label: "Infinite Corridor [W1]",
-            section: "B",
-            layer: "L0",
-            x: 680,
-            y: 760,
-            edges: [
-              { to: "ic2", label: "east" },
-              { to: "aero_lobby", label: "north" },
-              { to: "eng", label: "south" }
-            ]
-          },
-          { id: "ic2", label: "Infinite Corridor [W2]", section: "B", layer: "L0", x: 880, y: 760, edges: [{ to: "ic3", label: "east" }] },
-          {
-            id: "ic3",
-            label: "Infinite Corridor [W3]",
-            section: "B",
-            layer: "L0",
-            x: 1080,
-            y: 760,
-            edges: [
-              { to: "ic4", label: "east" },
-              { to: "gd", label: "up" },
-              { to: "great_court", label: "south" }
-            ]
-          },
-          {
-            id: "ic4",
-            label: "Infinite Corridor [W4]",
-            section: "B",
-            layer: "L0",
-            x: 1280,
-            y: 760,
-            edges: [{ to: "ic5", label: "east" }]
-          },
-          {
-            id: "ic5",
-            label: "Infinite Corridor [W5]",
-            section: "B",
-            layer: "L0",
-            x: 1480,
-            y: 760,
-            edges: [
-              { to: "chem", label: "south" },
-              { to: "fn", label: "north", type: "puzzle" }
-            ]
-          },
-          { id: "aero_lobby", label: "Aero Lobby", section: "B", layer: "L0", x: 680, y: 660, edges: [{ to: "ic1", label: "south" }] },
-          { id: "eng", label: "Engineering Building", section: "B", layer: "L0", x: 680, y: 860, edges: [{ to: "ic1", label: "north" }] },
-          { id: "gd", label: "Great Dome", section: "B", layer: "L+1", x: 1080, y: 480, edges: [{ to: "td", label: "up" }] },
-          { id: "td", label: "Top of Dome", section: "B", layer: "L+1", x: 1080, y: 390, edges: [{ to: "rgd", label: "up" }] },
-          { id: "rgd", label: "Roof of Great Dome", section: "B", layer: "L+2", x: 1080, y: 180, edges: [{ to: "ogd", label: "east" }] },
-          { id: "ogd", label: "On the Great Dome", section: "B", layer: "L+2", x: 1280, y: 180, edges: [] },
-          { id: "great_court", label: "Great Court", section: "B", layer: "L0", x: 1080, y: 860, edges: [] },
-          { id: "chem", label: "Chemistry Building", section: "B", layer: "L0", x: 1480, y: 860, edges: [{ to: "alc", label: "south" }] },
-          { id: "alc", label: "Dept. of Alchemy", section: "B", layer: "L0", x: 1480, y: 1000, edges: [{ to: "lab", label: "south" }] },
-          {
-            id: "lab",
-            label: "Lab",
-            section: "B",
-            layer: "L0",
-            x: 1480,
-            y: 1140,
-            edges: []
-          },
-          { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "cp", label: "east" }] },
-          { id: "cp", label: "Cluttered Passage", section: "R", layer: "L-1", x: 1940, y: 670, edges: [{ to: "brown", label: "east" }] },
-          {
-            id: "brown",
-            label: "Brown Building",
-            section: "R",
-            layer: "L0",
-            x: 1760,
-            y: 860,
-            edges: [
-              { to: "brown_b", label: "down" },
-              { to: "top_floor", label: "up" },
-              { to: "small_court", label: "south" }
-            ]
-          },
-          { id: "brown_b", label: "Brown Basement", section: "R", layer: "L-1", x: 1760, y: 1140, edges: [] },
-          { id: "top_floor", label: "Top Floor", section: "R", layer: "L+1", x: 1760, y: 520, edges: [{ to: "sky_roof", label: "up" }] },
-          { id: "sky_roof", label: "Skyscraper Roof", section: "R", layer: "L+2", x: 1760, y: 240, edges: [{ to: "inside_dome", label: "up" }] },
-          { id: "inside_dome", label: "Inside Dome", section: "R", layer: "L+2", x: 1980, y: 240, edges: [] },
-          { id: "small_court", label: "Small Courtyard", section: "R", layer: "L0", x: 1760, y: 980, edges: [] },
-
-          // Section D
-          {
-            id: "muddy",
-            label: "Muddy Tunnel",
-            section: "D",
-            layer: "L-2",
-            x: 3660,
-            y: 1460,
-            edges: [
-              { to: "tunnel_entry", label: "east" },
-              { to: "large_chamber", label: "down" }
-            ]
-          },
-          { id: "tunnel_entry", label: "Tunnel Entrance", section: "D", layer: "L-2", x: 3890, y: 1460, edges: [{ to: "steam1", label: "east" }] },
-          {
-            id: "steam1",
-            label: "Steam Tunnel [S1]",
-            section: "D",
-            layer: "L-2",
-            x: 4120,
-            y: 1460,
-            edges: [
-              { to: "tunnel_entry", label: "west/puzzle", type: "puzzle" },
-              { to: "steam2", label: "east" }
-            ]
-          },
-          {
-            id: "steam2",
-            label: "Steam Tunnel [S2]",
-            section: "D",
-            layer: "L-2",
-            x: 4180,
-            y: 1460,
-            edges: [
-              { to: "steam1", label: "west" },
-              { to: "steam3", label: "east" },
-              { to: "tomb", label: "puzzle", type: "puzzle" }
-            ]
-          },
-          { id: "steam3", label: "Steam Tunnel [S3]", section: "D", layer: "L-2", x: 4700, y: 1460, edges: [{ to: "steam4", label: "east" }] },
-          { id: "steam4", label: "Steam Tunnel [S4]", section: "D", layer: "L-2", x: 5400, y: 1460, edges: [{ to: "steam5", label: "east" }] },
-          {
-            id: "steam5",
-            label: "Steam Tunnel [S5]",
-            section: "D",
-            layer: "L-2",
-            x: 6100,
-            y: 1460,
-            edges: [{ to: "concrete_box", label: "puzzle/down?", type: "puzzle" }]
-          },
-          { id: "concrete_box", label: "Concrete Box", section: "D", layer: "L-3", x: 5880, y: 1760, edges: [] },
-          {
-            id: "sub",
-            label: "Subbasement",
-            section: "D",
-            layer: "L-2",
-            x: 4260,
-            y: 1360,
-            edges: [
-              { to: "stair", label: "up" },
-              { to: "tomb", label: "northwest", type: "restricted" }
-            ]
-          },
-          {
-            id: "tomb",
-            label: "Tomb",
-            section: "D",
-            layer: "L-2",
-            x: 4180,
-            y: 1260,
-            edges: [
-              { to: "sub", label: "southeast", type: "restricted" },
-              { to: "steam2", label: "down/puzzle", type: "puzzle" }
-            ]
-          },
-          {
-            id: "large_chamber",
-            label: "Large Chamber",
-            section: "D",
-            layer: "L-3",
-            x: 3500,
-            y: 1760,
-            edges: [{ to: "wet1", label: "down" }]
-          },
-          { id: "inner_lair", label: "Inner Lair", section: "D", layer: "L-3", x: 4920, y: 2360, edges: [] },
-          {
-            id: "wet_lair_link",
-            label: "Wet Tunnel [Outer]",
-            section: "D",
-            layer: "L-3",
-            x: 4720,
-            y: 2360,
-            edges: [{ to: "inner_lair", label: "east" }]
-          },
-
-          // Section F
-          { id: "wet1", label: "Wet Tunnel [Inset 1]", section: "F", layer: "L-3", x: 3500, y: 2160, edges: [{ to: "wet2", label: "passage" }] },
-          {
-            id: "wet2",
-            label: "Wet Tunnel [Inset 2]",
-            section: "F",
-            layer: "L-3",
-            x: 3750,
-            y: 2160,
-            edges: [
-              { to: "wet3", label: "passage" },
-              { to: "wet6", label: "passage" },
-              { to: "wet7", label: "passage" },
-              { to: "wet8", label: "passage" }
-            ]
-          },
-          {
-            id: "wet3",
-            label: "Wet Tunnel [Inset 3]",
-            section: "F",
-            layer: "L-3",
-            x: 4000,
-            y: 2160,
-            edges: [
-              { to: "wet4", label: "passage" },
-              { to: "wet7", label: "passage" }
-            ]
-          },
-          { id: "wet4", label: "Wet Tunnel [Inset 4]", section: "F", layer: "L-3", x: 4250, y: 2160, edges: [{ to: "wet5", label: "passage" }] },
-          {
-            id: "wet5",
-            label: "Wet Tunnel [Inset 5]",
-            section: "F",
-            layer: "L-3",
-            x: 4500,
-            y: 2160,
-            edges: [
-              { to: "wet11", label: "passage" },
-              { to: "wet_lair_link", label: "down" }
-            ]
-          },
-          {
-            id: "wet6",
-            label: "Wet Tunnel [Inset 6]",
-            section: "F",
-            layer: "L-3",
-            x: 3750,
-            y: 2340,
-            edges: [
-              { to: "wet8", label: "passage" },
-              { to: "wet9", label: "puzzle", type: "puzzle" }
-            ]
-          },
-          { id: "wet7", label: "Wet Tunnel [Inset 7]", section: "F", layer: "L-3", x: 4000, y: 2340, edges: [] },
-          { id: "wet8", label: "Wet Tunnel [Inset 8]", section: "F", layer: "L-3", x: 3500, y: 2430, edges: [{ to: "wet9", label: "passage" }] },
-          { id: "wet9", label: "Wet Tunnel [Inset 9]", section: "F", layer: "L-3", x: 3750, y: 2520, edges: [{ to: "wet11", label: "passage" }] },
-          { id: "wet10", label: "Wet Tunnel [Inset 10]", section: "F", layer: "L-3", x: 4250, y: 2520, edges: [] },
-          { id: "wet11", label: "Wet Tunnel [Inset 11]", section: "F", layer: "L-3", x: 4500, y: 2520, edges: [] },
-
-          // Section E
-          { id: "place", label: "Place", section: "E", layer: "L+2", x: 220, y: 120, edges: [{ to: "basalt", label: "down" }] },
-          { id: "basalt", label: "Basalt Bowl [SFX]", section: "E", layer: "L+2", x: 220, y: 220, edges: [{ to: "platform", label: "down" }] },
-          { id: "platform", label: "At Platform [SFX]", section: "E", layer: "L+2", x: 220, y: 320, edges: [] }
-        ]
+        rooms: MapPrototype2Data.MAP_ROOMS.map((room) => ({ ...room, edges: (room.edges || []).map((edge) => ({ ...edge })) }))
       };
 
       const CANONICAL_LOCATIONS = [
@@ -833,82 +475,7 @@
         { id: 249, name: "Great Dome" }
       ];
 
-      const LOCATION_ID_BY_NODE_ID = {
-        roof: 127,
-        third: 110,
-        elev_l2: 124,
-        second: 137,
-        kitchen: 33,
-        terminal: 176,
-        elev_l1: 124,
-        computer: 65,
-        smith1: 185,
-        smith2: 98,
-        temp_lab: 140,
-        elev_l0: 124,
-        aero_b: 158,
-        base: 27,
-        temp_b: 202,
-        dead: 47,
-        ancient: 171,
-        elev_lm1: 124,
-        stair: 35,
-        brick: 25,
-        reno: 201,
-        cinder: 17,
-        altar: 149,
-        mass: 190,
-        ic1: 218,
-        ic2: 214,
-        ic3: 210,
-        ic4: 208,
-        ic5: 206,
-        aero_lobby: 136,
-        eng: 38,
-        gd: 249,
-        td: 213,
-        rgd: 121,
-        ogd: 145,
-        great_court: 180,
-        chem: 248,
-        alc: 174,
-        lab: 42,
-        fn: 150,
-        cp: 179,
-        brown: 240,
-        brown_b: 200,
-        top_floor: 195,
-        sky_roof: 222,
-        inside_dome: 109,
-        small_court: 16,
-        muddy: 39,
-        tunnel_entry: 34,
-        steam1: 66,
-        steam2: 78,
-        steam3: 138,
-        steam4: 221,
-        steam5: 227,
-        concrete_box: 37,
-        sub: 142,
-        tomb: 9,
-        large_chamber: 99,
-        inner_lair: 69,
-        wet_lair_link: 181,
-        wet1: 187,
-        wet2: 164,
-        wet3: 15,
-        wet4: 131,
-        wet5: 234,
-        wet6: 117,
-        wet7: 87,
-        wet8: 51,
-        wet9: 232,
-        wet10: 161,
-        wet11: 184,
-        place: 152,
-        basalt: 134,
-        platform: 21
-      };
+      const LOCATION_ID_BY_NODE_ID = { ...MapPrototype2Data.LOCATION_ID_BY_NODE_ID };
 
       // Wet-tunnel inset numbering is now mapped to concrete engine ids in this prototype.
       const PRESERVE_CUSTOM_LABEL_IDS = new Set([66, 78, 98, 138, 185, 206, 208, 210, 214, 218, 221, 227]);
@@ -1180,22 +747,22 @@
         // Every block is defined by inclusive tile bounds:
         // top-left (tl) and bottom-right (br), using grid coordinates (c/rank).
         // A1 is bottom-left.
-        { id: "mass", type: "road-v", label: "Mass. Ave.", bounds: { tl: { c: 0, rank: 11 }, br: { c: 0, rank: 1 } } },
-        { id: "smith", type: "road-h", label: "Smith Street", bounds: { tl: { c: 0, rank: 11 }, br: { c: 13, rank: 11 } } },
-        { id: "computer", type: "building", label: "Computer Center", sub: "start area", bounds: { tl: { c: 3, rank: 10 }, br: { c: 5, rank: 8 } } },
-        { id: "temp", type: "building", label: "Temporary Lab", sub: "separate wing", bounds: { tl: { c: 6, rank: 9 }, br: { c: 8, rank: 8 } } },
+        { id: "mass", type: "road-v", label: "Mass. Ave.", bounds: { tl: { c: 3, rank: 11 }, br: { c: 3, rank: 1 } } },
+        { id: "smith", type: "road-h", label: "Smith Street", bounds: { tl: { c: 3, rank: 11 }, br: { c: 16, rank: 11 } } },
+        { id: "computer", type: "building", label: "Computer Center", sub: "start area", bounds: { tl: { c: 6, rank: 10 }, br: { c: 8, rank: 8 } } },
+        { id: "temp", type: "building", label: "Temporary Lab", sub: "separate wing", bounds: { tl: { c: 9, rank: 9 }, br: { c: 11, rank: 8 } } },
         {
           id: "central",
           type: "building-central",
           label: "Central Complex",
           sub: "Great Dome + Aero + Engineering + Chemistry",
-          bounds: { tl: { c: 1, rank: 7 }, br: { c: 7, rank: 3 } }
+          bounds: { tl: { c: 4, rank: 7 }, br: { c: 10, rank: 3 } }
         },
-        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 10, rank: 6 }, br: { c: 10, rank: 5 } } },
+        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 13, rank: 6 }, br: { c: 13, rank: 5 } } },
         // Hidden placement zones for underground grouping.
-        { id: "steam", type: "placement-zone", hidden: true, bounds: { tl: { c: 1, rank: 3 }, br: { c: 7, rank: 2 } } },
-        { id: "wet", type: "placement-zone", hidden: true, bounds: { tl: { c: 1, rank: 1 }, br: { c: 7, rank: 1 } } },
-        { id: "brick", type: "placement-zone", hidden: true, bounds: { tl: { c: 6, rank: 9 }, br: { c: 8, rank: 8 } } }
+        { id: "steam", type: "placement-zone", hidden: true, bounds: { tl: { c: 4, rank: 3 }, br: { c: 10, rank: 2 } } },
+        { id: "wet", type: "placement-zone", hidden: true, bounds: { tl: { c: 4, rank: 1 }, br: { c: 10, rank: 1 } } },
+        { id: "brick", type: "placement-zone", hidden: true, bounds: { tl: { c: 9, rank: 9 }, br: { c: 11, rank: 8 } } }
       ];
 
       // Booklet-inspired placement grid:
@@ -1209,7 +776,7 @@
         axisStep: 180,
         northTiltFromVerticalDeg: 30,
         levelY: 260,
-        cols: 14,
+        cols: 17,
         rows: 11
       };
 
@@ -1218,11 +785,11 @@
       // - Horizontal road: full file span (A..last column)
       const massRoad = CAMPUS_BLOCKS.find((b) => b.id === "mass");
       if (massRoad) {
-        massRoad.bounds = { tl: { c: 0, rank: TILE_GRID.rows }, br: { c: 0, rank: 1 } };
+        massRoad.bounds = { tl: { c: 3, rank: TILE_GRID.rows }, br: { c: 3, rank: 1 } };
       }
       const smithRoad = CAMPUS_BLOCKS.find((b) => b.id === "smith");
       if (smithRoad) {
-        smithRoad.bounds = { tl: { c: 0, rank: 11 }, br: { c: TILE_GRID.cols - 1, rank: 11 } };
+        smithRoad.bounds = { tl: { c: 3, rank: 11 }, br: { c: TILE_GRID.cols - 1, rank: 11 } };
       }
 
       const northTiltRad = (TILE_GRID.northTiltFromVerticalDeg * Math.PI) / 180;
@@ -1369,97 +936,7 @@
       // Core rule (authoritative): L0 tiles are leading for planar position.
       // - Cardinal directions (N/E/S/W + diagonals) move across tiles.
       // - Up/Down only changes layer and keeps the same tile.
-      const ROOM_LAYOUT = {
-        // Dream inset
-        place: { building: "central", layer: "L+2", tile: "A11" }, // [152] Place
-        basalt: { building: "central", layer: "L+2", tile: "A10" }, // [134] Basalt Bowl
-        platform: { building: "central", layer: "L+2", tile: "A9" }, // [21] At Platform
-
-        // Central complex (L0 anchor at 210 = E7)
-        mass: { building: "central", layer: "L0", tile: "B6" }, // [190] Mass. Ave.
-        ic1: { building: "central", layer: "L0", tile: "C6" }, // [218] Infinite Corridor
-        ic2: { building: "central", layer: "L0", tile: "D6" }, // [214] Infinite Corridor
-        ic3: { building: "central", layer: "L0", tile: "E6" }, // [210] Infinite Corridor
-        ic4: { building: "central", layer: "L0", tile: "F6" }, // [208] Infinite Corridor
-        ic5: { building: "central", layer: "L0", tile: "G6" }, // [206] Infinite Corridor
-        aero_lobby: { building: "central", layer: "L0", tile: "C7" }, // [136] Aero Lobby
-        eng: { building: "central", layer: "L0", tile: "C5" }, // [38] Engineering Building
-        gd: { building: "central", layer: "L+1", tile: "E6" }, // [249] Great Dome
-        td: { building: "central", layer: "L+2", tile: "E6" }, // [213] Top of Dome
-        rgd: { building: "central", layer: "L+3", tile: "E6" }, // [121] Roof of Great Dome
-        ogd: { building: "central", layer: "L+3", tile: "F6" }, // [145] On the Great Dome
-        great_court: { building: "central", layer: "L0", tile: "E5" }, // [180] Great Court
-        chem: { building: "central", layer: "L0", tile: "G5" }, // [248] Chemistry Building
-        alc: { building: "central", layer: "L0", tile: "G4" }, // [174] Department of Alchemy
-        lab: { building: "central", layer: "L0", tile: "G3" }, // [42] Lab
-        fn: { building: "central", layer: "L0", tile: "G7" }, // [150] Fruits and Nuts
-        stair: { building: "central", layer: "L-1", tile: "C7" }, // [35] Stairway
-        aero_b: { building: "central", layer: "L-1", tile: "D7" }, // [158] Aero Basement
-
-        // Computer center building + Smith Street anchors
-        smith1: { building: "computer", layer: "L0", tile: "E11" }, // [185] Smith Street
-        smith2: { building: "computer", layer: "L0", tile: "H11" }, // [98] Smith Street
-        computer: { building: "computer", layer: "L0", tile: "E9" }, // [65] Computer Center
-        kitchen: { building: "computer", layer: "L+1", tile: "D9" }, // [33] Kitchen
-        second: { building: "computer", layer: "L+1", tile: "E9" }, // [137] Second Floor
-        third: { building: "computer", layer: "L+2", tile: "E9" }, // [110] Third Floor
-        terminal: { building: "computer", layer: "L+1", tile: "E10" }, // [176] Terminal Room
-        roof: { building: "computer", layer: "L+3", tile: "E9" }, // [127] Roof
-        elev_l2: { building: "computer", layer: "L+2", tile: "E8" }, // [124] Elevator
-        elev_l1: { building: "computer", layer: "L+1", tile: "E8" }, // [124] Elevator
-        elev_l0: { building: "computer", layer: "L0", tile: "E8" }, // [124] Elevator
-        base: { building: "computer", layer: "L-1", tile: "E9" }, // [27] Basement
-        elev_lm1: { building: "computer", layer: "L-1", tile: "E8" }, // [124] Elevator
-
-        // Temporary lab building
-        temp_lab: { building: "temp", layer: "L0", tile: "H9" }, // [140] Temporary Lab
-        temp_b: { building: "temp", layer: "L-1", tile: "H9" }, // [202] Temporary Basement
-        dead: { building: "temp", layer: "L-1", tile: "I9" }, // [47] Dead Storage
-        ancient: { building: "temp", layer: "L-1", tile: "J9" }, // [171] Ancient Storage
-
-        // Brown building cluster
-        cp: { building: "brown", layer: "L-1", tile: "J4" }, // [179] Cluttered Passage
-        brown: { building: "brown", layer: "L0", tile: "K6" }, // [240] Brown Building
-        small_court: { building: "brown", layer: "L0", tile: "K5" }, // [16] Small Courtyard
-        brown_b: { building: "brown", layer: "L-1", tile: "K6" }, // [200] Brown Basement
-        top_floor: { building: "brown", layer: "L+1", tile: "K6" }, // [195] Top Floor
-        sky_roof: { building: "brown", layer: "L+2", tile: "K6" }, // [222] Skyscraper Roof
-        inside_dome: { building: "brown", layer: "L+3", tile: "K6" }, // [109] Inside Dome
-
-        // Steam / utility underground
-        muddy: { building: "steam", layer: "L-3", tile: "B3" }, // [39] Muddy Tunnel
-        tunnel_entry: { building: "steam", layer: "L-3", tile: "C3" }, // [34] Tunnel Entrance
-        steam1: { building: "steam", layer: "L-3", tile: "D3" }, // [66] Steam Tunnel
-        steam2: { building: "steam", layer: "L-3", tile: "B8" }, // [78] Steam Tunnel
-        steam3: { building: "steam", layer: "L-3", tile: "F3" }, // [138] Steam Tunnel
-        steam4: { building: "steam", layer: "L-3", tile: "G3" }, // [221] Steam Tunnel
-        steam5: { building: "steam", layer: "L-3", tile: "H3" }, // [227] Steam Tunnel
-        sub: { building: "steam", layer: "L-2", tile: "C7" }, // [142] Subbasement
-        tomb: { building: "steam", layer: "L-2", tile: "B8" }, // [9] Tomb
-        large_chamber: { building: "steam", layer: "L-4", tile: "B3" }, // [99] Large Chamber
-        concrete_box: { building: "steam", layer: "L-4", tile: "H3" }, // [37] Concrete Box
-
-        // Wet tunnel cluster
-        wet1: { building: "wet", layer: "L-5", tile: "B3" }, // [187] Wet Tunnel
-        wet2: { building: "wet", layer: "L-5", tile: "C1" }, // [164] Wet Tunnel
-        wet3: { building: "wet", layer: "L-5", tile: "D1" }, // [15] Wet Tunnel
-        wet4: { building: "wet", layer: "L-5", tile: "E1" }, // [131] Wet Tunnel
-        wet5: { building: "wet", layer: "L-5", tile: "F1" }, // [234] Wet Tunnel
-        wet6: { building: "wet", layer: "L-5", tile: "C2" }, // [117] Wet Tunnel
-        wet7: { building: "wet", layer: "L-5", tile: "D2" }, // [87] Wet Tunnel
-        wet8: { building: "wet", layer: "L-5", tile: "B2" }, // [51] Wet Tunnel
-        wet9: { building: "wet", layer: "L-5", tile: "E2" }, // [232] Wet Tunnel
-        wet10: { building: "wet", layer: "L-5", tile: "F2" }, // [161] Wet Tunnel
-        wet11: { building: "wet", layer: "L-5", tile: "G2" }, // [184] Wet Tunnel
-        wet_lair_link: { building: "wet", layer: "L-6", tile: "H2" }, // [181] Wet Tunnel
-        inner_lair: { building: "wet", layer: "L-6", tile: "I2" }, // [69] Inner Lair
-
-        // Brick/altar branch
-        brick: { building: "brick", layer: "L-2", tile: "J10" }, // [25] Brick Tunnel
-        reno: { building: "brick", layer: "L-2", tile: "J11" }, // [201] Renovated Cave
-        cinder: { building: "brick", layer: "L-2", tile: "J9" }, // [17] Cinderblock Tunnel
-        altar: { building: "brick", layer: "L-2", tile: "J11" } // [149] Before the Altar
-      };
+      const ROOM_LAYOUT = { ...MapPrototype2Data.ROOM_LAYOUT };
 
       const ROOM_LAYOUT_UNKNOWN = {};
 
@@ -1605,6 +1082,7 @@
       const ROOM_TILE_METADATA = [];
       const ROOM_LAYOUT_MISSING = [];
       const ROOM_LAYOUT_INVALID = [];
+      const MAP_HIDDEN_ROOM_IDS = new Set(["place", "basalt", "platform"]);
 
       for (const room of MAP_MODEL.rooms) {
         const spec = ROOM_LAYOUT[room.id] || ROOM_LAYOUT_UNKNOWN[room.id];
@@ -1679,16 +1157,62 @@
       window.LAYOUT_RULE_VIOLATIONS = LAYOUT_RULE_VIOLATIONS;
       window.LAYOUT_LAYER_RULE_VIOLATIONS = LAYOUT_LAYER_RULE_VIOLATIONS;
 
+      function buildLayerRenderContext(layerFilter) {
+        const verticalEdgeLength = Math.hypot(STEP_E.dx, STEP_E.dy);
+        if (layerFilter === "all") {
+          return {
+            includeRoom: () => true,
+            layerOffsetY: () => 0
+          };
+        }
+        const focusLevel = layerToLevel(layerFilter);
+        if (focusLevel == null) {
+          return {
+            includeRoom: (room) => room.layer === layerFilter,
+            layerOffsetY: () => 0
+          };
+        }
+        return {
+          includeRoom: (room) => {
+            const roomLevel = layerToLevel(room.layer);
+            if (roomLevel == null) return false;
+            return Math.abs(roomLevel - focusLevel) <= 1;
+          },
+          layerOffsetY: (room) => {
+            const roomLevel = layerToLevel(room.layer);
+            if (roomLevel == null) return 0;
+            return (focusLevel - roomLevel) * verticalEdgeLength;
+          }
+        };
+      }
+
       function drawRoomLayer(layerFilter) {
+        const layerRender = buildLayerRenderContext(layerFilter);
         const visibleRooms = ROOM_TILE_METADATA
-          .filter((room) => layerFilter === "all" || room.layer === layerFilter)
-          .map((room) => ({ ...room }));
+          .filter((room) => !MAP_HIDDEN_ROOM_IDS.has(room.id))
+          .filter((room) => layerRender.includeRoom(room))
+          .map((room) => ({ ...room, _layerOffsetY: layerRender.layerOffsetY(room) }));
 
         for (const room of visibleRooms) {
           const { p0, p1, p2, p3 } = tileCorners(room.tile.c, room.tile.rank);
           add("polygon", {
             class: "tile-room-known",
-            points: p0.x + "," + p0.y + " " + p1.x + "," + p1.y + " " + p2.x + "," + p2.y + " " + p3.x + "," + p3.y
+            points:
+              p0.x +
+              "," +
+              (p0.y + room._layerOffsetY) +
+              " " +
+              p1.x +
+              "," +
+              (p1.y + room._layerOffsetY) +
+              " " +
+              p2.x +
+              "," +
+              (p2.y + room._layerOffsetY) +
+              " " +
+              p3.x +
+              "," +
+              (p3.y + room._layerOffsetY)
           });
 
           // Room title at 25% of tile height/depth, centered horizontally in the tile.
@@ -1697,7 +1221,7 @@
             {
               class: "tile-room-title",
               x: p0.x + ISO_BASIS_E.dx * 0.5 + ISO_BASIS_S.dx * 0.25,
-              y: p0.y + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.25
+              y: p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.25
             },
             room.label
           );
@@ -1705,7 +1229,7 @@
 
         const occupancyByTile = new Map();
         for (const room of visibleRooms) {
-          const key = room.tile.c + ":" + room.tile.rank;
+          const key = room.tile.c + ":" + room.tile.rank + ":" + room.layer;
           const next = occupancyByTile.get(key) || 0;
           occupancyByTile.set(key, next + 1);
           room._stackIndex = next;
@@ -1713,14 +1237,14 @@
 
         for (const room of visibleRooms) {
           const center = tileCenter(room.tile.c, room.tile.rank);
-          const key = room.tile.c + ":" + room.tile.rank;
+          const key = room.tile.c + ":" + room.tile.rank + ":" + room.layer;
           const stackCount = occupancyByTile.get(key) || 1;
           const idx = room._stackIndex || 0;
           const angle = (Math.PI * 2 * idx) / Math.max(1, stackCount);
           const spread = stackCount > 1 ? 12 : 0;
           const roomYOffset = 24;
           const cx = center.x + Math.cos(angle) * spread;
-          const cy = center.y + roomYOffset + Math.sin(angle) * spread;
+          const cy = center.y + room._layerOffsetY + roomYOffset + Math.sin(angle) * spread;
           const nodeClass =
             room.building === "brown"
               ? "room-node room-node-brown"
@@ -1756,14 +1280,18 @@
       }
 
       function getVisibleCenterByLocationId(layerFilter) {
+        const layerRender = buildLayerRenderContext(layerFilter);
         const centerByLocationId = new Map();
-        const visibleRooms = ROOM_TILE_METADATA.filter((room) => layerFilter === "all" || room.layer === layerFilter);
+        const visibleRooms = ROOM_TILE_METADATA
+          .filter((room) => !MAP_HIDDEN_ROOM_IDS.has(room.id))
+          .filter((room) => layerRender.includeRoom(room));
         for (const room of visibleRooms) {
           if (typeof room.locationId !== "number") continue;
           const center = tileCenter(room.tile.c, room.tile.rank);
+          const layerOffsetY = layerRender.layerOffsetY(room);
           centerByLocationId.set(room.locationId, {
             x: center.x,
-            y: center.y + 24,
+            y: center.y + layerOffsetY + 24,
             c: room.tile.c,
             rank: room.tile.rank
           });
@@ -1839,6 +1367,12 @@
           if (s.includes("south")) return "south";
           return null;
         };
+        const verticalDir = (command) => {
+          const s = String(command || "").toLowerCase();
+          if (s.includes("up") && !s.includes("down")) return "up";
+          if (s.includes("down")) return "down";
+          return null;
+        };
 
         const centerAtGrid = (c, rank) => {
           const p = tileCenter(c, rank);
@@ -1867,13 +1401,102 @@
           return "M " + from.x + " " + from.y + " L " + to.x + " " + to.y;
         };
 
+        // Up/down edges are drawn as straight vertical screen lines.
+        // Keep length aligned with the map's primary edge step length.
+        const verticalEdgeLength = Math.hypot(STEP_E.dx, STEP_E.dy);
+        const verticalLoopSlots = new Map();
+        const curvedVerticalLoopPath = (from, dir, slot) => {
+          const band = Math.floor(slot / 2);
+          const spread = 26 + band * 8;
+          const rise = 44 + band * 10;
+          const bias = dir === "up" ? -1 : 1;
+          const x = from.x;
+          const y = from.y;
+          const yPeak = y + bias * rise;
+          return (
+            "M " +
+            x +
+            " " +
+            y +
+            " C " +
+            (x - spread) +
+            " " +
+            (y + bias * 12) +
+            ", " +
+            (x - spread) +
+            " " +
+            yPeak +
+            ", " +
+            x +
+            " " +
+            yPeak +
+            " C " +
+            (x + spread) +
+            " " +
+            yPeak +
+            ", " +
+            (x + spread) +
+            " " +
+            (y + bias * 12) +
+            ", " +
+            x +
+            " " +
+            y
+          );
+        };
+
         for (const edge of edgeSet) {
           const from = centerByLocationId.get(edge.from);
+          if (!from) continue;
+          const vDir = verticalDir(edge.command);
+          // Exception: for Tunnel Entrance (34) <-> Muddy Tunnel (39),
+          // render only horizontal aliases (east/west) and suppress up/down.
+          const isTunnelMuddyPair =
+            (edge.from === 34 && edge.to === 39) ||
+            (edge.from === 39 && edge.to === 34);
+          if (isTunnelMuddyPair && vDir) {
+            continue;
+          }
+          if (vDir) {
+            const isWet1Up = vDir === "up" && edge.from === 187;
+            const isWet5Down = vDir === "down" && edge.from === 234;
+            const wetLoopSourceIds = new Set([164, 15, 131, 117, 87, 51, 232, 161, 184]); // wet2..4 + wet6..11
+            const isWetLoopVertical = wetLoopSourceIds.has(edge.from);
+            if (isWet1Up || isWet5Down) {
+              const delta = vDir === "up" ? -verticalEdgeLength : verticalEdgeLength;
+              const d = "M " + from.x + " " + from.y + " L " + from.x + " " + (from.y + delta);
+              add("path", {
+                class: edgeClassByType[edge.type] || "edge-compare edge-match",
+                d
+              });
+              continue;
+            }
+            if (isWetLoopVertical) {
+              const slotKey =
+                String(Math.round(from.x)) + ":" + String(Math.round(from.y)) + ":" + vDir;
+              const slot = verticalLoopSlots.get(slotKey) || 0;
+              verticalLoopSlots.set(slotKey, slot + 1);
+              const d = curvedVerticalLoopPath(from, vDir, slot);
+              add("path", {
+                class: edgeClassByType[edge.type] || "edge-compare edge-match",
+                d
+              });
+              continue;
+            }
+            const delta = vDir === "up" ? -verticalEdgeLength : verticalEdgeLength;
+            const d = "M " + from.x + " " + from.y + " L " + from.x + " " + (from.y + delta);
+            add("path", {
+              class: edgeClassByType[edge.type] || "edge-compare edge-match",
+              d
+            });
+            continue;
+          }
           const to = centerByLocationId.get(edge.to);
-          if (!from || !to) continue;
+          if (!to) continue;
+          const d = orthogonalPath(from, to, primaryDir(edge.command));
           add("path", {
             class: edgeClassByType[edge.type] || "edge-compare edge-match",
-            d: orthogonalPath(from, to, primaryDir(edge.command))
+            d
           });
         }
       }
@@ -1957,22 +1580,22 @@
         const frame = tileLegendFrame();
         const gutterPx = TILE_GUTTER_SIDE * TILE_GRID.cellW;
         const x = frame.x;
-        const y = frame.y - gutterPx - 122;
+        const y = frame.y - gutterPx - 260;
         add("rect", {
           class: "building-frame",
           x,
           y,
-          width: 470,
-          height: 122
+          width: 940,
+          height: 260
         });
-        add("text", { class: "legend-title", x: x + 16, y: y + 24 }, "Legend");
-        add("rect", { class: "campus-building campus-central", x: x + 16, y: y + 38, width: 36, height: 20 });
-        add("text", { class: "legend-item-label", x: x + 92, y: y + 50 }, "central complex building");
-        add("rect", { class: "campus-building", x: x + 16, y: y + 66, width: 36, height: 20 });
-        add("text", { class: "legend-item-label", x: x + 92, y: y + 78 }, "standalone building");
-        add("rect", { class: "campus-road", x: x + 16, y: y + 94, width: 36, height: 12, rx: 5 });
-        add("text", { class: "legend-item-label", x: x + 92, y: y + 102 }, "street/road");
-        add("text", { class: "legend-item-label", x: x + 300, y: y + 78 }, "room nodes filtered by floor layer");
+        add("text", { class: "legend-title", x: x + 28, y: y + 44 }, "Legend");
+        add("rect", { class: "campus-building campus-central", x: x + 28, y: y + 74, width: 64, height: 34 });
+        add("text", { class: "legend-item-label", x: x + 150, y: y + 92 }, "central complex building");
+        add("rect", { class: "campus-building", x: x + 28, y: y + 124, width: 64, height: 34 });
+        add("text", { class: "legend-item-label", x: x + 150, y: y + 142 }, "standalone building");
+        add("rect", { class: "campus-road", x: x + 28, y: y + 176, width: 64, height: 22, rx: 9 });
+        add("text", { class: "legend-item-label", x: x + 150, y: y + 188 }, "street/road");
+        add("text", { class: "legend-item-label", x: x + 440, y: y + 142 }, "room nodes filtered by floor layer");
       }
 
       function drawDirectionArrow(x, y, dx, dy, label, stroke) {

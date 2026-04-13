@@ -21,6 +21,7 @@ Synchronization status:
   - `Wet Tunnel [Inset 1..11]` + `Wet Tunnel [Outer]`
   - `Smith Street [W]` and `Smith Street [E]`
 - Puzzle/restricted paths use distinct line styles while retaining explicit direction labels.
+- Rendering exception (documented decision): for Tunnel Entrance (34) <-> Muddy Tunnel (39), map rendering suppresses `up/down` aliases and keeps only horizontal (`east/west`) edge depiction, because we follow the hint booklet here and avoid diagonal/slanted connectors. See [`ADR-0002-map-direction-alias-rendering.md`](ADR-0002-map-direction-alias-rendering.md).
 
 Canonical map sources:
 

@@ -218,19 +218,20 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added per-building local level bands/layer labels and a map legend for edge semantics.
    - Kept 8-direction edge labels visible and highlighted cross-building links for readability.
 
+54. [done] Refine `src/map-prototype-2.html` layout until fully aligned with the campus map.
+   - Shifted global room/building/road placement rightward to restore left-side map margin while keeping route readability stable.
+   - Reworked Steam/Wet tunnel placement (including `steam2` under `tomb`) and aligned key vertical stacks (`39 -> 99 -> wet1`, `steam5 -> concrete_box`) to booklet-driven layout intent.
+   - Added selective vertical-edge rendering rules: straight screen-vertical for generic up/down, Tunnel Entrance/Muddy exception (34<->39), and wet-tunnel loop/straight mixed exceptions.
+   - Hid Dream-only rooms (`place`, `basalt`, `platform`) from map rendering while preserving source data.
+   - Documented map-rendering decisions in `docs/ADR-0002-map-direction-alias-rendering.md` and linked ADR from `README.md`/`docs/LOCATION_MAP.md`.
+   - Extracted shared map data into `src/map-prototype-2-data.js` for browser + Node reuse.
+   - Added `tools/test-map-prototype-2-layout.js` to validate ROOM_LAYOUT + vertical edge reciprocity with only agreed wet-tunnel exceptions; test currently passes.
+
 ## Pending Tasks
 
-54. [pending] Refine `src/map-prototype-2.html` layout until fully aligned with the campus map.
-   - steam-keten moet opnieuw worden bekeken.
-   - Keep connection topology as-is unless a mismatch with prototype v1 or `tools/location-map-discovery.json` is confirmed.
-   - Refine per-building internal layout so room spacing/readability is stable and consistent with building-specific structure.
-   - Refine global inter-building placement so the relative building arrangement matches the university campus map.
-   - Add/refine background graphics per building zone (visual style, placement, opacity) without reducing route readability.
-   - Ensure local layer bands per building are visually coherent and do not clash with room labels/edge labels.
-   - Preserve clear distinction of edge types (`normal`, `enter`, `puzzle`, `restricted`, `cross-building`) and keep compass labels readable.
-   - Use `src/map-prototype.html` as canonical fallback for route correctness and `tools/location-map-discovery.json` for ID/edge verification when conflicts appear.
+55. [pending] Continue refining `src/map-prototype-2.html` layout until it is very close to the desired in-game map.
 
-55. [pending] Add an in-game map of visited locations while adventuring.
+56. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -246,7 +247,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-56. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+57. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability

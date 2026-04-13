@@ -157,6 +157,7 @@ Useful local checks:
 - [`docs/PHASE1_FOUNDATION_DESIGN.md`](docs/PHASE1_FOUNDATION_DESIGN.md) - finalized Phase 1 design.
 - [`docs/QUETZAL_LOCAL_STORAGE.md`](docs/QUETZAL_LOCAL_STORAGE.md) - IndexedDB-based Quetzal slot storage with `.sav` import/export workflow.
 - [`docs/ADR-0001-quetzal-local-storage.md`](docs/ADR-0001-quetzal-local-storage.md) - architectural decision record for Quetzal persistence.
+- [`docs/ADR-0002-map-direction-alias-rendering.md`](docs/ADR-0002-map-direction-alias-rendering.md) - map-rendering decision for direction aliases on Tunnel Entrance (34) <-> Muddy Tunnel (39).
 - [`docs/INTERPRETER_EXTENSIONS.md`](docs/INTERPRETER_EXTENSIONS.md) - interpreter QoL extensions and behavior notes.
 - [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md) - spoiler-heavy technical/reference map.
 - [`docs/LOCATION_IMAGE_BRIEFS.md`](docs/LOCATION_IMAGE_BRIEFS.md) - location title/description briefs for image generation workflows.

@@ -9,6 +9,7 @@
 - documentation will be placed in the `docs` folder, indexed in the `README.md`
 - architecture decisions will be documented in ADR files under `docs`.
 - When documents are added under `docs` and referenced from `README.md`, those references must be Markdown hyperlinks.
+- Map-rendering exception: only for Tunnel Entrance (34) <-> Muddy Tunnel (39), suppress `up/down` edge rendering and keep only horizontal (`east/west`) rendering on the map.
 
 ## Git commit message format
 - Always use real newlines in commit bodies.
