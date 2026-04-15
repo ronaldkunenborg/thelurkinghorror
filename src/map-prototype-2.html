@@ -5,14 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TLH Map Prototype v2 - Building Isometric Layout</title>
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&display=swap");
+
       :root {
-        --bg: #0d0c0a;
-        --panel: #1a1814;
-        --panel-line: #4d4638;
-        --ink: #ece3c9;
-        --muted: #b6ab8b;
-        --room-fill: #262319;
-        --room-line: #a3966f;
+        --bg: #0b0b0b;
+        --panel: #151515;
+        --panel-line: #4a4a4a;
+        --ink: #e2e2e2;
+        --muted: #9b9b9b;
+        --mass: #161616;
+        --floor-inactive: #262626;
+        --floor-active: #444444;
+        --line-primary: #e2e2e2;
+        --line-secondary: #7a7a7a;
+        --line-hidden: #4a4a4a;
+        --danger: #6e1f1f;
       }
 
       * {
@@ -22,7 +29,7 @@
       body {
         margin: 0;
         font-family: Georgia, "Times New Roman", serif;
-        background: radial-gradient(circle at 20% 10%, #1f1a14 0%, var(--bg) 55%);
+        background: radial-gradient(circle at 18% 8%, #1a1a1a 0%, var(--bg) 58%);
         color: var(--ink);
         min-height: 100vh;
       }
@@ -49,21 +56,26 @@
 
       .controls {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         gap: 16px;
         margin-bottom: 14px;
         color: var(--muted);
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        scrollbar-width: thin;
       }
 
       .controls label {
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        flex: 0 0 auto;
       }
 
       .frame {
         border: 1px solid var(--panel-line);
-        background: linear-gradient(180deg, #17140f 0%, #13110d 100%);
+        background: linear-gradient(180deg, #111111 0%, #0d0d0d 100%);
         overflow: hidden;
         flex: 1;
         min-height: 0;
@@ -136,9 +148,9 @@
       }
 
       .building-frame {
-        fill: rgba(43, 38, 29, 0.24);
-        stroke: rgba(203, 189, 151, 0.45);
-        stroke-width: 1;
+        fill: rgba(22, 22, 22, 0.5);
+        stroke: rgba(122, 122, 122, 0.55);
+        stroke-width: 1.4;
         stroke-dasharray: 8 6;
         rx: 14;
       }
@@ -162,49 +174,83 @@
       }
 
       .section-title {
-        fill: #d7cbab;
+        fill: var(--line-primary);
         font-size: 32px;
         font-weight: 700;
       }
 
       .legend-title {
-        fill: #d7cbab;
+        fill: var(--line-primary);
         font-size: 28px;
         font-weight: 700;
       }
 
       .campus-road {
-        fill: rgba(161, 145, 110, 0.22);
-        stroke: rgba(194, 178, 142, 0.55);
-        stroke-width: 1.2;
+        fill: rgba(38, 38, 38, 0.5);
+        stroke: rgba(122, 122, 122, 0.65);
+        stroke-width: 1.6;
       }
 
       .campus-building {
-        fill: rgba(42, 37, 28, 0.72);
-        stroke: rgba(203, 189, 151, 0.8);
-        stroke-width: 1.5;
+        fill: rgba(22, 22, 22, 0.9);
+        stroke: rgba(226, 226, 226, 0.78);
+        stroke-width: 2.5;
         rx: 16;
       }
 
       .campus-central {
-        fill: rgba(54, 45, 32, 0.8);
+        fill: rgba(26, 26, 26, 0.94);
       }
 
       .campus-accent {
-        stroke: rgba(143, 185, 207, 0.85);
+        stroke: rgba(226, 226, 226, 0.92);
       }
 
       .campus-label {
-        fill: #f0e6c9;
+        fill: var(--line-primary);
         font-size: 48px;
         font-weight: 700;
         text-anchor: middle;
       }
 
       .campus-sub {
-        fill: #bfb290;
+        fill: #adadad;
         font-size: 26px;
         text-anchor: middle;
+      }
+
+      .campus-label-side {
+        fill: var(--line-primary);
+        font-size: 38px;
+        font-weight: 700;
+        font-family: "IM Fell English SC", Georgia, "Times New Roman", serif;
+        letter-spacing: 0.4px;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+
+      .campus-sub-side {
+        fill: #adadad;
+        font-size: 22px;
+        text-anchor: middle;
+        dominant-baseline: central;
+      }
+
+      .campus-label-bottom {
+        fill: var(--line-primary);
+        font-size: 46px;
+        font-weight: 700;
+        font-family: "IM Fell English SC", Georgia, "Times New Roman", serif;
+        letter-spacing: 0.5px;
+        text-anchor: start;
+        dominant-baseline: hanging;
+      }
+
+      .campus-sub-inside {
+        fill: #b5b5b5;
+        font-size: 24px;
+        text-anchor: start;
+        dominant-baseline: central;
       }
 
       .tile-grid-line {
@@ -222,37 +268,40 @@
       }
 
       .tile-grid-cell {
-        fill: rgba(92, 84, 66, 0.08);
-        stroke: rgba(176, 162, 128, 0.35);
+        fill: rgba(38, 38, 38, 0.16);
+        stroke: rgba(122, 122, 122, 0.45);
         stroke-width: 1;
       }
 
       .tile-room-known {
         fill: transparent;
-        stroke: #f4f2ea;
-        stroke-width: 2.2;
+        stroke: var(--line-primary);
+        stroke-width: 2.5;
       }
 
       .tile-room-focus {
-        fill: rgba(255, 255, 255, 0.06);
-        stroke: rgba(255, 255, 255, 0.95);
-        stroke-width: 2.6;
+        fill: rgba(68, 68, 68, 0.95);
+        stroke: rgba(226, 226, 226, 0.98);
+        stroke-width: 4;
+        opacity: 1;
       }
 
       .tile-room-above {
-        fill: rgba(225, 235, 255, 0.08);
-        stroke: rgba(198, 220, 255, 0.9);
-        stroke-width: 2.3;
+        fill: rgba(52, 52, 52, 0.9);
+        stroke: rgba(226, 226, 226, 0.78);
+        stroke-width: 2.4;
+        opacity: 0.78;
       }
 
       .tile-room-below {
-        fill: rgba(90, 84, 72, 0.18);
-        stroke: rgba(176, 165, 142, 0.62);
-        stroke-width: 2;
+        fill: rgba(28, 28, 28, 0.84);
+        stroke: rgba(160, 160, 160, 0.54);
+        stroke-width: 2.1;
+        opacity: 0.52;
       }
 
       .tile-room-title {
-        fill: #ffffff;
+        fill: var(--line-primary);
         font-size: 22px;
         font-weight: 700;
         text-anchor: middle;
@@ -261,7 +310,7 @@
       }
 
       .tile-room-level {
-        fill: rgba(240, 230, 205, 0.95);
+        fill: rgba(226, 226, 226, 0.85);
         font-size: 17px;
         font-weight: 700;
         text-anchor: middle;
@@ -270,7 +319,7 @@
       }
 
       .tile-grid-coord {
-        fill: rgba(230, 220, 192, 0.72);
+        fill: rgba(226, 226, 226, 0.64);
         font-size: 22px;
         text-anchor: middle;
         dominant-baseline: central;
@@ -283,14 +332,14 @@
       }
 
       .dir-label {
-        fill: #e8ddbf;
+        fill: var(--line-primary);
         font-size: 28px;
         font-weight: 700;
         text-anchor: middle;
       }
 
       .floor-select {
-        background: #17140f;
+        background: #141414;
         color: var(--ink);
         border: 1px solid var(--panel-line);
         padding: 4px 8px;
@@ -319,7 +368,7 @@
       }
 
       .room-node-label {
-        fill: #efe6c8;
+        fill: var(--line-primary);
         font-size: 20px;
         text-anchor: middle;
         dominant-baseline: central;
@@ -337,7 +386,7 @@
 
       .edge-compare {
         fill: none;
-        stroke-width: 2;
+        stroke-width: 2.2;
         stroke-linecap: round;
         opacity: 0.95;
       }
@@ -353,6 +402,21 @@
       .edge-presentation-only {
         stroke: #ff6f6f;
       }
+
+      .edge-depth-focus {
+        stroke-width: 2.8;
+        opacity: 0.98;
+      }
+
+      .edge-depth-near {
+        stroke-width: 2.2;
+        opacity: 0.78;
+      }
+
+      .edge-depth-far {
+        stroke-width: 1.6;
+        opacity: 0.6;
+      }
     </style>
   </head>
   <body>
@@ -362,7 +426,8 @@
       <div class="controls">
         <label><input id="toggle-roads" type="checkbox" checked /> Show roads</label>
         <label><input id="toggle-legend" type="checkbox" checked /> Show legend</label>
-        <label><input id="toggle-grid" type="checkbox" checked /> Show tile grid</label>
+        <label><input id="toggle-grid" type="checkbox" /> Show tile grid</label>
+        <label><input id="toggle-floor-tiles" type="checkbox" checked /> Show floor tiles</label>
         <label>
           Floor layer
           <select id="floor-filter" class="floor-select">
@@ -382,7 +447,7 @@
         </label>
       </div>
       <div class="frame">
-        <svg id="map" viewBox="0 0 1600 980" aria-label="Integrated map prototype"></svg>
+        <svg id="map" viewBox="0 0 1600 980" preserveAspectRatio="xMinYMin meet" aria-label="Integrated map prototype"></svg>
       </div>
     </div>
 
@@ -394,6 +459,8 @@
       const WORLD_H = 4200;
       const svg = document.getElementById("map");
       let viewport = null;
+      let uiLayer = null;
+      let legendLayer = null;
       const panZoom = {
         scale: 0.42,
         tx: 20,
@@ -762,11 +829,11 @@
         }
       }
 
-      function add(tag, attrs, text) {
+      function add(tag, attrs, text, target) {
         const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
         Object.entries(attrs || {}).forEach(([k, v]) => el.setAttribute(k, String(v)));
         if (text != null) el.textContent = text;
-        (viewport || svg).appendChild(el);
+        (target || viewport || svg).appendChild(el);
         return el;
       }
 
@@ -1227,6 +1294,28 @@
         };
       }
 
+      function roomLayerVisual(relativeLevel) {
+        if (relativeLevel > 0) {
+          return {
+            tileClass: "tile-room-above",
+            titleFill: "rgba(226, 226, 226, 0.82)",
+            levelFill: "rgba(226, 226, 226, 0.64)"
+          };
+        }
+        if (relativeLevel < 0) {
+          return {
+            tileClass: "tile-room-below",
+            titleFill: "rgba(194, 194, 194, 0.74)",
+            levelFill: "rgba(194, 194, 194, 0.56)"
+          };
+        }
+        return {
+          tileClass: "tile-room-focus",
+          titleFill: "rgba(255, 255, 255, 0.98)",
+          levelFill: "rgba(236, 236, 236, 0.88)"
+        };
+      }
+
       function drawRoomLayer(layerFilter) {
         const layerRender = buildLayerRenderContext(layerFilter);
         const visibleRooms = ROOM_TILE_METADATA
@@ -1236,15 +1325,18 @@
             ...room,
             _layerOffsetY: layerRender.layerOffsetY(room),
             _relativeLevel: layerRender.relativeLevel(room)
-          }));
+          }))
+          // Draw from lower to higher levels so upper floors visually sit on top.
+          .sort((a, b) => {
+            if (a._relativeLevel !== b._relativeLevel) return a._relativeLevel - b._relativeLevel;
+            return a.tile.rank - b.tile.rank;
+          });
 
         for (const room of visibleRooms) {
           const { p0, p1, p2, p3 } = tileCorners(room.tile.c, room.tile.rank);
-          let layerClass = "tile-room-focus";
-          if (room._relativeLevel > 0) layerClass = "tile-room-above";
-          else if (room._relativeLevel < 0) layerClass = "tile-room-below";
+          const layerVisual = roomLayerVisual(room._relativeLevel);
           add("polygon", {
-            class: "tile-room-known " + layerClass,
+            class: "tile-room-known " + layerVisual.tileClass,
             points:
               p0.x +
               "," +
@@ -1268,6 +1360,7 @@
             "text",
             {
               class: "tile-room-title",
+              style: "fill:" + layerVisual.titleFill + ";",
               x: p0.x + ISO_BASIS_E.dx * 0.5 + ISO_BASIS_S.dx * 0.25,
               y: p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.25
             },
@@ -1277,6 +1370,7 @@
             "text",
             {
               class: "tile-room-level",
+              style: "fill:" + layerVisual.levelFill + ";",
               x: p0.x + ISO_BASIS_E.dx * 0.5 + ISO_BASIS_S.dx * 0.75,
               y: p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.75
             },
@@ -1350,6 +1444,7 @@
             x: center.x,
             y: center.y + layerOffsetY + 24,
             layerOffsetY,
+            relativeLevel: layerRender.relativeLevel(room),
             c: room.tile.c,
             rank: room.tile.rank
           });
@@ -1463,6 +1558,14 @@
         // Keep length aligned with the map's primary edge step length.
         const verticalEdgeLength = Math.hypot(STEP_E.dx, STEP_E.dy);
         const verticalLoopSlots = new Map();
+        const edgeDepthClass = (from, to) => {
+          const fromDepth = Math.abs(Number(from?.relativeLevel || 0));
+          const toDepth = Math.abs(Number(to?.relativeLevel || 0));
+          const depth = to ? (fromDepth + toDepth) * 0.5 : fromDepth;
+          if (depth < 0.25) return "edge-depth-focus";
+          if (depth < 0.75) return "edge-depth-near";
+          return "edge-depth-far";
+        };
         const curvedVerticalLoopPath = (from, dir, slot) => {
           const band = Math.floor(slot / 2);
           const spread = 26 + band * 8;
@@ -1531,8 +1634,9 @@
             if (isWet1Up || isWet5Down) {
               const delta = vDir === "up" ? -verticalEdgeLength : verticalEdgeLength;
               const d = "M " + from.x + " " + from.y + " L " + from.x + " " + (from.y + delta);
+              const depthClass = edgeDepthClass(from, null);
               add("path", {
-                class: edgeClassByType[edge.type] || "edge-compare edge-match",
+                class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
                 d
               });
               continue;
@@ -1543,16 +1647,18 @@
               const slot = verticalLoopSlots.get(slotKey) || 0;
               verticalLoopSlots.set(slotKey, slot + 1);
               const d = curvedVerticalLoopPath(from, vDir, slot);
+              const depthClass = edgeDepthClass(from, null);
               add("path", {
-                class: edgeClassByType[edge.type] || "edge-compare edge-match",
+                class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
                 d
               });
               continue;
             }
             const delta = vDir === "up" ? -verticalEdgeLength : verticalEdgeLength;
             const d = "M " + from.x + " " + from.y + " L " + from.x + " " + (from.y + delta);
+            const depthClass = edgeDepthClass(from, null);
             add("path", {
-              class: edgeClassByType[edge.type] || "edge-compare edge-match",
+              class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
               d
             });
             continue;
@@ -1560,8 +1666,9 @@
           const to = centerByLocationId.get(edge.to);
           if (!to) continue;
           const d = orthogonalPath(from, to, primaryDir(edge.command));
+          const depthClass = edgeDepthClass(from, to);
           add("path", {
-            class: edgeClassByType[edge.type] || "edge-compare edge-match",
+            class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
             d
           });
         }
@@ -1617,6 +1724,101 @@
       }
 
       function drawCampusLayout(showRoads, layerFilter) {
+        const normalize = (v) => {
+          const d = Math.hypot(v.x, v.y) || 1;
+          return { x: v.x / d, y: v.y / d };
+        };
+        const drawBlockSideLabel = (pts, label, sub, placement) => {
+          if (!label) return;
+          // Left side of the projected block is p0 -> p3.
+          const a = pts[0];
+          const b = pts[3];
+          const center = {
+            x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+            y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
+          };
+          const edgeMid = { x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 };
+          const edgeDir = normalize({ x: b.x - a.x, y: b.y - a.y });
+          const inward = normalize({ x: center.x - edgeMid.x, y: center.y - edgeMid.y });
+          const placeOutside = placement === "outside";
+          const depth = placeOutside ? -34 : 36;
+
+          let angle = (Math.atan2(edgeDir.y, edgeDir.x) * 180) / Math.PI;
+          if (angle > 90) angle -= 180;
+          if (angle < -90) angle += 180;
+
+          const labelPos = {
+            x: edgeMid.x + inward.x * depth,
+            y: edgeMid.y + inward.y * depth
+          };
+
+          add(
+            "text",
+            {
+              class: "campus-label-side",
+              x: labelPos.x,
+              y: labelPos.y,
+              transform: "rotate(" + angle + " " + labelPos.x + " " + labelPos.y + ")"
+            },
+            label
+          );
+
+          if (sub) {
+            const subPos = {
+              x: labelPos.x + inward.x * 54,
+              y: labelPos.y + inward.y * 54
+            };
+            add(
+              "text",
+              {
+                class: "campus-sub-side",
+                x: subPos.x,
+                y: subPos.y,
+                transform: "rotate(" + angle + " " + subPos.x + " " + subPos.y + ")"
+              },
+              sub
+            );
+          }
+        };
+        const drawBuildingBottomLabel = (pts, label, xShiftPx, placeInside) => {
+          if (!label) return;
+          // Bottom edge is p3 -> p2; place label just outside and below that edge.
+          const bottomLeft = pts[3];
+          const edgeMid = { x: (pts[3].x + pts[2].x) * 0.5, y: (pts[3].y + pts[2].y) * 0.5 };
+          const center = {
+            x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+            y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
+          };
+          const outward = normalize({ x: edgeMid.x - center.x, y: edgeMid.y - center.y });
+          const inward = { x: -outward.x, y: -outward.y };
+          const xShift = Number.isFinite(xShiftPx) ? xShiftPx : 0;
+          const inside = placeInside === true;
+          const yBase = inside ? Math.max(pts[3].y, pts[2].y) - 22 : Math.max(pts[3].y, pts[2].y) + 14;
+          const inset = inside ? 30 : 12;
+          const shiftVec = inside ? inward : outward;
+          const labelPos = {
+            x: bottomLeft.x + 4 + shiftVec.x * inset + xShift,
+            y: yBase + shiftVec.y * inset
+          };
+          add("text", { class: "campus-label-bottom", x: labelPos.x, y: labelPos.y }, label);
+          return labelPos;
+        };
+        const drawCentralSubtitleInside = (pts, sub, titlePos) => {
+          if (!sub) return;
+          // Bottom-left inside anchor.
+          const bottomMid = { x: (pts[3].x + pts[2].x) * 0.5, y: (pts[3].y + pts[2].y) * 0.5 };
+          const center = {
+            x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+            y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
+          };
+          const inward = normalize({ x: center.x - bottomMid.x, y: center.y - bottomMid.y });
+          const subPos = {
+            x: titlePos && Number.isFinite(titlePos.x) ? titlePos.x : pts[3].x + 8,
+            y: Math.max(pts[3].y, pts[2].y) - 18 + inward.y * 8
+          };
+          add("text", { class: "campus-sub-inside", x: subPos.x, y: subPos.y }, sub);
+        };
+
         const layerRender = buildLayerRenderContext(layerFilter);
         const groundFloorOffsetY =
           layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
@@ -1626,53 +1828,60 @@
           const pts = blockPoints(block).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
           if (!pts.length) continue;
           const points = pts.map((p) => p.x + "," + p.y).join(" ");
-          const cx = (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4;
-          const cy = (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4;
 
           if (block.type === "road-h" || block.type === "road-v") {
             add("polygon", { class: "campus-road", points });
-            add("text", { class: "campus-label", x: cx, y: cy + 6 }, block.label);
+            if (block.id === "smith") {
+              drawBuildingBottomLabel(pts, block.label, ISO_BASIS_E.dx * 2, true);
+            } else {
+              drawBlockSideLabel(pts, block.label, null, "inside");
+            }
             continue;
           }
 
           const className =
             block.type === "building-central" ? "campus-building campus-central campus-accent" : "campus-building";
           add("polygon", { class: className, points });
-          add("text", { class: "campus-label", x: cx, y: cy - 10 }, block.label);
-          if (block.sub) {
-            add("text", { class: "campus-sub", x: cx, y: cy + 16 }, block.sub);
+          if (block.id === "brown") {
+            drawBlockSideLabel(pts, block.label, null, "outside");
+          } else {
+            const titlePos = drawBuildingBottomLabel(pts, block.label, 0);
+            if (block.type === "building-central") {
+              drawCentralSubtitleInside(pts, block.sub, titlePos);
+            }
           }
         }
       }
 
-      function drawLegend() {
-        const frame = tileLegendFrame();
-        const gutterPx = TILE_GUTTER_SIDE * TILE_GRID.cellW;
-        const x = frame.x;
-        const y = frame.y - gutterPx - 260;
+      function drawLegend(x, y, target) {
         add("rect", {
           class: "building-frame",
           x,
           y,
           width: 940,
           height: 260
-        });
-        add("text", { class: "legend-title", x: x + 28, y: y + 44 }, "Legend");
-        add("rect", { class: "campus-building campus-central", x: x + 28, y: y + 74, width: 64, height: 34 });
-        add("text", { class: "legend-item-label", x: x + 150, y: y + 92 }, "central complex building");
-        add("rect", { class: "campus-building", x: x + 28, y: y + 124, width: 64, height: 34 });
-        add("text", { class: "legend-item-label", x: x + 150, y: y + 142 }, "standalone building");
-        add("rect", { class: "campus-road", x: x + 28, y: y + 176, width: 64, height: 22, rx: 9 });
-        add("text", { class: "legend-item-label", x: x + 150, y: y + 188 }, "street/road");
-        add("text", { class: "legend-item-label", x: x + 440, y: y + 142 }, "room nodes filtered by floor layer");
+        }, null, target);
+        add("text", { class: "legend-title", x: x + 28, y: y + 44 }, "Legend", target);
+        add("rect", { class: "campus-building campus-central", x: x + 28, y: y + 74, width: 64, height: 34 }, null, target);
+        add("text", { class: "legend-item-label", x: x + 150, y: y + 92 }, "central complex building", target);
+        add("rect", { class: "campus-building", x: x + 28, y: y + 124, width: 64, height: 34 }, null, target);
+        add("text", { class: "legend-item-label", x: x + 150, y: y + 142 }, "standalone building", target);
+        add("rect", { class: "campus-road", x: x + 28, y: y + 176, width: 64, height: 22, rx: 9 }, null, target);
+        add("text", { class: "legend-item-label", x: x + 150, y: y + 188 }, "street/road", target);
+        add("text", { class: "legend-item-label", x: x + 440, y: y + 142 }, "room nodes filtered by floor layer", target);
       }
 
-      function drawDirectionArrow(x, y, dx, dy, label, stroke) {
-        add("line", { class: "dir-line", x1: x, y1: y, x2: x + dx, y2: y + dy, stroke });
-        add("text", { class: "dir-label", x: x + dx + Math.sign(dx || 1) * 18, y: y + dy + (dy < 0 ? -8 : 14) }, label);
+      function drawDirectionArrow(x, y, dx, dy, label, stroke, target) {
+        add("line", { class: "dir-line", x1: x, y1: y, x2: x + dx, y2: y + dy, stroke }, null, target);
+        add(
+          "text",
+          { class: "dir-label", x: x + dx + Math.sign(dx || 1) * 18, y: y + dy + (dy < 0 ? -8 : 14) },
+          label,
+          target
+        );
       }
 
-      function drawPlacementGridAndLegend(showLegend) {
+      function drawPlacementGridAndLegend(showGrid, showLegend, x, y, target) {
         const gridX0 = TILE_GRID.originX;
         const gridY0 = TILE_GRID.originY;
         const anchorAt = (c, r) => ({
@@ -1680,92 +1889,85 @@
           y: gridY0 + c * STEP_E.dy + r * STEP_S.dy
         });
 
-        for (let c = 0; c < TILE_GRID.cols; c += 1) {
-          for (let r = 0; r < TILE_GRID.rows; r += 1) {
-            const p0 = anchorAt(c, r);
-            const p1 = { x: p0.x + ISO_BASIS_E.dx, y: p0.y + ISO_BASIS_E.dy };
-            const p3 = { x: p0.x + ISO_BASIS_S.dx, y: p0.y + ISO_BASIS_S.dy };
-            const p2 = { x: p1.x + ISO_BASIS_S.dx, y: p1.y + ISO_BASIS_S.dy };
-            const className = "tile-grid-cell";
-            add("polygon", {
-              class: className,
-              points: p0.x + "," + p0.y + " " + p1.x + "," + p1.y + " " + p2.x + "," + p2.y + " " + p3.x + "," + p3.y
-            });
+        if (showGrid) {
+          for (let c = 0; c < TILE_GRID.cols; c += 1) {
+            for (let r = 0; r < TILE_GRID.rows; r += 1) {
+              const p0 = anchorAt(c, r);
+              const p1 = { x: p0.x + ISO_BASIS_E.dx, y: p0.y + ISO_BASIS_E.dy };
+              const p3 = { x: p0.x + ISO_BASIS_S.dx, y: p0.y + ISO_BASIS_S.dy };
+              const p2 = { x: p1.x + ISO_BASIS_S.dx, y: p1.y + ISO_BASIS_S.dy };
+              const className = "tile-grid-cell";
+              add("polygon", {
+                class: className,
+                points: p0.x + "," + p0.y + " " + p1.x + "," + p1.y + " " + p2.x + "," + p2.y + " " + p3.x + "," + p3.y
+              });
 
-            const center = {
-              x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
-              y: p0.y + (ISO_BASIS_E.dy + ISO_BASIS_S.dy) * 0.5
-            };
-            const file = colToLetters(c);
-            const rank = TILE_GRID.rows - r; // A1 = bottom-left
-            add("text", { class: "tile-grid-coord", x: center.x, y: center.y }, file + rank);
+              const center = {
+                x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
+                y: p0.y + (ISO_BASIS_E.dy + ISO_BASIS_S.dy) * 0.5
+              };
+              const file = colToLetters(c);
+              const rank = TILE_GRID.rows - r; // A1 = bottom-left
+              add("text", { class: "tile-grid-coord", x: center.x, y: center.y }, file + rank);
+            }
+          }
+          for (let c = 0; c <= TILE_GRID.cols; c += 1) {
+            for (let r = 0; r <= TILE_GRID.rows; r += 1) {
+              const p = anchorAt(c, r);
+              add("circle", {
+                class: "tile-grid-point",
+                cx: p.x,
+                cy: p.y,
+                r: 2.2
+              });
+            }
           }
         }
-        for (let c = 0; c <= TILE_GRID.cols; c += 1) {
-          for (let r = 0; r <= TILE_GRID.rows; r += 1) {
-            const p = anchorAt(c, r);
-            add("circle", {
-              class: "tile-grid-point",
-              cx: p.x,
-              cy: p.y,
-              r: 2.2
-            });
-          }
-        }
 
-        const frame = tileLegendFrame();
-        const legendW = frame.w;
-        const legendH = frame.h;
-        const legendX = frame.x;
-        const legendY = frame.y;
+        const legendW = 1170;
+        const legendH = 520;
+        const legendX = x;
+        const legendY = y;
         const vx = legendX + 330;
         const vy = legendY + 310;
 
         if (showLegend) {
-          const fmt = (n) => Number(n).toFixed(2);
-          add("rect", { class: "building-frame", x: legendX, y: legendY, width: legendW, height: legendH });
-          add("text", { class: "legend-title", x: legendX + 20, y: legendY + 26 }, "Tile Direction Grid");
-          add(
-            "text",
-            { class: "grid-meta-label", x: legendX + 20, y: legendY + 50 },
-              "iso tile basis: E(" +
-              fmt(ISO_BASIS_E.dx) +
-              "," +
-              fmt(ISO_BASIS_E.dy) +
-              "), S(" +
-              fmt(ISO_BASIS_S.dx) +
-              "," +
-              fmt(ISO_BASIS_S.dy) +
-              "), N tilt=" +
-              TILE_GRID.northTiltFromVerticalDeg +
-              "deg, gutter=0.5 tile/side (step=2.0x), level=" +
-              TILE_GRID.levelY
-          );
-          add("circle", { class: "tile-grid-point", cx: vx, cy: vy, r: 4 });
-          add("text", { class: "grid-meta-label", x: vx + 52, y: vy + 4 }, "origin");
+          add("rect", { class: "building-frame", x: legendX, y: legendY, width: legendW, height: legendH }, null, target);
+          add("text", { class: "legend-title", x: legendX + 20, y: legendY + 26 }, "Tile Direction Grid", target);
+          // Intentionally omit technical/debug metadata from the on-screen legend.
+          add("circle", { class: "tile-grid-point", cx: vx, cy: vy, r: 4 }, null, target);
+          add("text", { class: "grid-meta-label", x: vx + 52, y: vy + 4 }, "origin", target);
 
           const scale = 0.55;
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.N.dx * scale, DIRECTION_VECTORS.N.dy * scale, "N", "#8fb9cf");
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NE.dx * scale, DIRECTION_VECTORS.NE.dy * scale, "NE", "#8fb9cf");
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.E.dx * scale, DIRECTION_VECTORS.E.dy * scale, "E", "#8fb9cf");
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SE.dx * scale, DIRECTION_VECTORS.SE.dy * scale, "SE", "#8fb9cf");
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.S.dx * scale, DIRECTION_VECTORS.S.dy * scale, "S", "#8fb9cf");
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SW.dx * scale, DIRECTION_VECTORS.SW.dy * scale, "SW", "#8fb9cf");
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.W.dx * scale, DIRECTION_VECTORS.W.dy * scale, "W", "#8fb9cf");
-          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NW.dx * scale, DIRECTION_VECTORS.NW.dy * scale, "NW", "#8fb9cf");
-          drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.UP.dx, DIRECTION_VECTORS.UP.dy * 0.55, "UP", "#d8cfb3");
-          drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.DOWN.dx, DIRECTION_VECTORS.DOWN.dy * 0.55, "DOWN", "#d8cfb3");
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.N.dx * scale, DIRECTION_VECTORS.N.dy * scale, "N", "#8fb9cf", target);
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NE.dx * scale, DIRECTION_VECTORS.NE.dy * scale, "NE", "#8fb9cf", target);
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.E.dx * scale, DIRECTION_VECTORS.E.dy * scale, "E", "#8fb9cf", target);
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SE.dx * scale, DIRECTION_VECTORS.SE.dy * scale, "SE", "#8fb9cf", target);
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.S.dx * scale, DIRECTION_VECTORS.S.dy * scale, "S", "#8fb9cf", target);
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.SW.dx * scale, DIRECTION_VECTORS.SW.dy * scale, "SW", "#8fb9cf", target);
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.W.dx * scale, DIRECTION_VECTORS.W.dy * scale, "W", "#8fb9cf", target);
+          drawDirectionArrow(vx, vy, DIRECTION_VECTORS.NW.dx * scale, DIRECTION_VECTORS.NW.dy * scale, "NW", "#8fb9cf", target);
+          drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.UP.dx, DIRECTION_VECTORS.UP.dy * 0.55, "UP", "#d8cfb3", target);
+          drawDirectionArrow(vx + 240, vy, DIRECTION_VECTORS.DOWN.dx, DIRECTION_VECTORS.DOWN.dy * 0.55, "DOWN", "#d8cfb3", target);
         }
       }
 
       function draw() {
         svg.innerHTML = "";
         viewport = null;
+        uiLayer = null;
+        legendLayer = null;
         const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
         svg.appendChild(defs);
         viewport = document.createElementNS("http://www.w3.org/2000/svg", "g");
         viewport.setAttribute("id", "viewport");
         svg.appendChild(viewport);
+        uiLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        uiLayer.setAttribute("id", "ui-layer");
+        svg.appendChild(uiLayer);
+        legendLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        legendLayer.setAttribute("id", "legend-layer");
+        uiLayer.appendChild(legendLayer);
 
         const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
         marker.setAttribute("id", "arrow");
@@ -1814,18 +2016,45 @@
         const showRoads = document.getElementById("toggle-roads").checked;
         const showLegend = document.getElementById("toggle-legend").checked;
         const showGrid = document.getElementById("toggle-grid").checked;
+        const showFloorTiles = document.getElementById("toggle-floor-tiles").checked;
         const floorFilter = document.getElementById("floor-filter").value;
+        const hudPadding = 20;
+        const hudScale = 0.33;
+        const legendW = 940;
+        const legendH = 260;
+        const tileLegendW = 1170;
+        const tileLegendH = 520;
+        const hudTotalW = Math.max(legendW, tileLegendW);
+        const hudTotalH = legendH + 12 + tileLegendH;
+        const viewBoxWidth = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal.width : 1600;
+        const viewBoxHeight = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal.height : 980;
+        const legendX = hudPadding;
+        const legendY = Math.max(hudPadding, viewBoxHeight - hudTotalH * hudScale - hudPadding);
+        const tileLegendX = 0;
+        const tileLegendY = legendH + 12;
+        legendLayer.setAttribute("transform", "translate(" + legendX.toFixed(2) + " " + legendY.toFixed(2) + ") scale(" + hudScale + ")");
         drawCampusLayout(showRoads, floorFilter);
-        drawEdgeComparison(floorFilter);
-        drawRoomLayer(floorFilter);
-        if (showLegend) drawLegend();
-        if (showGrid) drawPlacementGridAndLegend(showLegend);
+        if (showFloorTiles) {
+          drawEdgeComparison(floorFilter);
+          drawRoomLayer(floorFilter);
+        }
+        if (showLegend) drawLegend(0, 0, legendLayer);
+        if (showGrid || showLegend) drawPlacementGridAndLegend(showGrid, showLegend, tileLegendX, tileLegendY, legendLayer);
 
         if (!panZoom.hasUserMoved) {
           setInitialView();
         } else {
           applyTransform();
         }
+      }
+
+      function redrawSoon() {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(() => {
+            draw();
+          });
+        });
+        setTimeout(draw, 0);
       }
 
       function clamp(value, min, max) {
@@ -1933,20 +2162,19 @@
       document.getElementById("toggle-roads").addEventListener("change", draw);
       document.getElementById("toggle-legend").addEventListener("change", draw);
       document.getElementById("toggle-grid").addEventListener("change", draw);
+      document.getElementById("toggle-floor-tiles").addEventListener("change", draw);
       document.getElementById("floor-filter").addEventListener("change", draw);
       svg.addEventListener("mousedown", onPointerDown);
       window.addEventListener("mousemove", onPointerMove);
       window.addEventListener("mouseup", onPointerUp);
       svg.addEventListener("mouseleave", onPointerUp);
       svg.addEventListener("wheel", onWheel, { passive: false });
-      window.addEventListener("resize", () => {
-        if (!panZoom.hasUserMoved) {
-          setInitialView();
-        } else {
-          applyTransform();
-        }
-      });
+      window.addEventListener("resize", draw);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(redrawSoon).catch(() => {});
+      }
       draw();
+      redrawSoon();
     </script>
   </body>
 </html>
