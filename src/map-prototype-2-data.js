@@ -188,7 +188,7 @@
             edges: []
           },
           { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "cp", label: "east" }] },
-          { id: "cp", label: "Cluttered Passage", section: "R", layer: "L-1", x: 1940, y: 670, edges: [{ to: "brown", label: "east" }] },
+          { id: "cp", label: "Cluttered Passage", section: "R", layer: "L-1", x: 1940, y: 670, edges: [{ to: "brown_b", label: "southeast" }] },
           {
             id: "brown",
             label: "Brown Building",
@@ -202,7 +202,15 @@
               { to: "small_court", label: "south" }
             ]
           },
-          { id: "brown_b", label: "Brown Basement", section: "R", layer: "L-1", x: 1760, y: 1140, edges: [] },
+          {
+            id: "brown_b",
+            label: "Brown Basement",
+            section: "R",
+            layer: "L-1",
+            x: 1760,
+            y: 1140,
+            edges: [{ to: "cp", label: "northwest" }]
+          },
           { id: "top_floor", label: "Top Floor", section: "R", layer: "L+1", x: 1760, y: 520, edges: [{ to: "sky_roof", label: "up" }] },
           { id: "sky_roof", label: "Skyscraper Roof", section: "R", layer: "L+2", x: 1760, y: 240, edges: [{ to: "inside_dome", label: "up" }] },
           { id: "inside_dome", label: "Inside Dome", section: "R", layer: "L+2", x: 1980, y: 240, edges: [] },

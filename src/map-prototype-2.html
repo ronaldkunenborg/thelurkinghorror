@@ -233,9 +233,36 @@
         stroke-width: 2.2;
       }
 
+      .tile-room-focus {
+        fill: rgba(255, 255, 255, 0.06);
+        stroke: rgba(255, 255, 255, 0.95);
+        stroke-width: 2.6;
+      }
+
+      .tile-room-above {
+        fill: rgba(225, 235, 255, 0.08);
+        stroke: rgba(198, 220, 255, 0.9);
+        stroke-width: 2.3;
+      }
+
+      .tile-room-below {
+        fill: rgba(90, 84, 72, 0.18);
+        stroke: rgba(176, 165, 142, 0.62);
+        stroke-width: 2;
+      }
+
       .tile-room-title {
         fill: #ffffff;
         font-size: 22px;
+        font-weight: 700;
+        text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
+
+      .tile-room-level {
+        fill: rgba(240, 230, 205, 0.95);
+        font-size: 17px;
         font-weight: 700;
         text-anchor: middle;
         dominant-baseline: central;
@@ -1159,20 +1186,29 @@
 
       function buildLayerRenderContext(layerFilter) {
         const verticalEdgeLength = Math.hypot(STEP_E.dx, STEP_E.dy);
+        const layerStep = verticalEdgeLength * 0.75;
         if (layerFilter === "all") {
           return {
+            focusLevel: null,
+            layerStep,
             includeRoom: () => true,
-            layerOffsetY: () => 0
+            layerOffsetY: () => 0,
+            relativeLevel: () => 0
           };
         }
         const focusLevel = layerToLevel(layerFilter);
         if (focusLevel == null) {
           return {
+            focusLevel: null,
+            layerStep,
             includeRoom: (room) => room.layer === layerFilter,
-            layerOffsetY: () => 0
+            layerOffsetY: () => 0,
+            relativeLevel: () => 0
           };
         }
         return {
+          focusLevel,
+          layerStep,
           includeRoom: (room) => {
             const roomLevel = layerToLevel(room.layer);
             if (roomLevel == null) return false;
@@ -1181,7 +1217,12 @@
           layerOffsetY: (room) => {
             const roomLevel = layerToLevel(room.layer);
             if (roomLevel == null) return 0;
-            return (focusLevel - roomLevel) * verticalEdgeLength;
+            return (focusLevel - roomLevel) * layerStep;
+          },
+          relativeLevel: (room) => {
+            const roomLevel = layerToLevel(room.layer);
+            if (roomLevel == null) return 0;
+            return roomLevel - focusLevel;
           }
         };
       }
@@ -1191,12 +1232,19 @@
         const visibleRooms = ROOM_TILE_METADATA
           .filter((room) => !MAP_HIDDEN_ROOM_IDS.has(room.id))
           .filter((room) => layerRender.includeRoom(room))
-          .map((room) => ({ ...room, _layerOffsetY: layerRender.layerOffsetY(room) }));
+          .map((room) => ({
+            ...room,
+            _layerOffsetY: layerRender.layerOffsetY(room),
+            _relativeLevel: layerRender.relativeLevel(room)
+          }));
 
         for (const room of visibleRooms) {
           const { p0, p1, p2, p3 } = tileCorners(room.tile.c, room.tile.rank);
+          let layerClass = "tile-room-focus";
+          if (room._relativeLevel > 0) layerClass = "tile-room-above";
+          else if (room._relativeLevel < 0) layerClass = "tile-room-below";
           add("polygon", {
-            class: "tile-room-known",
+            class: "tile-room-known " + layerClass,
             points:
               p0.x +
               "," +
@@ -1224,6 +1272,15 @@
               y: p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.25
             },
             room.label
+          );
+          add(
+            "text",
+            {
+              class: "tile-room-level",
+              x: p0.x + ISO_BASIS_E.dx * 0.5 + ISO_BASIS_S.dx * 0.75,
+              y: p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.75
+            },
+            room.layer
           );
         }
 
@@ -1292,6 +1349,7 @@
           centerByLocationId.set(room.locationId, {
             x: center.x,
             y: center.y + layerOffsetY + 24,
+            layerOffsetY,
             c: room.tile.c,
             rank: room.tile.rank
           });
@@ -1374,9 +1432,9 @@
           return null;
         };
 
-        const centerAtGrid = (c, rank) => {
+        const centerAtGrid = (c, rank, layerOffsetY) => {
           const p = tileCenter(c, rank);
-          return { x: p.x, y: p.y + 24 };
+          return { x: p.x, y: p.y + 24 + (layerOffsetY || 0) };
         };
 
         // Route bends in tile-space, so corners follow the map's projected grid axes.
@@ -1388,14 +1446,14 @@
 
           if ((dir === "west" || dir === "east") && Math.abs(from.rank - to.rank) > 0.001) {
             const midC = (from.c + to.c) / 2;
-            const p1 = centerAtGrid(midC, from.rank);
-            const p2 = centerAtGrid(midC, to.rank);
+            const p1 = centerAtGrid(midC, from.rank, from.layerOffsetY);
+            const p2 = centerAtGrid(midC, to.rank, to.layerOffsetY);
             return "M " + from.x + " " + from.y + " L " + p1.x + " " + p1.y + " L " + p2.x + " " + p2.y + " L " + to.x + " " + to.y;
           }
           if ((dir === "north" || dir === "south") && Math.abs(from.c - to.c) > 0.001) {
             const midR = (from.rank + to.rank) / 2;
-            const p1 = centerAtGrid(from.c, midR);
-            const p2 = centerAtGrid(to.c, midR);
+            const p1 = centerAtGrid(from.c, midR, from.layerOffsetY);
+            const p2 = centerAtGrid(to.c, midR, to.layerOffsetY);
             return "M " + from.x + " " + from.y + " L " + p1.x + " " + p1.y + " L " + p2.x + " " + p2.y + " L " + to.x + " " + to.y;
           }
           return "M " + from.x + " " + from.y + " L " + to.x + " " + to.y;
@@ -1455,6 +1513,14 @@
             (edge.from === 34 && edge.to === 39) ||
             (edge.from === 39 && edge.to === 34);
           if (isTunnelMuddyPair && vDir) {
+            continue;
+          }
+          // Manual suppression: Fruits and Nuts (150) <-> Cluttered Passage (179)
+          // vertical aliases are noisy here; keep the canonical horizontal link only.
+          const isFnCpPair =
+            (edge.from === 150 && edge.to === 179) ||
+            (edge.from === 179 && edge.to === 150);
+          if (isFnCpPair && vDir) {
             continue;
           }
           if (vDir) {
@@ -1550,11 +1616,14 @@
         return [p0, p1, p2, p3];
       }
 
-      function drawCampusLayout(showRoads) {
+      function drawCampusLayout(showRoads, layerFilter) {
+        const layerRender = buildLayerRenderContext(layerFilter);
+        const groundFloorOffsetY =
+          layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
         for (const block of CAMPUS_BLOCKS) {
           if (block.hidden) continue;
           if ((block.type === "road-h" || block.type === "road-v") && !showRoads) continue;
-          const pts = blockPoints(block);
+          const pts = blockPoints(block).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
           if (!pts.length) continue;
           const points = pts.map((p) => p.x + "," + p.y).join(" ");
           const cx = (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4;
@@ -1746,7 +1815,7 @@
         const showLegend = document.getElementById("toggle-legend").checked;
         const showGrid = document.getElementById("toggle-grid").checked;
         const floorFilter = document.getElementById("floor-filter").value;
-        drawCampusLayout(showRoads);
+        drawCampusLayout(showRoads, floorFilter);
         drawEdgeComparison(floorFilter);
         drawRoomLayer(floorFilter);
         if (showLegend) drawLegend();

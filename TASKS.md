@@ -230,6 +230,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 ## Pending Tasks
 
 55. [pending] Continue refining `src/map-prototype-2.html` layout until it is very close to the desired in-game map.
+   - Add explicit visual layer differentiation so top/middle/bottom floors are immediately distinguishable (for example stronger per-layer color coding, tint bands, and/or clear level badges).
+   - Reduce vertical separation between layers.
+   - Building outline should also go up or down as L-0 goes up or down to give a good indication of ground floor level.
+   - Apply the agreed semi-wireframe/cutaway visual profile: dark matte background, monochrome-first linework, and restrained accent usage.
+   - Keep at most three visible layers in focus mode (`X-1`, `X`, `X+1`) with consistent exploded vertical spacing tied to vertical-edge length.
+   - Tune active vs non-active floor contrast/opacity so active rooms stay dominant while adjacent layers remain readable and unambiguous.
+   - Finalize line hierarchy (outer contour > architecture > detail > hidden/secondary) and verify legibility at normal browser zoom.
+   - Ensure legend and map typography stay proportionate to tile size (larger labels and badges where needed for quick floor reading).
 
 56. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.

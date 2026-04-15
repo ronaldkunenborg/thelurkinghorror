@@ -42,10 +42,28 @@ For Wet Tunnel rendering:
   - `wet1` (`Wet Tunnel [Inset 1]`, tile `B8`) `up` is straight (no curve).
   - `wet5` (`Wet Tunnel [Inset 5]`, tile `B4`) `down` is straight (no curve).
 
+For Fruits and Nuts / Cluttered Passage rendering:
+
+- For `150 <-> 179` (`Fruits and Nuts` <-> `Cluttered Passage`), vertical aliases (`up`/`down`) are manually suppressed.
+- Keep the canonical horizontal/planar link rendering for this pair.
+
 For Dream-area rendering:
 
 - `place`, `basalt`, and `platform` are intentionally hidden from the map view.
 - Reason: this area is non-physical/non-cartographic in gameplay terms and should not be presented as a normal mapped level.
+
+For visual floor readability (Task 55 refinement), we adopt a constrained subset of the semi-wireframe/cutaway style guidance:
+
+- show up to 3 floor layers at once for a selected layer (`X-1`, `X`, `X+1`)
+- apply a vertical exploded offset between visible layers (based on vertical-edge scale)
+- keep the active/selected layer visually strongest
+- render adjacent layers with lower-contrast styling (`.tile-room-above`, `.tile-room-below`)
+- keep a dark, matte background and monochrome-first linework/palette for map readability
+
+Notes:
+
+- We do not lock exact yaw/pitch camera values in this ADR (the map is rendered in the existing SVG projection).
+- We do not globally enforce a new accent-color system here; color accents remain local to functional overlays.
 
 ## Consequences
 
@@ -54,3 +72,4 @@ For Dream-area rendering:
 - Engine data remains unchanged; only visual rendering policy is overridden for one edge pair.
 - Wet-tunnel vertical rendering intentionally mixes looped and straight styles to match booklet-guided readability at key anchors (`wet1`/`B8`, `wet5`/`B4`).
 - Dream-area nodes remain in source data but are excluded from visual map rendering.
+- Floor context around the selected layer is easier to read without introducing diagonal cross-layer links.
