@@ -197,11 +197,83 @@
         stroke-width: 1.6;
       }
 
+      .campus-road-base {
+        fill: rgba(8, 10, 13, 0.97);
+      }
+
+      .campus-road-grain {
+        fill: rgba(192, 202, 214, 0.016);
+        filter: url(#road-grain-filter);
+      }
+
+      .campus-road-photo-texture {
+        opacity: 0.62;
+        filter: contrast(1.22) brightness(0.92);
+        pointer-events: none;
+      }
+
+      .campus-road-scratch-line {
+        stroke: rgba(202, 210, 220, 0.09);
+        stroke-width: 0.9;
+        stroke-linecap: round;
+      }
+
+      .campus-road-edge-halo {
+        stroke: rgba(222, 228, 236, 0.2);
+        stroke-width: 5.2;
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .campus-road-edge-primary {
+        stroke: rgba(214, 216, 220, 0.9);
+        stroke-width: 2.35;
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .campus-road-edge-secondary {
+        stroke: rgba(158, 164, 170, 0.66);
+        stroke-width: 1.28;
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .campus-road-centerline {
+        stroke: rgba(210, 216, 224, 0.8);
+        stroke-width: 1.45;
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .campus-road-centerline-ghost {
+        stroke: rgba(190, 198, 206, 0.34);
+        stroke-width: 2.6;
+        fill: none;
+        stroke-linecap: round;
+      }
+
+      .campus-road-junction {
+        fill: rgba(8, 10, 13, 0.94);
+      }
+
+      .campus-road-junction-grain {
+        fill: rgba(192, 202, 214, 0.05);
+        filter: url(#road-grain-filter);
+      }
+
       .campus-building {
         fill: rgba(22, 22, 22, 0.9);
         stroke: rgba(226, 226, 226, 0.78);
         stroke-width: 2.5;
         rx: 16;
+      }
+
+      .campus-building-outline-overlay {
+        fill: none;
+        stroke: rgba(230, 234, 238, 0.8);
+        stroke-width: 2.2;
+        pointer-events: none;
       }
 
       .campus-central {
@@ -577,6 +649,7 @@
       let viewport = null;
       let uiLayer = null;
       let legendLayer = null;
+      let svgDefs = null;
       const panZoom = {
         scale: 0.42,
         tx: 20,
@@ -957,6 +1030,318 @@
         if (text != null) el.textContent = text;
         (target || viewport || svg).appendChild(el);
         return el;
+      }
+
+      function hashString32(input) {
+        let h = 2166136261 >>> 0;
+        const s = String(input || "");
+        for (let i = 0; i < s.length; i += 1) {
+          h ^= s.charCodeAt(i);
+          h = Math.imul(h, 16777619);
+        }
+        return h >>> 0;
+      }
+
+      function createSeededRandom(seedInput) {
+        let seed = (Number(seedInput) || 0) >>> 0;
+        return () => {
+          seed = (seed + 0x6d2b79f5) >>> 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function polygonSignedArea(points) {
+        if (!Array.isArray(points) || points.length < 3) return 0;
+        let area2 = 0;
+        for (let i = 0; i < points.length; i += 1) {
+          const a = points[i];
+          const b = points[(i + 1) % points.length];
+          area2 += a.x * b.y - b.x * a.y;
+        }
+        return area2 * 0.5;
+      }
+
+      function lineIntersectionInfinite(a, b, c, d) {
+        const r = { x: b.x - a.x, y: b.y - a.y };
+        const s = { x: d.x - c.x, y: d.y - c.y };
+        const denom = r.x * s.y - r.y * s.x;
+        if (Math.abs(denom) < 1e-6) return null;
+        const t = ((c.x - a.x) * s.y - (c.y - a.y) * s.x) / denom;
+        return { x: a.x + t * r.x, y: a.y + t * r.y };
+      }
+
+      function intersectConvexPolygons(subjectPoly, clipPoly) {
+        if (!Array.isArray(subjectPoly) || !Array.isArray(clipPoly) || subjectPoly.length < 3 || clipPoly.length < 3) {
+          return [];
+        }
+        let outputList = subjectPoly.slice();
+        const clipOrientation = polygonSignedArea(clipPoly);
+        const isInside = (p, a, b) => {
+          const cross = (b.x - a.x) * (p.y - a.y) - (b.y - a.y) * (p.x - a.x);
+          return clipOrientation >= 0 ? cross >= -1e-6 : cross <= 1e-6;
+        };
+
+        for (let i = 0; i < clipPoly.length; i += 1) {
+          const cp1 = clipPoly[i];
+          const cp2 = clipPoly[(i + 1) % clipPoly.length];
+          const inputList = outputList.slice();
+          outputList = [];
+          if (!inputList.length) break;
+          let s = inputList[inputList.length - 1];
+          for (const e of inputList) {
+            const eInside = isInside(e, cp1, cp2);
+            const sInside = isInside(s, cp1, cp2);
+            if (eInside) {
+              if (!sInside) {
+                const hit = lineIntersectionInfinite(s, e, cp1, cp2);
+                if (hit) outputList.push(hit);
+              }
+              outputList.push(e);
+            } else if (sInside) {
+              const hit = lineIntersectionInfinite(s, e, cp1, cp2);
+              if (hit) outputList.push(hit);
+            }
+            s = e;
+          }
+        }
+        return outputList;
+      }
+
+      function drawRoadJunctionPatch(roadPolygons, roadOpacityScale) {
+        const smith = roadPolygons && roadPolygons.smith;
+        const mass = roadPolygons && roadPolygons.mass;
+        if (!smith || !mass) return;
+        const overlap = intersectConvexPolygons(smith, mass);
+        if (!overlap || overlap.length < 3) return;
+        const points = overlap.map((p) => p.x + "," + p.y).join(" ");
+        const opacity = Math.max(0.2, Math.min(1, roadOpacityScale || 1));
+        const junctionBaseOpacity = Math.max(0.12, 0.22 * opacity);
+        add("polygon", { class: "campus-road-junction", points, style: "opacity:" + junctionBaseOpacity.toFixed(3) + ";" });
+        add("polygon", {
+          class: "campus-road-junction-grain",
+          points,
+          style: "opacity:" + Math.max(0.08, 0.16 * opacity).toFixed(3) + ";"
+        });
+
+        if (svgDefs) {
+          const vA = { x: smith[1].x - smith[0].x, y: smith[1].y - smith[0].y };
+          const vB = { x: smith[3].x - smith[0].x, y: smith[3].y - smith[0].y };
+          const lenA = Math.hypot(vA.x, vA.y) || 1;
+          const lenB = Math.hypot(vB.x, vB.y) || 1;
+          const along = lenA >= lenB ? vA : vB;
+          const shortLen = Math.min(lenA, lenB);
+          const roadAngleDeg = (Math.atan2(along.y, along.x) * 180) / Math.PI;
+          const center = overlap.reduce((acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y }), { x: 0, y: 0 });
+          center.x /= overlap.length;
+          center.y /= overlap.length;
+
+          const srcW = 2307;
+          const srcH = 240;
+          const texScale = 1.7;
+          const texW = srcW * texScale;
+          const texH = shortLen * 0.9;
+          const seed = hashString32("junction:smith-mass");
+          const phaseX = (seed % 997) * 0.37;
+          const patternId = "road-junction-pattern-" + seed.toString(16);
+
+          const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+          pattern.setAttribute("id", patternId);
+          pattern.setAttribute("patternUnits", "userSpaceOnUse");
+          pattern.setAttribute("x", (center.x - texW * 0.5 - phaseX).toFixed(2));
+          pattern.setAttribute("y", (center.y - texH * 0.5).toFixed(2));
+          pattern.setAttribute("width", texW.toFixed(2));
+          pattern.setAttribute("height", texH.toFixed(2));
+          pattern.setAttribute(
+            "patternTransform",
+            "rotate(" + roadAngleDeg.toFixed(2) + " " + center.x.toFixed(2) + " " + center.y.toFixed(2) + ")"
+          );
+          const patternImage = document.createElementNS("http://www.w3.org/2000/svg", "image");
+          patternImage.setAttribute("href", "assets/gfx/maps/texture_road_3.png");
+          patternImage.setAttribute("x", "0");
+          patternImage.setAttribute("y", "0");
+          patternImage.setAttribute("width", texW.toFixed(2));
+          patternImage.setAttribute("height", (srcH * (texH / 240)).toFixed(2));
+          patternImage.setAttribute("preserveAspectRatio", "none");
+          pattern.appendChild(patternImage);
+          svgDefs.appendChild(pattern);
+
+          add("polygon", {
+            class: "campus-road-photo-texture",
+            points,
+            fill: "url(#" + patternId + ")",
+            style: "opacity:" + Math.max(0.12, 0.24 * opacity).toFixed(3) + ";"
+          });
+        }
+      }
+
+      function drawStyledRoadBlock(block, pts, roadOpacityScale) {
+        if (!pts || pts.length !== 4) return;
+        const p0 = pts[0];
+        const p1 = pts[1];
+        const p2 = pts[2];
+        const p3 = pts[3];
+        const vec = (a, b) => ({ x: b.x - a.x, y: b.y - a.y });
+        const len = (v) => Math.hypot(v.x, v.y) || 1;
+        const norm = (v) => {
+          const d = len(v);
+          return { x: v.x / d, y: v.y / d };
+        };
+        const addv = (a, b) => ({ x: a.x + b.x, y: a.y + b.y });
+        const mul = (v, s) => ({ x: v.x * s, y: v.y * s });
+        const midpoint = (a, b) => ({ x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 });
+
+        const vA = vec(p0, p1);
+        const vB = vec(p0, p3);
+        const lenA = len(vA);
+        const lenB = len(vB);
+        const alongA = lenA >= lenB;
+        const axisVec = alongA ? vA : vB;
+        const crossVec = alongA ? vB : vA;
+        const u = norm(axisVec);
+        const n = norm(crossVec);
+        const longLen = Math.max(lenA, lenB);
+        const shortLen = Math.min(lenA, lenB);
+        const extendLen = Math.max(90, Math.min(260, longLen * 0.1));
+        const ext = mul(u, extendLen);
+
+        // Extend road geometry slightly so ends can fade into the distance.
+        const rp0 = alongA ? addv(p0, mul(ext, -1)) : addv(p0, mul(ext, -1));
+        const rp1 = alongA ? addv(p1, ext) : addv(p1, mul(ext, -1));
+        const rp2 = alongA ? addv(p2, ext) : addv(p2, ext);
+        const rp3 = alongA ? addv(p3, mul(ext, -1)) : addv(p3, ext);
+
+        const center = {
+          x: (rp0.x + rp1.x + rp2.x + rp3.x) * 0.25,
+          y: (rp0.y + rp1.y + rp2.y + rp3.y) * 0.25
+        };
+
+        const sideA0 = alongA ? rp0 : rp0;
+        const sideA1 = alongA ? rp1 : rp3;
+        const sideB0 = alongA ? rp3 : rp1;
+        const sideB1 = alongA ? rp2 : rp2;
+        const centerStart = alongA ? midpoint(rp0, rp3) : midpoint(rp0, rp1);
+        const centerEnd = alongA ? midpoint(rp1, rp2) : midpoint(rp3, rp2);
+        const seed = hashString32("road:" + String(block.id || ""));
+        const rnd = createSeededRandom(seed);
+        const points = [rp0, rp1, rp2, rp3].map((p) => p.x + "," + p.y).join(" ");
+
+        const opacity = Math.max(0.28, Math.min(1, roadOpacityScale || 1));
+        let fadeMaskRef = null;
+        if (svgDefs) {
+          const gradientId = "road-fade-grad-" + String(block.id || "road") + "-" + seed.toString(16);
+          const maskId = "road-fade-mask-" + String(block.id || "road") + "-" + seed.toString(16);
+          const grad = document.createElementNS("http://www.w3.org/2000/svg", "linearGradient");
+          grad.setAttribute("id", gradientId);
+          grad.setAttribute("gradientUnits", "userSpaceOnUse");
+          grad.setAttribute("x1", centerStart.x.toFixed(2));
+          grad.setAttribute("y1", centerStart.y.toFixed(2));
+          grad.setAttribute("x2", centerEnd.x.toFixed(2));
+          grad.setAttribute("y2", centerEnd.y.toFixed(2));
+          const mkStop = (offset, color, opacityVal) => {
+            const stop = document.createElementNS("http://www.w3.org/2000/svg", "stop");
+            stop.setAttribute("offset", offset);
+            stop.setAttribute("stop-color", color);
+            stop.setAttribute("stop-opacity", opacityVal);
+            grad.appendChild(stop);
+          };
+          mkStop("0%", "#ffffff", "0");
+          mkStop("12%", "#ffffff", "1");
+          mkStop("88%", "#ffffff", "1");
+          mkStop("100%", "#ffffff", "0");
+          svgDefs.appendChild(grad);
+
+          const mask = document.createElementNS("http://www.w3.org/2000/svg", "mask");
+          mask.setAttribute("id", maskId);
+          const maskPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+          maskPoly.setAttribute("points", points);
+          maskPoly.setAttribute("fill", "url(#" + gradientId + ")");
+          mask.appendChild(maskPoly);
+          svgDefs.appendChild(mask);
+          fadeMaskRef = "url(#" + maskId + ")";
+        }
+        const roadGroup = add("g", {
+          class: "campus-road-styled",
+          "data-road-id": String(block.id || ""),
+          style: "opacity:" + opacity.toFixed(3) + ";"
+        });
+        if (fadeMaskRef) {
+          roadGroup.setAttribute("mask", fadeMaskRef);
+        }
+        add("polygon", { class: "campus-road-base", points }, null, roadGroup);
+        if (svgDefs) {
+          const patternId = "road-texture-pattern-" + String(block.id || "road") + "-" + seed.toString(16);
+          const roadAngleDeg = (Math.atan2(u.y, u.x) * 180) / Math.PI;
+          const texScale = 1.7;
+          // Use only the central asphalt strip from the source texture so
+          // source-side road edges/markings don't fight our vector road edges.
+          const srcW = 2307;
+          const srcH = 240;
+          const cropTopPx = 0;
+          const cropHeightPx = 240;
+          const texW = srcW * texScale;
+          const texH = shortLen * 0.9;
+          const phaseX = (seed % 997) * 0.37;
+
+          const pattern = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+          pattern.setAttribute("id", patternId);
+          pattern.setAttribute("patternUnits", "userSpaceOnUse");
+          pattern.setAttribute("x", (center.x - texW * 0.5 - phaseX).toFixed(2));
+          pattern.setAttribute("y", (center.y - texH * 0.5).toFixed(2));
+          pattern.setAttribute("width", texW.toFixed(2));
+          pattern.setAttribute("height", texH.toFixed(2));
+          pattern.setAttribute(
+            "patternTransform",
+            "rotate(" + roadAngleDeg.toFixed(2) + " " + center.x.toFixed(2) + " " + center.y.toFixed(2) + ")"
+          );
+          const patternImage = document.createElementNS("http://www.w3.org/2000/svg", "image");
+          patternImage.setAttribute("href", "assets/gfx/maps/texture_road_3.png");
+          patternImage.setAttribute("x", "0");
+          patternImage.setAttribute("y", (-cropTopPx * (texH / cropHeightPx)).toFixed(2));
+          patternImage.setAttribute("width", texW.toFixed(2));
+          patternImage.setAttribute("height", (srcH * (texH / cropHeightPx)).toFixed(2));
+          patternImage.setAttribute("preserveAspectRatio", "none");
+          pattern.appendChild(patternImage);
+          svgDefs.appendChild(pattern);
+
+          add("polygon", { class: "campus-road-photo-texture", points, fill: "url(#" + patternId + ")" }, null, roadGroup);
+        }
+        add("polygon", { class: "campus-road-grain", points }, null, roadGroup);
+
+        const halfLong = longLen * 0.5;
+        const halfShort = shortLen * 0.5;
+        const scratchCount = Math.max(12, Math.round(longLen / 22));
+        const longMargin = Math.max(20, longLen * 0.065);
+        const shortMargin = Math.max(7, shortLen * 0.18);
+
+        for (let i = 0; i < scratchCount; i += 1) {
+          const along = (rnd() * 2 - 1) * Math.max(8, halfLong - longMargin);
+          const across = (rnd() * 2 - 1) * Math.max(2, halfShort - shortMargin);
+          const segmentLen = 10 + rnd() * 30;
+          const normalJitter = (rnd() * 2 - 1) * 1.4;
+          const base = addv(addv(center, mul(u, along)), mul(n, across));
+          const s0 = addv(addv(base, mul(u, -segmentLen * 0.5)), mul(n, normalJitter));
+          const s1 = addv(addv(base, mul(u, segmentLen * 0.5)), mul(n, normalJitter));
+          const alpha = 0.08 + rnd() * 0.12;
+          add(
+            "line",
+            {
+              class: "campus-road-scratch-line",
+              x1: s0.x.toFixed(2),
+              y1: s0.y.toFixed(2),
+              x2: s1.x.toFixed(2),
+              y2: s1.y.toFixed(2),
+              style: "stroke-opacity:" + alpha.toFixed(3) + ";"
+            },
+            null,
+            roadGroup
+          );
+        }
+
+        // SVG road side-edge strokes disabled for texture evaluation pass.
+
+        // SVG centerline disabled for texture-evaluation pass.
       }
 
       const CAMPUS_BLOCKS = [
@@ -1582,10 +1967,8 @@
         };
       }
 
-      function drawRoomLayer(layerFilter) {
-        const drawBrownBuildingSideLabel = () => {
-          const block = CAMPUS_BLOCKS.find((b) => b.id === "brown");
-          if (!block) return;
+      function drawCampusGroundOverlay(showRoads, layerFilter) {
+        const drawAllCampusLabels = () => {
           const normalize = (v) => {
             const d = Math.hypot(v.x, v.y) || 1;
             return { x: v.x / d, y: v.y / d };
@@ -1606,38 +1989,153 @@
             ];
           };
 
+          const drawBlockSideLabel = (pts, label, sub, placement) => {
+            if (!label) return;
+            const a = pts[0];
+            const b = pts[3];
+            const center = {
+              x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+              y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
+            };
+            const edgeMid = { x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 };
+            const edgeDir = normalize({ x: b.x - a.x, y: b.y - a.y });
+            const inward = normalize({ x: center.x - edgeMid.x, y: center.y - edgeMid.y });
+            const placeOutside = placement === "outside";
+            const depth = placeOutside ? -34 : 36;
+
+            let angle = (Math.atan2(edgeDir.y, edgeDir.x) * 180) / Math.PI;
+            if (angle > 90) angle -= 180;
+            if (angle < -90) angle += 180;
+
+            const labelPos = {
+              x: edgeMid.x + inward.x * depth,
+              y: edgeMid.y + inward.y * depth
+            };
+
+            add(
+              "text",
+              {
+                class: "campus-label-side",
+                x: labelPos.x,
+                y: labelPos.y,
+                transform: "rotate(" + angle + " " + labelPos.x + " " + labelPos.y + ")"
+              },
+              label
+            );
+
+            if (sub) {
+              const subPos = {
+                x: labelPos.x + inward.x * 54,
+                y: labelPos.y + inward.y * 54
+              };
+              add(
+                "text",
+                {
+                  class: "campus-sub-side",
+                  x: subPos.x,
+                  y: subPos.y,
+                  transform: "rotate(" + angle + " " + subPos.x + " " + subPos.y + ")"
+                },
+                sub
+              );
+            }
+          };
+          const drawBuildingBottomLabel = (pts, label, xShiftPx, placeInside) => {
+            if (!label) return;
+            const bottomLeft = pts[3];
+            const edgeMid = { x: (pts[3].x + pts[2].x) * 0.5, y: (pts[3].y + pts[2].y) * 0.5 };
+            const center = {
+              x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+              y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
+            };
+            const outward = normalize({ x: edgeMid.x - center.x, y: edgeMid.y - center.y });
+            const inward = { x: -outward.x, y: -outward.y };
+            const xShift = Number.isFinite(xShiftPx) ? xShiftPx : 0;
+            const inside = placeInside === true;
+            const yBase = inside ? Math.max(pts[3].y, pts[2].y) - 22 : Math.max(pts[3].y, pts[2].y) + 14;
+            const inset = inside ? 30 : 12;
+            const shiftVec = inside ? inward : outward;
+            const labelPos = {
+              x: bottomLeft.x + 4 + shiftVec.x * inset + xShift,
+              y: yBase + shiftVec.y * inset
+            };
+            add("text", { class: "campus-label-bottom", x: labelPos.x, y: labelPos.y }, label);
+            return labelPos;
+          };
+          const drawCentralSubtitleInside = (pts, sub, titlePos) => {
+            if (!sub) return;
+            const bottomMid = { x: (pts[3].x + pts[2].x) * 0.5, y: (pts[3].y + pts[2].y) * 0.5 };
+            const center = {
+              x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+              y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
+            };
+            const inward = normalize({ x: center.x - bottomMid.x, y: center.y - bottomMid.y });
+            const subPos = {
+              x: titlePos && Number.isFinite(titlePos.x) ? titlePos.x : pts[3].x + 8,
+              y: Math.max(pts[3].y, pts[2].y) - 18 + inward.y * 8
+            };
+            add("text", { class: "campus-sub-inside", x: subPos.x, y: subPos.y }, sub);
+          };
+
           const layerRenderLocal = buildLayerRenderContext(layerFilter);
           const groundFloorOffsetY =
             layerRenderLocal.focusLevel == null ? 0 : layerRenderLocal.focusLevel * layerRenderLocal.layerStep;
-          const basePts = blockPoints(block).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
-          const pts = expandParallelogram(basePts, TILE_GRID.cellW * 0.1);
-          if (!pts || pts.length !== 4) return;
+          const buildingPad = TILE_GRID.cellW * 0.1;
+          for (const block of CAMPUS_BLOCKS) {
+            if (block.hidden) continue;
+            if (block.type !== "building" && block.type !== "building-central" && block.type !== "road-h" && block.type !== "road-v") {
+              continue;
+            }
+            if ((block.type === "road-h" || block.type === "road-v") && !showRoads) continue;
+            const basePts = blockPoints(block).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+            const pts =
+              block.type === "building" || block.type === "building-central"
+                ? expandParallelogram(basePts, buildingPad)
+                : basePts;
+            if (!pts || pts.length !== 4) continue;
 
-          const a = pts[0];
-          const b = pts[3];
-          const center = {
-            x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
-            y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
-          };
-          const edgeMid = { x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 };
-          const edgeDir = normalize({ x: b.x - a.x, y: b.y - a.y });
-          const inward = normalize({ x: center.x - edgeMid.x, y: center.y - edgeMid.y });
-          const depth = -34;
-          let angle = (Math.atan2(edgeDir.y, edgeDir.x) * 180) / Math.PI;
-          if (angle > 90) angle -= 180;
-          if (angle < -90) angle += 180;
-          const labelPos = { x: edgeMid.x + inward.x * depth, y: edgeMid.y + inward.y * depth };
-          add(
-            "text",
-            {
-              class: "campus-label-side",
-              x: labelPos.x,
-              y: labelPos.y,
-              transform: "rotate(" + angle + " " + labelPos.x + " " + labelPos.y + ")"
-            },
-            block.label || "Brown Building"
-          );
+            if (block.type === "road-h" || block.type === "road-v") {
+              if (block.id === "smith") {
+                drawBuildingBottomLabel(pts, block.label, ISO_BASIS_E.dx * 2, true);
+              } else {
+                drawBlockSideLabel(pts, block.label, null, "inside");
+              }
+              continue;
+            }
+
+            if (block.id === "brown") {
+              drawBlockSideLabel(pts, block.label, null, "outside");
+            } else {
+              const titlePos = drawBuildingBottomLabel(pts, block.label, 0);
+              if (block.type === "building-central") {
+                drawCentralSubtitleInside(pts, block.sub, titlePos);
+              }
+            }
+          }
         };
+        const layerRender = buildLayerRenderContext(layerFilter);
+        const groundFloorOffsetY = layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
+        const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
+        const depth = Math.abs(focusLevel);
+        const roadOpacityScale = layerRender.focusLevel == null ? 1 : Math.max(0.3, 1 - depth * 0.27);
+        const roadPolygons = {};
+        for (const block of CAMPUS_BLOCKS) {
+          if (block.hidden) continue;
+          if (block.type !== "road-h" && block.type !== "road-v") continue;
+          if (!showRoads) continue;
+          const basePts = blockPoints(block).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+          roadPolygons[block.id] = basePts;
+          drawStyledRoadBlock(block, basePts, roadOpacityScale);
+        }
+        if (showRoads) {
+          drawRoadJunctionPatch(roadPolygons, roadOpacityScale);
+        }
+
+        drawBuildingOutlineOverlay(layerFilter);
+        drawAllCampusLabels();
+      }
+
+      function drawRoomLayer(layerFilter, showRoads) {
 
         const layerRender = buildLayerRenderContext(layerFilter);
         const visibleRooms = ROOM_TILE_METADATA
@@ -1646,20 +2144,34 @@
           .map((room) => ({
             ...room,
             _layerOffsetY: layerRender.layerOffsetY(room),
-            _relativeLevel: layerRender.relativeLevel(room)
+            _relativeLevel: layerRender.relativeLevel(room),
+            _absoluteLevel: layerToLevel(room.layer)
           }))
-          // Draw from lower to higher levels so upper floors visually sit on top.
+          // Draw from lower to higher absolute levels so upper floors visually sit on top.
           .sort((a, b) => {
-            if (a._relativeLevel !== b._relativeLevel) return a._relativeLevel - b._relativeLevel;
+            if (a._absoluteLevel !== b._absoluteLevel) return a._absoluteLevel - b._absoluteLevel;
             return a.tile.rank - b.tile.rank;
           });
 
-        let brownSideLabelDrawn = false;
+        const roomsByLevel = new Map();
         for (const room of visibleRooms) {
-          if (!brownSideLabelDrawn && room._relativeLevel >= 0) {
-            drawBrownBuildingSideLabel();
-            brownSideLabelDrawn = true;
+          const level = Number.isFinite(room._absoluteLevel) ? room._absoluteLevel : 0;
+          if (!roomsByLevel.has(level)) roomsByLevel.set(level, []);
+          roomsByLevel.get(level).push(room);
+        }
+        const visibleLevels = Array.from(roomsByLevel.keys()).sort((a, b) => a - b);
+
+        let groundOverlayDrawn = false;
+        for (let i = 0; i < visibleLevels.length; i += 1) {
+          const level = visibleLevels[i];
+          // Primary insertion point: anchor overlay z-order to the absolute L0 boundary,
+          // not the current focus layer.
+          if (!groundOverlayDrawn && level >= 0) {
+            drawCampusGroundOverlay(showRoads, layerFilter);
+            groundOverlayDrawn = true;
           }
+          const roomsAtLevel = roomsByLevel.get(level) || [];
+          for (const room of roomsAtLevel) {
           const { p0, p1, p2, p3 } = tileCorners(room.tile.c, room.tile.rank);
           const layerVisual = roomLayerVisual(room._relativeLevel);
           const isoSkewDeg = (Math.atan2(Math.abs(ISO_BASIS_S.dx), Math.abs(ISO_BASIS_S.dy)) * 180) / Math.PI;
@@ -1810,9 +2322,23 @@
             },
             idLabel
           );
+          }
+
+          drawEdgeComparison(layerFilter, ({ fromLevel, toLevel }) => {
+            return Number.isFinite(fromLevel) && Number.isFinite(toLevel) && fromLevel === level && toLevel === level;
+          });
+          const nextLevel = visibleLevels[i + 1];
+          if (Number.isFinite(nextLevel) && nextLevel === level + 1) {
+            drawEdgeComparison(layerFilter, ({ fromLevel, toLevel }) => {
+              if (!Number.isFinite(fromLevel) || !Number.isFinite(toLevel)) return false;
+              return (fromLevel === level && toLevel === nextLevel) || (fromLevel === nextLevel && toLevel === level);
+            });
+          }
         }
-        if (!brownSideLabelDrawn) {
-          drawBrownBuildingSideLabel();
+        // Fallback for views where no room crosses the L0 boundary in this pass
+        // (for example all-below, all-hidden, or sparse-filtered selections).
+        if (!groundOverlayDrawn) {
+          drawCampusGroundOverlay(showRoads, layerFilter);
         }
       }
 
@@ -1836,6 +2362,7 @@
             y: center.y + layerOffsetY,
             layerOffsetY,
             relativeLevel: layerRender.relativeLevel(room),
+            absoluteLevel: layerToLevel(room.layer),
             c: room.tile.c,
             rank: room.tile.rank,
             corners: shiftedCorners
@@ -1901,7 +2428,7 @@
         return combined;
       }
 
-      function drawEdgeComparison(layerFilter) {
+      function drawEdgeComparison(layerFilter, edgeLevelPredicate) {
         const layerRender = buildLayerRenderContext(layerFilter);
         const { centerByLocationId, centerByNodeId } = getVisibleCenterByLocationId(layerFilter);
         const edgeSet = buildEdgeComparisonSet();
@@ -2052,6 +2579,22 @@
           const from = edge.fromNodeId ? centerByNodeId.get(edge.fromNodeId) : centerByLocationId.get(edge.from);
           if (!from) continue;
           const vDir = verticalDir(edge.command);
+          const to = edge.toNodeId ? centerByNodeId.get(edge.toNodeId) : centerByLocationId.get(edge.to);
+          const fromLevel = Number.isFinite(from.absoluteLevel) ? from.absoluteLevel : null;
+          const toLevel = to && Number.isFinite(to.absoluteLevel) ? to.absoluteLevel : null;
+          if (
+            typeof edgeLevelPredicate === "function" &&
+            !edgeLevelPredicate({
+              edge,
+              from,
+              to,
+              fromLevel,
+              toLevel,
+              isVertical: Boolean(vDir)
+            })
+          ) {
+            continue;
+          }
           // Exception: for Tunnel Entrance (34) <-> Muddy Tunnel (39),
           // render only horizontal aliases (east/west) and suppress up/down.
           const isTunnelMuddyPair =
@@ -2119,7 +2662,6 @@
             });
             continue;
           }
-          const to = edge.toNodeId ? centerByNodeId.get(edge.toNodeId) : centerByLocationId.get(edge.to);
           if (!to) continue;
           const points = orthogonalPolyline(from, to, primaryDir(edge.command));
           if (points.length >= 2) {
@@ -2184,7 +2726,7 @@
         return [p0, p1, p2, p3];
       }
 
-      function drawCampusLayout(showRoads, layerFilter, suppressBrownSideLabel) {
+      function drawCampusLayout(showRoads, layerFilter, suppressGroundOverlay) {
         const normalize = (v) => {
           const d = Math.hypot(v.x, v.y) || 1;
           return { x: v.x / d, y: v.y / d };
@@ -2311,11 +2853,13 @@
           const points = pts.map((p) => p.x + "," + p.y).join(" ");
 
           if (block.type === "road-h" || block.type === "road-v") {
-            add("polygon", { class: "campus-road", points });
-            if (block.id === "smith") {
-              drawBuildingBottomLabel(pts, block.label, ISO_BASIS_E.dx * 2, true);
-            } else {
-              drawBlockSideLabel(pts, block.label, null, "inside");
+            if (!suppressGroundOverlay) {
+              add("polygon", { class: "campus-road", points });
+              if (block.id === "smith") {
+                drawBuildingBottomLabel(pts, block.label, ISO_BASIS_E.dx * 2, true);
+              } else {
+                drawBlockSideLabel(pts, block.label, null, "inside");
+              }
             }
             continue;
           }
@@ -2323,16 +2867,66 @@
           const className =
             block.type === "building-central" ? "campus-building campus-central campus-accent" : "campus-building";
           add("polygon", { class: className, points });
-          if (block.id === "brown") {
-            if (!suppressBrownSideLabel) {
+          if (!suppressGroundOverlay) {
+            if (block.id === "brown") {
               drawBlockSideLabel(pts, block.label, null, "outside");
-            }
-          } else {
-            const titlePos = drawBuildingBottomLabel(pts, block.label, 0);
-            if (block.type === "building-central") {
-              drawCentralSubtitleInside(pts, block.sub, titlePos);
+            } else {
+              const titlePos = drawBuildingBottomLabel(pts, block.label, 0);
+              if (block.type === "building-central") {
+                drawCentralSubtitleInside(pts, block.sub, titlePos);
+              }
             }
           }
+        }
+        if (!suppressGroundOverlay) {
+          drawBuildingOutlineOverlay(layerFilter);
+        }
+      }
+
+      function drawBuildingOutlineOverlay(layerFilter) {
+        const normalize = (v) => {
+          const d = Math.hypot(v.x, v.y) || 1;
+          return { x: v.x / d, y: v.y / d };
+        };
+        const expandParallelogram = (pts, pad) => {
+          if (!pts || pts.length !== 4) return pts;
+          const p0 = pts[0];
+          const p1 = pts[1];
+          const p2 = pts[2];
+          const p3 = pts[3];
+          const u = normalize({ x: p1.x - p0.x, y: p1.y - p0.y });
+          const v = normalize({ x: p3.x - p0.x, y: p3.y - p0.y });
+          return [
+            { x: p0.x - u.x * pad - v.x * pad, y: p0.y - u.y * pad - v.y * pad },
+            { x: p1.x + u.x * pad - v.x * pad, y: p1.y + u.y * pad - v.y * pad },
+            { x: p2.x + u.x * pad + v.x * pad, y: p2.y + u.y * pad + v.y * pad },
+            { x: p3.x - u.x * pad + v.x * pad, y: p3.y - u.y * pad + v.y * pad }
+          ];
+        };
+
+        const layerRender = buildLayerRenderContext(layerFilter);
+        const groundFloorOffsetY =
+          layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
+        const buildingPad = TILE_GRID.cellW * 0.1;
+        const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
+        const upNorm = focusLevel > 0 ? Math.min(1, focusLevel / 4) : 0;
+        const downNorm = focusLevel < 0 ? Math.min(1, Math.abs(focusLevel) / 6) : 0;
+        const fadeT = Math.max(upNorm, downNorm);
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const strokeR = Math.round(lerp(230, 112, fadeT));
+        const strokeG = Math.round(lerp(234, 116, fadeT));
+        const strokeB = Math.round(lerp(238, 122, fadeT));
+        const strokeA = lerp(0.8, 0.62, fadeT);
+        const dynamicStroke = "rgba(" + strokeR + "," + strokeG + "," + strokeB + "," + strokeA.toFixed(3) + ")";
+
+        for (const block of CAMPUS_BLOCKS) {
+          if (block.hidden) continue;
+          if (block.type !== "building" && block.type !== "building-central") continue;
+          const basePts = blockPoints(block).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+          const pts = expandParallelogram(basePts, buildingPad);
+          if (!pts || !pts.length) continue;
+          const points = pts.map((p) => p.x + "," + p.y).join(" ");
+          add("polygon", { class: "campus-building-outline-overlay", points, style: "stroke:" + dynamicStroke + ";" });
         }
       }
 
@@ -2473,8 +3067,10 @@
         viewport = null;
         uiLayer = null;
         legendLayer = null;
+        svgDefs = null;
         const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
         svg.appendChild(defs);
+        svgDefs = defs;
         viewport = document.createElementNS("http://www.w3.org/2000/svg", "g");
         viewport.setAttribute("id", "viewport");
         svg.appendChild(viewport);
@@ -2589,6 +3185,38 @@
         tileDisplace.setAttribute("yChannelSelector", "G");
         tileHanddrawn.appendChild(tileDisplace);
 
+        const roadGrainFilter = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+        roadGrainFilter.setAttribute("id", "road-grain-filter");
+        roadGrainFilter.setAttribute("x", "-20%");
+        roadGrainFilter.setAttribute("y", "-20%");
+        roadGrainFilter.setAttribute("width", "140%");
+        roadGrainFilter.setAttribute("height", "140%");
+        const roadNoise = document.createElementNS("http://www.w3.org/2000/svg", "feTurbulence");
+        roadNoise.setAttribute("type", "fractalNoise");
+        roadNoise.setAttribute("baseFrequency", "0.82 0.36");
+        roadNoise.setAttribute("numOctaves", "2");
+        roadNoise.setAttribute("seed", "23");
+        roadNoise.setAttribute("result", "noise");
+        roadGrainFilter.appendChild(roadNoise);
+        const roadTint = document.createElementNS("http://www.w3.org/2000/svg", "feColorMatrix");
+        roadTint.setAttribute("in", "noise");
+        roadTint.setAttribute("type", "matrix");
+        roadTint.setAttribute("values", "0 0 0 0 0.84  0 0 0 0 0.88  0 0 0 0 0.94  0.08 0.08 0.08 0 0");
+        roadTint.setAttribute("result", "grainTint");
+        roadGrainFilter.appendChild(roadTint);
+        const roadClipToShape = document.createElementNS("http://www.w3.org/2000/svg", "feComposite");
+        roadClipToShape.setAttribute("in", "grainTint");
+        roadClipToShape.setAttribute("in2", "SourceAlpha");
+        roadClipToShape.setAttribute("operator", "in");
+        roadClipToShape.setAttribute("result", "grainClipped");
+        roadGrainFilter.appendChild(roadClipToShape);
+        const roadBlend = document.createElementNS("http://www.w3.org/2000/svg", "feBlend");
+        roadBlend.setAttribute("in", "SourceGraphic");
+        roadBlend.setAttribute("in2", "grainClipped");
+        roadBlend.setAttribute("mode", "screen");
+        roadGrainFilter.appendChild(roadBlend);
+        defs.appendChild(roadGrainFilter);
+
         add("rect", { x: 0, y: 0, width: WORLD_W, height: WORLD_H, fill: "transparent" });
 
         const showRoads = document.getElementById("toggle-roads").checked;
@@ -2613,8 +3241,7 @@
         legendLayer.setAttribute("transform", "translate(" + legendX.toFixed(2) + " " + legendY.toFixed(2) + ") scale(" + hudScale + ")");
         drawCampusLayout(showRoads, floorFilter, showFloorTiles);
         if (showFloorTiles) {
-          drawEdgeComparison(floorFilter);
-          drawRoomLayer(floorFilter);
+          drawRoomLayer(floorFilter, showRoads);
         }
         if (showLegend) drawLegend(0, 0, legendLayer);
         if (showGrid || showLegend) drawPlacementGridAndLegend(showGrid, showLegend, tileLegendX, tileLegendY, legendLayer);

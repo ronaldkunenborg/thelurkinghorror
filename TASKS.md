@@ -227,21 +227,87 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Extracted shared map data into `src/map-prototype-2-data.js` for browser + Node reuse.
    - Added `tools/test-map-prototype-2-layout.js` to validate ROOM_LAYOUT + vertical edge reciprocity with only agreed wet-tunnel exceptions; test currently passes.
 
+55. [done] Rebuild campus-road rendering in `src/map-prototype-2.html` to match the blueprint-road reference style.
+   - Replaced flat road rendering with layered SVG road passes (base fill, texture/grain overlays, and optional vector edge/centerline components).
+   - Added deterministic per-road texture mapping with seeded phase offsets so redraws remain stable.
+   - Integrated external texture workflow using `src/assets/gfx/maps/texture_road_3.png` as active source and tuned projection/crop scaling for map roads.
+   - Added depth-aware road opacity attenuation so roads remain readable without overpowering lower-layer room tiles during floor scrubbing.
+   - Implemented overlap-aware junction blending for `Smith Street` x `Mass. Ave.` to reduce hard overpaint dominance at crossings.
+   - Added slight road extension + distance fade mask so road ends recede more naturally instead of ending abruptly.
+   - Iterated and validated texture behavior with dynamic floor-focus movement to keep texture anchored during up/down scrub.
+
 ## Pending Tasks
 
-55. [pending] Continue refining `src/map-prototype-2.html` layout until it is very close to the desired in-game map.
+56. [pending] Continue refining `src/map-prototype-2.html` layout until it is very close to the desired in-game map.
    - Current progress (2026-04-17): added RMB floor scrubbing (vertical), RMB perspective shift (horizontal), darker blueprint-like hatch/inset tile styling, and tuned wobble frequency to be less busy.
    - Done (2026-04-18): explicit visual layer differentiation improved with per-layer contour accents and clear level badges (`X-1`/`X`/`X+1` focus styling).
    - Done (2026-04-17): vertical layer separation reduced/tuned; current spacing accepted.
-   - Building outline should also go up or down as L-0 goes up or down to give a good indication of ground floor level.
    - Done (2026-04-18): applied semi-wireframe/cutaway visual profile (dark matte background, monochrome-first linework, restrained accents).
    - Done (2026-04-18): focus mode keeps at most three visible layers (`X-1`, `X`, `X+1`) with consistent exploded vertical spacing tied to vertical-edge length.
-   - Tune active vs non-active floor contrast/opacity so active rooms stay dominant while adjacent layers remain readable and unambiguous.
    - Done (2026-04-18): finalized line hierarchy (outer contour > architecture > detail > hidden/secondary) and tuned legibility at normal browser zoom.
    - Done (2026-04-18): legend/map typography tuned to tile scale for quick floor reading (tile-aligned level/id placement, improved title wrapping/projection, and dense-area label ordering fixes).
-   - Add a dedicated building-outline composition pass to pull the central complex silhouette closer to the provided blueprint reference image (courtyard massing + perimeter readability, without changing room-truth topology).
+   - Tune active vs non-active floor contrast/opacity so active rooms stay dominant while adjacent layers remain readable and unambiguous.
 
-56. [pending] Add an in-game map of visited locations while adventuring.
+57. [pending] Add a dedicated architectural outline composition pass for the Central Complex in `src/map-prototype-2.html`, with the visual goal of pulling the campus silhouette closer to the provided blueprint image while being explicitly informed by MIT’s Central Building / Building 10 massing.
+   - Scope: Central Complex only. Keep Brown Building, Computer Center, and Temporary Lab on the existing simpler treatment for this pass.
+   - Motion rule: the architectural shell moves with `L0`/`groundFloorOffsetY` in focus mode, and stays neutral in `all` mode.
+   - Treat the new layer as presentation-only: do not change room positions, exits, layer truth, or traversal topology.
+   - Add a separate architectural shell/composition layer that visually expresses:
+     - a strong central axis
+     - a dome-adjacent central mass
+     - flanking wing masses
+     - courtyard/perimeter enclosure
+     - a front-facing entrance/forebuilding mass
+   - Use MIT Building 10 / Central Building as a near-architectural massing reference:
+     - borrow the central dome composition, axial symmetry, wing rhythm, and institutional courtyard/perimeter logic
+     - do not treat MIT as literal map truth
+     - when outline aesthetics conflict with room truth, room truth wins
+   - Implement the shell as a swappable composition layer that can support both:
+     - raster mode: AI-generated blueprint image aligned into the isometric projection
+     - vector mode: traced/polygonal shell and cutaway shapes in SVG
+   - First-pass workflow should be hybrid:
+     - generate AI blueprint-style reference/asset images for Central Complex
+     - evaluate raster integration first for silhouette/massing fit
+     - keep a clean upgrade path to traced SVG if raster is too soft or inflexible
+   - Add a compact composition model for the shell layer, independent from `ROOM_LAYOUT`, supporting:
+     - outer shell masses
+     - courtyard/cutout regions
+     - central/dome base mass
+     - front entrance mass
+     - wing masses
+     - optional subtle inner architecture traces
+   - Render order:
+     - roads / broad campus masses
+     - Central Complex architectural shell layer
+     - room shadows / room tiles / room labels
+     - exit edges
+     - legend / UI overlays
+   - Line hierarchy:
+     - shell outer contour stronger than shell detail
+     - courtyard/cutaway edges medium
+     - architectural hints subtle
+     - shell must remain subordinate to active room labels and active room contours
+   - AI prompt/output direction for source images:
+     - black-background white-line architectural blueprint / etched style
+     - MIT Central Building / Building 10 inspired composition
+     - dome axis, flanking wings, front entrance body, courtyard readability
+     - no scenery clutter, no people, no fantasy additions
+     - style/composition reference only, not literal floorplan correctness
+   - Acceptance criteria:
+     - in `L0`, Central Complex reads as an MIT-informed campus building mass rather than a single large block
+     - the shell moves coherently with `L0`
+     - room tiles/labels/exits remain readable
+     - no room-truth topology changes are introduced
+
+58. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
+   - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
+   - Keep deterministic per-room/per-tile jitter so lines stay stable between renders.
+   - Keep displacement filter only as optional subtle accent (or remove entirely if readability improves).
+   - Tune contour hierarchy and hatch density for legibility at normal browser zoom.
+   - Document final rendering policy in map ADR and link implementation notes.
+   - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.
+
+59. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -257,17 +323,11 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-57. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+60. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
    - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
    - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
    - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
 
-58. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 55 style follow-up).
-   - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
-   - Keep deterministic per-room/per-tile jitter so lines stay stable between renders.
-   - Keep displacement filter only as optional subtle accent (or remove entirely if readability improves).
-   - Tune contour hierarchy and hatch density for legibility at normal browser zoom.
-   - Document final rendering policy in map ADR and link implementation notes.
-   - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.
+
