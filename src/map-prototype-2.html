@@ -262,6 +262,22 @@
         filter: url(#road-grain-filter);
       }
 
+      .brown-outline-main {
+        fill: none;
+        stroke: rgba(228, 232, 236, 0.86);
+        stroke-width: 2.1;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+      }
+
+      .brown-outline-sub {
+        fill: none;
+        stroke: rgba(170, 178, 186, 0.68);
+        stroke-width: 1.15;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+      }
+
       .campus-building {
         fill: rgba(22, 22, 22, 0.9);
         stroke: rgba(226, 226, 226, 0.78);
@@ -1359,7 +1375,7 @@
           sub: "Great Dome + Aero + Engineering + Chemistry",
           bounds: { tl: { c: 4, rank: 7 }, br: { c: 10, rank: 3 } }
         },
-        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 13, rank: 6 }, br: { c: 13, rank: 5 } } },
+        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 13, rank: 6 }, br: { c: 13, rank: 6 } } },
         // Hidden placement zones for underground grouping.
         { id: "steam", type: "placement-zone", hidden: true, bounds: { tl: { c: 4, rank: 3 }, br: { c: 10, rank: 2 } } },
         { id: "wet", type: "placement-zone", hidden: true, bounds: { tl: { c: 4, rank: 1 }, br: { c: 10, rank: 1 } } },
@@ -2131,8 +2147,110 @@
           drawRoadJunctionPatch(roadPolygons, roadOpacityScale);
         }
 
+        drawComputerCenterIllustration(layerFilter);
+        drawBrownBuildingIllustration(layerFilter);
         drawBuildingOutlineOverlay(layerFilter);
         drawAllCampusLabels();
+      }
+
+      function drawComputerCenterIllustration(layerFilter) {
+        const computer = CAMPUS_BLOCKS.find((b) => b.id === "computer");
+        if (!computer) return;
+        const layerRender = buildLayerRenderContext(layerFilter);
+        const groundFloorOffsetY = layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
+        const pts = blockPoints(computer).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+        if (!pts || pts.length !== 4) return;
+
+        const p0 = pts[0];
+        const p1 = pts[1];
+        const p2 = pts[2];
+        const p3 = pts[3];
+        const topLen = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
+        const center = {
+          x: (p0.x + p1.x + p2.x + p3.x) * 0.25,
+          y: (p0.y + p1.y + p2.y + p3.y) * 0.25
+        };
+        const bottomMid = { x: (p2.x + p3.x) * 0.5, y: (p2.y + p3.y) * 0.5 };
+        const inward = { x: center.x - bottomMid.x, y: center.y - bottomMid.y };
+        const inwardLen = Math.hypot(inward.x, inward.y) || 1;
+        const inNorm = { x: inward.x / inwardLen, y: inward.y / inwardLen };
+
+        const baseInsetPx = 18;
+        const settleDownPx = 8;
+        const baseAnchor = {
+          x: center.x,
+          y: bottomMid.y + inNorm.y * baseInsetPx + settleDownPx
+        };
+
+        const imgRatio = 488 / 784;
+        const imgW = Math.max(460, topLen * 1.05);
+        const imgH = imgW * imgRatio;
+
+        const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
+        const depth = Math.abs(focusLevel);
+        const overlayOpacity = layerRender.focusLevel == null ? 0.78 : Math.max(0.3, 0.78 - depth * 0.12);
+
+        add("image", {
+          href: "assets/gfx/maps/computer_center_overlay_2c.png",
+          x: (baseAnchor.x - imgW * 0.5).toFixed(2),
+          y: (baseAnchor.y - imgH).toFixed(2),
+          width: imgW.toFixed(2),
+          height: imgH.toFixed(2),
+          preserveAspectRatio: "xMidYMid meet",
+          style: "opacity:" + overlayOpacity.toFixed(3) + ";pointer-events:none;"
+        });
+      }
+
+      function drawBrownBuildingIllustration(layerFilter) {
+        const brown = CAMPUS_BLOCKS.find((b) => b.id === "brown");
+        if (!brown) return;
+        const layerRender = buildLayerRenderContext(layerFilter);
+        const groundFloorOffsetY = layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
+        const pts = blockPoints(brown).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+        if (!pts || pts.length !== 4) return;
+
+        const p0 = pts[0];
+        const p1 = pts[1];
+        const p2 = pts[2];
+        const p3 = pts[3];
+        const topLen = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
+        const center = {
+          x: (p0.x + p1.x + p2.x + p3.x) * 0.25,
+          y: (p0.y + p1.y + p2.y + p3.y) * 0.25
+        };
+        const bottomMid = { x: (p2.x + p3.x) * 0.5, y: (p2.y + p3.y) * 0.5 };
+        const inward = { x: center.x - bottomMid.x, y: center.y - bottomMid.y };
+        const inwardLen = Math.hypot(inward.x, inward.y) || 1;
+        const inNorm = { x: inward.x / inwardLen, y: inward.y / inwardLen };
+        const east = { x: p1.x - p0.x, y: p1.y - p0.y };
+        const eastLen = Math.hypot(east.x, east.y) || 1;
+        const eastNorm = { x: east.x / eastLen, y: east.y / eastLen };
+        const baseInsetPx = 8;
+        const lateralShiftPx = 10;
+        const settleDownPx = 34;
+        const baseAnchor = {
+          // Keep dome centered over tile 240 by hard-anchoring X to tile center.
+          x: center.x,
+          y: bottomMid.y + inNorm.y * baseInsetPx + eastNorm.y * lateralShiftPx + settleDownPx
+        };
+
+        const imgRatio = 941 / 449;
+        const imgW = Math.max(560, topLen * 3.1);
+        const imgH = imgW * imgRatio;
+
+        const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
+        const depth = Math.abs(focusLevel);
+        const overlayOpacity = layerRender.focusLevel == null ? 0.82 : Math.max(0.34, 0.82 - depth * 0.12);
+
+        add("image", {
+          href: "assets/gfx/maps/brown_building_overlay.png",
+          x: (baseAnchor.x - imgW * 0.5).toFixed(2),
+          y: (baseAnchor.y - imgH).toFixed(2),
+          width: imgW.toFixed(2),
+          height: imgH.toFixed(2),
+          preserveAspectRatio: "xMidYMid meet",
+          style: "opacity:" + overlayOpacity.toFixed(3) + ";pointer-events:none;"
+        });
       }
 
       function drawRoomLayer(layerFilter, showRoads) {
