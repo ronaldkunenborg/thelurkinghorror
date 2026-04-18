@@ -59,6 +59,17 @@ For visual floor readability (Task 55 refinement), we adopt a constrained subset
 - keep the active/selected layer visually strongest
 - render adjacent layers with lower-contrast styling (`.tile-room-above`, `.tile-room-below`)
 - keep a dark, matte background and monochrome-first linework/palette for map readability
+- apply a line hierarchy with thicker focus contours and thinner non-focus connectors
+- keep room-title text color synchronized with the room layer style (focus/above/below)
+
+Current visual baseline tokens (map prototype):
+
+- background: `#0B0B0B`
+- mass/inactive floor: `#161616` / `#262626`
+- active floor: `#444444`
+- primary/secondary lines: `#E2E2E2` / `#7A7A7A`
+- depth-based edge widths: focus `2.8`, near `2.2`, far `1.6`
+- non-active layer opacity target: roughly `0.52` - `0.58`
 
 Notes:
 

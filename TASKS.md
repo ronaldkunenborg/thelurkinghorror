@@ -230,14 +230,16 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 ## Pending Tasks
 
 55. [pending] Continue refining `src/map-prototype-2.html` layout until it is very close to the desired in-game map.
-   - Add explicit visual layer differentiation so top/middle/bottom floors are immediately distinguishable (for example stronger per-layer color coding, tint bands, and/or clear level badges).
-   - Reduce vertical separation between layers.
+   - Current progress (2026-04-17): added RMB floor scrubbing (vertical), RMB perspective shift (horizontal), darker blueprint-like hatch/inset tile styling, and tuned wobble frequency to be less busy.
+   - Done (2026-04-18): explicit visual layer differentiation improved with per-layer contour accents and clear level badges (`X-1`/`X`/`X+1` focus styling).
+   - Done (2026-04-17): vertical layer separation reduced/tuned; current spacing accepted.
    - Building outline should also go up or down as L-0 goes up or down to give a good indication of ground floor level.
-   - Apply the agreed semi-wireframe/cutaway visual profile: dark matte background, monochrome-first linework, and restrained accent usage.
-   - Keep at most three visible layers in focus mode (`X-1`, `X`, `X+1`) with consistent exploded vertical spacing tied to vertical-edge length.
+   - Done (2026-04-18): applied semi-wireframe/cutaway visual profile (dark matte background, monochrome-first linework, restrained accents).
+   - Done (2026-04-18): focus mode keeps at most three visible layers (`X-1`, `X`, `X+1`) with consistent exploded vertical spacing tied to vertical-edge length.
    - Tune active vs non-active floor contrast/opacity so active rooms stay dominant while adjacent layers remain readable and unambiguous.
-   - Finalize line hierarchy (outer contour > architecture > detail > hidden/secondary) and verify legibility at normal browser zoom.
-   - Ensure legend and map typography stay proportionate to tile size (larger labels and badges where needed for quick floor reading).
+   - Done (2026-04-18): finalized line hierarchy (outer contour > architecture > detail > hidden/secondary) and tuned legibility at normal browser zoom.
+   - Done (2026-04-18): legend/map typography tuned to tile scale for quick floor reading (tile-aligned level/id placement, improved title wrapping/projection, and dense-area label ordering fixes).
+   - Add a dedicated building-outline composition pass to pull the central complex silhouette closer to the provided blueprint reference image (courtyard massing + perimeter readability, without changing room-truth topology).
 
 56. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
@@ -261,3 +263,11 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Add safe-location gating skeleton and feature flag for consultation availability
    - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
    - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
+
+58. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 55 style follow-up).
+   - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
+   - Keep deterministic per-room/per-tile jitter so lines stay stable between renders.
+   - Keep displacement filter only as optional subtle accent (or remove entirely if readability improves).
+   - Tune contour hierarchy and hatch density for legibility at normal browser zoom.
+   - Document final rendering policy in map ADR and link implementation notes.
+   - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.

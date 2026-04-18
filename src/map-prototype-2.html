@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>TLH Map Prototype v2 - Building Isometric Layout</title>
     <style>
-      @import url("https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Patrick+Hand&display=swap");
 
       :root {
         --bg: #0b0b0b;
@@ -282,34 +282,152 @@
       .tile-room-known {
         fill: transparent;
         stroke: var(--line-primary);
-        stroke-width: 2.5;
+        stroke-width: 2.3;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        filter: url(#tile-handdrawn);
       }
 
       .tile-room-focus {
-        fill: rgba(68, 68, 68, 0.95);
-        stroke: rgba(226, 226, 226, 0.98);
-        stroke-width: 4;
+        fill: rgba(42, 42, 42, 0.9);
+        stroke: rgba(232, 236, 240, 0.98);
+        stroke-width: 3.5;
         opacity: 1;
       }
 
       .tile-room-above {
-        fill: rgba(52, 52, 52, 0.9);
-        stroke: rgba(226, 226, 226, 0.78);
-        stroke-width: 2.4;
-        opacity: 0.78;
+        fill: rgba(34, 34, 34, 0.86);
+        stroke: rgba(206, 210, 214, 0.84);
+        stroke-width: 2.2;
+        opacity: 0.8;
       }
 
       .tile-room-below {
-        fill: rgba(28, 28, 28, 0.84);
-        stroke: rgba(160, 160, 160, 0.54);
-        stroke-width: 2.1;
-        opacity: 0.52;
+        fill: rgba(18, 18, 18, 0.88);
+        stroke: rgba(170, 176, 182, 0.72);
+        stroke-width: 2;
+        opacity: 0.58;
+      }
+
+      .tile-room-shadow {
+        stroke: none;
+        pointer-events: none;
+      }
+
+      .tile-room-shadow-focus {
+        fill: rgba(0, 0, 0, 0.3);
+      }
+
+      .tile-room-shadow-above {
+        fill: rgba(0, 0, 0, 0.24);
+      }
+
+      .tile-room-shadow-below {
+        fill: rgba(0, 0, 0, 0.18);
+      }
+
+      .tile-room-rim {
+        stroke-width: 0.7;
+        pointer-events: none;
+      }
+
+      .tile-room-rim-focus {
+        fill: rgba(36, 42, 48, 0.84);
+        stroke: rgba(182, 188, 194, 0.56);
+      }
+
+      .tile-room-rim-above {
+        fill: rgba(30, 34, 32, 0.78);
+        stroke: rgba(166, 172, 178, 0.48);
+      }
+
+      .tile-room-rim-below {
+        fill: rgba(28, 30, 32, 0.76);
+        stroke: rgba(148, 154, 160, 0.46);
+      }
+
+      .tile-room-hatch {
+        stroke: none;
+        pointer-events: none;
+      }
+
+      .tile-room-hatch-focus {
+        fill: url(#tile-hatch-focus);
+        opacity: 0.36;
+      }
+
+      .tile-room-hatch-above {
+        fill: url(#tile-hatch-above);
+        opacity: 0.28;
+      }
+
+      .tile-room-hatch-below {
+        fill: url(#tile-hatch-below);
+        opacity: 0.22;
+      }
+
+      .tile-room-inset {
+        fill: none;
+        stroke-width: 0.95;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-dasharray: 2.6 4.2;
+        pointer-events: none;
+        filter: url(#tile-handdrawn);
+      }
+
+      .tile-room-ghost {
+        fill: none;
+        stroke: rgba(244, 244, 244, 0.16);
+        stroke-width: 0.72;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-dasharray: 7 12;
+        pointer-events: none;
+        filter: url(#tile-handdrawn);
+      }
+
+      .tile-room-inset-focus {
+        stroke: rgba(244, 246, 248, 0.54);
+      }
+
+      .tile-room-inset-above {
+        stroke: rgba(206, 210, 214, 0.4);
+      }
+
+      .tile-room-inset-below {
+        stroke: rgba(164, 170, 176, 0.34);
+      }
+
+      .tile-corner-hint {
+        fill: none;
+        stroke-linecap: round;
+        pointer-events: none;
+      }
+
+      .tile-corner-hint-solid {
+        stroke: rgba(236, 236, 236, 0.88);
+        stroke-width: 1.1;
+      }
+
+      .tile-corner-hint-broken {
+        stroke: rgba(224, 224, 224, 0.7);
+        stroke-width: 0.9;
+        stroke-dasharray: 2.8 2.8;
+      }
+
+      .tile-corner-hint-fade {
+        stroke: rgba(208, 208, 208, 0.46);
+        stroke-width: 0.75;
+        stroke-dasharray: 2.2 3.8;
       }
 
       .tile-room-title {
         fill: var(--line-primary);
         font-size: 22px;
         font-weight: 700;
+        font-family: "Patrick Hand", "IM Fell English SC", Georgia, "Times New Roman", serif;
+        letter-spacing: 0.2px;
         text-anchor: middle;
         dominant-baseline: central;
         pointer-events: none;
@@ -317,9 +435,28 @@
 
       .tile-room-level {
         fill: rgba(226, 226, 226, 0.85);
-        font-size: 17px;
+        font-size: 18px;
         font-weight: 700;
         text-anchor: middle;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
+
+      .tile-room-level-inline {
+        fill: rgba(220, 224, 228, 0.9);
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.15px;
+        text-anchor: start;
+        dominant-baseline: central;
+        pointer-events: none;
+      }
+
+      .tile-room-id-inline {
+        fill: rgba(232, 236, 240, 0.92);
+        font-size: 19px;
+        font-weight: 700;
+        text-anchor: end;
         dominant-baseline: central;
         pointer-events: none;
       }
@@ -352,35 +489,6 @@
         border: 1px solid var(--panel-line);
         padding: 4px 8px;
         border-radius: 6px;
-      }
-
-      .room-node {
-        fill: rgba(143, 185, 207, 0.22);
-        stroke: rgba(143, 185, 207, 0.92);
-        stroke-width: 1.2;
-      }
-
-      .room-node-brown {
-        fill: rgba(198, 170, 120, 0.22);
-        stroke: rgba(198, 170, 120, 0.92);
-      }
-
-      .room-node-main {
-        fill: rgba(143, 185, 207, 0.22);
-        stroke: rgba(143, 185, 207, 0.92);
-      }
-
-      .room-node-other {
-        fill: rgba(185, 175, 150, 0.2);
-        stroke: rgba(185, 175, 150, 0.8);
-      }
-
-      .room-node-label {
-        fill: var(--line-primary);
-        font-size: 20px;
-        text-anchor: middle;
-        dominant-baseline: central;
-        pointer-events: none;
       }
 
       .room-node-title {
@@ -422,8 +530,8 @@
       }
 
       .edge-depth-far {
-        stroke-width: 1.6;
-        opacity: 0.6;
+        stroke-width: 1.3;
+        opacity: 0.48;
       }
     </style>
   </head>
@@ -480,6 +588,12 @@
         lastY: 0,
         hasUserMoved: false
       };
+      const floorDrag = {
+        active: false,
+        lastY: 0,
+        carryY: 0
+      };
+      const FLOOR_DRAG_STEP_PX = 30;
 
       // Prototype model: room id + section + layer + x/y + edges.
       const MAP_MODEL = {
@@ -1019,6 +1133,114 @@
         return { p0, p1, p2, p3 };
       }
 
+      function polygonPointsWithOffset(p0, p1, p2, p3, offsetY) {
+        return (
+          p0.x +
+          "," +
+          (p0.y + offsetY) +
+          " " +
+          p1.x +
+          "," +
+          (p1.y + offsetY) +
+          " " +
+          p2.x +
+          "," +
+          (p2.y + offsetY) +
+          " " +
+          p3.x +
+          "," +
+          (p3.y + offsetY)
+        );
+      }
+
+      function insetTileCorners(p0, p1, p2, p3, insetFactor) {
+        const center = {
+          x: (p0.x + p1.x + p2.x + p3.x) / 4,
+          y: (p0.y + p1.y + p2.y + p3.y) / 4
+        };
+        const moveTowardCenter = (p) => ({
+          x: p.x + (center.x - p.x) * insetFactor,
+          y: p.y + (center.y - p.y) * insetFactor
+        });
+        return {
+          p0: moveTowardCenter(p0),
+          p1: moveTowardCenter(p1),
+          p2: moveTowardCenter(p2),
+          p3: moveTowardCenter(p3)
+        };
+      }
+
+      function drawCornerVerticalHints(p0, p1, p2, p3, offsetY, directionSign, hintColors) {
+        const total = Math.max(12, Math.abs(ISO_BASIS_S.dy) * 0.18);
+        const solid = total * 0.5;
+        const broken = total * 0.32;
+        const fade = total * 0.18;
+        const gap1 = 1.8;
+        const gap2 = 1.4;
+        const corners = [p0, p1, p2, p3];
+        for (const c of corners) {
+          const x = c.x;
+          const y0 = c.y + offsetY;
+          const y1 = y0 + directionSign * solid;
+          const y2a = y1 + directionSign * gap1;
+          const y2b = y2a + directionSign * broken;
+          const y3a = y2b + directionSign * gap2;
+          const y3b = y3a + directionSign * fade;
+          add("line", {
+            class: "tile-corner-hint tile-corner-hint-solid",
+            x1: x,
+            y1: y0,
+            x2: x,
+            y2: y1,
+            style: "stroke:" + hintColors.solid + ";"
+          });
+          add("line", {
+            class: "tile-corner-hint tile-corner-hint-broken",
+            x1: x,
+            y1: y2a,
+            x2: x,
+            y2: y2b,
+            style: "stroke:" + hintColors.broken + ";"
+          });
+          add("line", {
+            class: "tile-corner-hint tile-corner-hint-fade",
+            x1: x,
+            y1: y3a,
+            x2: x,
+            y2: y3b,
+            style: "stroke:" + hintColors.fade + ";"
+          });
+        }
+      }
+
+      function splitTileTitleLines(label, maxCharsPerLine) {
+        const text = String(label || "").trim();
+        if (!text) return [""];
+        const maxChars = Number.isFinite(maxCharsPerLine) ? maxCharsPerLine : 16;
+        if (text.length <= maxChars) return [text];
+
+        const words = text.split(/\s+/).filter(Boolean);
+        if (words.length <= 1) {
+          const mid = Math.ceil(text.length / 2);
+          return [text.slice(0, mid).trim(), text.slice(mid).trim()].filter(Boolean);
+        }
+
+        let bestIdx = 1;
+        let bestScore = Number.POSITIVE_INFINITY;
+        for (let i = 1; i < words.length; i += 1) {
+          const left = words.slice(0, i).join(" ");
+          const right = words.slice(i).join(" ");
+          const score = Math.abs(left.length - right.length);
+          if (score < bestScore) {
+            bestScore = score;
+            bestIdx = i;
+          }
+        }
+        const line1 = words.slice(0, bestIdx).join(" ").trim();
+        const line2 = words.slice(bestIdx).join(" ").trim();
+        return [line1, line2].filter(Boolean);
+      }
+
       function tilesInBounds(bounds) {
         const c0 = Math.min(bounds.tl.c, bounds.br.c);
         const c1 = Math.max(bounds.tl.c, bounds.br.c);
@@ -1306,25 +1528,117 @@
         if (relativeLevel > 0) {
           return {
             tileClass: "tile-room-above",
-            titleFill: "rgba(226, 226, 226, 0.82)",
-            levelFill: "rgba(226, 226, 226, 0.64)"
+            shadowClass: "tile-room-shadow-above",
+            rimClass: "tile-room-rim-above",
+            rimDepth: 7,
+            hatchClass: "tile-room-hatch-above",
+            insetClass: "tile-room-inset-above",
+            titleFill: "rgba(218, 222, 226, 0.86)",
+            levelFill: "rgba(212, 218, 224, 0.9)",
+            levelBadgeFill: "rgba(44, 46, 50, 0.66)",
+            levelBadgeStroke: "rgba(186, 190, 196, 0.72)",
+            cornerHint: {
+              solid: "rgba(206, 210, 214, 0.9)",
+              broken: "rgba(206, 210, 214, 0.72)",
+              fade: "rgba(206, 210, 214, 0.48)"
+            }
           };
         }
         if (relativeLevel < 0) {
           return {
             tileClass: "tile-room-below",
-            titleFill: "rgba(194, 194, 194, 0.74)",
-            levelFill: "rgba(194, 194, 194, 0.56)"
+            shadowClass: "tile-room-shadow-below",
+            rimClass: "tile-room-rim-below",
+            rimDepth: 5,
+            hatchClass: "tile-room-hatch-below",
+            insetClass: "tile-room-inset-below",
+            titleFill: "rgba(190, 196, 202, 0.82)",
+            levelFill: "rgba(196, 202, 208, 0.88)",
+            levelBadgeFill: "rgba(36, 38, 42, 0.62)",
+            levelBadgeStroke: "rgba(156, 162, 170, 0.72)",
+            cornerHint: {
+              solid: "rgba(170, 176, 182, 0.88)",
+              broken: "rgba(170, 176, 182, 0.7)",
+              fade: "rgba(170, 176, 182, 0.46)"
+            }
           };
         }
         return {
           tileClass: "tile-room-focus",
-          titleFill: "rgba(255, 255, 255, 0.98)",
-          levelFill: "rgba(236, 236, 236, 0.88)"
+          shadowClass: "tile-room-shadow-focus",
+          rimClass: "tile-room-rim-focus",
+          rimDepth: 8,
+          hatchClass: "tile-room-hatch-focus",
+          insetClass: "tile-room-inset-focus",
+          titleFill: "rgba(248, 250, 252, 0.99)",
+          levelFill: "rgba(234, 238, 244, 0.94)",
+          levelBadgeFill: "rgba(46, 50, 56, 0.72)",
+          levelBadgeStroke: "rgba(196, 202, 210, 0.82)",
+          cornerHint: {
+            solid: "rgba(232, 236, 240, 0.92)",
+            broken: "rgba(232, 236, 240, 0.74)",
+            fade: "rgba(232, 236, 240, 0.5)"
+          }
         };
       }
 
       function drawRoomLayer(layerFilter) {
+        const drawBrownBuildingSideLabel = () => {
+          const block = CAMPUS_BLOCKS.find((b) => b.id === "brown");
+          if (!block) return;
+          const normalize = (v) => {
+            const d = Math.hypot(v.x, v.y) || 1;
+            return { x: v.x / d, y: v.y / d };
+          };
+          const expandParallelogram = (pts, pad) => {
+            if (!pts || pts.length !== 4) return pts;
+            const p0 = pts[0];
+            const p1 = pts[1];
+            const p2 = pts[2];
+            const p3 = pts[3];
+            const u = normalize({ x: p1.x - p0.x, y: p1.y - p0.y });
+            const v = normalize({ x: p3.x - p0.x, y: p3.y - p0.y });
+            return [
+              { x: p0.x - u.x * pad - v.x * pad, y: p0.y - u.y * pad - v.y * pad },
+              { x: p1.x + u.x * pad - v.x * pad, y: p1.y + u.y * pad - v.y * pad },
+              { x: p2.x + u.x * pad + v.x * pad, y: p2.y + u.y * pad + v.y * pad },
+              { x: p3.x - u.x * pad + v.x * pad, y: p3.y - u.y * pad + v.y * pad }
+            ];
+          };
+
+          const layerRenderLocal = buildLayerRenderContext(layerFilter);
+          const groundFloorOffsetY =
+            layerRenderLocal.focusLevel == null ? 0 : layerRenderLocal.focusLevel * layerRenderLocal.layerStep;
+          const basePts = blockPoints(block).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+          const pts = expandParallelogram(basePts, TILE_GRID.cellW * 0.1);
+          if (!pts || pts.length !== 4) return;
+
+          const a = pts[0];
+          const b = pts[3];
+          const center = {
+            x: (pts[0].x + pts[1].x + pts[2].x + pts[3].x) / 4,
+            y: (pts[0].y + pts[1].y + pts[2].y + pts[3].y) / 4
+          };
+          const edgeMid = { x: (a.x + b.x) * 0.5, y: (a.y + b.y) * 0.5 };
+          const edgeDir = normalize({ x: b.x - a.x, y: b.y - a.y });
+          const inward = normalize({ x: center.x - edgeMid.x, y: center.y - edgeMid.y });
+          const depth = -34;
+          let angle = (Math.atan2(edgeDir.y, edgeDir.x) * 180) / Math.PI;
+          if (angle > 90) angle -= 180;
+          if (angle < -90) angle += 180;
+          const labelPos = { x: edgeMid.x + inward.x * depth, y: edgeMid.y + inward.y * depth };
+          add(
+            "text",
+            {
+              class: "campus-label-side",
+              x: labelPos.x,
+              y: labelPos.y,
+              transform: "rotate(" + angle + " " + labelPos.x + " " + labelPos.y + ")"
+            },
+            block.label || "Brown Building"
+          );
+        };
+
         const layerRender = buildLayerRenderContext(layerFilter);
         const visibleRooms = ROOM_TILE_METADATA
           .filter((room) => !MAP_HIDDEN_ROOM_IDS.has(room.id))
@@ -1340,101 +1654,165 @@
             return a.tile.rank - b.tile.rank;
           });
 
+        let brownSideLabelDrawn = false;
         for (const room of visibleRooms) {
+          if (!brownSideLabelDrawn && room._relativeLevel >= 0) {
+            drawBrownBuildingSideLabel();
+            brownSideLabelDrawn = true;
+          }
           const { p0, p1, p2, p3 } = tileCorners(room.tile.c, room.tile.rank);
           const layerVisual = roomLayerVisual(room._relativeLevel);
+          const isoSkewDeg = (Math.atan2(Math.abs(ISO_BASIS_S.dx), Math.abs(ISO_BASIS_S.dy)) * 180) / Math.PI;
+          const isoTextTransform = (x, y, scaleX = 1) =>
+            "translate(" +
+            x.toFixed(2) +
+            " " +
+            y.toFixed(2) +
+            ") skewX(" +
+            isoSkewDeg.toFixed(2) +
+            ") scale(" +
+            scaleX.toFixed(3) +
+            " 0.95) translate(" +
+            (-x).toFixed(2) +
+            " " +
+            (-y).toFixed(2) +
+            ")";
+          const shadowDx = room._relativeLevel > 0 ? 2.1 : room._relativeLevel < 0 ? 1.4 : 2.4;
+          const shadowDy = room._relativeLevel > 0 ? 6.6 : room._relativeLevel < 0 ? 4.8 : 7.2;
+          const shadowPoints = polygonPointsWithOffset(
+            { x: p0.x + shadowDx, y: p0.y + shadowDy },
+            { x: p1.x + shadowDx, y: p1.y + shadowDy },
+            { x: p2.x + shadowDx, y: p2.y + shadowDy },
+            { x: p3.x + shadowDx, y: p3.y + shadowDy },
+            room._layerOffsetY
+          );
+          add("polygon", {
+            class: "tile-room-shadow " + layerVisual.shadowClass,
+            points: shadowPoints
+          });
+          const points = polygonPointsWithOffset(p0, p1, p2, p3, room._layerOffsetY);
           add("polygon", {
             class: "tile-room-known " + layerVisual.tileClass,
-            points:
-              p0.x +
-              "," +
-              (p0.y + room._layerOffsetY) +
-              " " +
-              p1.x +
-              "," +
-              (p1.y + room._layerOffsetY) +
-              " " +
-              p2.x +
-              "," +
-              (p2.y + room._layerOffsetY) +
-              " " +
-              p3.x +
-              "," +
-              (p3.y + room._layerOffsetY)
+            points
           });
+          const rimDepth = layerVisual.rimDepth || 6;
+          const rimPoints = polygonPointsWithOffset(
+            p3,
+            p2,
+            { x: p2.x, y: p2.y + rimDepth },
+            { x: p3.x, y: p3.y + rimDepth },
+            room._layerOffsetY
+          );
+          add("polygon", {
+            class: "tile-room-rim " + layerVisual.rimClass,
+            points: rimPoints
+          });
+          add("polygon", {
+            class: "tile-room-ghost",
+            points,
+            transform: "translate(0.8 -0.5)"
+          });
+          add("polygon", { class: "tile-room-hatch " + layerVisual.hatchClass, points });
+          const inset = insetTileCorners(p0, p1, p2, p3, 0.12);
+          add("polygon", {
+            class: "tile-room-inset " + layerVisual.insetClass,
+            points: polygonPointsWithOffset(inset.p0, inset.p1, inset.p2, inset.p3, room._layerOffsetY)
+          });
+          const verticalHintDir = room._relativeLevel < 0 ? 1 : -1;
+          drawCornerVerticalHints(p0, p1, p2, p3, room._layerOffsetY, verticalHintDir, layerVisual.cornerHint);
 
           // Room title at 25% of tile height/depth, centered horizontally in the tile.
+          const titleX = p0.x + ISO_BASIS_E.dx * 0.5 + ISO_BASIS_S.dx * 0.25;
+          const titleY = p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.25;
+          const titleLines = splitTileTitleLines(room.label, 16);
+          const titleScaleX = 1.08;
+          if (titleLines.length > 1) {
+            const lineGap = 18;
+            const titleBlockTransform = isoTextTransform(titleX, titleY, titleScaleX);
+            add(
+              "text",
+              {
+                class: "tile-room-title",
+                style: "fill:" + layerVisual.titleFill + ";font-size:18px;",
+                x: titleX,
+                y: titleY - lineGap * 0.5,
+                transform: titleBlockTransform
+              },
+              titleLines[0]
+            );
+            add(
+              "text",
+              {
+                class: "tile-room-title",
+                style: "fill:" + layerVisual.titleFill + ";font-size:18px;",
+                x: titleX,
+                y: titleY + lineGap * 0.5,
+                transform: titleBlockTransform
+              },
+              titleLines[1]
+            );
+          } else {
+            add(
+              "text",
+              {
+                class: "tile-room-title",
+                style: "fill:" + layerVisual.titleFill + ";",
+                x: titleX,
+                y: titleY,
+                transform: isoTextTransform(titleX, titleY, titleScaleX)
+              },
+              titleLines[0]
+            );
+          }
+          const levelLabel = String(room.layer || "");
+          const idLabel = typeof room.locationId === "number" ? String(room.locationId) : room.id;
+          const insetP3 = { x: inset.p3.x, y: inset.p3.y + room._layerOffsetY };
+          const insetP2 = { x: inset.p2.x, y: inset.p2.y + room._layerOffsetY };
+          const insetCenter = {
+            x: (inset.p0.x + inset.p1.x + inset.p2.x + inset.p3.x) / 4,
+            y: (inset.p0.y + inset.p1.y + inset.p2.y + inset.p3.y) / 4 + room._layerOffsetY
+          };
+          const edgeDx = insetP2.x - insetP3.x;
+          const edgeDy = insetP2.y - insetP3.y;
+          const tLevel = 0.12;
+          const tId = 0.88;
+          const levelBase = { x: insetP3.x + edgeDx * tLevel, y: insetP3.y + edgeDy * tLevel };
+          const idBase = { x: insetP3.x + edgeDx * tId, y: insetP3.y + edgeDy * tId };
+          const bottomMid = { x: (insetP3.x + insetP2.x) * 0.5, y: (insetP3.y + insetP2.y) * 0.5 };
+          const inwardDx = insetCenter.x - bottomMid.x;
+          const inwardDy = insetCenter.y - bottomMid.y;
+          const inwardLen = Math.hypot(inwardDx, inwardDy) || 1;
+          const inward = { x: inwardDx / inwardLen, y: inwardDy / inwardLen };
+          const pushIn = 9;
+          const levelX = levelBase.x + inward.x * pushIn;
+          const levelY = levelBase.y + inward.y * pushIn;
+          const idX = idBase.x + inward.x * pushIn;
+          const idY = idBase.y + inward.y * pushIn;
           add(
             "text",
             {
-              class: "tile-room-title",
-              style: "fill:" + layerVisual.titleFill + ";",
-              x: p0.x + ISO_BASIS_E.dx * 0.5 + ISO_BASIS_S.dx * 0.25,
-              y: p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.25
-            },
-            room.label
-          );
-          add(
-            "text",
-            {
-              class: "tile-room-level",
+              class: "tile-room-level-inline",
               style: "fill:" + layerVisual.levelFill + ";",
-              x: p0.x + ISO_BASIS_E.dx * 0.5 + ISO_BASIS_S.dx * 0.75,
-              y: p0.y + room._layerOffsetY + ISO_BASIS_E.dy * 0.5 + ISO_BASIS_S.dy * 0.75
+              x: levelX,
+              y: levelY,
+              transform: isoTextTransform(levelX, levelY)
             },
-            room.layer
+            levelLabel
           );
-        }
-
-        const occupancyByTile = new Map();
-        for (const room of visibleRooms) {
-          const key = room.tile.c + ":" + room.tile.rank + ":" + room.layer;
-          const next = occupancyByTile.get(key) || 0;
-          occupancyByTile.set(key, next + 1);
-          room._stackIndex = next;
-        }
-
-        for (const room of visibleRooms) {
-          const center = tileCenter(room.tile.c, room.tile.rank);
-          const key = room.tile.c + ":" + room.tile.rank + ":" + room.layer;
-          const stackCount = occupancyByTile.get(key) || 1;
-          const idx = room._stackIndex || 0;
-          const angle = (Math.PI * 2 * idx) / Math.max(1, stackCount);
-          const spread = stackCount > 1 ? 12 : 0;
-          const roomYOffset = 24;
-          const cx = center.x + Math.cos(angle) * spread;
-          const cy = center.y + room._layerOffsetY + roomYOffset + Math.sin(angle) * spread;
-          const nodeClass =
-            room.building === "brown"
-              ? "room-node room-node-brown"
-              : room.building === "central" ||
-                  room.building === "computer" ||
-                  room.building === "temp" ||
-                  room.building === "main" ||
-                  room.building === "corridor" ||
-                  room.building === "dome"
-                ? "room-node room-node-main"
-                : "room-node room-node-other";
-
-          const node = add("circle", { class: nodeClass, cx, cy, r: 10 });
-          const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
-          title.textContent =
-            room.label +
-            " [" +
-            (room.locationId || room.id) +
-            "] | building=" +
-            room.building +
-            " | layer=" +
-            room.layer +
-            " | tile=" +
-            room.tileLabel;
-          node.appendChild(title);
-
           add(
             "text",
-            { class: "room-node-label", x: cx, y: cy + 0.5 },
-            typeof room.locationId === "number" ? String(room.locationId) : room.id
+            {
+              class: "tile-room-id-inline",
+              style: "fill:" + layerVisual.titleFill + ";",
+              x: idX,
+              y: idY,
+              transform: isoTextTransform(idX, idY)
+            },
+            idLabel
           );
+        }
+        if (!brownSideLabelDrawn) {
+          drawBrownBuildingSideLabel();
         }
       }
 
@@ -1806,7 +2184,7 @@
         return [p0, p1, p2, p3];
       }
 
-      function drawCampusLayout(showRoads, layerFilter) {
+      function drawCampusLayout(showRoads, layerFilter, suppressBrownSideLabel) {
         const normalize = (v) => {
           const d = Math.hypot(v.x, v.y) || 1;
           return { x: v.x / d, y: v.y / d };
@@ -1946,7 +2324,9 @@
             block.type === "building-central" ? "campus-building campus-central campus-accent" : "campus-building";
           add("polygon", { class: className, points });
           if (block.id === "brown") {
-            drawBlockSideLabel(pts, block.label, null, "outside");
+            if (!suppressBrownSideLabel) {
+              drawBlockSideLabel(pts, block.label, null, "outside");
+            }
           } else {
             const titlePos = drawBuildingBottomLabel(pts, block.label, 0);
             if (block.type === "building-central") {
@@ -2147,6 +2527,68 @@
         gridPath.setAttribute("fill", "#d8cfb3");
         gridMarker.appendChild(gridPath);
 
+        const hatchFocus = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+        hatchFocus.setAttribute("id", "tile-hatch-focus");
+        hatchFocus.setAttribute("width", "12");
+        hatchFocus.setAttribute("height", "12");
+        hatchFocus.setAttribute("patternUnits", "userSpaceOnUse");
+        hatchFocus.setAttribute("patternTransform", "rotate(32)");
+        defs.appendChild(hatchFocus);
+        const hatchFocusPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        hatchFocusPath.setAttribute("d", "M 0 0 L 0 12");
+        hatchFocusPath.setAttribute("stroke", "rgba(244, 244, 244, 0.5)");
+        hatchFocusPath.setAttribute("stroke-width", "1.1");
+        hatchFocus.appendChild(hatchFocusPath);
+
+        const hatchAbove = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+        hatchAbove.setAttribute("id", "tile-hatch-above");
+        hatchAbove.setAttribute("width", "14");
+        hatchAbove.setAttribute("height", "14");
+        hatchAbove.setAttribute("patternUnits", "userSpaceOnUse");
+        hatchAbove.setAttribute("patternTransform", "rotate(26)");
+        defs.appendChild(hatchAbove);
+        const hatchAbovePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        hatchAbovePath.setAttribute("d", "M 0 0 L 0 14");
+        hatchAbovePath.setAttribute("stroke", "rgba(236, 236, 236, 0.36)");
+        hatchAbovePath.setAttribute("stroke-width", "0.9");
+        hatchAbove.appendChild(hatchAbovePath);
+
+        const hatchBelow = document.createElementNS("http://www.w3.org/2000/svg", "pattern");
+        hatchBelow.setAttribute("id", "tile-hatch-below");
+        hatchBelow.setAttribute("width", "16");
+        hatchBelow.setAttribute("height", "16");
+        hatchBelow.setAttribute("patternUnits", "userSpaceOnUse");
+        hatchBelow.setAttribute("patternTransform", "rotate(18)");
+        defs.appendChild(hatchBelow);
+        const hatchBelowPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        hatchBelowPath.setAttribute("d", "M 0 0 L 0 16");
+        hatchBelowPath.setAttribute("stroke", "rgba(196, 196, 196, 0.28)");
+        hatchBelowPath.setAttribute("stroke-width", "0.8");
+        hatchBelow.appendChild(hatchBelowPath);
+
+        const tileHanddrawn = document.createElementNS("http://www.w3.org/2000/svg", "filter");
+        tileHanddrawn.setAttribute("id", "tile-handdrawn");
+        tileHanddrawn.setAttribute("x", "-8%");
+        tileHanddrawn.setAttribute("y", "-8%");
+        tileHanddrawn.setAttribute("width", "116%");
+        tileHanddrawn.setAttribute("height", "116%");
+        tileHanddrawn.setAttribute("color-interpolation-filters", "sRGB");
+        defs.appendChild(tileHanddrawn);
+        const tileNoise = document.createElementNS("http://www.w3.org/2000/svg", "feTurbulence");
+        tileNoise.setAttribute("type", "fractalNoise");
+        tileNoise.setAttribute("baseFrequency", "0.028 0.009");
+        tileNoise.setAttribute("numOctaves", "2");
+        tileNoise.setAttribute("seed", "7");
+        tileNoise.setAttribute("result", "noise");
+        tileHanddrawn.appendChild(tileNoise);
+        const tileDisplace = document.createElementNS("http://www.w3.org/2000/svg", "feDisplacementMap");
+        tileDisplace.setAttribute("in", "SourceGraphic");
+        tileDisplace.setAttribute("in2", "noise");
+        tileDisplace.setAttribute("scale", "4.8");
+        tileDisplace.setAttribute("xChannelSelector", "R");
+        tileDisplace.setAttribute("yChannelSelector", "G");
+        tileHanddrawn.appendChild(tileDisplace);
+
         add("rect", { x: 0, y: 0, width: WORLD_W, height: WORLD_H, fill: "transparent" });
 
         const showRoads = document.getElementById("toggle-roads").checked;
@@ -2169,7 +2611,7 @@
         const tileLegendX = 0;
         const tileLegendY = legendH + 12;
         legendLayer.setAttribute("transform", "translate(" + legendX.toFixed(2) + " " + legendY.toFixed(2) + ") scale(" + hudScale + ")");
-        drawCampusLayout(showRoads, floorFilter);
+        drawCampusLayout(showRoads, floorFilter, showFloorTiles);
         if (showFloorTiles) {
           drawEdgeComparison(floorFilter);
           drawRoomLayer(floorFilter);
@@ -2254,29 +2696,80 @@
       }
 
       function onPointerDown(event) {
-        if (event.button !== 0) return;
-        panZoom.dragging = true;
-        panZoom.lastX = event.clientX;
-        panZoom.lastY = event.clientY;
-        svg.classList.add("dragging");
+        if (event.button === 0) {
+          panZoom.dragging = true;
+          panZoom.lastX = event.clientX;
+          panZoom.lastY = event.clientY;
+          svg.classList.add("dragging");
+          return;
+        }
+        if (event.button === 2) {
+          floorDrag.active = true;
+          floorDrag.lastY = event.clientY;
+          floorDrag.carryY = 0;
+          event.preventDefault();
+        }
+      }
+
+      function stepFloorFilter(step) {
+        if (!step) return;
+        const floorFilterEl = document.getElementById("floor-filter");
+        if (!floorFilterEl) return;
+        const options = Array.from(floorFilterEl.options).map((opt) => opt.value).filter((value) => value !== "all");
+        if (!options.length) return;
+        let currentIndex = options.indexOf(floorFilterEl.value);
+        if (currentIndex < 0) {
+          const defaultIndex = options.indexOf("L0");
+          currentIndex = defaultIndex >= 0 ? defaultIndex : 0;
+        }
+        const nextIndex = clamp(currentIndex + step, 0, options.length - 1);
+        if (nextIndex === currentIndex) return;
+        floorFilterEl.value = options[nextIndex];
+        draw();
       }
 
       function onPointerMove(event) {
-        if (!panZoom.dragging) return;
-        const dx = event.clientX - panZoom.lastX;
-        const dy = event.clientY - panZoom.lastY;
-        panZoom.lastX = event.clientX;
-        panZoom.lastY = event.clientY;
-        panZoom.tx += dx;
-        panZoom.ty += dy;
-        panZoom.hasUserMoved = true;
-        applyTransform();
+        if (panZoom.dragging) {
+          const dx = event.clientX - panZoom.lastX;
+          const dy = event.clientY - panZoom.lastY;
+          panZoom.lastX = event.clientX;
+          panZoom.lastY = event.clientY;
+          panZoom.tx += dx;
+          panZoom.ty += dy;
+          panZoom.hasUserMoved = true;
+          applyTransform();
+        }
+        if (floorDrag.active) {
+          const dy = event.clientY - floorDrag.lastY;
+          floorDrag.lastY = event.clientY;
+          floorDrag.carryY += dy;
+          while (floorDrag.carryY <= -FLOOR_DRAG_STEP_PX) {
+            stepFloorFilter(-1);
+            floorDrag.carryY += FLOOR_DRAG_STEP_PX;
+          }
+          while (floorDrag.carryY >= FLOOR_DRAG_STEP_PX) {
+            stepFloorFilter(1);
+            floorDrag.carryY -= FLOOR_DRAG_STEP_PX;
+          }
+          panZoom.hasUserMoved = true;
+          applyTransform();
+          event.preventDefault();
+        }
       }
 
       function onPointerUp() {
-        if (!panZoom.dragging) return;
-        panZoom.dragging = false;
-        svg.classList.remove("dragging");
+        if (panZoom.dragging) {
+          panZoom.dragging = false;
+          svg.classList.remove("dragging");
+        }
+        if (floorDrag.active) {
+          floorDrag.active = false;
+          floorDrag.carryY = 0;
+        }
+      }
+
+      function onContextMenu(event) {
+        event.preventDefault();
       }
 
       function onWheel(event) {
@@ -2304,6 +2797,7 @@
       window.addEventListener("mousemove", onPointerMove);
       window.addEventListener("mouseup", onPointerUp);
       svg.addEventListener("mouseleave", onPointerUp);
+      svg.addEventListener("contextmenu", onContextMenu);
       svg.addEventListener("wheel", onWheel, { passive: false });
       window.addEventListener("resize", draw);
       if (document.fonts && document.fonts.ready) {
