@@ -1,0 +1,159 @@
+{
+  "prompt": [
+    2,
+    "e6b905f3-94a1-4b60-9384-bee613cd7aa7",
+    {
+      "1": {
+        "inputs": {
+          "ckpt_name": "v1-5-pruned-emaonly-fp16.safetensors"
+        },
+        "class_type": "CheckpointLoaderSimple"
+      },
+      "6": {
+        "inputs": {
+          "denoise": 0.68,
+          "negative": [
+            "5",
+            0
+          ],
+          "cfg": 7.5,
+          "latent_image": [
+            "3",
+            0
+          ],
+          "sampler_name": "euler",
+          "positive": [
+            "4",
+            0
+          ],
+          "steps": 36,
+          "model": [
+            "1",
+            0
+          ],
+          "seed": 30849305,
+          "scheduler": "normal"
+        },
+        "class_type": "KSampler"
+      },
+      "2": {
+        "inputs": {
+          "image": "computer_center_overlay_2c.png"
+        },
+        "class_type": "LoadImage"
+      },
+      "4": {
+        "inputs": {
+          "clip": [
+            "1",
+            1
+          ],
+          "text": "single isolated square building, exactly three floors, frontal view with very slight rightward rotation, no entrance visible, no doors, flat roof, repetitive window bands, white technical linework on black background, blueprint-like map overlay, subtle scratch texture, centered composition"
+        },
+        "class_type": "CLIPTextEncode"
+      },
+      "5": {
+        "inputs": {
+          "clip": [
+            "1",
+            1
+          ],
+          "text": "extra buildings, floorplan maze, photorealism, gray paper background, color, trees, people, cars, signs, text labels, main entrance, stairs at front, strong perspective"
+        },
+        "class_type": "CLIPTextEncode"
+      },
+      "3": {
+        "inputs": {
+          "pixels": [
+            "2",
+            0
+          ],
+          "vae": [
+            "1",
+            2
+          ]
+        },
+        "class_type": "VAEEncode"
+      },
+      "7": {
+        "inputs": {
+          "samples": [
+            "6",
+            0
+          ],
+          "vae": [
+            "1",
+            2
+          ]
+        },
+        "class_type": "VAEDecode"
+      },
+      "8": {
+        "inputs": {
+          "images": [
+            "7",
+            0
+          ],
+          "filename_prefix": "TLH/map_overlays/square_3floors_no_entrance_i2i"
+        },
+        "class_type": "SaveImage"
+      }
+    },
+    {
+      "client_id": "58a82674-ac45-48a2-9a5d-9772dbcfb2a0",
+      "create_time": 1776630900122
+    },
+    [
+      "8"
+    ]
+  ],
+  "outputs": {
+    "8": {
+      "images": [
+        {
+          "filename": "square_3floors_no_entrance_i2i_00001_.png",
+          "subfolder": "TLH\\map_overlays",
+          "type": "output"
+        }
+      ]
+    }
+  },
+  "status": {
+    "status_str": "success",
+    "completed": true,
+    "messages": [
+      [
+        "execution_start",
+        {
+          "prompt_id": "e6b905f3-94a1-4b60-9384-bee613cd7aa7",
+          "timestamp": 1776630900123
+        }
+      ],
+      [
+        "execution_cached",
+        {
+          "nodes": [
+            "1"
+          ],
+          "prompt_id": "e6b905f3-94a1-4b60-9384-bee613cd7aa7",
+          "timestamp": 1776630900128
+        }
+      ],
+      [
+        "execution_success",
+        {
+          "prompt_id": "e6b905f3-94a1-4b60-9384-bee613cd7aa7",
+          "timestamp": 1776630903109
+        }
+      ]
+    ]
+  },
+  "meta": {
+    "8": {
+      "node_id": "8",
+      "display_node": "8",
+      "parent_node": null,
+      "real_node_id": "8"
+    }
+  }
+}

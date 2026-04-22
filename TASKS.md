@@ -236,17 +236,16 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added slight road extension + distance fade mask so road ends recede more naturally instead of ending abruptly.
    - Iterated and validated texture behavior with dynamic floor-focus movement to keep texture anchored during up/down scrub.
 
-## Pending Tasks
+56. [done] Continue refining `src/map-prototype-2.html` layout until it is very close to the desired in-game map.
+   - Added RMB floor scrubbing (vertical), tuned perspective handling, and stabilized layer motion during scrubbing.
+   - Applied and finalized the semi-wireframe/cutaway profile (dark matte background, monochrome-first linework, restrained accents).
+   - Locked focus mode to at most three visible layers (`X-1`, `X`, `X+1`) with consistent exploded spacing.
+   - Finalized line hierarchy and adjusted detail/subtlety for readability at normal browser zoom.
+   - Improved tile typography and dense-area ordering (title wrapping/projection, inline level/id placement).
+   - Tuned active vs non-active layer contrast so active rooms remain dominant while adjacent layers stay readable.
+   - Refined building/road/label z-order behavior across floor-focus states to avoid misleading overlap.
 
-56. [pending] Continue refining `src/map-prototype-2.html` layout until it is very close to the desired in-game map.
-   - Current progress (2026-04-17): added RMB floor scrubbing (vertical), RMB perspective shift (horizontal), darker blueprint-like hatch/inset tile styling, and tuned wobble frequency to be less busy.
-   - Done (2026-04-18): explicit visual layer differentiation improved with per-layer contour accents and clear level badges (`X-1`/`X`/`X+1` focus styling).
-   - Done (2026-04-17): vertical layer separation reduced/tuned; current spacing accepted.
-   - Done (2026-04-18): applied semi-wireframe/cutaway visual profile (dark matte background, monochrome-first linework, restrained accents).
-   - Done (2026-04-18): focus mode keeps at most three visible layers (`X-1`, `X`, `X+1`) with consistent exploded vertical spacing tied to vertical-edge length.
-   - Done (2026-04-18): finalized line hierarchy (outer contour > architecture > detail > hidden/secondary) and tuned legibility at normal browser zoom.
-   - Done (2026-04-18): legend/map typography tuned to tile scale for quick floor reading (tile-aligned level/id placement, improved title wrapping/projection, and dense-area label ordering fixes).
-   - Tune active vs non-active floor contrast/opacity so active rooms stay dominant while adjacent layers remain readable and unambiguous.
+## Pending Tasks
 
 57. [pending] Add a dedicated architectural outline composition pass for the Central Complex in `src/map-prototype-2.html`, with the visual goal of pulling the campus silhouette closer to the provided blueprint image while being explicitly informed by MIT’s Central Building / Building 10 massing.
    - Scope: Central Complex only. Keep Brown Building, Computer Center, and Temporary Lab on the existing simpler treatment for this pass.
@@ -324,10 +323,9 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
 60. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
-   - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
-   - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
-   - Add safe-location gating skeleton and feature flag for consultation availability
-   - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
-   - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
 
-
+- Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
+- Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
+- Add safe-location gating skeleton and feature flag for consultation availability
+- Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
+- Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
