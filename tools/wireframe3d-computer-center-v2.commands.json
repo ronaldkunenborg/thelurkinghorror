@@ -5,7 +5,8 @@
       "overrides": {
         "meta": {
           "name": "computer-center-wireframe-v2",
-          "units": "meters"
+          "units": "meters",
+          "occlusionStrategy": "roof_parapet_* are visual only (occluder=false). roof_occluder_* are invisible 4-strip occluders to hide beam tops without clipping roof-unit walls."
         },
         "camera": {
           "projection": "tile_oblique",
@@ -65,14 +66,14 @@
       "id": "ground_plinth",
       "type": "rectangle",
       "params": {
-        "width": 11.7,
-        "height": 0.2,
-        "depth": 6.7
+        "width": 11.9,
+        "height": 0.5,
+        "depth": 6.9
       },
       "transform": {
         "translate": [
           0,
-          0.1,
+          -0.25,
           0
         ]
       },
@@ -86,6 +87,7 @@
       "op": "add_primitive",
       "id": "roof_parapet_outer",
       "type": "rectangle",
+      "occluder": false,
       "params": {
         "width": 11.85,
         "height": 0.24,
@@ -107,6 +109,7 @@
       "op": "add_primitive",
       "id": "roof_parapet_inner",
       "type": "rectangle",
+      "occluder": false,
       "params": {
         "width": 10.75,
         "height": 0.16,
@@ -127,12 +130,100 @@
     },
     {
       "op": "add_primitive",
+      "id": "roof_occluder_front",
+      "type": "rectangle",
+      "occluder": true,
+      "params": {
+        "width": 11.85,
+        "height": 0.24,
+        "depth": 0.24
+      },
+      "transform": {
+        "translate": [
+          0,
+          4.95,
+          3.305
+        ]
+      },
+      "style": {
+        "stroke": "none",
+        "strokeOpacity": 0
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "roof_occluder_back",
+      "type": "rectangle",
+      "occluder": true,
+      "params": {
+        "width": 11.85,
+        "height": 0.24,
+        "depth": 0.24
+      },
+      "transform": {
+        "translate": [
+          0,
+          4.95,
+          -3.305
+        ]
+      },
+      "style": {
+        "stroke": "none",
+        "strokeOpacity": 0
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "roof_occluder_left",
+      "type": "rectangle",
+      "occluder": true,
+      "params": {
+        "width": 0.24,
+        "height": 0.24,
+        "depth": 6.37
+      },
+      "transform": {
+        "translate": [
+          -5.805,
+          4.95,
+          0
+        ]
+      },
+      "style": {
+        "stroke": "none",
+        "strokeOpacity": 0
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "roof_occluder_right",
+      "type": "rectangle",
+      "occluder": true,
+      "params": {
+        "width": 0.24,
+        "height": 0.24,
+        "depth": 6.37
+      },
+      "transform": {
+        "translate": [
+          5.805,
+          4.95,
+          0
+        ]
+      },
+      "style": {
+        "stroke": "none",
+        "strokeOpacity": 0
+      }
+    },
+    {
+      "op": "add_primitive",
       "id": "floor_ring_1",
       "type": "rectangle",
       "params": {
-        "width": 11.219999999999999,
+        "width": 11.16,
         "height": 0.12,
-        "depth": 6.22
+        "depth": 6.16
       },
       "transform": {
         "translate": [
@@ -151,9 +242,9 @@
       "id": "floor_ring_2",
       "type": "rectangle",
       "params": {
-        "width": 11.219999999999999,
+        "width": 11.16,
         "height": 0.12,
-        "depth": 6.22
+        "depth": 6.16
       },
       "transform": {
         "translate": [
@@ -172,9 +263,9 @@
       "id": "floor_ring_3",
       "type": "rectangle",
       "params": {
-        "width": 11.219999999999999,
+        "width": 11.16,
         "height": 0.12,
-        "depth": 6.22
+        "depth": 6.16
       },
       "transform": {
         "translate": [
@@ -525,7 +616,7 @@
     {
       "op": "export_svg",
       "options": {
-        "hiddenEdges": "none"
+        "hiddenEdges": "partial"
       }
     }
   ]

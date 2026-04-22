@@ -2,7 +2,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1500" height="980" viewBox="0 0 1500 980">
   <rect x="0" y="0" width="1500" height="980" fill="#06090f" />
   <g id="main_block">
-    <line x1="241.55" y1="129.33" x2="241.55" y2="445.10" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="241.55" y1="129.33" x2="241.55" y2="173.73" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="241.55" y1="184.42" x2="241.55" y2="262.53" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="241.55" y1="273.22" x2="241.55" y2="351.33" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="241.55" y1="362.02" x2="241.55" y2="445.10" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
     <line x1="241.55" y1="445.10" x2="329.50" y2="597.44" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
     <line x1="353.06" y1="638.25" x2="358.63" y2="647.89" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
     <line x1="382.19" y1="688.69" x2="387.76" y2="698.33" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
@@ -16,8 +19,14 @@
     <line x1="930.95" y1="770.90" x2="1048.60" y2="770.90" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
     <line x1="1073.03" y1="770.90" x2="1190.68" y2="770.90" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
     <line x1="1215.11" y1="770.90" x2="1258.45" y2="770.90" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
-    <line x1="1258.45" y1="770.90" x2="1258.45" y2="430.56" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
-    <line x1="429.65" y1="430.56" x2="429.65" y2="770.90" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="1258.45" y1="770.90" x2="1258.45" y2="687.07" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="1258.45" y1="678.19" x2="1258.45" y2="598.27" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="1258.45" y1="589.39" x2="1258.45" y2="509.47" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="1258.45" y1="500.59" x2="1258.45" y2="430.56" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="429.65" y1="430.56" x2="429.65" y2="500.59" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="429.65" y1="509.47" x2="429.65" y2="589.39" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="429.65" y1="598.27" x2="429.65" y2="678.19" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
+    <line x1="429.65" y1="687.07" x2="429.65" y2="770.90" stroke="#f2f8ff" stroke-width="1.25" stroke-opacity="0.950" fill="none" />
   </g>
   <g id="ground_plinth">
     <line x1="241.55" y1="426.71" x2="205.03" y2="426.71" stroke="#88baf3" stroke-width="1.10" stroke-opacity="0.800" fill="none" />

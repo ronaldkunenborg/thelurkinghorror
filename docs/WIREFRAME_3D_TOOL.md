@@ -33,7 +33,7 @@ node tools/wireframe3d-cli.js tools/wireframe3d-computer-center-v2.commands.json
 {
   "commands": [
     { "op": "create_scene", "overrides": {} },
-    { "op": "add_primitive", "id": "p1", "type": "cube", "params": {}, "transform": {}, "style": {} },
+    { "op": "add_primitive", "id": "p1", "type": "cube", "params": {}, "transform": {}, "style": {}, "occluder": true },
     { "op": "transform_primitive", "id": "p1", "rotateDeg": [15, 30, 0] },
     { "op": "rotate_scene", "rotationDeg": [10, -20, 0] },
     { "op": "export_svg", "options": { "hiddenEdges": "far" } }
@@ -60,6 +60,9 @@ node tools/wireframe3d-cli.js tools/wireframe3d-computer-center-v2.commands.json
 - `set_camera`
 - `rotate_scene`
 - `export_svg`
+
+`add_primitive` also supports:
+- `occluder` (default `true`): when `false`, the primitive is still rendered but its faces do not hide other edges.
 
 ## Camera Controls
 
@@ -115,5 +118,52 @@ Camera framing example:
 ## Notes
 
 - SVG output is deterministic for identical command input.
-- Hidden-edge suppression currently uses a simple depth heuristic (`hiddenEdges: "far"`).
+- Hidden-edge modes:
+  - `hiddenEdges: "none"`: draw all edges.
+  - `hiddenEdges: "far"`: conservative clipping (only clearly far, fully covered segments).
+  - `hiddenEdges: "partial"`: segment-level clipping with a depth-gap threshold.
+  - `hiddenEdges: "strict"`: segment-level clipping without that threshold (most aggressive).
+- Face debug hatch:
+  - Add `faceDebug` under `export_svg.options` to visualize which polygons are treated as faces.
+  - Example:
+```json
+{
+  "op": "export_svg",
+  "options": {
+    "hiddenEdges": "none",
+    "faceDebug": {
+      "enabled": true,
+      "hatchColor": "#79c7ff",
+      "hatchOpacity": 0.42,
+      "hatchSpacing": 10,
+      "hatchStrokeWidth": 0.9,
+      "fill": "#79c7ff",
+      "fillOpacity": 0.08
+    }
+  }
+}
+```
+- Numbered debug labels:
+  - Add `debugLabels` under `export_svg.options` to print IDs on faces and edges.
+  - Useful format: `primitiveId:F<faceIndex>` and `primitiveId:E<edgeIndex>`.
+```json
+{
+  "op": "export_svg",
+  "options": {
+    "debugLabels": {
+      "enabled": true,
+      "faces": true,
+      "edges": true,
+      "color": "#ffd66e",
+      "halo": "#071019",
+      "fontSize": 11,
+      "minEdgeLength": 22,
+      "prefixPrimitive": true
+    }
+  }
+}
+```
 - The tool is intended for blockout/composition workflows and fast wireframe iteration.
+- Occlusion modeling tip:
+  - For wire-only architectural details (for example parapets), prefer `occluder: false`.
+  - If they still need to hide specific edges (for example beam tops), add separate invisible occluder primitives split into smaller strips instead of one large solid box occluder.
