@@ -1,0 +1,123 @@
+{
+  "10": {
+    "class_type": "LoaderGGUF",
+    "inputs": {
+      "gguf_name": "flux1-schnell-Q8_0.gguf"
+    }
+  },
+  "20": {
+    "class_type": "LoraLoaderModelOnly",
+    "inputs": {
+      "model": [
+        "10",
+        0
+      ],
+      "lora_name": "flux\\Flux.1 3D Wireframe architecture - 1752544956.safetensors",
+      "strength_model": 0.85
+    }
+  },
+  "11": {
+    "class_type": "DualClipLoaderGGUF",
+    "inputs": {
+      "clip_name1": "flux\\t5xxl_fp8_e4m3fn.safetensors",
+      "clip_name2": "flux\\clip_l.safetensors",
+      "type": "flux",
+      "device": "default"
+    }
+  },
+  "12": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "flux\\ae.safetensors"
+    }
+  },
+  "13": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "computer_center_overlay_2c.png"
+    }
+  },
+  "14": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": [
+        "13",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ]
+    }
+  },
+  "15": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "11",
+        0
+      ],
+      "text": "isolated square building, exactly three floors, frontal facade, architecture wireframe drawing, white luminous linework on black background, blueprint overlay, city lights in distance, no humans, centered composition"
+    }
+  },
+  "16": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": [
+        "11",
+        0
+      ],
+      "text": "doors, visible entrance, floorplan maze, photorealism, grayscale paper texture, trees, cars, people, text labels, perspective distortion"
+    }
+  },
+  "17": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": [
+        "20",
+        0
+      ],
+      "positive": [
+        "15",
+        0
+      ],
+      "negative": [
+        "16",
+        0
+      ],
+      "latent_image": [
+        "14",
+        0
+      ],
+      "seed": 1030722840263512,
+      "steps": 10,
+      "cfg": 1.5,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 0.77
+    }
+  },
+  "18": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": [
+        "17",
+        0
+      ],
+      "vae": [
+        "12",
+        0
+      ]
+    }
+  },
+  "19": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "images": [
+        "18",
+        0
+      ],
+      "filename_prefix": "TLH/map_overlays/d3d_wireframe_architecture_i2i_flux1"
+    }
+  }
+}
