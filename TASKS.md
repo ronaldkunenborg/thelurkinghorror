@@ -329,3 +329,49 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 - Add safe-location gating skeleton and feature flag for consultation availability
 - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
 - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
+
+61. [pending] Build a parameter-controlled 3D wireframe composition tool for game-development map/building art, with SVG export for verification.
+   - Goal:
+     - Create a local tool that can be driven by explicit parameters (by AI/operator) to create, add to, and modify a 3D vector scene.
+     - Scene output should be wireframe-first and convertible/exportable to SVG for visual verification.
+   - Required primitive building blocks:
+     - cube
+     - rectangle (cuboid with independent `width/height/depth`)
+     - cylinder
+     - parallelogram/parallelepiped-style block (skewed prism via shear/skew parameters)
+     - globe segments (full sphere and partial globe by latitude/longitude clipping)
+   - Core operations (parameter-driven):
+     - `create_scene`
+     - `add_primitive`
+     - `update_primitive`
+     - `delete_primitive`
+     - `transform_primitive` (translate/rotate/scale/shear)
+     - `set_style` (stroke color/width/opacity/dash)
+     - `export_svg`
+   - Implementation plan:
+     1. Define scene + command schema:
+        - Add a JSON schema in `docs` for scene state and operation payloads.
+        - Include stable IDs for primitives and deterministic defaults (units, origin, camera).
+     2. Build geometry core in `tools`:
+        - Implement primitive mesh/wireframe generators returning vertices/edges in 3D.
+        - Implement transform stack (local + world transforms) and deterministic ordering.
+     3. Add projection + hidden-line policy:
+        - Implement isometric and perspective projection modes.
+        - Start with simple depth-sorted wireframe rendering; add optional hidden-edge suppression flag.
+     4. Build scene command runner:
+        - Implement a CLI script that accepts a JSON command file and mutates scene state.
+        - Support incremental workflows: create -> add -> modify -> export.
+     5. Implement SVG exporter:
+        - Convert projected wireframe edges to SVG `<path>/<line>` output.
+        - Add layer/group naming per primitive for debugging and verification.
+     6. Add composition presets:
+        - Provide reusable preset command sequences for architectural massing (campus/blockout style).
+        - Include sample scenes combining all required primitive types.
+     7. Verification and regression tests:
+        - Add tests for primitive generation counts (vertex/edge invariants), transform correctness, and deterministic SVG output hash/snapshot.
+        - Add a smoke test that runs a full command sequence and writes an SVG artifact.
+   - Acceptance criteria:
+     - A scene can be created and edited only through parameterized commands (no manual drawing required).
+     - All required primitive types can be added and transformed in one scene.
+     - SVG export opens correctly and visually reflects scene updates.
+     - Re-running the same command sequence yields byte-stable (or normalized-stable) SVG output.
