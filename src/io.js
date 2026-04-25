@@ -8,6 +8,7 @@ const SOUND_EFFECT_STOP = 3;
 const SOUND_EFFECT_FINISH = 4;
 const SOUND_CLASS_SFX = 'sfx';
 const SOUND_CLASS_MUSIC = 'music';
+const GAME_OVER_MUSIC_ID = 'game-over-music';
 const DEFAULT_SAVE_SLOT = 0;
 const DEFAULT_SLOT_MENU_SIZE = 5;
 const ROOM_EXIT_PROPERTY_COMMANDS = [
@@ -39,6 +40,7 @@ const DEFAULT_SOUND_CATALOG = {
   16: { src: './assets/soundfx/blorb/s16.wav', class: SOUND_CLASS_SFX },
   17: { src: './assets/soundfx/blorb/s17.wav', class: SOUND_CLASS_SFX },
   18: { src: './assets/soundfx/blorb/s18.wav', class: SOUND_CLASS_SFX },
+  [GAME_OVER_MUSIC_ID]: { src: './assets/audio/game-over-desmae-877160.mp3', class: SOUND_CLASS_MUSIC },
 };
 
 class GameIoController {
@@ -65,6 +67,8 @@ class GameIoController {
     this.debugEnabled = false;
     this.sfxEnabled = true;
     this.gameMusicEnabled = true;
+    this.gameOverMusicActive = false;
+    this.gameOverMusicStartToken = 0;
     this.sfxVolume = 1;
     this.gameMusicVolume = 1;
     this.saveSlotCount = this._coerceSaveSlotCount(opts.saveSlotCount);
@@ -100,6 +104,14 @@ class GameIoController {
     this.onGameMusicPreferenceChanged =
       typeof opts.onGameMusicPreferenceChanged === 'function'
         ? opts.onGameMusicPreferenceChanged
+        : function () {};
+    this.onBeforeGameOverMusicStart =
+      typeof opts.onBeforeGameOverMusicStart === 'function'
+        ? opts.onBeforeGameOverMusicStart
+        : function () {};
+    this.onGameOver =
+      typeof opts.onGameOver === 'function'
+        ? opts.onGameOver
         : function () {};
     this.audioFactory = typeof opts.audioFactory === 'function'
       ? opts.audioFactory
@@ -148,6 +160,9 @@ class GameIoController {
     this.sawCurrentRoomHeadingThisCycle = false;
     this.previousVmLine = '';
     this.pendingViewReturn = null;
+    this.gameOverMusicActive = false;
+    this.gameOverMusicStartToken += 1;
+    this._stopGameOverMusic();
     this.onRoomChanged('', 0, { isDark: false });
     this.vm = new window.Z3VM({
       memory: parsed.memory.bytes,
@@ -289,6 +304,9 @@ class GameIoController {
       return;
     }
     const normalized = String(command || '').trim().toLowerCase();
+    if (this._isGameOverRecoveryCommand(normalized)) {
+      this._stopGameOverMusic();
+    }
     if (normalized === 'load') {
       this.ui.appendOutput('Use "restore" for the story command, or "$LOAD" for interpreter slot loading.', 'system');
       this.ui.setStatus('Command hint', 'Use restore or $LOAD');
@@ -535,6 +553,7 @@ class GameIoController {
   _toggleGameMusic() {
       this.gameMusicEnabled = !this.gameMusicEnabled;
       if (!this.gameMusicEnabled) {
+        this._stopGameOverMusic();
         this._stopAllSoundsByClass(SOUND_CLASS_MUSIC);
       }
       this.onGameMusicPreferenceChanged(this.gameMusicEnabled);
@@ -1061,6 +1080,7 @@ class GameIoController {
   setGameMusicEnabled(enabled) {
     this.gameMusicEnabled = !!enabled;
     if (!this.gameMusicEnabled) {
+      this._stopGameOverMusic();
       this._stopAllSoundsByClass(SOUND_CLASS_MUSIC);
     }
     this.onGameMusicPreferenceChanged(this.gameMusicEnabled);
@@ -1898,7 +1918,19 @@ class GameIoController {
     if (this._isComputerHelpHintLine(line)) {
       this.ui.appendOutput(COMPUTER_HELP_NOTE, 'system');
     }
+    if (this._isDeathBannerLine(line)) {
+      this._startGameOverMusic();
+    }
     this.previousVmLine = line;
+  }
+
+  _isDeathBannerLine(line) {
+    const normalized = String(line || '').trim();
+    return /^\*+\s*You have died\s*\*+$/i.test(normalized);
+  }
+
+  _isGameOverRecoveryCommand(normalizedCommand) {
+    return this.gameOverMusicActive && /^(restart|restore|quit)$/.test(String(normalizedCommand || ''));
   }
 
   _isPitchBlackLine(line) {
@@ -2408,6 +2440,57 @@ class GameIoController {
     this.activeSounds.delete(number);
   }
 
+  _startGameOverMusic() {
+    if (this.gameOverMusicActive) {
+      return;
+    }
+    const soundDef = this.soundCatalog[GAME_OVER_MUSIC_ID];
+    this._stopAllSounds();
+    this.gameOverMusicActive = true;
+    const startToken = ++this.gameOverMusicStartToken;
+    const play = () => {
+      if (
+        startToken !== this.gameOverMusicStartToken ||
+        !this.gameOverMusicActive
+      ) {
+        return;
+      }
+      this.onGameOver({
+        musicSrc: soundDef && soundDef.src ? soundDef.src : '',
+      });
+      if (!this.gameMusicEnabled || !soundDef || !soundDef.src) {
+        return;
+      }
+      this._playSound(GAME_OVER_MUSIC_ID, soundDef, {
+        gain: 1,
+        restart: true,
+      });
+    };
+    let delayResult = null;
+    try {
+      delayResult = this.onBeforeGameOverMusicStart({
+        src: soundDef && soundDef.src ? soundDef.src : '',
+      });
+    } catch (error) {
+      delayResult = null;
+    }
+    if (delayResult && typeof delayResult.then === 'function') {
+      delayResult.then(play).catch(play);
+      return;
+    }
+    if (Number.isFinite(delayResult) && delayResult > 0) {
+      setTimeout(play, delayResult);
+      return;
+    }
+    play();
+  }
+
+  _stopGameOverMusic() {
+    this.gameOverMusicStartToken += 1;
+    this._stopSound(GAME_OVER_MUSIC_ID);
+    this.gameOverMusicActive = false;
+  }
+
   _finishSound(number) {
     const audio = this.activeSounds.get(number);
     if (!audio) {
@@ -2470,6 +2553,7 @@ class GameIoController {
 
   _prepareAudioForRestore() {
     this.restoreAudioTransitionActive = true;
+    this._stopGameOverMusic();
     this._stopAllSoundsByClass(SOUND_CLASS_SFX);
   }
 }

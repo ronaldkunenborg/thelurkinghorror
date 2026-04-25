@@ -245,6 +245,19 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Tuned active vs non-active layer contrast so active rooms remain dominant while adjacent layers stay readable.
    - Refined building/road/label z-order behavior across floor-focus states to avoid misleading overlap.
 
+62. [done] Process `src/assets/audio/game-over-desmae-877160.mp3` as game-over music when the player dies.
+   - Added the Newgrounds game-over track to the runtime sound catalog as music:
+     - https://www.newgrounds.com/audio/listen/877160
+   - Credited the track as audio by Desmae under CC BY-NC-ND 3.0:
+     - https://creativecommons.org/licenses/by-nc-nd/3.0/
+   - Detects the exact story death banner (`****  You have died  ****`) so ordinary room names such as `Dead Storage` do not trigger it.
+   - Stops active controller-managed audio before game-over playback, respects game-music enablement and volume settings, and stops cleanly on restart/restore/quit/load flows.
+   - If splash music is still playing at death, fades it out over 2 seconds before starting the game-over music.
+   - Shows `src/assets/gfx/lurkinghorror/game_over.png` in the scene pane on the same death event:
+     - fades out the old scene over 2 seconds alongside any remaining splash music
+     - then starts game-over music and fades in the game-over artwork over 2 seconds
+   - Added controller regression coverage for death detection, false-positive avoidance, delayed start after external fade, and stop behavior.
+
 ## Pending Tasks
 
 57. [pending] Add a dedicated architectural outline composition pass for the Central Complex in `src/map-prototype-2.html`, with the visual goal of pulling the campus silhouette closer to the provided blueprint image while being explicitly informed by MIT’s Central Building / Building 10 massing.

@@ -240,6 +240,11 @@
               Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
               <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
             </p>
+            <p>
+              Game over music: audio by Desmae
+              (<a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 3.0</a>),
+              <a href="https://www.newgrounds.com/audio/listen/877160" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+            </p>
           </div>
           <div class="credits-group">
             <h3>Visual Assets</h3>
@@ -290,6 +295,9 @@
           <p class="settings-attribution" id="audio-attribution">
             Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
             <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+            Game over music: audio by Desmae
+            (<a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 3.0</a>),
+            <a href="https://www.newgrounds.com/audio/listen/877160" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
           </p>
           <div id="experience-onboarding-actions" class="settings-actions" hidden>
             <button id="experience-continue" class="btn btn-accent" type="button">Enter Game</button>
@@ -552,7 +560,9 @@
           249: './assets/gfx/lurkinghorror/great_dome_249.jpg',
         };
         const roomArtMissingIds = new Set();
+        const GAME_OVER_ART = './assets/gfx/lurkinghorror/game_over.png';
         let currentRoomArt = '';
+        let gameOverSceneFadeTimer = 0;
 
         function resolveRoomArt(roomName, roomObjectId) {
           if (roomObjectId && ROOM_ART_BY_ID[roomObjectId]) {
@@ -977,6 +987,23 @@
         function setRoomScene(roomName, roomObjectId, options) {
           const isDark = !!(options && options.isDark);
           const art = isDark ? '' : resolveRoomArt(roomName, roomObjectId);
+          setSceneArt(art);
+        }
+
+        function setSceneLayerTransition(layer, durationMs) {
+          if (!layer) {
+            return;
+          }
+          if (!Number.isFinite(durationMs)) {
+            layer.style.transition = '';
+            return;
+          }
+          const ms = Math.max(0, Number(durationMs));
+          layer.style.transition = 'opacity ' + ms + 'ms ease, transform ' + ms + 'ms ease';
+        }
+
+        function setSceneArt(art, options) {
+          const opts = options || {};
           if (art === currentRoomArt) {
             return;
           }
@@ -986,20 +1013,52 @@
           const prevLayer = sceneLayers[activeSceneIndex];
 
           if (!art) {
+            setSceneLayerTransition(prevLayer, opts.durationMs);
+            setSceneLayerTransition(nextLayer, opts.durationMs);
             prevLayer.style.opacity = '0';
             nextLayer.style.opacity = '0';
+            prevLayer.classList.remove('scene-layer-game-over');
+            nextLayer.classList.remove('scene-layer-game-over');
             return;
           }
 
           const offsetX = randomSceneOffsetPercent();
           const offsetY = randomSceneOffsetPercent();
+          setSceneLayerTransition(nextLayer, opts.durationMs);
+          setSceneLayerTransition(prevLayer, opts.durationMs);
           nextLayer.style.backgroundImage = 'url("' + art + '")';
           nextLayer.style.backgroundPosition = 'calc(50% + ' + offsetX + '%) calc(50% + ' + offsetY + '%)';
           nextLayer.style.transform = 'scale(1.02)';
+          nextLayer.classList.toggle('scene-layer-game-over', !!opts.gameOver);
+          prevLayer.classList.remove('scene-layer-game-over');
           nextLayer.style.opacity = '1';
           prevLayer.style.opacity = '0';
           activeSceneIndex = nextIndex;
           scheduleRoomEntryHorror(nextLayer);
+        }
+
+        function fadeOutCurrentScene(durationMs) {
+          const ms = Number.isFinite(durationMs) ? Math.max(0, Number(durationMs)) : 2000;
+          if (gameOverSceneFadeTimer) {
+            clearTimeout(gameOverSceneFadeTimer);
+            gameOverSceneFadeTimer = 0;
+          }
+          if (!currentRoomArt) {
+            return Promise.resolve();
+          }
+          const layer = sceneLayers[activeSceneIndex];
+          setSceneLayerTransition(layer, ms);
+          layer.style.opacity = '0';
+          return new Promise(resolve => {
+            gameOverSceneFadeTimer = setTimeout(() => {
+              gameOverSceneFadeTimer = 0;
+              resolve();
+            }, ms);
+          });
+        }
+
+        function setGameOverScene() {
+          setSceneArt(GAME_OVER_ART, { durationMs: 2000, gameOver: true });
         }
 
         function clearBloodTimers() {
@@ -1243,6 +1302,20 @@
               splashMusic.currentTime = 0;
             }
             startSplashMusic();
+          },
+          onBeforeGameOverMusicStart: () => {
+            return Promise.all([
+              stopSplashMusicWithFade({
+                resetToStart: true,
+                markEnded: true,
+                durationMs: 2000,
+                onlyIfPlaying: true,
+              }),
+              fadeOutCurrentScene(2000),
+            ]);
+          },
+          onGameOver: () => {
+            setGameOverScene();
           },
           onRoomChanged: (roomName, roomObjectId, options) => {
             setRoomScene(roomName, roomObjectId, options);
@@ -1614,32 +1687,47 @@
         function stopSplashMusicWithFade(options) {
           const opts = options || {};
           if (splashMusicEnded) {
-            return;
+            return Promise.resolve();
+          }
+          if (opts.onlyIfPlaying && splashMusic.paused) {
+            return Promise.resolve();
           }
           cancelSplashMusicFade(false);
           const resetToStart = opts.resetToStart !== false;
           const markEnded = !!opts.markEnded;
           const startVolume = splashMusic.volume;
-          const durationMs = 420;
+          const durationMs = Number.isFinite(opts.durationMs) ? Math.max(0, Number(opts.durationMs)) : 420;
           const startAt = performance.now();
 
-          function fadeFrame(now) {
-            const progress = Math.min(1, (now - startAt) / durationMs);
-            splashMusic.volume = startVolume * (1 - progress);
-            if (progress < 1) {
-              splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+          return new Promise(resolve => {
+            function finishFade() {
+              splashMusic.pause();
+              if (resetToStart && typeof splashMusic.currentTime === 'number') {
+                splashMusic.currentTime = 0;
+              }
+              splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+              splashMusicFadeFrame = 0;
+              splashMusicEnded = markEnded;
+              resolve();
+            }
+
+            if (durationMs <= 0 || startVolume <= 0) {
+              finishFade();
               return;
             }
-            splashMusic.pause();
-            if (resetToStart && typeof splashMusic.currentTime === 'number') {
-              splashMusic.currentTime = 0;
-            }
-            splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
-            splashMusicFadeFrame = 0;
-            splashMusicEnded = markEnded;
-          }
 
-          splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+            function fadeFrame(now) {
+              const progress = Math.min(1, (now - startAt) / durationMs);
+              splashMusic.volume = startVolume * (1 - progress);
+              if (progress < 1) {
+                splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+                return;
+              }
+              finishFade();
+            }
+
+            splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+          });
         }
 
         function hideSplash() {

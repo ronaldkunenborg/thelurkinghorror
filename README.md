@@ -116,7 +116,9 @@ These are used as map/reference material during location reconciliation work.
 ### Committed runtime assets
 
 - [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music.
+- [`src/assets/audio/game-over-desmae-877160.mp3`](src/assets/audio/game-over-desmae-877160.mp3) - game-over music.
 - [`src/assets/gfx/lurkinghorror/`](src/assets/gfx/lurkinghorror/) - location artwork set.
+- [`src/assets/gfx/lurkinghorror/game_over.png`](src/assets/gfx/lurkinghorror/game_over.png) - game-over artwork.
 - [`src/assets/gfx/blood/`](src/assets/gfx/blood/) - blood-splatter overlays used by the ambient blood effect.
 
 ## Installation
@@ -168,3 +170,7 @@ Useful local checks:
 - Splash music: `horror` by **Whirlguy** (CC BY-ND 3.0),
   published on Newgrounds Audio Portal:
   https://www.newgrounds.com/audio/listen/6630
+- Game over music: audio by **Desmae** (CC BY-NC-ND 3.0),
+  published on Newgrounds Audio Portal:
+  https://www.newgrounds.com/audio/listen/877160
+  License deed: https://creativecommons.org/licenses/by-nc-nd/3.0/

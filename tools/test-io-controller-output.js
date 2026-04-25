@@ -720,6 +720,212 @@ function testMusicAndSfxUseSeparateReplacementGroups() {
   assert.strictEqual(audioBySrc['./music-a.mp3'].pauseCalls, 1, 'new music should replace old music');
 }
 
+function testGameOverMusicStartsOnlyOnDeathBanner() {
+  const ui = createUi();
+  const audioBySrc = {};
+  const gameOverEvents = [];
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      volume: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+    onGameOver(payload) {
+      gameOverEvents.push(payload);
+    },
+  });
+
+  controller._appendVmLine('Dead Storage');
+  assert.strictEqual(gameOverEvents.length, 0, 'ordinary room names should not emit game-over events');
+  assert.strictEqual(
+    audioBySrc['./assets/audio/game-over-desmae-877160.mp3'],
+    undefined,
+    'ordinary room names containing dead should not start game-over music'
+  );
+
+  controller._appendVmLine('   ****  You have died  ****');
+  const gameOverAudio = audioBySrc['./assets/audio/game-over-desmae-877160.mp3'];
+  assert.ok(gameOverAudio, 'death banner should create game-over audio');
+  assert.strictEqual(gameOverEvents.length, 1, 'death banner should emit one game-over event');
+  assert.strictEqual(gameOverAudio.playCalls, 1, 'death banner should start game-over music');
+  assert.strictEqual(gameOverAudio.loop, false, 'game-over music should play as a one-shot track');
+}
+
+function testGameOverMusicStopsOnRecoveryCommand() {
+  const ui = createUi();
+  const audioBySrc = {};
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      volume: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+  });
+  controller.vm = {
+    haltReason: 'input',
+    provideInput() {},
+    run() {
+      return { haltReason: 'input', quit: false };
+    },
+  };
+
+  controller._appendVmLine('****  You have died  ****');
+  const gameOverAudio = audioBySrc['./assets/audio/game-over-desmae-877160.mp3'];
+  controller.submitCommand('restart');
+
+  assert.strictEqual(gameOverAudio.pauseCalls, 1, 'restart should stop game-over music before continuing');
+  assert.strictEqual(gameOverAudio.currentTime, 0, 'restart should rewind game-over music');
+}
+
+function testGameMusicDisableStopsGameOverMusic() {
+  const ui = createUi();
+  const audioBySrc = {};
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      volume: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+  });
+
+  controller._appendVmLine('****  You have died  ****');
+  const gameOverAudio = audioBySrc['./assets/audio/game-over-desmae-877160.mp3'];
+  controller.setGameMusicEnabled(false);
+
+  assert.strictEqual(gameOverAudio.pauseCalls, 1, 'disabling game music should stop game-over music');
+  controller._appendVmLine('****  You have died  ****');
+  assert.strictEqual(gameOverAudio.playCalls, 1, 'disabled game music should prevent replaying game-over music');
+}
+
+async function testGameOverMusicCanWaitForExternalFade() {
+  const ui = createUi();
+  const audioBySrc = {};
+  let releaseFade = null;
+  const gameOverEvents = [];
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      volume: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+    onBeforeGameOverMusicStart() {
+      return new Promise(resolve => {
+        releaseFade = resolve;
+      });
+    },
+    onGameOver(payload) {
+      gameOverEvents.push(payload);
+    },
+  });
+
+  controller._appendVmLine('****  You have died  ****');
+  const gameOverAudio = audioBySrc['./assets/audio/game-over-desmae-877160.mp3'];
+
+  assert.strictEqual(gameOverAudio, undefined, 'game-over audio should not be created before external fade completes');
+  assert.strictEqual(gameOverEvents.length, 0, 'game-over event should wait for external fade completion');
+  releaseFade();
+  await flushAsyncWork();
+
+  assert.strictEqual(gameOverEvents.length, 1, 'game-over event should fire after external fade completes');
+  assert.strictEqual(
+    audioBySrc['./assets/audio/game-over-desmae-877160.mp3'].playCalls,
+    1,
+    'game-over audio should start after external fade completes'
+  );
+}
+
 function testSoundStatsAllPrintsEventBreakdown() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -1347,6 +1553,10 @@ async function run() {
   testStartingNewSampleStopsPreviousSample();
   testDefaultSfxLoopsUntilExplicitStop();
   testMusicAndSfxUseSeparateReplacementGroups();
+  testGameOverMusicStartsOnlyOnDeathBanner();
+  testGameOverMusicStopsOnRecoveryCommand();
+  testGameMusicDisableStopsGameOverMusic();
+  await testGameOverMusicCanWaitForExternalFade();
   testSoundStatsAllPrintsEventBreakdown();
   testSoundEventCommandTriggersSyntheticPlayback();
   await testSaveCommandStoresVmSnapshot();
