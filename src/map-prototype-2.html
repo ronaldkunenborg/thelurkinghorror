@@ -2176,14 +2176,14 @@
         const inNorm = { x: inward.x / inwardLen, y: inward.y / inwardLen };
 
         const baseInsetPx = 18;
-        const settleDownPx = 8;
+        const settleDownPx = -22;
         const baseAnchor = {
           x: center.x,
           y: bottomMid.y + inNorm.y * baseInsetPx + settleDownPx
         };
 
         const imgRatio = 488 / 784;
-        const imgW = Math.max(460, topLen * 1.05);
+        const imgW = Math.max(420, topLen * 0.96);
         const imgH = imgW * imgRatio;
 
         const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
