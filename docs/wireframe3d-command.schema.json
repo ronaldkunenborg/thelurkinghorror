@@ -1,0 +1,288 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://thelurkinghorror.local/schemas/wireframe3d-command.schema.json",
+  "title": "Wireframe 3D Command Batch",
+  "description": "Command batch input for tools/wireframe3d-cli.js.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["commands"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "scene": {
+      "$ref": "#/definitions/sceneOverrides"
+    },
+    "commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/command"
+      }
+    }
+  },
+  "definitions": {
+    "command": {
+      "oneOf": [
+        { "$ref": "#/definitions/createSceneCommand" },
+        { "$ref": "#/definitions/addPrimitiveCommand" },
+        { "$ref": "#/definitions/updatePrimitiveCommand" },
+        { "$ref": "#/definitions/deletePrimitiveCommand" },
+        { "$ref": "#/definitions/transformPrimitiveCommand" },
+        { "$ref": "#/definitions/setStyleCommand" },
+        { "$ref": "#/definitions/setCameraCommand" },
+        { "$ref": "#/definitions/rotateSceneCommand" },
+        { "$ref": "#/definitions/exportSvgCommand" }
+      ]
+    },
+    "createSceneCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op"],
+      "properties": {
+        "op": { "const": "create_scene" },
+        "scene": { "$ref": "#/definitions/sceneOverrides" },
+        "overrides": { "$ref": "#/definitions/sceneOverrides" }
+      }
+    },
+    "addPrimitiveCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "type"],
+      "properties": {
+        "op": { "const": "add_primitive" },
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "$ref": "#/definitions/primitiveType" },
+        "params": { "$ref": "#/definitions/primitiveParams" },
+        "transform": { "$ref": "#/definitions/transform" },
+        "style": { "$ref": "#/definitions/style" },
+        "occluder": { "type": "boolean" },
+        "shear": { "$ref": "#/definitions/shear" }
+      }
+    },
+    "updatePrimitiveCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "id"],
+      "properties": {
+        "op": { "const": "update_primitive" },
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "$ref": "#/definitions/primitiveType" },
+        "params": { "$ref": "#/definitions/primitiveParams" },
+        "transform": { "$ref": "#/definitions/transform" },
+        "style": { "$ref": "#/definitions/style" },
+        "occluder": { "type": "boolean" }
+      }
+    },
+    "deletePrimitiveCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "id"],
+      "properties": {
+        "op": { "const": "delete_primitive" },
+        "id": { "$ref": "#/definitions/id" }
+      }
+    },
+    "transformPrimitiveCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "id"],
+      "properties": {
+        "op": { "const": "transform_primitive" },
+        "id": { "$ref": "#/definitions/id" },
+        "translate": { "$ref": "#/definitions/vector3" },
+        "rotateDeg": { "$ref": "#/definitions/vector3" },
+        "scale": { "$ref": "#/definitions/vector3" },
+        "shear": { "$ref": "#/definitions/shear" }
+      }
+    },
+    "setStyleCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "style"],
+      "properties": {
+        "op": { "const": "set_style" },
+        "target": {
+          "type": "string",
+          "enum": ["primitive", "scene"]
+        },
+        "id": { "$ref": "#/definitions/id" },
+        "style": { "$ref": "#/definitions/style" }
+      }
+    },
+    "setCameraCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "camera"],
+      "properties": {
+        "op": { "const": "set_camera" },
+        "camera": { "$ref": "#/definitions/camera" }
+      }
+    },
+    "rotateSceneCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op", "rotationDeg"],
+      "properties": {
+        "op": { "const": "rotate_scene" },
+        "rotationDeg": { "$ref": "#/definitions/vector3" }
+      }
+    },
+    "exportSvgCommand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["op"],
+      "properties": {
+        "op": { "const": "export_svg" },
+        "file": { "type": "string" },
+        "options": { "$ref": "#/definitions/exportOptions" }
+      }
+    },
+    "sceneOverrides": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "meta": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "camera": { "$ref": "#/definitions/camera" },
+        "style": { "$ref": "#/definitions/style" },
+        "primitives": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/primitive" }
+        },
+        "exportOptions": { "$ref": "#/definitions/exportOptions" }
+      }
+    },
+    "primitive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "$ref": "#/definitions/primitiveType" },
+        "params": { "$ref": "#/definitions/primitiveParams" },
+        "transform": { "$ref": "#/definitions/transform" },
+        "style": { "$ref": "#/definitions/style" },
+        "occluder": { "type": "boolean" }
+      }
+    },
+    "primitiveType": {
+      "type": "string",
+      "enum": ["cube", "rectangle", "parallelogram", "cylinder", "globe"]
+    },
+    "primitiveParams": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "size": { "type": "number" },
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "depth": { "type": "number" },
+        "radius": { "type": "number" },
+        "segments": { "type": "integer", "minimum": 3 },
+        "latSegments": { "type": "integer", "minimum": 1 },
+        "lonSegments": { "type": "integer", "minimum": 3 },
+        "latStart": { "type": "number" },
+        "latEnd": { "type": "number" },
+        "lonStart": { "type": "number" },
+        "lonEnd": { "type": "number" }
+      }
+    },
+    "transform": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "translate": { "$ref": "#/definitions/vector3" },
+        "rotateDeg": { "$ref": "#/definitions/vector3" },
+        "scale": { "$ref": "#/definitions/vector3" },
+        "shear": { "$ref": "#/definitions/shear" }
+      }
+    },
+    "camera": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "projection": {
+          "type": "string",
+          "enum": ["isometric", "perspective", "tile_oblique"]
+        },
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "scale": { "type": "number" },
+        "xScale": { "type": "number" },
+        "yScale": { "type": "number" },
+        "offsetX": { "type": "number" },
+        "offsetY": { "type": "number" },
+        "rotationDeg": { "$ref": "#/definitions/vector3" },
+        "perspectiveDistance": { "type": "number" },
+        "isometric": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "yawDeg": { "type": "number" },
+            "pitchDeg": { "type": "number" }
+          }
+        },
+        "oblique": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "zDx": { "type": "number" },
+            "zDy": { "type": "number" },
+            "zScale": { "type": "number" }
+          }
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "background": { "type": "string" },
+        "stroke": { "type": "string" },
+        "strokeWidth": { "type": "number" },
+        "strokeOpacity": { "type": "number" },
+        "strokeDasharray": { "type": "string" },
+        "fill": { "type": "string" },
+        "fillOpacity": { "type": "number" }
+      }
+    },
+    "exportOptions": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "hiddenEdges": {
+          "type": "string",
+          "enum": ["none", "far", "partial", "strict"]
+        },
+        "faceDebug": { "type": "boolean" },
+        "debugLabels": { "type": "boolean" },
+        "debugLabelPrefixPrimitive": { "type": "boolean" }
+      }
+    },
+    "vector3": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "shear": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "xy": { "type": "number" },
+        "xz": { "type": "number" },
+        "yx": { "type": "number" },
+        "yz": { "type": "number" },
+        "zx": { "type": "number" },
+        "zy": { "type": "number" }
+      }
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

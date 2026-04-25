@@ -165,6 +165,14 @@ Useful local checks:
 - [`docs/LOCATION_IMAGE_BRIEFS.md`](docs/LOCATION_IMAGE_BRIEFS.md) - location title/description briefs for image generation workflows.
 - [`docs/HORROR_GLYPH_SET_PLAN.md`](docs/HORROR_GLYPH_SET_PLAN.md) - initial design plan for custom occult glyphs used in rune/icon glitch effects.
 
+### Documentation for supporting tools
+
+- [`docs/WIREFRAME_3D_TOOL.md`](docs/WIREFRAME_3D_TOOL.md) - parameter-controlled 3D wireframe tool usage, CLI examples, and command schema link.
+- [`docs/wireframe3d-command.schema.json`](docs/wireframe3d-command.schema.json) - JSON Schema for wireframe command batches.
+- [`asset-sources/README.md`](asset-sources/README.md) - index for non-runtime source material used to produce final game assets.
+- [`asset-sources/comfyui/README_D3D_WIREFRAME_WORKFLOWS.md`](asset-sources/comfyui/README_D3D_WIREFRAME_WORKFLOWS.md) - ComfyUI workflow import notes for wireframe-to-image experiments.
+- [`asset-sources/wireframe3d/README.md`](asset-sources/wireframe3d/README.md) - source workspace for wireframe command batches, generated scene snapshots, and SVG previews.
+
 ## Attribution
 
 - Splash music: `horror` by **Whirlguy** (CC BY-ND 3.0),

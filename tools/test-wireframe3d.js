@@ -6,7 +6,7 @@ const path = require('path');
 const { runCommandBatch, renderSvg, createDefaultScene, applyCommand } = require('./wireframe3d-core.js');
 
 function run() {
-  const samplePath = path.join(__dirname, 'wireframe3d-sample-commands.json');
+  const samplePath = path.join(__dirname, '..', 'asset-sources', 'wireframe3d', 'commands', 'wireframe3d-sample-commands.json');
   const payload = JSON.parse(fs.readFileSync(samplePath, 'utf8'));
   const scene = runCommandBatch(payload);
   const svg = scene.lastSvg || renderSvg(scene, {});

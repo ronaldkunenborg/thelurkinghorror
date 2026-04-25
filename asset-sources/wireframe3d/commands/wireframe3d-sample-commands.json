@@ -1,4 +1,5 @@
 {
+  "$schema": "../../../docs/wireframe3d-command.schema.json",
   "commands": [
     {
       "op": "create_scene",
@@ -142,4 +143,3 @@
     }
   ]
 }
-

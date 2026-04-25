@@ -11,7 +11,7 @@ function usage() {
       '  node tools/wireframe3d-cli.js <commands.json> [--scene-out <scene.json>] [--svg-out <out.svg>]',
       '',
       'Example:',
-      '  node tools/wireframe3d-cli.js tools/wireframe3d-sample-commands.json --svg-out docs/wireframe3d/sample.svg',
+      '  node tools/wireframe3d-cli.js asset-sources/wireframe3d/commands/wireframe3d-sample-commands.json --svg-out asset-sources/wireframe3d/svg/sample.svg',
     ].join('\n')
   );
 }
@@ -65,4 +65,3 @@ function main(argv) {
 }
 
 main(process.argv.slice(2));
-

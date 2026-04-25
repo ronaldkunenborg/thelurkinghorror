@@ -6,31 +6,34 @@ This tool creates and edits a 3D wireframe scene through JSON commands, then exp
 
 - Core: `tools/wireframe3d-core.js`
 - CLI: `tools/wireframe3d-cli.js`
-- Sample commands: `tools/wireframe3d-sample-commands.json`
+- Command schema: `docs/wireframe3d-command.schema.json`
+- Asset-source workspace: `asset-sources/wireframe3d/`
+- Sample commands: `asset-sources/wireframe3d/commands/wireframe3d-sample-commands.json`
 - Test: `tools/test-wireframe3d.js`
 
 ## Run
 
 ```bash
-node tools/wireframe3d-cli.js tools/wireframe3d-sample-commands.json --scene-out docs/wireframe3d/sample.scene.json --svg-out docs/wireframe3d/sample.svg
+node tools/wireframe3d-cli.js asset-sources/wireframe3d/commands/wireframe3d-sample-commands.json --scene-out asset-sources/wireframe3d/scenes/sample.scene.json --svg-out asset-sources/wireframe3d/svg/sample.svg
 ```
 
 Computer Center preset:
 
 ```bash
-node tools/wireframe3d-cli.js tools/wireframe3d-computer-center.commands.json --scene-out docs/wireframe3d/computer-center.scene.json --svg-out docs/wireframe3d/computer-center.svg
+node tools/wireframe3d-cli.js asset-sources/wireframe3d/commands/wireframe3d-computer-center.commands.json --scene-out asset-sources/wireframe3d/scenes/computer-center.scene.json --svg-out asset-sources/wireframe3d/svg/computer-center.svg
 ```
 
 Computer Center preset (v2, improved massing + facade rhythm):
 
 ```bash
-node tools/wireframe3d-cli.js tools/wireframe3d-computer-center-v2.commands.json --scene-out docs/wireframe3d/computer-center-v2.scene.json --svg-out docs/wireframe3d/computer-center-v2.svg
+node tools/wireframe3d-cli.js asset-sources/wireframe3d/commands/wireframe3d-computer-center-v2.commands.json --scene-out asset-sources/wireframe3d/scenes/computer-center-v2.scene.json --svg-out asset-sources/wireframe3d/svg/computer-center-v2.svg
 ```
 
 ## Command Payload Shape
 
 ```json
 {
+  "$schema": "../../../docs/wireframe3d-command.schema.json",
   "commands": [
     { "op": "create_scene", "overrides": {} },
     { "op": "add_primitive", "id": "p1", "type": "cube", "params": {}, "transform": {}, "style": {}, "occluder": true },
@@ -164,6 +167,7 @@ Camera framing example:
 }
 ```
 - The tool is intended for blockout/composition workflows and fast wireframe iteration.
+- Generated scene JSON and SVG previews live under `asset-sources/wireframe3d/` because they are creative source material for image production, not game runtime assets or documentation pages.
 - Occlusion modeling tip:
   - For wire-only architectural details (for example parapets), prefer `occluder: false`.
   - If they still need to hide specific edges (for example beam tops), add separate invisible occluder primitives split into smaller strips instead of one large solid box occluder.
