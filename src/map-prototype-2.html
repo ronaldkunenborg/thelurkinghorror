@@ -2149,6 +2149,7 @@
 
         drawComputerCenterIllustration(layerFilter);
         drawBrownBuildingIllustration(layerFilter);
+        drawTemporaryLabIllustration(layerFilter);
         drawBuildingOutlineOverlay(layerFilter);
         drawAllCampusLabels();
       }
@@ -2191,7 +2192,56 @@
         const overlayOpacity = layerRender.focusLevel == null ? 0.78 : Math.max(0.3, 0.78 - depth * 0.12);
 
         add("image", {
-          href: "assets/gfx/maps/computer_center_overlay_2c.png",
+          href: "assets/gfx/maps/computer_center_overlay.png",
+          x: (baseAnchor.x - imgW * 0.5).toFixed(2),
+          y: (baseAnchor.y - imgH).toFixed(2),
+          width: imgW.toFixed(2),
+          height: imgH.toFixed(2),
+          preserveAspectRatio: "xMidYMid meet",
+          style: "opacity:" + overlayOpacity.toFixed(3) + ";pointer-events:none;"
+        });
+      }
+
+      function drawTemporaryLabIllustration(layerFilter) {
+        const temp = CAMPUS_BLOCKS.find((b) => b.id === "temp");
+        if (!temp) return;
+        const layerRender = buildLayerRenderContext(layerFilter);
+        const groundFloorOffsetY = layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
+        const pts = blockPoints(temp).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+        if (!pts || pts.length !== 4) return;
+
+        const p0 = pts[0];
+        const p1 = pts[1];
+        const p2 = pts[2];
+        const p3 = pts[3];
+        const topLen = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
+        const center = {
+          x: (p0.x + p1.x + p2.x + p3.x) * 0.25,
+          y: (p0.y + p1.y + p2.y + p3.y) * 0.25
+        };
+        const bottomMid = { x: (p2.x + p3.x) * 0.5, y: (p2.y + p3.y) * 0.5 };
+        const inward = { x: center.x - bottomMid.x, y: center.y - bottomMid.y };
+        const inwardLen = Math.hypot(inward.x, inward.y) || 1;
+        const inNorm = { x: inward.x / inwardLen, y: inward.y / inwardLen };
+
+        const baseInsetPx = 46;
+        const settleDownPx = -42;
+        const southShiftPx = TILE_GRID.axisStep * 0.66;
+        const baseAnchor = {
+          x: center.x - inNorm.x * southShiftPx,
+          y: bottomMid.y + inNorm.y * baseInsetPx - inNorm.y * southShiftPx + settleDownPx
+        };
+
+        const imgRatio = 1024 / 1536;
+        const imgW = Math.max(735, topLen * 0.87);
+        const imgH = imgW * imgRatio;
+
+        const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
+        const depth = Math.abs(focusLevel);
+        const overlayOpacity = layerRender.focusLevel == null ? 0.78 : Math.max(0.32, 0.78 - depth * 0.12);
+
+        add("image", {
+          href: "assets/gfx/maps/temporary_lab_overlay.png",
           x: (baseAnchor.x - imgW * 0.5).toFixed(2),
           y: (baseAnchor.y - imgH).toFixed(2),
           width: imgW.toFixed(2),

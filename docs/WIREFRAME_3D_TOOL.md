@@ -29,6 +29,12 @@ Computer Center preset (v2, improved massing + facade rhythm):
 node tools/wireframe3d-cli.js asset-sources/wireframe3d/commands/wireframe3d-computer-center-v2.commands.json --scene-out asset-sources/wireframe3d/scenes/computer-center-v2.scene.json --svg-out asset-sources/wireframe3d/svg/computer-center-v2.svg
 ```
 
+Temporary Lab clean-control preset (3x2 map footprint, simplified for overlay production):
+
+```bash
+node tools/wireframe3d-cli.js asset-sources/wireframe3d/commands/wireframe3d-temporary-lab-clean-control.commands.json --scene-out asset-sources/wireframe3d/scenes/temporary-lab-clean-control.scene.json --svg-out asset-sources/wireframe3d/svg/temporary-lab-clean-control-partial.svg
+```
+
 ## Command Payload Shape
 
 ```json
