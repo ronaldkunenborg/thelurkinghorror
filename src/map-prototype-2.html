@@ -1367,13 +1367,13 @@
         { id: "mass", type: "road-v", label: "Mass. Ave.", bounds: { tl: { c: 3, rank: 11 }, br: { c: 3, rank: 1 } } },
         { id: "smith", type: "road-h", label: "Smith Street", bounds: { tl: { c: 3, rank: 11 }, br: { c: 16, rank: 11 } } },
         { id: "computer", type: "building", label: "Computer Center", sub: "start area", bounds: { tl: { c: 6, rank: 10 }, br: { c: 8, rank: 8 } } },
-        { id: "temp", type: "building", label: "Temporary Lab", sub: "separate wing", bounds: { tl: { c: 9, rank: 9 }, br: { c: 11, rank: 8 } } },
+        { id: "temp", type: "building", label: "Temporary Lab", sub: "separate wing", bounds: { tl: { c: 9, rank: 9 }, br: { c: 10, rank: 9 } } },
         {
           id: "central",
           type: "building-central",
           label: "Central Complex",
           sub: "Great Dome + Aero + Engineering + Chemistry",
-          bounds: { tl: { c: 4, rank: 7 }, br: { c: 10, rank: 3 } }
+          bounds: { tl: { c: 5, rank: 7 }, br: { c: 9, rank: 3 } }
         },
         { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 13, rank: 6 }, br: { c: 13, rank: 6 } } },
         // Hidden placement zones for underground grouping.
@@ -2212,28 +2212,33 @@
 
         const p0 = pts[0];
         const p1 = pts[1];
-        const p2 = pts[2];
-        const p3 = pts[3];
         const topLen = Math.hypot(p1.x - p0.x, p1.y - p0.y) || 1;
-        const center = {
-          x: (p0.x + p1.x + p2.x + p3.x) * 0.25,
-          y: (p0.y + p1.y + p2.y + p3.y) * 0.25
-        };
-        const bottomMid = { x: (p2.x + p3.x) * 0.5, y: (p2.y + p3.y) * 0.5 };
-        const inward = { x: center.x - bottomMid.x, y: center.y - bottomMid.y };
-        const inwardLen = Math.hypot(inward.x, inward.y) || 1;
-        const inNorm = { x: inward.x / inwardLen, y: inward.y / inwardLen };
+        const j9 = tileCorners(9, 9);
+        const anchorCorner = { x: j9.p3.x, y: j9.p3.y + groundFloorOffsetY };
 
-        const baseInsetPx = 46;
-        const settleDownPx = -42;
-        const southShiftPx = TILE_GRID.axisStep * 0.66;
-        const baseAnchor = {
-          x: center.x - inNorm.x * southShiftPx,
-          y: bottomMid.y + inNorm.y * baseInsetPx - inNorm.y * southShiftPx + settleDownPx
+        // Temporary Lab overlay placement guide:
+        // - `pts` is the current presentation footprint for the Temporary Lab building block
+        //   (currently J9-K9), after any floor-focus vertical offset has been applied.
+        // - `anchorCorner` is the lower-left corner (`p3`) of tile J9. The raster overlay's
+        //   lower-left image box is anchored to this exact point, so the illustration placement
+        //   has an inspectable tile reference instead of a hand-tuned center offset.
+        // - `overlayTileOffsetE` and `overlayTileOffsetS` move that image-box anchor along the
+        //   same isometric tile vectors used by the map. Positive E moves east/right along the
+        //   tile row; negative E moves west/left. Positive S moves south/down-right along tile depth.
+        // - The current raster has been cropped tightly to its visible outline. If the source
+        //   image box changes again, adjust these fractions rather than switching back to opaque
+        //   pixel offsets.
+        // - `imgW` controls scale only. Do not shrink the overlay just to fix footprint alignment;
+        //   adjust the anchor values above first.
+        const overlayTileOffsetE = -1 / 2;
+        const overlayTileOffsetS = 1 / 4;
+        const overlayOffset = {
+          x: ISO_BASIS_E.dx * overlayTileOffsetE + ISO_BASIS_S.dx * overlayTileOffsetS,
+          y: ISO_BASIS_E.dy * overlayTileOffsetE + ISO_BASIS_S.dy * overlayTileOffsetS
         };
 
         const imgRatio = 1024 / 1536;
-        const imgW = Math.max(735, topLen * 0.87);
+        const imgW = Math.max(735, topLen * 0.9);
         const imgH = imgW * imgRatio;
 
         const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
@@ -2242,8 +2247,8 @@
 
         add("image", {
           href: "assets/gfx/maps/temporary_lab_overlay.png",
-          x: (baseAnchor.x - imgW * 0.5).toFixed(2),
-          y: (baseAnchor.y - imgH).toFixed(2),
+          x: (anchorCorner.x + overlayOffset.x).toFixed(2),
+          y: (anchorCorner.y + overlayOffset.y - imgH).toFixed(2),
           width: imgW.toFixed(2),
           height: imgH.toFixed(2),
           preserveAspectRatio: "xMidYMid meet",

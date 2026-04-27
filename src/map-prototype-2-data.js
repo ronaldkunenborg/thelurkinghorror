@@ -482,7 +482,7 @@
 
         // Computer center building + Smith Street anchors
         smith1: { building: "computer", layer: "L0", tile: "H11" }, // [185] Smith Street
-        smith2: { building: "computer", layer: "L0", tile: "K11" }, // [98] Smith Street
+        smith2: { building: "computer", layer: "L0", tile: "J11" }, // [98] Smith Street
         computer: { building: "computer", layer: "L0", tile: "H9" }, // [65] Computer Center
         kitchen: { building: "computer", layer: "L+1", tile: "G9" }, // [33] Kitchen
         second: { building: "computer", layer: "L+1", tile: "H9" }, // [137] Second Floor
@@ -496,13 +496,13 @@
         elev_lm1: { building: "computer", layer: "L-1", tile: "H8" }, // [124] Elevator
 
         // Temporary lab building
-        temp_lab: { building: "temp", layer: "L0", tile: "K9" }, // [140] Temporary Lab
-        temp_b: { building: "temp", layer: "L-1", tile: "K9" }, // [202] Temporary Basement
-        dead: { building: "temp", layer: "L-1", tile: "L9" }, // [47] Dead Storage
-        ancient: { building: "temp", layer: "L-1", tile: "M10" }, // [171] Ancient Storage
+        temp_lab: { building: "temp", layer: "L0", tile: "J9" }, // [140] Temporary Lab
+        temp_b: { building: "temp", layer: "L-1", tile: "J9" }, // [202] Temporary Basement
+        dead: { building: "temp", layer: "L-1", tile: "K9" }, // [47] Dead Storage
+        ancient: { building: "temp", layer: "L-1", tile: "L10" }, // [171] Ancient Storage
 
         // Brown building cluster
-        cp: { building: "brown", layer: "L-1", tile: "M4" }, // [179] Cluttered Passage
+        cp: { building: "brown", layer: "L-1", tile: "M7" }, // [179] Cluttered Passage
         brown: { building: "brown", layer: "L0", tile: "N6" }, // [240] Brown Building
         small_court: { building: "brown", layer: "L0", tile: "N5" }, // [16] Small Courtyard
         brown_b: { building: "brown", layer: "L-1", tile: "N6" }, // [200] Brown Basement
@@ -539,10 +539,10 @@
         inner_lair: { building: "wet", layer: "L-6", tile: "C4" }, // [69] Inner Lair
 
         // Brick/altar branch
-        brick: { building: "brick", layer: "L-2", tile: "M10" }, // [25] Brick Tunnel
-        reno: { building: "brick", layer: "L-2", tile: "M11" }, // [201] Renovated Cave
-        cinder: { building: "brick", layer: "L-2", tile: "M9" }, // [17] Cinderblock Tunnel
-        altar: { building: "brick", layer: "L-3", tile: "M11" } // [149] Before the Altar
+        brick: { building: "brick", layer: "L-2", tile: "L10" }, // [25] Brick Tunnel
+        reno: { building: "brick", layer: "L-2", tile: "L11" }, // [201] Renovated Cave
+        cinder: { building: "brick", layer: "L-2", tile: "L9" }, // [17] Cinderblock Tunnel
+        altar: { building: "brick", layer: "L-3", tile: "L11" } // [149] Before the Altar
       };
 
   function ensureRoomEdge(fromId, toId, label, type) {
