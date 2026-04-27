@@ -1,0 +1,1244 @@
+{
+  "meta": {
+    "units": "meters",
+    "name": "central-dome-left-wing-wireframe-labeled",
+    "sourceReferences": [
+      "data/blueprint_campus_central_complex.jpg",
+      "data/booklet-page3.png",
+      "https://monolithicdome.com/captain-america-shield-covers-mit-great-dome/fig/04-mit-great-dome-night-shot-justin-jensen",
+      "https://images.fineartamerica.com/images-medium-large-5/mit-building-10-the-great-dome-marianne-campolongo.jpg",
+      "https://media.istockphoto.com/id/2169522150/fi/valokuva/massachusetts-institute-of-technologyn-etun%C3%A4kym%C3%A4-kes%C3%A4ll%C3%A4.jpg?s=2048x2048&w=is&k=20&c=gUhWDni0LjDiDG9AQeUnyXj0WyYZfjwTVtIMxA0V5ao="
+    ],
+    "mapPrototype2Reference": {
+      "domeTile": "H6",
+      "wingRooms": [
+        "F7 Aero Lobby",
+        "F5 Engineering Building"
+      ],
+      "interpretation": "Left wing is the smaller Aero/Engineering side around column F, west of the H6 dome core."
+    },
+    "attachmentContract": {
+      "shoulderSource": "wireframe3d-central-dome-core.commands.json",
+      "shoulderRef": {
+        "id": "left_shoulder_ref",
+        "center": [
+          -7.3,
+          2.25,
+          -0.33
+        ],
+        "size": {
+          "width": 4,
+          "height": 3.7,
+          "depth": 5.7
+        },
+        "westEdge": -9.3,
+        "frontZ": 2.52,
+        "rearZ": -3.18
+      },
+      "wing": {
+        "id": "left_wing_mass",
+        "center": [
+          -11.075,
+          1.9,
+          -0.26
+        ],
+        "size": {
+          "width": 3.55,
+          "height": 3.05,
+          "depth": 5.15
+        },
+        "attachesTo": "left_shoulder_ref west side",
+        "eastEdge": -9.3,
+        "frontZ": 2.32,
+        "rearZ": -2.83
+      }
+    },
+    "designIntent": "Separate left wing for the Central Complex. Based on map-prototype-2 and the snowy courtyard photo, this is the smaller west-side Aero/Engineering wing near F7/F5: a quiet lower wing with a two-story courtyard facade, restrained pilaster cadence, plinth, cornice, and no dome-scale landmark elements.",
+    "photoInterpretation": {
+      "courtyardPhoto": "Snowy plaza view of the left wing: quiet two-story classical facade, repeated tall lower windows with smaller upper openings, restrained pilaster rhythm, and a continuous low roofline subordinate to the dome.",
+      "modelResponse": "Adds the inward courtyard-facing east facade rhythm while keeping the west/outside windows as secondary context."
+    }
+  },
+  "camera": {
+    "projection": "tile_oblique",
+    "width": 1600,
+    "height": 980,
+    "scale": 62,
+    "yScale": 1,
+    "perspectiveDistance": 8,
+    "offsetX": 390,
+    "offsetY": 170,
+    "rotationDeg": [
+      0,
+      0,
+      0
+    ],
+    "oblique": {
+      "zDx": 0.5,
+      "zDy": 0.866,
+      "zScale": 0.82
+    },
+    "isometric": {
+      "yawDeg": 0,
+      "pitchDeg": 30
+    }
+  },
+  "style": {
+    "stroke": "#e6f0ff",
+    "strokeWidth": 1.1,
+    "strokeOpacity": 0.95,
+    "fill": "none",
+    "strokeDasharray": "",
+    "background": "#06090f"
+  },
+  "primitives": [
+    {
+      "id": "left_shoulder_ref",
+      "type": "rectangle",
+      "params": {
+        "width": 4,
+        "height": 3.7,
+        "depth": 5.7
+      },
+      "transform": {
+        "translate": [
+          -7.3,
+          2.25,
+          -0.33
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#8fa8c4",
+        "strokeWidth": 0.72,
+        "strokeOpacity": 0.58,
+        "strokeDasharray": "6 5"
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_mass",
+      "type": "rectangle",
+      "params": {
+        "width": 3.55,
+        "height": 3.05,
+        "depth": 5.15
+      },
+      "transform": {
+        "translate": [
+          -11.075,
+          1.9,
+          -0.26
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#d7e7fa",
+        "strokeWidth": 0.95
+      },
+      "occluder": true
+    },
+    {
+      "id": "left_wing_roof",
+      "type": "rectangle",
+      "params": {
+        "width": 3.77,
+        "height": 0.16,
+        "depth": 5.33
+      },
+      "transform": {
+        "translate": [
+          -11.075,
+          3.52,
+          -0.26
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#bcd6ef",
+        "strokeWidth": 0.82
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_corner_pavilion",
+      "type": "rectangle",
+      "params": {
+        "width": 0.95,
+        "height": 3.34,
+        "depth": 1.15
+      },
+      "transform": {
+        "translate": [
+          -12.370000000000001,
+          2.05,
+          1.7399999999999998
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#e1edf9",
+        "strokeWidth": 0.86
+      },
+      "occluder": true
+    },
+    {
+      "id": "left_wing_south_cap",
+      "type": "rectangle",
+      "params": {
+        "width": 3.77,
+        "height": 0.36,
+        "depth": 0.48
+      },
+      "transform": {
+        "translate": [
+          -11.075,
+          3.34,
+          2.08
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.74
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_roof_monitor",
+      "type": "rectangle",
+      "params": {
+        "width": 1.55,
+        "height": 0.34,
+        "depth": 0.9
+      },
+      "transform": {
+        "translate": [
+          -11.325,
+          3.82,
+          -1.35
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.64
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_west_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.65,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          -12.89,
+          1.86,
+          -2.18
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_west_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.65,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          -12.89,
+          1.86,
+          -1.2
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_west_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.65,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          -12.89,
+          1.86,
+          -0.22
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_west_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.65,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          -12.89,
+          1.86,
+          0.76
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_west_window_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.65,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          -12.89,
+          1.86,
+          1.62
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_plinth",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.28,
+        "depth": 4.92
+      },
+      "transform": {
+        "translate": [
+          -9.29,
+          0.42,
+          -0.24
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_cornice",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.22,
+        "depth": 5.05
+      },
+      "transform": {
+        "translate": [
+          -9.28,
+          3.18,
+          -0.24
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.64
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_pilaster_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.24,
+          1.72,
+          -1.7500000000000002
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_lower_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          1.5,
+          -2.18
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_upper_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.215,
+          2.58,
+          -2.18
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_pilaster_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.24,
+          1.72,
+          -0.77
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_lower_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          1.5,
+          -1.2
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_upper_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.215,
+          2.58,
+          -1.2
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_pilaster_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.24,
+          1.72,
+          0.21
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_lower_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          1.5,
+          -0.22
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_upper_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.215,
+          2.58,
+          -0.22
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_pilaster_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.24,
+          1.72,
+          1.19
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_lower_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          1.5,
+          0.76
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_upper_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.215,
+          2.58,
+          0.76
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_pilaster_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.24,
+          1.72,
+          2.0100000000000002
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_lower_window_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          1.5,
+          1.58
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_court_upper_window_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.215,
+          2.58,
+          1.58
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "id": "left_wing_inner_return_shadow",
+      "type": "rectangle",
+      "params": {
+        "width": 0.18,
+        "height": 2.45,
+        "depth": 0.62
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          1.66,
+          2.08
+        ],
+        "rotateDeg": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ],
+        "shear": {
+          "xy": 0,
+          "xz": 0,
+          "yx": 0,
+          "yz": 0,
+          "zx": 0,
+          "zy": 0
+        }
+      },
+      "style": {
+        "stroke": "#8fa8c4",
+        "strokeWidth": 0.45,
+        "strokeOpacity": 0.55
+      },
+      "occluder": false
+    }
+  ],
+  "exportOptions": {
+    "hiddenEdges": "partial",
+    "debugLabels": {
+      "enabled": true,
+      "faces": false,
+      "edges": true,
+      "color": "#ffd66e",
+      "halo": "#071019",
+      "fontSize": 11,
+      "minEdgeLength": 28,
+      "prefixPrimitive": true
+    }
+  },
+  "lastSvg": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1600\" height=\"980\" viewBox=\"0 0 1600 980\">\n  <rect x=\"0\" y=\"0\" width=\"1600\" height=\"980\" fill=\"#06090f\" />\n  <g id=\"left_shoulder_ref\">\n    <line x1=\"640.85\" y1=\"495.19\" x2=\"780.56\" y2=\"495.19\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"780.56\" y1=\"495.19\" x2=\"780.56\" y2=\"265.79\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"780.56\" y1=\"495.19\" x2=\"925.46\" y2=\"746.15\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"532.56\" y1=\"265.79\" x2=\"532.56\" y2=\"322.83\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"780.56\" y1=\"265.79\" x2=\"532.56\" y2=\"265.79\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"672.25\" y1=\"737.12\" x2=\"677.46\" y2=\"746.15\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"780.56\" y1=\"265.79\" x2=\"925.46\" y2=\"516.75\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"677.46\" y1=\"746.15\" x2=\"925.46\" y2=\"746.15\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"925.46\" y1=\"746.15\" x2=\"925.46\" y2=\"516.75\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"532.56\" y1=\"265.79\" x2=\"677.46\" y2=\"516.75\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"677.46\" y1=\"516.75\" x2=\"677.46\" y2=\"746.15\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n    <line x1=\"925.46\" y1=\"516.75\" x2=\"677.46\" y2=\"516.75\" stroke=\"#8fa8c4\" stroke-width=\"0.72\" stroke-opacity=\"0.580\" fill=\"none\" stroke-dasharray=\"6 5\" />\n  </g>\n  <g id=\"left_wing_mass\">\n    <line x1=\"321.23\" y1=\"322.83\" x2=\"321.23\" y2=\"511.93\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"541.33\" y1=\"322.83\" x2=\"321.23\" y2=\"322.83\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"321.23\" y1=\"511.93\" x2=\"452.15\" y2=\"738.67\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"541.33\" y1=\"322.83\" x2=\"672.25\" y2=\"549.57\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"452.15\" y1=\"738.67\" x2=\"672.25\" y2=\"738.67\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"321.23\" y1=\"322.83\" x2=\"452.15\" y2=\"549.57\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"738.67\" x2=\"672.25\" y2=\"549.57\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"452.15\" y1=\"549.57\" x2=\"452.15\" y2=\"738.67\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"549.57\" x2=\"452.15\" y2=\"549.57\" stroke=\"#d7e7fa\" stroke-width=\"0.95\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_roof\">\n    <line x1=\"545.87\" y1=\"317.94\" x2=\"545.87\" y2=\"308.02\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"312.13\" y1=\"317.94\" x2=\"545.87\" y2=\"317.94\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"545.87\" y1=\"308.02\" x2=\"312.13\" y2=\"308.02\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"312.13\" y1=\"308.02\" x2=\"312.13\" y2=\"317.94\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"545.87\" y1=\"317.94\" x2=\"681.36\" y2=\"552.61\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"545.87\" y1=\"308.02\" x2=\"681.36\" y2=\"542.69\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"312.13\" y1=\"317.94\" x2=\"447.62\" y2=\"552.61\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"312.13\" y1=\"308.02\" x2=\"447.62\" y2=\"542.69\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"681.36\" y1=\"552.61\" x2=\"681.36\" y2=\"542.69\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"447.62\" y1=\"552.61\" x2=\"681.36\" y2=\"552.61\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"681.36\" y1=\"542.69\" x2=\"447.62\" y2=\"542.69\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"447.62\" y1=\"542.69\" x2=\"447.62\" y2=\"552.61\" stroke=\"#bcd6ef\" stroke-width=\"0.82\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_corner_pavilion\">\n    <line x1=\"423.22\" y1=\"687.73\" x2=\"452.46\" y2=\"738.36\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"452.46\" y1=\"738.36\" x2=\"511.36\" y2=\"738.36\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"423.22\" y1=\"480.65\" x2=\"423.22\" y2=\"687.73\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"511.36\" y1=\"738.36\" x2=\"511.36\" y2=\"531.28\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"482.12\" y1=\"480.65\" x2=\"423.22\" y2=\"480.65\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"452.46\" y1=\"531.28\" x2=\"452.46\" y2=\"738.36\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"482.12\" y1=\"480.65\" x2=\"511.36\" y2=\"531.28\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"423.22\" y1=\"480.65\" x2=\"452.46\" y2=\"531.28\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"511.36\" y1=\"531.28\" x2=\"452.46\" y2=\"531.28\" stroke=\"#e1edf9\" stroke-width=\"0.86\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_south_cap\">\n    <line x1=\"666.99\" y1=\"540.47\" x2=\"666.99\" y2=\"522.77\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"554.19\" x2=\"679.19\" y2=\"566.22\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"666.99\" y1=\"522.77\" x2=\"679.19\" y2=\"543.90\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"679.19\" y1=\"566.22\" x2=\"679.19\" y2=\"543.90\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"666.99\" y1=\"522.77\" x2=\"506.44\" y2=\"522.77\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"447.54\" y1=\"522.77\" x2=\"433.25\" y2=\"522.77\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"445.45\" y1=\"566.22\" x2=\"679.19\" y2=\"566.22\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"679.19\" y1=\"543.90\" x2=\"445.45\" y2=\"543.90\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"433.25\" y1=\"522.77\" x2=\"433.25\" y2=\"545.09\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"433.25\" y1=\"545.09\" x2=\"445.45\" y2=\"566.22\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"433.25\" y1=\"522.77\" x2=\"445.45\" y2=\"543.90\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"445.45\" y1=\"543.90\" x2=\"445.45\" y2=\"566.22\" stroke=\"#c8dcf0\" stroke-width=\"0.74\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_roof_monitor\">\n    <line x1=\"490.14\" y1=\"354.45\" x2=\"490.14\" y2=\"333.37\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"394.04\" y1=\"354.45\" x2=\"490.14\" y2=\"354.45\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"490.14\" y1=\"354.45\" x2=\"513.02\" y2=\"394.08\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"490.14\" y1=\"333.37\" x2=\"394.04\" y2=\"333.37\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"490.14\" y1=\"333.37\" x2=\"513.02\" y2=\"373.00\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"394.04\" y1=\"333.37\" x2=\"394.04\" y2=\"354.45\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"513.02\" y1=\"394.08\" x2=\"513.02\" y2=\"373.00\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"394.04\" y1=\"354.45\" x2=\"416.92\" y2=\"394.08\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"416.92\" y1=\"394.08\" x2=\"513.02\" y2=\"394.08\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"394.04\" y1=\"333.37\" x2=\"416.92\" y2=\"373.00\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"513.02\" y1=\"373.00\" x2=\"416.92\" y2=\"373.00\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"416.92\" y1=\"373.00\" x2=\"416.92\" y2=\"394.08\" stroke=\"#a9c3dd\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_west_window_1\">\n    <line x1=\"327.64\" y1=\"490.16\" x2=\"331.98\" y2=\"490.16\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"331.98\" y1=\"490.16\" x2=\"343.17\" y2=\"509.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"327.64\" y1=\"490.16\" x2=\"338.83\" y2=\"509.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"338.83\" y1=\"509.54\" x2=\"343.17\" y2=\"509.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"331.98\" y1=\"490.16\" x2=\"331.98\" y2=\"387.86\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"327.64\" y1=\"387.86\" x2=\"327.64\" y2=\"490.16\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"343.17\" y1=\"509.54\" x2=\"343.17\" y2=\"407.24\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"338.83\" y1=\"407.24\" x2=\"338.83\" y2=\"509.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"331.98\" y1=\"387.86\" x2=\"327.64\" y2=\"387.86\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"331.98\" y1=\"387.86\" x2=\"343.17\" y2=\"407.24\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"327.64\" y1=\"387.86\" x2=\"338.83\" y2=\"407.24\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"343.17\" y1=\"407.24\" x2=\"338.83\" y2=\"407.24\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_west_window_2\">\n    <line x1=\"352.55\" y1=\"533.31\" x2=\"356.89\" y2=\"533.31\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"356.89\" y1=\"533.31\" x2=\"368.08\" y2=\"552.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"352.55\" y1=\"533.31\" x2=\"363.74\" y2=\"552.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"363.74\" y1=\"552.68\" x2=\"368.08\" y2=\"552.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"356.89\" y1=\"533.31\" x2=\"356.89\" y2=\"431.01\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"352.55\" y1=\"431.01\" x2=\"352.55\" y2=\"533.31\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"368.08\" y1=\"552.68\" x2=\"368.08\" y2=\"450.38\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"363.74\" y1=\"450.38\" x2=\"363.74\" y2=\"552.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"356.89\" y1=\"431.01\" x2=\"352.55\" y2=\"431.01\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"356.89\" y1=\"431.01\" x2=\"368.08\" y2=\"450.38\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"352.55\" y1=\"431.01\" x2=\"363.74\" y2=\"450.38\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"368.08\" y1=\"450.38\" x2=\"363.74\" y2=\"450.38\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_west_window_3\">\n    <line x1=\"377.47\" y1=\"576.46\" x2=\"381.81\" y2=\"576.46\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"381.81\" y1=\"576.46\" x2=\"392.99\" y2=\"595.83\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"377.47\" y1=\"576.46\" x2=\"388.65\" y2=\"595.83\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"388.65\" y1=\"595.83\" x2=\"392.99\" y2=\"595.83\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"381.81\" y1=\"576.46\" x2=\"381.81\" y2=\"474.16\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"377.47\" y1=\"474.16\" x2=\"377.47\" y2=\"576.46\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"392.99\" y1=\"595.83\" x2=\"392.99\" y2=\"493.53\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"388.65\" y1=\"493.53\" x2=\"388.65\" y2=\"595.83\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"381.81\" y1=\"474.16\" x2=\"377.47\" y2=\"474.16\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"381.81\" y1=\"474.16\" x2=\"392.99\" y2=\"493.53\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"377.47\" y1=\"474.16\" x2=\"388.65\" y2=\"493.53\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"392.99\" y1=\"493.53\" x2=\"388.65\" y2=\"493.53\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_west_window_4\">\n    <line x1=\"402.38\" y1=\"619.60\" x2=\"406.72\" y2=\"619.60\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"406.72\" y1=\"619.60\" x2=\"417.90\" y2=\"638.98\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"402.38\" y1=\"619.60\" x2=\"413.56\" y2=\"638.98\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"413.56\" y1=\"638.98\" x2=\"417.90\" y2=\"638.98\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"406.72\" y1=\"619.60\" x2=\"406.72\" y2=\"517.30\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"402.38\" y1=\"517.30\" x2=\"402.38\" y2=\"619.60\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"417.90\" y1=\"638.98\" x2=\"417.90\" y2=\"536.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"413.56\" y1=\"536.68\" x2=\"413.56\" y2=\"638.98\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"406.72\" y1=\"517.30\" x2=\"402.38\" y2=\"517.30\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"406.72\" y1=\"517.30\" x2=\"417.90\" y2=\"536.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"402.38\" y1=\"517.30\" x2=\"413.56\" y2=\"536.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"417.90\" y1=\"536.68\" x2=\"413.56\" y2=\"536.68\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_west_window_5\">\n    <line x1=\"424.24\" y1=\"657.47\" x2=\"428.58\" y2=\"657.47\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"428.58\" y1=\"657.47\" x2=\"439.76\" y2=\"676.84\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"424.24\" y1=\"657.47\" x2=\"435.42\" y2=\"676.84\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"435.42\" y1=\"676.84\" x2=\"439.76\" y2=\"676.84\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"428.58\" y1=\"657.47\" x2=\"428.58\" y2=\"555.17\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"424.24\" y1=\"555.17\" x2=\"424.24\" y2=\"657.47\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"439.76\" y1=\"676.84\" x2=\"439.76\" y2=\"574.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"435.42\" y1=\"574.54\" x2=\"435.42\" y2=\"676.84\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"428.58\" y1=\"555.17\" x2=\"424.24\" y2=\"555.17\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"428.58\" y1=\"555.17\" x2=\"439.76\" y2=\"574.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"424.24\" y1=\"555.17\" x2=\"435.42\" y2=\"574.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"439.76\" y1=\"574.54\" x2=\"435.42\" y2=\"574.54\" stroke=\"#b8d8f4\" stroke-width=\"0.60\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_court_plinth\">\n    <line x1=\"672.25\" y1=\"737.05\" x2=\"674.17\" y2=\"740.38\" stroke=\"#c8dcf0\" stroke-width=\"0.58\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"665.75\" y1=\"738.67\" x2=\"666.73\" y2=\"740.38\" stroke=\"#c8dcf0\" stroke-width=\"0.58\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"719.69\" x2=\"674.17\" y2=\"723.02\" stroke=\"#c8dcf0\" stroke-width=\"0.58\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"666.73\" y1=\"740.38\" x2=\"674.17\" y2=\"740.38\" stroke=\"#c8dcf0\" stroke-width=\"0.58\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"674.17\" y1=\"740.38\" x2=\"674.17\" y2=\"723.02\" stroke=\"#c8dcf0\" stroke-width=\"0.58\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"666.73\" y1=\"738.67\" x2=\"666.73\" y2=\"740.38\" stroke=\"#c8dcf0\" stroke-width=\"0.58\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"674.17\" y1=\"723.02\" x2=\"672.25\" y2=\"723.02\" stroke=\"#c8dcf0\" stroke-width=\"0.58\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_court_cornice\">\n    <line x1=\"548.07\" y1=\"334.50\" x2=\"548.07\" y2=\"334.28\" stroke=\"#c8dcf0\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"548.07\" y1=\"334.28\" x2=\"547.95\" y2=\"334.28\" stroke=\"#c8dcf0\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"562.99\" x2=\"676.44\" y2=\"570.26\" stroke=\"#c8dcf0\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"548.07\" y1=\"334.28\" x2=\"676.44\" y2=\"556.62\" stroke=\"#c8dcf0\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"570.26\" x2=\"676.44\" y2=\"570.26\" stroke=\"#c8dcf0\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"676.44\" y1=\"570.26\" x2=\"676.44\" y2=\"556.62\" stroke=\"#c8dcf0\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"676.44\" y1=\"556.62\" x2=\"672.25\" y2=\"556.62\" stroke=\"#c8dcf0\" stroke-width=\"0.64\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_court_pilaster_1\">\n  </g>\n  <g id=\"left_wing_court_lower_window_1\">\n  </g>\n  <g id=\"left_wing_court_upper_window_1\">\n  </g>\n  <g id=\"left_wing_court_pilaster_2\">\n  </g>\n  <g id=\"left_wing_court_lower_window_2\">\n  </g>\n  <g id=\"left_wing_court_upper_window_2\">\n  </g>\n  <g id=\"left_wing_court_pilaster_3\">\n  </g>\n  <g id=\"left_wing_court_lower_window_3\">\n  </g>\n  <g id=\"left_wing_court_upper_window_3\">\n  </g>\n  <g id=\"left_wing_court_pilaster_4\">\n  </g>\n  <g id=\"left_wing_court_lower_window_4\">\n  </g>\n  <g id=\"left_wing_court_upper_window_4\">\n  </g>\n  <g id=\"left_wing_court_pilaster_5\">\n    <line x1=\"672.25\" y1=\"722.52\" x2=\"672.33\" y2=\"722.67\" stroke=\"#d9e8f6\" stroke-width=\"0.48\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"722.67\" x2=\"672.33\" y2=\"722.67\" stroke=\"#d9e8f6\" stroke-width=\"0.48\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.33\" y1=\"722.67\" x2=\"672.33\" y2=\"564.57\" stroke=\"#d9e8f6\" stroke-width=\"0.48\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"564.42\" x2=\"672.33\" y2=\"564.57\" stroke=\"#d9e8f6\" stroke-width=\"0.48\" stroke-opacity=\"0.950\" fill=\"none\" />\n    <line x1=\"672.33\" y1=\"564.57\" x2=\"672.25\" y2=\"564.57\" stroke=\"#d9e8f6\" stroke-width=\"0.48\" stroke-opacity=\"0.950\" fill=\"none\" />\n  </g>\n  <g id=\"left_wing_court_lower_window_5\">\n  </g>\n  <g id=\"left_wing_court_upper_window_5\">\n  </g>\n  <g id=\"left_wing_inner_return_shadow\">\n    <line x1=\"672.25\" y1=\"716.70\" x2=\"684.69\" y2=\"738.26\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"736.03\" x2=\"673.53\" y2=\"738.26\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n    <line x1=\"673.53\" y1=\"738.26\" x2=\"684.69\" y2=\"738.26\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n    <line x1=\"684.69\" y1=\"738.26\" x2=\"684.69\" y2=\"586.36\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n    <line x1=\"673.53\" y1=\"586.36\" x2=\"673.53\" y2=\"738.26\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"564.80\" x2=\"684.69\" y2=\"586.36\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n    <line x1=\"672.25\" y1=\"584.13\" x2=\"673.53\" y2=\"586.36\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n    <line x1=\"684.69\" y1=\"586.36\" x2=\"673.53\" y2=\"586.36\" stroke=\"#8fa8c4\" stroke-width=\"0.45\" stroke-opacity=\"0.550\" fill=\"none\" />\n  </g>\n  <g id=\"debug-labels\">\n    <text x=\"710.71\" y=\"495.19\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E0</text>\n    <text x=\"780.56\" y=\"380.49\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E1</text>\n    <text x=\"656.56\" y=\"265.79\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E2</text>\n    <text x=\"532.56\" y=\"294.31\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E3</text>\n    <text x=\"801.46\" y=\"746.15\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E4</text>\n    <text x=\"925.46\" y=\"631.45\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E5</text>\n    <text x=\"801.46\" y=\"516.75\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E6</text>\n    <text x=\"677.46\" y=\"631.45\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E7</text>\n    <text x=\"853.01\" y=\"620.67\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E9</text>\n    <text x=\"853.01\" y=\"391.27\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E10</text>\n    <text x=\"605.01\" y=\"391.27\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_shoulder_ref:E11</text>\n    <text x=\"431.28\" y=\"322.83\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E2</text>\n    <text x=\"321.23\" y=\"417.38\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E3</text>\n    <text x=\"562.20\" y=\"738.67\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E4</text>\n    <text x=\"672.25\" y=\"644.12\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E5</text>\n    <text x=\"562.20\" y=\"549.57\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E6</text>\n    <text x=\"452.15\" y=\"644.12\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E7</text>\n    <text x=\"386.69\" y=\"625.30\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E8</text>\n    <text x=\"606.79\" y=\"436.20\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E10</text>\n    <text x=\"386.69\" y=\"436.20\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_mass:E11</text>\n    <text x=\"429.00\" y=\"317.94\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E0</text>\n    <text x=\"429.00\" y=\"308.02\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E2</text>\n    <text x=\"564.49\" y=\"552.61\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E4</text>\n    <text x=\"564.49\" y=\"542.69\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E6</text>\n    <text x=\"379.87\" y=\"435.27\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E8</text>\n    <text x=\"613.61\" y=\"435.27\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E9</text>\n    <text x=\"613.61\" y=\"425.35\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E10</text>\n    <text x=\"379.87\" y=\"425.35\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof:E11</text>\n    <text x=\"452.67\" y=\"480.65\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E2</text>\n    <text x=\"423.22\" y=\"584.19\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E3</text>\n    <text x=\"481.91\" y=\"738.36\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E4</text>\n    <text x=\"511.36\" y=\"634.82\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E5</text>\n    <text x=\"481.91\" y=\"531.28\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E6</text>\n    <text x=\"452.46\" y=\"634.82\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E7</text>\n    <text x=\"437.84\" y=\"713.05\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E8</text>\n    <text x=\"496.74\" y=\"505.97\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E10</text>\n    <text x=\"437.84\" y=\"505.97\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_corner_pavilion:E11</text>\n    <text x=\"586.72\" y=\"522.77\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_south_cap:E2</text>\n    <text x=\"562.32\" y=\"566.22\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_south_cap:E4</text>\n    <text x=\"562.32\" y=\"543.90\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_south_cap:E6</text>\n    <text x=\"442.09\" y=\"354.45\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E0</text>\n    <text x=\"442.09\" y=\"333.37\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E2</text>\n    <text x=\"464.97\" y=\"394.08\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E4</text>\n    <text x=\"464.97\" y=\"373.00\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E6</text>\n    <text x=\"405.48\" y=\"374.26\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E8</text>\n    <text x=\"501.58\" y=\"374.26\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E9</text>\n    <text x=\"501.58\" y=\"353.18\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E10</text>\n    <text x=\"405.48\" y=\"353.18\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_roof_monitor:E11</text>\n    <text x=\"331.98\" y=\"439.01\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_1:E1</text>\n    <text x=\"327.64\" y=\"439.01\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_1:E3</text>\n    <text x=\"343.17\" y=\"458.39\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_1:E5</text>\n    <text x=\"338.83\" y=\"458.39\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_1:E7</text>\n    <text x=\"356.89\" y=\"482.16\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_2:E1</text>\n    <text x=\"352.55\" y=\"482.16\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_2:E3</text>\n    <text x=\"368.08\" y=\"501.53\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_2:E5</text>\n    <text x=\"363.74\" y=\"501.53\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_2:E7</text>\n    <text x=\"381.81\" y=\"525.31\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_3:E1</text>\n    <text x=\"377.47\" y=\"525.31\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_3:E3</text>\n    <text x=\"392.99\" y=\"544.68\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_3:E5</text>\n    <text x=\"388.65\" y=\"544.68\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_3:E7</text>\n    <text x=\"406.72\" y=\"568.45\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_4:E1</text>\n    <text x=\"402.38\" y=\"568.45\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_4:E3</text>\n    <text x=\"417.90\" y=\"587.83\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_4:E5</text>\n    <text x=\"413.56\" y=\"587.83\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_4:E7</text>\n    <text x=\"428.58\" y=\"606.32\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_5:E1</text>\n    <text x=\"424.24\" y=\"606.32\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_5:E3</text>\n    <text x=\"439.76\" y=\"625.69\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_5:E5</text>\n    <text x=\"435.42\" y=\"625.69\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_west_window_5:E7</text>\n    <text x=\"612.26\" y=\"445.45\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_court_cornice:E10</text>\n    <text x=\"672.33\" y=\"643.62\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_court_pilaster_5:E5</text>\n    <text x=\"684.69\" y=\"662.31\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_inner_return_shadow:E5</text>\n    <text x=\"673.53\" y=\"662.31\" font-size=\"11.0\" fill=\"#ffd66e\" stroke=\"#071019\" stroke-width=\"2.2\" paint-order=\"stroke\" text-anchor=\"middle\" dominant-baseline=\"middle\">left_wing_inner_return_shadow:E7</text>\n  </g>\n</svg>"
+}

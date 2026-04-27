@@ -1,0 +1,1327 @@
+{
+  "$schema": "../../../docs/wireframe3d-command.schema.json",
+  "commands": [
+    {
+      "op": "create_scene",
+      "overrides": {
+        "meta": {
+          "name": "central-dome-left-wing-wireframe",
+          "units": "meters",
+          "sourceReferences": [
+            "data/blueprint_campus_central_complex.jpg",
+            "data/booklet-page3.png",
+            "https://monolithicdome.com/captain-america-shield-covers-mit-great-dome/fig/04-mit-great-dome-night-shot-justin-jensen",
+            "https://images.fineartamerica.com/images-medium-large-5/mit-building-10-the-great-dome-marianne-campolongo.jpg",
+            "https://media.istockphoto.com/id/2169522150/fi/valokuva/massachusetts-institute-of-technologyn-etun%C3%A4kym%C3%A4-kes%C3%A4ll%C3%A4.jpg?s=2048x2048&w=is&k=20&c=gUhWDni0LjDiDG9AQeUnyXj0WyYZfjwTVtIMxA0V5ao="
+          ],
+          "mapPrototype2Reference": {
+            "domeTile": "H6",
+            "wingRooms": [
+              "F7 Aero Lobby",
+              "F5 Engineering Building"
+            ],
+            "interpretation": "Left wing is the smaller Aero/Engineering side around column F, west of the H6 dome core.",
+            "modelScaleNote": "Wing model length is intentionally architectural rather than tile-count literal: each wing runs 18.6m north-south, matching the central core width so the Central Complex reads as a square campus block."
+          },
+          "attachmentContract": {
+            "shoulderSource": "wireframe3d-central-dome-core.commands.json",
+            "shoulderRef": {
+              "id": "left_shoulder_ref",
+              "center": [
+                -7.3,
+                2.25,
+                -0.33
+              ],
+              "size": {
+                "width": 4,
+                "height": 3.7,
+                "depth": 5.7
+              },
+              "westEdge": -9.3,
+              "frontZ": 2.52,
+              "rearZ": -3.18
+            },
+            "wing": {
+              "id": "left_wing_mass",
+              "center": [
+                -11.125,
+                1.9,
+                -3.4
+              ],
+              "size": {
+                "width": 3.65,
+                "height": 3.05,
+                "depth": 18.6
+              },
+              "attachesTo": "left_shoulder_ref west side",
+              "eastEdge": -9.3,
+              "frontZ": 5.9,
+              "rearZ": -12.7
+            }
+          },
+          "designIntent": "Separate left wing for the Central Complex. The wing is intentionally lengthened to match the 18.6m central core width, so the west-side Aero/Engineering range reads as one long side of the square Central Complex rather than a small appendage beside the shoulder.",
+          "photoInterpretation": {
+            "courtyardPhoto": "Snowy plaza view of the left wing: quiet two-story classical facade, repeated tall lower windows with smaller upper openings, restrained pilaster rhythm, and a continuous low roofline subordinate to the dome.",
+            "modelResponse": "Lengthens the inward courtyard-facing facade to central-core width, keeping a calmer bay rhythm than the right wing while preserving two-story windows, plinth, cornice, and restrained pilasters."
+          }
+        },
+        "camera": {
+          "projection": "tile_oblique",
+          "width": 1600,
+          "height": 980,
+          "scale": 40,
+          "yScale": 1,
+          "offsetX": 520,
+          "offsetY": 140,
+          "oblique": {
+            "zDx": 0.5,
+            "zDy": 0.866,
+            "zScale": 0.82
+          },
+          "isometric": {
+            "yawDeg": 0,
+            "pitchDeg": 30
+          },
+          "rotationDeg": [
+            0,
+            0,
+            0
+          ]
+        },
+        "style": {
+          "background": "#06090f",
+          "stroke": "#e6f0ff",
+          "strokeWidth": 1.1,
+          "strokeOpacity": 0.95,
+          "strokeDasharray": ""
+        }
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_shoulder_ref",
+      "type": "rectangle",
+      "params": {
+        "width": 4,
+        "height": 3.7,
+        "depth": 5.7
+      },
+      "transform": {
+        "translate": [
+          -7.3,
+          2.25,
+          -0.33
+        ]
+      },
+      "style": {
+        "stroke": "#8fa8c4",
+        "strokeWidth": 0.72,
+        "strokeOpacity": 0.58,
+        "strokeDasharray": "6 5"
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_mass",
+      "type": "rectangle",
+      "params": {
+        "width": 3.65,
+        "height": 3.05,
+        "depth": 18.6
+      },
+      "transform": {
+        "translate": [
+          -11.125,
+          1.9,
+          -3.4
+        ]
+      },
+      "style": {
+        "stroke": "#d7e7fa",
+        "strokeWidth": 0.95
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_roof",
+      "type": "rectangle",
+      "params": {
+        "width": 3.8899999999999997,
+        "height": 0.15,
+        "depth": 18.900000000000002
+      },
+      "transform": {
+        "translate": [
+          -11.125,
+          3.52,
+          -3.4
+        ]
+      },
+      "style": {
+        "stroke": "#bcd6ef",
+        "strokeWidth": 0.82
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_plinth",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.28,
+        "depth": 18.150000000000002
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          0.41,
+          -3.4
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_cornice",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.22,
+        "depth": 18.32
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          3.18,
+          -3.4
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.64
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_south_cap",
+      "type": "rectangle",
+      "params": {
+        "width": 3.8899999999999997,
+        "height": 0.34,
+        "depth": 0.5
+      },
+      "transform": {
+        "translate": [
+          -11.125,
+          3.34,
+          5.65
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.74
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_north_cap",
+      "type": "rectangle",
+      "params": {
+        "width": 3.8899999999999997,
+        "height": 0.28,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -11.125,
+          3.24,
+          -12.48
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_front_return_pavilion",
+      "type": "rectangle",
+      "params": {
+        "width": 1,
+        "height": 3.28,
+        "depth": 1.25
+      },
+      "transform": {
+        "translate": [
+          -12.47,
+          2.02,
+          5.18
+        ]
+      },
+      "style": {
+        "stroke": "#e1edf9",
+        "strokeWidth": 0.84
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_roof_monitor",
+      "type": "rectangle",
+      "params": {
+        "width": 1.55,
+        "height": 0.34,
+        "depth": 2.8
+      },
+      "transform": {
+        "translate": [
+          -11.375,
+          3.82,
+          -6.8
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.64
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -11.03
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -11.45
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -11.45
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -9.562
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -9.982
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -9.982
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -8.094
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -8.514
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -8.514
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -6.625
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -7.045
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -7.045
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -5.157
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -5.577
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -5.577
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_6",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -3.689
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_6",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -4.109
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_6",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -4.109
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_7",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -2.221
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_7",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -2.641
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_7",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -2.641
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -0.753
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -1.173
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -1.173
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          0.715
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          0.295
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          0.295
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          2.184
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          1.764
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          1.764
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          3.652
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          3.232
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          3.232
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          5.12
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          4.7
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          4.7
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          -11.1
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          -9.169
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          -7.238
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          -5.306
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          -3.375
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_6",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          -1.444
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_7",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          0.488
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          2.419
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13,
+          1.82,
+          4.35
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_inner_return_shadow",
+      "type": "rectangle",
+      "params": {
+        "width": 0.18,
+        "height": 2.45,
+        "depth": 0.62
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.66,
+          5.35
+        ]
+      },
+      "style": {
+        "stroke": "#8fa8c4",
+        "strokeWidth": 0.45,
+        "strokeOpacity": 0.55
+      },
+      "occluder": false
+    },
+    {
+      "op": "export_svg",
+      "options": {
+        "hiddenEdges": "partial"
+      }
+    }
+  ]
+}
