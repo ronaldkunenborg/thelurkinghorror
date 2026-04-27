@@ -472,7 +472,7 @@
         td: { building: "central", layer: "L+2", tile: "H6" }, // [213] Top of Dome
         rgd: { building: "central", layer: "L+3", tile: "H6" }, // [121] Roof of Great Dome
         ogd: { building: "central", layer: "L+4", tile: "H6" }, // [145] On the Great Dome
-        great_court: { building: "central", layer: "L0", tile: "H5" }, // [180] Great Court
+        great_court: { building: "central", layer: "L0", tile: "H4" }, // [180] Great Court
         chem: { building: "central", layer: "L0", tile: "J5" }, // [248] Chemistry Building
         alc: { building: "central", layer: "L0", tile: "J4" }, // [174] Department of Alchemy
         lab: { building: "central", layer: "L0", tile: "J3" }, // [42] Lab
