@@ -245,7 +245,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Tuned active vs non-active layer contrast so active rooms remain dominant while adjacent layers stay readable.
    - Refined building/road/label z-order behavior across floor-focus states to avoid misleading overlap.
 
-62. [done] Process `src/assets/audio/game-over-desmae-877160.mp3` as game-over music when the player dies.
+57. [done] Process `src/assets/audio/game-over-desmae-877160.mp3` as game-over music when the player dies.
    - Added the Newgrounds game-over track to the runtime sound catalog as music:
      - https://www.newgrounds.com/audio/listen/877160
    - Credited the track as audio by Desmae under CC BY-NC-ND 3.0:
@@ -258,7 +258,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
      - then starts game-over music and fades in the game-over artwork over 2 seconds
    - Added controller regression coverage for death detection, false-positive avoidance, delayed start after external fade, and stop behavior.
 
-61. [done] Build a parameter-controlled 3D wireframe composition tool for game-development map/building art, with SVG export for verification.
+58. [done] Build a parameter-controlled 3D wireframe composition tool for game-development map/building art, with SVG export for verification.
    - Added the command-driven core in `tools/wireframe3d-core.js` and CLI runner in `tools/wireframe3d-cli.js`.
    - Supports the required primitive set: `cube`, `rectangle`, `cylinder`, `parallelogram`, and `globe` with partial globe segment parameters.
    - Supports the command flow: `create_scene`, `add_primitive`, `update_primitive`, `delete_primitive`, `transform_primitive`, `set_style`, `set_camera`, `rotate_scene`, and `export_svg`.
@@ -268,7 +268,11 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 
 ## Pending Tasks
 
-57. [pending] Add a dedicated architectural outline composition pass for the Central Complex in `src/map-prototype-2.html`, with the visual goal of pulling the campus silhouette closer to the provided blueprint image while being explicitly informed by MIT’s Central Building / Building 10 massing.
+59. [pending] Add snow as effect to the map-prototype-2.html and to the game itself. They are similar but not quite equal effects.
+In the map, it needs to snow across the map, on a layer that is drawn in the foreground. The vertical speed with which the snow falls is screenwide, and can vary from time to time but not too often. The wind blows from a certain direction and varies more. This affects horizontal displacement of snowflakes and starts in a given area on the side of the screen, then moves to the other side. Depending on how strong it is it may either reach the other side or peter out while moving.
+In the game, the snow is the same but the layer on which it is drawn is behind everything else.
+
+60. [pending] Add a dedicated architectural outline composition pass for the Central Complex in `src/map-prototype-2.html`, with the visual goal of pulling the campus silhouette closer to the provided blueprint image while being explicitly informed by MIT’s Central Building / Building 10 massing.
    - Scope: Central Complex only. Keep Brown Building, Computer Center, and Temporary Lab on the existing simpler treatment for this pass.
    - Motion rule: the architectural shell moves with `L0`/`groundFloorOffsetY` in focus mode, and stays neutral in `all` mode.
    - Treat the new layer as presentation-only: do not change room positions, exits, layer truth, or traversal topology.
@@ -319,7 +323,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
      - room tiles/labels/exits remain readable
      - no room-truth topology changes are introduced
 
-58. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
+61. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
    - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
    - Keep deterministic per-room/per-tile jitter so lines stay stable between renders.
    - Keep displacement filter only as optional subtle accent (or remove entirely if readability improves).
@@ -327,7 +331,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Document final rendering policy in map ADR and link implementation notes.
    - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.
 
-59. [pending] Add an in-game map of visited locations while adventuring.
+62. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -343,7 +347,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-60. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+63. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
 
 - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
 - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
