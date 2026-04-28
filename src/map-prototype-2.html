@@ -79,6 +79,7 @@
         overflow: hidden;
         flex: 1;
         min-height: 0;
+        position: relative;
       }
 
       svg {
@@ -87,6 +88,18 @@
         display: block;
         cursor: grab;
         user-select: none;
+        position: relative;
+        z-index: 1;
+      }
+
+      .snow-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        mix-blend-mode: screen;
       }
 
       svg.dragging {
@@ -652,6 +665,7 @@
       </div>
       <div class="frame">
         <svg id="map" viewBox="0 0 1600 980" preserveAspectRatio="xMinYMin meet" aria-label="Integrated map prototype"></svg>
+        <canvas id="map-snow" class="snow-overlay" aria-hidden="true"></canvas>
       </div>
     </div>
 
@@ -662,10 +676,26 @@
       const WORLD_W = 5900;
       const WORLD_H = 4200;
       const svg = document.getElementById("map");
+      const snowCanvas = document.getElementById("map-snow");
+      const snowCtx = snowCanvas.getContext("2d");
       let viewport = null;
       let uiLayer = null;
       let legendLayer = null;
       let svgDefs = null;
+      const snowState = {
+        width: 0,
+        height: 0,
+        flakes: [],
+        gusts: [],
+        lastTime: 0,
+        spawnTimer: 0,
+        fallSpeed: 58,
+        targetFallSpeed: 58,
+        nextFallShift: 0,
+        ambientWind: -5,
+        windPhase: Math.random() * 1000,
+        running: false
+      };
       const panZoom = {
         scale: 0.42,
         tx: 20,
@@ -683,6 +713,10 @@
         carryY: 0
       };
       const FLOOR_DRAG_STEP_PX = 30;
+      const SNOW_DENSITY = 0.00036;
+      const SNOW_MIN_FLAKES = 240;
+      const SNOW_MAX_FLAKES = 820;
+      const SNOW_SIDE_BUFFER_SCREENS = 1;
 
       // Prototype model: room id + section + layer + x/y + edges.
       const MAP_MODEL = {
@@ -3666,6 +3700,179 @@
         applyTransform();
       }
 
+      function randomBetween(min, max) {
+        return min + Math.random() * (max - min);
+      }
+
+      function resizeSnowCanvas() {
+        const rect = snowCanvas.getBoundingClientRect();
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const width = Math.max(1, Math.round(rect.width));
+        const height = Math.max(1, Math.round(rect.height));
+        const pixelWidth = Math.round(width * dpr);
+        const pixelHeight = Math.round(height * dpr);
+        if (snowCanvas.width !== pixelWidth || snowCanvas.height !== pixelHeight) {
+          snowCanvas.width = pixelWidth;
+          snowCanvas.height = pixelHeight;
+          snowCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        snowState.width = width;
+        snowState.height = height;
+        const simulatedWidth = width * (1 + SNOW_SIDE_BUFFER_SCREENS * 2);
+        const targetCount = Math.max(SNOW_MIN_FLAKES, Math.min(SNOW_MAX_FLAKES, Math.round(simulatedWidth * height * SNOW_DENSITY)));
+        while (snowState.flakes.length < targetCount) {
+          snowState.flakes.push(createSnowFlake(true));
+        }
+        if (snowState.flakes.length > targetCount) {
+          snowState.flakes.length = targetCount;
+        }
+      }
+
+      function createSnowFlake(anywhere) {
+        const depth = Math.pow(Math.random(), 1.85);
+        const radius = randomBetween(0.45, 1.32) + depth * randomBetween(0.5, 2.05);
+        const sideBuffer = snowState.width * SNOW_SIDE_BUFFER_SCREENS;
+        return {
+          x: randomBetween(-sideBuffer, snowState.width + sideBuffer),
+          y: anywhere ? randomBetween(-snowState.height * 0.08, snowState.height * 1.06) : randomBetween(-36, -2),
+          radius,
+          depth,
+          alpha: randomBetween(0.16, 0.42) + depth * 0.4,
+          fallFactor: randomBetween(0.58, 1.18) + depth * 0.66,
+          windFactor: randomBetween(0.45, 1.15) + depth * 0.72,
+          swayPhase: randomBetween(0, Math.PI * 2),
+          swaySpeed: randomBetween(0.7, 1.7),
+          swaySize: randomBetween(2, 10) + depth * 8
+        };
+      }
+
+      function resetSnowFlake(flake, fromTop) {
+        const replacement = createSnowFlake(false);
+        Object.assign(flake, replacement);
+        if (!fromTop) {
+          const sideBuffer = snowState.width * SNOW_SIDE_BUFFER_SCREENS;
+          const centerWind = snowWindAt(snowState.width * 0.5, snowState.height * 0.5, performance.now());
+          flake.y = randomBetween(0, snowState.height);
+          flake.x =
+            centerWind >= 0
+              ? randomBetween(-sideBuffer, -sideBuffer * 0.72)
+              : randomBetween(snowState.width + sideBuffer * 0.72, snowState.width + sideBuffer);
+        }
+      }
+
+      function scheduleSnowGust(now) {
+        const direction = Math.random() < 0.58 ? 1 : -1;
+        const width = randomBetween(210, 520);
+        const startX = direction > 0 ? -width * randomBetween(0.6, 1.2) : snowState.width + width * randomBetween(0.6, 1.2);
+        const travelSpeed = randomBetween(46, 145) * direction;
+        const strength = randomBetween(20, 86) * direction;
+        const canCross = Math.random() < 0.64 || Math.abs(strength) > 48;
+        snowState.gusts.push({
+          centerX: startX,
+          width,
+          travelSpeed,
+          strength,
+          startTime: now,
+          life: canCross ? randomBetween(9, 18) : randomBetween(3.6, 7.5),
+          edge: direction > 0 ? -1 : 1
+        });
+        snowState.spawnTimer = randomBetween(2.8, 7.8);
+      }
+
+      function snowWindAt(x, y, now) {
+        const slowWind = snowState.ambientWind + Math.sin(now * 0.00018 + snowState.windPhase) * 9;
+        let wind = slowWind + Math.sin((y + now * 0.035) * 0.009) * 3.5;
+        for (const gust of snowState.gusts) {
+          const age = (now - gust.startTime) / 1000;
+          const dx = (x - gust.centerX) / gust.width;
+          const band = Math.exp(-dx * dx * 2.8);
+          const rise = Math.min(1, age / 1.1);
+          const fade = Math.max(0, Math.min(1, (gust.life - age) / 2.1));
+          const shear = 1 + Math.sin(y * 0.012 + age * 1.6) * 0.18;
+          wind += gust.strength * band * rise * fade * shear;
+        }
+        return wind;
+      }
+
+      function updateSnowWeather(dt, now) {
+        snowState.nextFallShift -= dt;
+        if (snowState.nextFallShift <= 0) {
+          snowState.targetFallSpeed = randomBetween(42, 92);
+          snowState.nextFallShift = randomBetween(11, 24);
+        }
+        snowState.fallSpeed += (snowState.targetFallSpeed - snowState.fallSpeed) * Math.min(1, dt * 0.12);
+        snowState.ambientWind += (Math.sin(now * 0.00009 + 3.2) * 12 - snowState.ambientWind) * Math.min(1, dt * 0.045);
+
+        snowState.spawnTimer -= dt;
+        if (snowState.spawnTimer <= 0) {
+          scheduleSnowGust(now);
+        }
+        snowState.gusts = snowState.gusts.filter((gust) => {
+          const age = (now - gust.startTime) / 1000;
+          gust.centerX += gust.travelSpeed * dt;
+          const crossed = gust.edge < 0 ? gust.centerX > snowState.width + gust.width : gust.centerX < -gust.width;
+          return age < gust.life && !crossed;
+        });
+      }
+
+      function drawSnowFrame(now) {
+        if (!snowState.running) return;
+        resizeSnowCanvas();
+        const dt = Math.min(0.05, Math.max(0.001, (now - snowState.lastTime) / 1000 || 0.016));
+        snowState.lastTime = now;
+        updateSnowWeather(dt, now);
+
+        snowCtx.clearRect(0, 0, snowState.width, snowState.height);
+        snowCtx.lineCap = "round";
+        for (const flake of snowState.flakes) {
+          const wind = snowWindAt(flake.x, flake.y, now) * flake.windFactor;
+          const sway = Math.sin(now * 0.001 * flake.swaySpeed + flake.swayPhase) * flake.swaySize;
+          const vx = wind + sway;
+          const vy = snowState.fallSpeed * flake.fallFactor;
+          flake.x += vx * dt;
+          flake.y += vy * dt;
+
+          const sideBuffer = snowState.width * SNOW_SIDE_BUFFER_SCREENS;
+          if (flake.y > snowState.height + 36 || flake.x < -sideBuffer - 80 || flake.x > snowState.width + sideBuffer + 80) {
+            resetSnowFlake(flake, flake.y > snowState.height + 36);
+          }
+
+          if (flake.x < -12 || flake.x > snowState.width + 12) {
+            continue;
+          }
+
+          const speed = Math.sqrt(vx * vx + vy * vy);
+          const streak = Math.min(11, Math.max(1.8, speed * 0.026 * (0.35 + flake.depth)));
+          const alpha = Math.max(0.12, Math.min(0.82, flake.alpha));
+          snowCtx.strokeStyle = "rgba(238, 246, 255, " + (alpha * 0.62).toFixed(3) + ")";
+          snowCtx.fillStyle = "rgba(248, 252, 255, " + alpha.toFixed(3) + ")";
+          if (streak > 6.4 && flake.depth > 0.58) {
+            const angle = Math.atan2(vy, vx);
+            const tx = Math.cos(angle) * streak;
+            const ty = Math.sin(angle) * streak;
+            snowCtx.lineWidth = Math.max(0.42, flake.radius * 0.66);
+            snowCtx.beginPath();
+            snowCtx.moveTo(flake.x - tx * 0.45, flake.y - ty * 0.45);
+            snowCtx.lineTo(flake.x + tx * 0.55, flake.y + ty * 0.55);
+            snowCtx.stroke();
+          } else {
+            snowCtx.beginPath();
+            snowCtx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+            snowCtx.fill();
+          }
+        }
+        window.requestAnimationFrame(drawSnowFrame);
+      }
+
+      function startSnow() {
+        if (snowState.running) return;
+        snowState.running = true;
+        snowState.lastTime = performance.now();
+        snowState.spawnTimer = 0.4;
+        resizeSnowCanvas();
+        window.requestAnimationFrame(drawSnowFrame);
+      }
+
       document.getElementById("toggle-roads").addEventListener("change", draw);
       document.getElementById("toggle-legend").addEventListener("change", draw);
       document.getElementById("toggle-grid").addEventListener("change", draw);
@@ -3677,12 +3884,16 @@
       svg.addEventListener("mouseleave", onPointerUp);
       svg.addEventListener("contextmenu", onContextMenu);
       svg.addEventListener("wheel", onWheel, { passive: false });
-      window.addEventListener("resize", draw);
+      window.addEventListener("resize", () => {
+        draw();
+        resizeSnowCanvas();
+      });
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(redrawSoon).catch(() => {});
       }
       draw();
       redrawSoon();
+      startSnow();
     </script>
   </body>
 </html>
