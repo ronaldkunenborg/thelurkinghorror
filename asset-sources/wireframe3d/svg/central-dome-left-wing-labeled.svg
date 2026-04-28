@@ -2,170 +2,112 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980">
   <rect x="0" y="0" width="1600" height="980" fill="#06090f" />
   <g id="left_shoulder_ref">
-    <line x1="640.85" y1="495.19" x2="780.56" y2="495.19" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="780.56" y1="495.19" x2="780.56" y2="265.79" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="780.56" y1="495.19" x2="925.46" y2="746.15" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="532.56" y1="265.79" x2="532.56" y2="322.83" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="780.56" y1="265.79" x2="532.56" y2="265.79" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="672.25" y1="737.12" x2="677.46" y2="746.15" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="780.56" y1="265.79" x2="925.46" y2="516.75" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="677.46" y1="746.15" x2="925.46" y2="746.15" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="925.46" y1="746.15" x2="925.46" y2="516.75" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="532.56" y1="265.79" x2="677.46" y2="516.75" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="677.46" y1="516.75" x2="677.46" y2="746.15" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
-    <line x1="925.46" y1="516.75" x2="677.46" y2="516.75" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="965.71" y1="523.67" x2="1055.85" y2="523.67" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="1055.85" y1="523.67" x2="1055.85" y2="375.67" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="1055.85" y1="523.67" x2="1149.33" y2="685.58" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="895.85" y1="375.67" x2="895.85" y2="402.67" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="1055.85" y1="375.67" x2="895.85" y2="375.67" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="1055.85" y1="375.67" x2="1149.33" y2="537.58" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="1059.19" y1="685.58" x2="1149.33" y2="685.58" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="1149.33" y1="685.58" x2="1149.33" y2="537.58" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="895.85" y1="375.67" x2="989.33" y2="537.58" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="989.33" y1="537.58" x2="989.33" y2="564.58" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
+    <line x1="1149.33" y1="537.58" x2="989.33" y2="537.58" stroke="#8fa8c4" stroke-width="0.72" stroke-opacity="0.580" fill="none" stroke-dasharray="6 5" />
   </g>
   <g id="left_wing_mass">
-    <line x1="321.23" y1="322.83" x2="321.23" y2="511.93" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="541.33" y1="322.83" x2="321.23" y2="322.83" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="321.23" y1="511.93" x2="452.15" y2="738.67" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="541.33" y1="322.83" x2="672.25" y2="549.57" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="452.15" y1="738.67" x2="672.25" y2="738.67" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="321.23" y1="322.83" x2="452.15" y2="549.57" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="738.67" x2="672.25" y2="549.57" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="452.15" y1="549.57" x2="452.15" y2="738.67" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="549.57" x2="452.15" y2="549.57" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="679.11" y1="321.72" x2="679.11" y2="443.72" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="849.11" y1="321.72" x2="679.11" y2="321.72" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="679.11" y1="443.72" x2="912.81" y2="848.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="849.11" y1="321.72" x2="1082.81" y2="726.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="679.11" y1="321.72" x2="912.81" y2="726.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="912.81" y1="848.49" x2="912.92" y2="848.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="954.01" y1="848.49" x2="1082.81" y2="848.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="848.49" x2="1082.81" y2="726.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="912.81" y1="726.49" x2="912.81" y2="848.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="726.49" x2="954.01" y2="726.49" stroke="#d7e7fa" stroke-width="0.95" stroke-opacity="0.950" fill="none" />
   </g>
   <g id="left_wing_roof">
-    <line x1="545.87" y1="317.94" x2="545.87" y2="308.02" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="312.13" y1="317.94" x2="545.87" y2="317.94" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="545.87" y1="308.02" x2="312.13" y2="308.02" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="312.13" y1="308.02" x2="312.13" y2="317.94" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="545.87" y1="317.94" x2="681.36" y2="552.61" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="545.87" y1="308.02" x2="681.36" y2="542.69" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="312.13" y1="317.94" x2="447.62" y2="552.61" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="312.13" y1="308.02" x2="447.62" y2="542.69" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="681.36" y1="552.61" x2="681.36" y2="542.69" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="447.62" y1="552.61" x2="681.36" y2="552.61" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="681.36" y1="542.69" x2="447.62" y2="542.69" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-    <line x1="447.62" y1="542.69" x2="447.62" y2="552.61" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_corner_pavilion">
-    <line x1="423.22" y1="687.73" x2="452.46" y2="738.36" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="452.46" y1="738.36" x2="511.36" y2="738.36" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="423.22" y1="480.65" x2="423.22" y2="687.73" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="511.36" y1="738.36" x2="511.36" y2="531.28" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="482.12" y1="480.65" x2="423.22" y2="480.65" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="452.46" y1="531.28" x2="452.46" y2="738.36" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="482.12" y1="480.65" x2="511.36" y2="531.28" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="423.22" y1="480.65" x2="452.46" y2="531.28" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-    <line x1="511.36" y1="531.28" x2="452.46" y2="531.28" stroke="#e1edf9" stroke-width="0.86" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_south_cap">
-    <line x1="666.99" y1="540.47" x2="666.99" y2="522.77" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="554.19" x2="679.19" y2="566.22" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="666.99" y1="522.77" x2="679.19" y2="543.90" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="679.19" y1="566.22" x2="679.19" y2="543.90" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="666.99" y1="522.77" x2="506.44" y2="522.77" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="447.54" y1="522.77" x2="433.25" y2="522.77" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="445.45" y1="566.22" x2="679.19" y2="566.22" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="679.19" y1="543.90" x2="445.45" y2="543.90" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="433.25" y1="522.77" x2="433.25" y2="545.09" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="433.25" y1="545.09" x2="445.45" y2="566.22" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="433.25" y1="522.77" x2="445.45" y2="543.90" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-    <line x1="445.45" y1="543.90" x2="445.45" y2="566.22" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_roof_monitor">
-    <line x1="490.14" y1="354.45" x2="490.14" y2="333.37" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="394.04" y1="354.45" x2="490.14" y2="354.45" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="490.14" y1="354.45" x2="513.02" y2="394.08" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="490.14" y1="333.37" x2="394.04" y2="333.37" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="490.14" y1="333.37" x2="513.02" y2="373.00" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="394.04" y1="333.37" x2="394.04" y2="354.45" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="513.02" y1="394.08" x2="513.02" y2="373.00" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="394.04" y1="354.45" x2="416.92" y2="394.08" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="416.92" y1="394.08" x2="513.02" y2="394.08" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="394.04" y1="333.37" x2="416.92" y2="373.00" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="513.02" y1="373.00" x2="416.92" y2="373.00" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="416.92" y1="373.00" x2="416.92" y2="394.08" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_west_window_1">
-    <line x1="327.64" y1="490.16" x2="331.98" y2="490.16" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="331.98" y1="490.16" x2="343.17" y2="509.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="327.64" y1="490.16" x2="338.83" y2="509.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="338.83" y1="509.54" x2="343.17" y2="509.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="331.98" y1="490.16" x2="331.98" y2="387.86" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="327.64" y1="387.86" x2="327.64" y2="490.16" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="343.17" y1="509.54" x2="343.17" y2="407.24" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="338.83" y1="407.24" x2="338.83" y2="509.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="331.98" y1="387.86" x2="327.64" y2="387.86" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="331.98" y1="387.86" x2="343.17" y2="407.24" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="327.64" y1="387.86" x2="338.83" y2="407.24" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="343.17" y1="407.24" x2="338.83" y2="407.24" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_west_window_2">
-    <line x1="352.55" y1="533.31" x2="356.89" y2="533.31" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="356.89" y1="533.31" x2="368.08" y2="552.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="352.55" y1="533.31" x2="363.74" y2="552.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="363.74" y1="552.68" x2="368.08" y2="552.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="356.89" y1="533.31" x2="356.89" y2="431.01" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="352.55" y1="431.01" x2="352.55" y2="533.31" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="368.08" y1="552.68" x2="368.08" y2="450.38" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="363.74" y1="450.38" x2="363.74" y2="552.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="356.89" y1="431.01" x2="352.55" y2="431.01" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="356.89" y1="431.01" x2="368.08" y2="450.38" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="352.55" y1="431.01" x2="363.74" y2="450.38" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="368.08" y1="450.38" x2="363.74" y2="450.38" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_west_window_3">
-    <line x1="377.47" y1="576.46" x2="381.81" y2="576.46" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="381.81" y1="576.46" x2="392.99" y2="595.83" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="377.47" y1="576.46" x2="388.65" y2="595.83" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="388.65" y1="595.83" x2="392.99" y2="595.83" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="381.81" y1="576.46" x2="381.81" y2="474.16" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="377.47" y1="474.16" x2="377.47" y2="576.46" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="392.99" y1="595.83" x2="392.99" y2="493.53" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="388.65" y1="493.53" x2="388.65" y2="595.83" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="381.81" y1="474.16" x2="377.47" y2="474.16" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="381.81" y1="474.16" x2="392.99" y2="493.53" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="377.47" y1="474.16" x2="388.65" y2="493.53" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="392.99" y1="493.53" x2="388.65" y2="493.53" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_west_window_4">
-    <line x1="402.38" y1="619.60" x2="406.72" y2="619.60" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="406.72" y1="619.60" x2="417.90" y2="638.98" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="402.38" y1="619.60" x2="413.56" y2="638.98" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="413.56" y1="638.98" x2="417.90" y2="638.98" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="406.72" y1="619.60" x2="406.72" y2="517.30" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="402.38" y1="517.30" x2="402.38" y2="619.60" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="417.90" y1="638.98" x2="417.90" y2="536.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="413.56" y1="536.68" x2="413.56" y2="638.98" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="406.72" y1="517.30" x2="402.38" y2="517.30" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="406.72" y1="517.30" x2="417.90" y2="536.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="402.38" y1="517.30" x2="413.56" y2="536.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="417.90" y1="536.68" x2="413.56" y2="536.68" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-  </g>
-  <g id="left_wing_west_window_5">
-    <line x1="424.24" y1="657.47" x2="428.58" y2="657.47" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="428.58" y1="657.47" x2="439.76" y2="676.84" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="424.24" y1="657.47" x2="435.42" y2="676.84" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="435.42" y1="676.84" x2="439.76" y2="676.84" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="428.58" y1="657.47" x2="428.58" y2="555.17" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="424.24" y1="555.17" x2="424.24" y2="657.47" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="439.76" y1="676.84" x2="439.76" y2="574.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="435.42" y1="574.54" x2="435.42" y2="676.84" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="428.58" y1="555.17" x2="424.24" y2="555.17" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="428.58" y1="555.17" x2="439.76" y2="574.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="424.24" y1="555.17" x2="435.42" y2="574.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
-    <line x1="439.76" y1="574.54" x2="435.42" y2="574.54" stroke="#b8d8f4" stroke-width="0.60" stroke-opacity="0.950" fill="none" />
+    <line x1="852.02" y1="317.65" x2="852.02" y2="311.65" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="672.42" y1="317.65" x2="852.02" y2="317.65" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="852.02" y1="311.65" x2="672.42" y2="311.65" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="672.42" y1="311.65" x2="672.42" y2="317.65" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="852.02" y1="317.65" x2="1089.49" y2="728.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="852.02" y1="311.65" x2="1089.49" y2="722.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="672.42" y1="317.65" x2="909.89" y2="728.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="672.42" y1="311.65" x2="909.89" y2="722.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="1089.49" y1="728.95" x2="1089.49" y2="722.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="909.89" y1="728.95" x2="1089.49" y2="728.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="1089.49" y1="722.95" x2="909.89" y2="722.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
+    <line x1="909.89" y1="722.95" x2="909.89" y2="728.95" stroke="#bcd6ef" stroke-width="0.82" stroke-opacity="0.950" fill="none" />
   </g>
   <g id="left_wing_court_plinth">
-    <line x1="672.25" y1="737.05" x2="674.17" y2="740.38" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
-    <line x1="665.75" y1="738.67" x2="666.73" y2="740.38" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="719.69" x2="674.17" y2="723.02" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
-    <line x1="666.73" y1="740.38" x2="674.17" y2="740.38" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
-    <line x1="674.17" y1="740.38" x2="674.17" y2="723.02" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
-    <line x1="666.73" y1="738.67" x2="666.73" y2="740.38" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
-    <line x1="674.17" y1="723.02" x2="672.25" y2="723.02" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="842.99" x2="1085.58" y2="847.79" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="831.79" x2="1085.58" y2="836.59" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="847.79" x2="1085.58" y2="847.79" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="1085.58" y1="847.79" x2="1085.58" y2="836.59" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="1085.58" y1="836.59" x2="1082.81" y2="836.59" stroke="#c8dcf0" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
   </g>
   <g id="left_wing_court_cornice">
-    <line x1="548.07" y1="334.50" x2="548.07" y2="334.28" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="548.07" y1="334.28" x2="547.95" y2="334.28" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="562.99" x2="676.44" y2="570.26" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="548.07" y1="334.28" x2="676.44" y2="556.62" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="570.26" x2="676.44" y2="570.26" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="676.44" y1="570.26" x2="676.44" y2="556.62" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
-    <line x1="676.44" y1="556.62" x2="672.25" y2="556.62" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="856.47" y1="334.46" x2="856.47" y2="330.17" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="856.47" y1="330.17" x2="853.98" y2="330.17" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="730.99" x2="1086.65" y2="737.64" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="856.47" y1="330.17" x2="1086.65" y2="728.84" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="737.64" x2="1086.65" y2="737.64" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="1086.65" y1="737.64" x2="1086.65" y2="728.84" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="1086.65" y1="728.84" x2="1082.81" y2="728.84" stroke="#c8dcf0" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+  </g>
+  <g id="left_wing_south_cap">
+    <line x1="1080.37" y1="722.26" x2="1080.37" y2="710.55" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="1082.81" y1="728.37" x2="1088.57" y2="738.35" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="1080.37" y1="710.55" x2="1088.57" y2="724.75" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="1088.57" y1="738.35" x2="1088.57" y2="724.75" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="1080.37" y1="710.55" x2="949.03" y2="710.55" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="909.03" y1="710.55" x2="900.77" y2="710.55" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="908.97" y1="738.35" x2="1088.57" y2="738.35" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="1088.57" y1="724.75" x2="908.97" y2="724.75" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="900.77" y1="710.55" x2="900.77" y2="724.15" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="900.77" y1="724.15" x2="908.97" y2="738.35" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="900.77" y1="710.55" x2="908.97" y2="724.75" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+    <line x1="908.97" y1="724.75" x2="908.97" y2="738.35" stroke="#c8dcf0" stroke-width="0.74" stroke-opacity="0.950" fill="none" />
+  </g>
+  <g id="left_wing_north_cap">
+    <line x1="853.23" y1="328.86" x2="853.23" y2="322.34" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="853.23" y1="322.34" x2="860.12" y2="334.27" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="860.12" y1="340.79" x2="860.12" y2="334.27" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="673.63" y1="333.54" x2="679.11" y2="333.54" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="853.23" y1="322.34" x2="849.47" y2="322.34" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="679.11" y1="322.34" x2="673.63" y2="322.34" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="860.12" y1="334.27" x2="856.36" y2="334.27" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="686.36" y1="334.27" x2="680.52" y2="334.27" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="673.63" y1="322.34" x2="673.63" y2="333.54" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="673.63" y1="333.54" x2="680.52" y2="345.47" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="673.63" y1="322.34" x2="680.52" y2="334.27" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+    <line x1="680.52" y1="334.27" x2="680.52" y2="345.47" stroke="#a9c3dd" stroke-width="0.58" stroke-opacity="0.950" fill="none" />
+  </g>
+  <g id="left_wing_front_return_pavilion">
+    <line x1="893.51" y1="814.87" x2="914.01" y2="850.37" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="914.01" y1="850.37" x2="954.01" y2="850.37" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="893.51" y1="683.67" x2="893.51" y2="814.87" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="954.01" y1="850.37" x2="954.01" y2="719.17" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="933.51" y1="683.67" x2="893.51" y2="683.67" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="914.01" y1="719.17" x2="914.01" y2="850.37" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="933.51" y1="683.67" x2="954.01" y2="719.17" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="893.51" y1="683.67" x2="914.01" y2="719.17" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+    <line x1="954.01" y1="719.17" x2="914.01" y2="719.17" stroke="#e1edf9" stroke-width="0.84" stroke-opacity="0.950" fill="none" />
+  </g>
+  <g id="left_wing_roof_monitor">
+    <line x1="841.65" y1="410.65" x2="841.65" y2="397.05" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="779.65" y1="410.65" x2="841.65" y2="410.65" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="841.65" y1="397.05" x2="779.65" y2="397.05" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="779.65" y1="397.05" x2="779.65" y2="410.65" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="841.65" y1="410.65" x2="876.83" y2="471.58" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="841.65" y1="397.05" x2="876.83" y2="457.98" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="779.65" y1="410.65" x2="814.83" y2="471.58" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="779.65" y1="397.05" x2="814.83" y2="457.98" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="876.83" y1="471.58" x2="876.83" y2="457.98" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="814.83" y1="471.58" x2="876.83" y2="471.58" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="876.83" y1="457.98" x2="814.83" y2="457.98" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
+    <line x1="814.83" y1="457.98" x2="814.83" y2="471.58" stroke="#a9c3dd" stroke-width="0.64" stroke-opacity="0.950" fill="none" />
   </g>
   <g id="left_wing_court_pilaster_1">
   </g>
@@ -179,111 +121,167 @@
   </g>
   <g id="left_wing_court_upper_window_2">
   </g>
-  <g id="left_wing_court_pilaster_3">
+  <g id="left_wing_court_pilaster_8">
   </g>
-  <g id="left_wing_court_lower_window_3">
+  <g id="left_wing_court_lower_window_8">
   </g>
-  <g id="left_wing_court_upper_window_3">
+  <g id="left_wing_court_upper_window_8">
   </g>
-  <g id="left_wing_court_pilaster_4">
+  <g id="left_wing_court_pilaster_9">
   </g>
-  <g id="left_wing_court_lower_window_4">
+  <g id="left_wing_court_lower_window_9">
   </g>
-  <g id="left_wing_court_upper_window_4">
+  <g id="left_wing_court_upper_window_9">
   </g>
-  <g id="left_wing_court_pilaster_5">
-    <line x1="672.25" y1="722.52" x2="672.33" y2="722.67" stroke="#d9e8f6" stroke-width="0.48" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="722.67" x2="672.33" y2="722.67" stroke="#d9e8f6" stroke-width="0.48" stroke-opacity="0.950" fill="none" />
-    <line x1="672.33" y1="722.67" x2="672.33" y2="564.57" stroke="#d9e8f6" stroke-width="0.48" stroke-opacity="0.950" fill="none" />
-    <line x1="672.25" y1="564.42" x2="672.33" y2="564.57" stroke="#d9e8f6" stroke-width="0.48" stroke-opacity="0.950" fill="none" />
-    <line x1="672.33" y1="564.57" x2="672.25" y2="564.57" stroke="#d9e8f6" stroke-width="0.48" stroke-opacity="0.950" fill="none" />
+  <g id="left_wing_court_pilaster_10">
   </g>
-  <g id="left_wing_court_lower_window_5">
+  <g id="left_wing_court_lower_window_10">
   </g>
-  <g id="left_wing_court_upper_window_5">
+  <g id="left_wing_court_upper_window_10">
+  </g>
+  <g id="left_wing_court_pilaster_11">
+  </g>
+  <g id="left_wing_court_lower_window_11">
+  </g>
+  <g id="left_wing_court_upper_window_11">
+  </g>
+  <g id="left_wing_court_pilaster_12">
+  </g>
+  <g id="left_wing_court_lower_window_12">
+  </g>
+  <g id="left_wing_court_upper_window_12">
+  </g>
+  <g id="left_wing_west_window_1">
+    <line x1="692.37" y1="444.77" x2="695.17" y2="444.77" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="695.17" y1="444.77" x2="702.06" y2="456.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="692.37" y1="444.77" x2="699.26" y2="456.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="699.26" y1="456.70" x2="702.06" y2="456.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="695.17" y1="444.77" x2="695.17" y2="384.77" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="692.37" y1="384.77" x2="692.37" y2="444.77" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="702.06" y1="456.70" x2="702.06" y2="396.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="699.26" y1="396.70" x2="699.26" y2="456.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="695.17" y1="384.77" x2="692.37" y2="384.77" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="695.17" y1="384.77" x2="702.06" y2="396.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="692.37" y1="384.77" x2="699.26" y2="396.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="702.06" y1="396.70" x2="699.26" y2="396.70" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+  </g>
+  <g id="left_wing_west_window_7">
+    <line x1="837.96" y1="696.95" x2="840.76" y2="696.95" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="840.76" y1="696.95" x2="847.65" y2="708.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="837.96" y1="696.95" x2="844.85" y2="708.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="844.85" y1="708.88" x2="847.65" y2="708.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="840.76" y1="696.95" x2="840.76" y2="636.95" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="837.96" y1="636.95" x2="837.96" y2="696.95" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="847.65" y1="708.88" x2="847.65" y2="648.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="844.85" y1="648.88" x2="844.85" y2="708.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="840.76" y1="636.95" x2="837.96" y2="636.95" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="840.76" y1="636.95" x2="847.65" y2="648.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="837.96" y1="636.95" x2="844.85" y2="648.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="847.65" y1="648.88" x2="844.85" y2="648.88" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+  </g>
+  <g id="left_wing_west_window_8">
+    <line x1="862.23" y1="738.97" x2="865.03" y2="738.97" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="865.03" y1="738.97" x2="871.91" y2="750.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="862.23" y1="738.97" x2="869.11" y2="750.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="869.11" y1="750.90" x2="871.91" y2="750.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="865.03" y1="738.97" x2="865.03" y2="678.97" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="862.23" y1="678.97" x2="862.23" y2="738.97" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="871.91" y1="750.90" x2="871.91" y2="690.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="869.11" y1="690.90" x2="869.11" y2="750.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="865.03" y1="678.97" x2="862.23" y2="678.97" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="865.03" y1="678.97" x2="871.91" y2="690.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="862.23" y1="678.97" x2="869.11" y2="690.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="871.91" y1="690.90" x2="869.11" y2="690.90" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+  </g>
+  <g id="left_wing_west_window_9">
+    <line x1="886.49" y1="780.99" x2="889.29" y2="780.99" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="889.29" y1="780.99" x2="896.18" y2="792.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="886.49" y1="780.99" x2="893.38" y2="792.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="893.38" y1="792.92" x2="896.18" y2="792.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="889.29" y1="780.99" x2="889.29" y2="720.99" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="886.49" y1="720.99" x2="886.49" y2="780.99" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="896.18" y1="792.92" x2="896.18" y2="732.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="893.38" y1="732.92" x2="893.38" y2="792.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="889.29" y1="720.99" x2="886.49" y2="720.99" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="889.29" y1="720.99" x2="896.18" y2="732.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="886.49" y1="720.99" x2="893.38" y2="732.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
+    <line x1="896.18" y1="732.92" x2="893.38" y2="732.92" stroke="#9fc1df" stroke-width="0.50" stroke-opacity="0.700" fill="none" />
   </g>
   <g id="left_wing_inner_return_shadow">
-    <line x1="672.25" y1="716.70" x2="684.69" y2="738.26" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
-    <line x1="672.25" y1="736.03" x2="673.53" y2="738.26" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
-    <line x1="673.53" y1="738.26" x2="684.69" y2="738.26" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
-    <line x1="684.69" y1="738.26" x2="684.69" y2="586.36" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
-    <line x1="673.53" y1="586.36" x2="673.53" y2="738.26" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
-    <line x1="672.25" y1="564.80" x2="684.69" y2="586.36" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
-    <line x1="672.25" y1="584.13" x2="673.53" y2="586.36" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
-    <line x1="684.69" y1="586.36" x2="673.53" y2="586.36" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1082.81" y1="830.15" x2="1090.18" y2="842.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1082.81" y1="842.62" x2="1082.98" y2="842.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1082.98" y1="842.92" x2="1090.18" y2="842.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1090.18" y1="842.92" x2="1090.18" y2="744.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1082.98" y1="744.92" x2="1082.98" y2="842.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1082.81" y1="732.15" x2="1090.18" y2="744.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1082.81" y1="744.62" x2="1082.98" y2="744.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
+    <line x1="1090.18" y1="744.92" x2="1082.98" y2="744.92" stroke="#8fa8c4" stroke-width="0.45" stroke-opacity="0.550" fill="none" />
   </g>
   <g id="debug-labels">
-    <text x="710.71" y="495.19" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E0</text>
-    <text x="780.56" y="380.49" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E1</text>
-    <text x="656.56" y="265.79" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E2</text>
-    <text x="532.56" y="294.31" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E3</text>
-    <text x="801.46" y="746.15" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E4</text>
-    <text x="925.46" y="631.45" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E5</text>
-    <text x="801.46" y="516.75" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E6</text>
-    <text x="677.46" y="631.45" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E7</text>
-    <text x="853.01" y="620.67" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E9</text>
-    <text x="853.01" y="391.27" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E10</text>
-    <text x="605.01" y="391.27" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E11</text>
-    <text x="431.28" y="322.83" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E2</text>
-    <text x="321.23" y="417.38" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E3</text>
-    <text x="562.20" y="738.67" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E4</text>
-    <text x="672.25" y="644.12" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E5</text>
-    <text x="562.20" y="549.57" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E6</text>
-    <text x="452.15" y="644.12" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E7</text>
-    <text x="386.69" y="625.30" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E8</text>
-    <text x="606.79" y="436.20" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E10</text>
-    <text x="386.69" y="436.20" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E11</text>
-    <text x="429.00" y="317.94" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E0</text>
-    <text x="429.00" y="308.02" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E2</text>
-    <text x="564.49" y="552.61" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E4</text>
-    <text x="564.49" y="542.69" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E6</text>
-    <text x="379.87" y="435.27" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E8</text>
-    <text x="613.61" y="435.27" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E9</text>
-    <text x="613.61" y="425.35" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E10</text>
-    <text x="379.87" y="425.35" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E11</text>
-    <text x="452.67" y="480.65" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E2</text>
-    <text x="423.22" y="584.19" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E3</text>
-    <text x="481.91" y="738.36" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E4</text>
-    <text x="511.36" y="634.82" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E5</text>
-    <text x="481.91" y="531.28" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E6</text>
-    <text x="452.46" y="634.82" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E7</text>
-    <text x="437.84" y="713.05" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E8</text>
-    <text x="496.74" y="505.97" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E10</text>
-    <text x="437.84" y="505.97" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_corner_pavilion:E11</text>
-    <text x="586.72" y="522.77" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_south_cap:E2</text>
-    <text x="562.32" y="566.22" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_south_cap:E4</text>
-    <text x="562.32" y="543.90" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_south_cap:E6</text>
-    <text x="442.09" y="354.45" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E0</text>
-    <text x="442.09" y="333.37" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E2</text>
-    <text x="464.97" y="394.08" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E4</text>
-    <text x="464.97" y="373.00" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E6</text>
-    <text x="405.48" y="374.26" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E8</text>
-    <text x="501.58" y="374.26" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E9</text>
-    <text x="501.58" y="353.18" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E10</text>
-    <text x="405.48" y="353.18" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E11</text>
-    <text x="331.98" y="439.01" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E1</text>
-    <text x="327.64" y="439.01" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E3</text>
-    <text x="343.17" y="458.39" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E5</text>
-    <text x="338.83" y="458.39" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E7</text>
-    <text x="356.89" y="482.16" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_2:E1</text>
-    <text x="352.55" y="482.16" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_2:E3</text>
-    <text x="368.08" y="501.53" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_2:E5</text>
-    <text x="363.74" y="501.53" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_2:E7</text>
-    <text x="381.81" y="525.31" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_3:E1</text>
-    <text x="377.47" y="525.31" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_3:E3</text>
-    <text x="392.99" y="544.68" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_3:E5</text>
-    <text x="388.65" y="544.68" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_3:E7</text>
-    <text x="406.72" y="568.45" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_4:E1</text>
-    <text x="402.38" y="568.45" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_4:E3</text>
-    <text x="417.90" y="587.83" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_4:E5</text>
-    <text x="413.56" y="587.83" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_4:E7</text>
-    <text x="428.58" y="606.32" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_5:E1</text>
-    <text x="424.24" y="606.32" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_5:E3</text>
-    <text x="439.76" y="625.69" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_5:E5</text>
-    <text x="435.42" y="625.69" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_5:E7</text>
-    <text x="612.26" y="445.45" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_court_cornice:E10</text>
-    <text x="672.33" y="643.62" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_court_pilaster_5:E5</text>
-    <text x="684.69" y="662.31" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_inner_return_shadow:E5</text>
-    <text x="673.53" y="662.31" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_inner_return_shadow:E7</text>
+    <text x="1010.78" y="523.67" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E0</text>
+    <text x="1055.85" y="449.67" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E1</text>
+    <text x="975.85" y="375.67" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E2</text>
+    <text x="1104.26" y="685.58" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E4</text>
+    <text x="1149.33" y="611.58" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E5</text>
+    <text x="1069.33" y="537.58" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E6</text>
+    <text x="1102.59" y="604.63" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E9</text>
+    <text x="1102.59" y="456.63" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E10</text>
+    <text x="942.59" y="456.63" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_shoulder_ref:E11</text>
+    <text x="764.11" y="321.72" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E2</text>
+    <text x="679.11" y="382.72" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E3</text>
+    <text x="1018.41" y="848.49" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E4</text>
+    <text x="1082.81" y="787.49" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E5</text>
+    <text x="1018.41" y="726.49" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E6</text>
+    <text x="912.81" y="787.49" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E7</text>
+    <text x="795.96" y="646.10" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E8</text>
+    <text x="965.96" y="524.10" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E10</text>
+    <text x="795.96" y="524.10" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_mass:E11</text>
+    <text x="762.22" y="317.65" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E0</text>
+    <text x="762.22" y="311.65" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E2</text>
+    <text x="999.69" y="728.95" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E4</text>
+    <text x="999.69" y="722.95" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E6</text>
+    <text x="791.16" y="523.30" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E8</text>
+    <text x="970.76" y="523.30" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E9</text>
+    <text x="970.76" y="517.30" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E10</text>
+    <text x="791.16" y="517.30" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof:E11</text>
+    <text x="971.56" y="529.50" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_court_cornice:E10</text>
+    <text x="1014.70" y="710.55" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_south_cap:E2</text>
+    <text x="998.77" y="738.35" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_south_cap:E4</text>
+    <text x="998.77" y="724.75" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_south_cap:E6</text>
+    <text x="913.51" y="683.67" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E2</text>
+    <text x="893.51" y="749.27" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E3</text>
+    <text x="934.01" y="850.37" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E4</text>
+    <text x="954.01" y="784.77" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E5</text>
+    <text x="934.01" y="719.17" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E6</text>
+    <text x="914.01" y="784.77" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E7</text>
+    <text x="903.76" y="832.62" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E8</text>
+    <text x="943.76" y="701.42" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E10</text>
+    <text x="903.76" y="701.42" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_front_return_pavilion:E11</text>
+    <text x="810.65" y="410.65" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E0</text>
+    <text x="810.65" y="397.05" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E2</text>
+    <text x="845.83" y="471.58" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E4</text>
+    <text x="845.83" y="457.98" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E6</text>
+    <text x="797.24" y="441.11" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E8</text>
+    <text x="859.24" y="441.11" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E9</text>
+    <text x="859.24" y="427.51" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E10</text>
+    <text x="797.24" y="427.51" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_roof_monitor:E11</text>
+    <text x="695.17" y="414.77" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E1</text>
+    <text x="692.37" y="414.77" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E3</text>
+    <text x="702.06" y="426.70" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E5</text>
+    <text x="699.26" y="426.70" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_1:E7</text>
+    <text x="840.76" y="666.95" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_7:E1</text>
+    <text x="837.96" y="666.95" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_7:E3</text>
+    <text x="847.65" y="678.88" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_7:E5</text>
+    <text x="844.85" y="678.88" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_7:E7</text>
+    <text x="865.03" y="708.97" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_8:E1</text>
+    <text x="862.23" y="708.97" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_8:E3</text>
+    <text x="871.91" y="720.90" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_8:E5</text>
+    <text x="869.11" y="720.90" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_8:E7</text>
+    <text x="889.29" y="750.99" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_9:E1</text>
+    <text x="886.49" y="750.99" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_9:E3</text>
+    <text x="896.18" y="762.92" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_9:E5</text>
+    <text x="893.38" y="762.92" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_west_window_9:E7</text>
+    <text x="1090.18" y="793.92" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_inner_return_shadow:E5</text>
+    <text x="1082.98" y="793.92" font-size="11.0" fill="#ffd66e" stroke="#071019" stroke-width="2.2" paint-order="stroke" text-anchor="middle" dominant-baseline="middle">left_wing_inner_return_shadow:E7</text>
   </g>
 </svg>

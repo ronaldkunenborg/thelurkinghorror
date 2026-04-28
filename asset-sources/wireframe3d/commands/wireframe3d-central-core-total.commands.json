@@ -1,0 +1,2769 @@
+{
+  "": "../../../docs/wireframe3d-command.schema.json",
+  "commands": [
+    {
+      "op": "create_scene",
+      "overrides": {
+        "meta": {
+          "name": "central-core-total-wireframe",
+          "units": "meters",
+          "sourceReferences": [
+            "data/blueprint_campus_central_complex.jpg",
+            "data/booklet-page3.png",
+            "wireframe3d-central-dome-left-wing.commands.json",
+            "wireframe3d-central-dome-core.commands.json",
+            "wireframe3d-central-dome-right-wing.commands.json"
+          ],
+          "componentSources": {
+            "leftWing": "wireframe3d-central-dome-left-wing.commands.json",
+            "core": "wireframe3d-central-dome-core.commands.json",
+            "rightWing": "wireframe3d-central-dome-right-wing.commands.json"
+          },
+          "designIntent": "Combined Central Complex wireframe: central core plus left and right wings in one building, preserving the current proportions and component-specific details."
+        },
+        "camera": {
+          "projection": "tile_oblique",
+          "width": 1600,
+          "height": 980,
+          "scale": 31,
+          "yScale": 1,
+          "offsetX": 0,
+          "offsetY": 150,
+          "oblique": {
+            "zDx": 0.5,
+            "zDy": 0.866,
+            "zScale": 0.82
+          },
+          "isometric": {
+            "yawDeg": 0,
+            "pitchDeg": 30
+          },
+          "rotationDeg": [
+            0,
+            0,
+            0
+          ]
+        },
+        "style": {
+          "background": "#06090f",
+          "stroke": "#e6f0ff",
+          "strokeWidth": 1.1,
+          "strokeOpacity": 0.95,
+          "strokeDasharray": ""
+        }
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_mass",
+      "type": "rectangle",
+      "params": {
+        "width": 4.25,
+        "height": 3.05,
+        "depth": 14.25
+      },
+      "transform": {
+        "translate": [
+          -11.425,
+          1.9,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#d7e7fa",
+        "strokeWidth": 0.95
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_roof",
+      "type": "rectangle",
+      "params": {
+        "width": 4.49,
+        "height": 0.15,
+        "depth": 14.479839
+      },
+      "transform": {
+        "translate": [
+          -11.425,
+          3.52,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#bcd6ef",
+        "strokeWidth": 0.82
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_plinth",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.28,
+        "depth": 13.905242
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          0.41,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_cornice",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.22,
+        "depth": 14.035484
+      },
+      "transform": {
+        "translate": [
+          -9.22,
+          3.18,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.64
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_south_cap",
+      "type": "rectangle",
+      "params": {
+        "width": 4.49,
+        "height": 0.34,
+        "depth": 0.5
+      },
+      "transform": {
+        "translate": [
+          -11.425,
+          3.34,
+          8.028468
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.74
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_north_cap",
+      "type": "rectangle",
+      "params": {
+        "width": 4.49,
+        "height": 0.28,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -11.425,
+          3.24,
+          -5.861452
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_front_return_pavilion",
+      "type": "rectangle",
+      "params": {
+        "width": 1,
+        "height": 3.28,
+        "depth": 1.25
+      },
+      "transform": {
+        "translate": [
+          -13.05,
+          2.02,
+          7.668387
+        ]
+      },
+      "style": {
+        "stroke": "#e1edf9",
+        "strokeWidth": 0.84
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_roof_monitor",
+      "type": "rectangle",
+      "params": {
+        "width": 1.55,
+        "height": 0.34,
+        "depth": 2.145161
+      },
+      "transform": {
+        "translate": [
+          -11.675,
+          3.82,
+          -1.509839
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.64
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -4.750565
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -5.072339
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -5.072339
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          -3.625887
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          -3.947661
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          -3.947661
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          3.122944
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          2.801169
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          2.801169
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          4.247621
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          3.925847
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          3.925847
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          5.373065
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          5.05129
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          5.05129
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          6.497742
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          6.175968
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          6.175968
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_pilaster_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.55,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          -9.18,
+          1.72,
+          7.622419
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.48
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_lower_window_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.36
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.5,
+          7.300645
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.6
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_court_upper_window_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.56,
+        "depth": 0.32
+      },
+      "transform": {
+        "translate": [
+          -9.155,
+          2.58,
+          7.300645
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.46
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13.6,
+          1.82,
+          -4.804194
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_7",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13.6,
+          1.82,
+          4.07371
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_8",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13.6,
+          1.82,
+          5.553105
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_west_window_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.5,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          -13.6,
+          1.82,
+          7.0325
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_wing_inner_return_shadow",
+      "type": "rectangle",
+      "params": {
+        "width": 0.18,
+        "height": 2.45,
+        "depth": 0.62
+      },
+      "transform": {
+        "translate": [
+          -9.16,
+          1.66,
+          7.798629
+        ]
+      },
+      "style": {
+        "stroke": "#8fa8c4",
+        "strokeWidth": 0.45,
+        "strokeOpacity": 0.55
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "ground_plinth",
+      "type": "rectangle",
+      "params": {
+        "width": 18.6,
+        "height": 0.42,
+        "depth": 11.8
+      },
+      "transform": {
+        "translate": [
+          0,
+          0.21,
+          0
+        ]
+      },
+      "style": {
+        "stroke": "#8eb4d8",
+        "strokeWidth": 1
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "main_hall_mass",
+      "type": "rectangle",
+      "params": {
+        "width": 11.2,
+        "height": 5.1,
+        "depth": 7.4
+      },
+      "transform": {
+        "translate": [
+          0,
+          2.97,
+          -0.45
+        ]
+      },
+      "style": {
+        "stroke": "#f3f8ff",
+        "strokeWidth": 1.24
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_attic_wall",
+      "type": "rectangle",
+      "params": {
+        "width": 11.55,
+        "height": 1.1,
+        "depth": 0.18
+      },
+      "transform": {
+        "translate": [
+          0,
+          4.96,
+          3.42
+        ]
+      },
+      "style": {
+        "stroke": "#eef6ff",
+        "strokeWidth": 1.02
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_entablature_band",
+      "type": "rectangle",
+      "params": {
+        "width": 11.85,
+        "height": 0.28,
+        "depth": 0.22
+      },
+      "transform": {
+        "translate": [
+          0,
+          4.08,
+          3.52
+        ]
+      },
+      "style": {
+        "stroke": "#f4f9ff",
+        "strokeWidth": 1.08
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_back_wall",
+      "type": "rectangle",
+      "params": {
+        "width": 7.35,
+        "height": 3.08,
+        "depth": 0.12
+      },
+      "transform": {
+        "translate": [
+          0,
+          2.28,
+          4.18
+        ]
+      },
+      "style": {
+        "stroke": "#b8cde4",
+        "strokeWidth": 0.82,
+        "strokeOpacity": 0.72
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.58,
+        "height": 2.55,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -2.85,
+          2.26,
+          4.28
+        ]
+      },
+      "style": {
+        "stroke": "#cfe8ff",
+        "strokeWidth": 0.78
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.58,
+        "height": 2.55,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -1.72,
+          2.26,
+          4.28
+        ]
+      },
+      "style": {
+        "stroke": "#cfe8ff",
+        "strokeWidth": 0.78
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.58,
+        "height": 2.55,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -0.58,
+          2.26,
+          4.28
+        ]
+      },
+      "style": {
+        "stroke": "#cfe8ff",
+        "strokeWidth": 0.78
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.58,
+        "height": 2.55,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          0.58,
+          2.26,
+          4.28
+        ]
+      },
+      "style": {
+        "stroke": "#cfe8ff",
+        "strokeWidth": 0.78
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_window_5",
+      "type": "rectangle",
+      "params": {
+        "width": 0.58,
+        "height": 2.55,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          1.72,
+          2.26,
+          4.28
+        ]
+      },
+      "style": {
+        "stroke": "#cfe8ff",
+        "strokeWidth": 0.78
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_window_6",
+      "type": "rectangle",
+      "params": {
+        "width": 0.58,
+        "height": 2.55,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          2.85,
+          2.26,
+          4.28
+        ]
+      },
+      "style": {
+        "stroke": "#cfe8ff",
+        "strokeWidth": 0.78
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_facade_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.3,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -4.9,
+          2.25,
+          3.55
+        ]
+      },
+      "style": {
+        "stroke": "#b9d7f2",
+        "strokeWidth": 0.72
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_facade_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.3,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -4.12,
+          2.25,
+          3.55
+        ]
+      },
+      "style": {
+        "stroke": "#b9d7f2",
+        "strokeWidth": 0.72
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_facade_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.3,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          4.12,
+          2.25,
+          3.55
+        ]
+      },
+      "style": {
+        "stroke": "#b9d7f2",
+        "strokeWidth": 0.72
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_facade_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.3,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          4.9,
+          2.25,
+          3.55
+        ]
+      },
+      "style": {
+        "stroke": "#b9d7f2",
+        "strokeWidth": 0.72
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_portico_floor",
+      "type": "rectangle",
+      "params": {
+        "width": 8.8,
+        "height": 0.28,
+        "depth": 2.4
+      },
+      "transform": {
+        "translate": [
+          0,
+          0.56,
+          4.55
+        ]
+      },
+      "style": {
+        "stroke": "#bad4ee",
+        "strokeWidth": 0.95
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_stair_lower",
+      "type": "rectangle",
+      "params": {
+        "width": 7.2,
+        "height": 0.18,
+        "depth": 0.9
+      },
+      "transform": {
+        "translate": [
+          0,
+          0.25,
+          6.62
+        ]
+      },
+      "style": {
+        "stroke": "#8fbce6",
+        "strokeWidth": 0.86,
+        "strokeOpacity": 0.78
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_stair_mid",
+      "type": "rectangle",
+      "params": {
+        "width": 6.4,
+        "height": 0.18,
+        "depth": 0.7
+      },
+      "transform": {
+        "translate": [
+          0,
+          0.43,
+          6.08
+        ]
+      },
+      "style": {
+        "stroke": "#8fbce6",
+        "strokeWidth": 0.82,
+        "strokeOpacity": 0.76
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_portico_roof",
+      "type": "rectangle",
+      "params": {
+        "width": 8.95,
+        "height": 0.18,
+        "depth": 3.15
+      },
+      "transform": {
+        "translate": [
+          0,
+          3.98,
+          4.88
+        ]
+      },
+      "style": {
+        "stroke": "#f4f9ff",
+        "strokeWidth": 1.16
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_pediment_base",
+      "type": "rectangle",
+      "params": {
+        "width": 7.85,
+        "height": 0.42,
+        "depth": 1.2
+      },
+      "transform": {
+        "translate": [
+          0,
+          4.33,
+          5.22
+        ]
+      },
+      "style": {
+        "stroke": "#dcecff",
+        "strokeWidth": 1.08
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "portico_pediment_cap",
+      "type": "parallelogram",
+      "params": {
+        "width": 7.15,
+        "height": 0.28,
+        "depth": 0.9
+      },
+      "transform": {
+        "translate": [
+          0,
+          4.86,
+          5.2
+        ]
+      },
+      "style": {
+        "stroke": "#cfe3fa",
+        "strokeWidth": 0.98,
+        "strokeOpacity": 0.9
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_1",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          -3.18,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_2",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          -2.27,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_3",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          -1.36,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_4",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          -0.45,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_5",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          0.45,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_6",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          1.36,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_7",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          2.27,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "front_column_8",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.17,
+        "height": 3.42,
+        "segments": 14
+      },
+      "transform": {
+        "translate": [
+          3.18,
+          2.41,
+          5.36
+        ]
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_shoulder",
+      "type": "rectangle",
+      "params": {
+        "width": 4,
+        "height": 3.7,
+        "depth": 5.7
+      },
+      "transform": {
+        "translate": [
+          -7.3,
+          2.25,
+          -0.33
+        ]
+      },
+      "style": {
+        "stroke": "#dbeafe",
+        "strokeWidth": 1
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_shoulder",
+      "type": "rectangle",
+      "params": {
+        "width": 4,
+        "height": 3.7,
+        "depth": 5.7
+      },
+      "transform": {
+        "translate": [
+          7.3,
+          2.25,
+          -0.33
+        ]
+      },
+      "style": {
+        "stroke": "#dbeafe",
+        "strokeWidth": 1
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_shoulder_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.05,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -8.45,
+          2.2,
+          2.58
+        ]
+      },
+      "style": {
+        "stroke": "#b7d4ed",
+        "strokeWidth": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_shoulder_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.05,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -7.3,
+          2.2,
+          2.58
+        ]
+      },
+      "style": {
+        "stroke": "#b7d4ed",
+        "strokeWidth": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_shoulder_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.05,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          -6.15,
+          2.2,
+          2.58
+        ]
+      },
+      "style": {
+        "stroke": "#b7d4ed",
+        "strokeWidth": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_shoulder_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.05,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          6.15,
+          2.2,
+          2.58
+        ]
+      },
+      "style": {
+        "stroke": "#b7d4ed",
+        "strokeWidth": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_shoulder_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.05,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          7.3,
+          2.2,
+          2.58
+        ]
+      },
+      "style": {
+        "stroke": "#b7d4ed",
+        "strokeWidth": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_shoulder_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.5,
+        "height": 2.05,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          8.45,
+          2.2,
+          2.58
+        ]
+      },
+      "style": {
+        "stroke": "#b7d4ed",
+        "strokeWidth": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "left_link_roof",
+      "type": "rectangle",
+      "params": {
+        "width": 3.85,
+        "height": 0.16,
+        "depth": 1.75
+      },
+      "transform": {
+        "translate": [
+          -4.72,
+          4.12,
+          2.78
+        ]
+      },
+      "style": {
+        "stroke": "#bcd6ef",
+        "strokeWidth": 0.92
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_link_roof",
+      "type": "rectangle",
+      "params": {
+        "width": 3.85,
+        "height": 0.16,
+        "depth": 1.75
+      },
+      "transform": {
+        "translate": [
+          4.72,
+          4.12,
+          2.78
+        ]
+      },
+      "style": {
+        "stroke": "#bcd6ef",
+        "strokeWidth": 0.92
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "dome_tambour",
+      "type": "cylinder",
+      "params": {
+        "radius": 2.82,
+        "height": 0.72,
+        "segments": 30
+      },
+      "transform": {
+        "translate": [
+          0,
+          5.88,
+          -0.55
+        ]
+      },
+      "style": {
+        "stroke": "#d7e6f8",
+        "strokeWidth": 1.12
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "dome_drum",
+      "type": "cylinder",
+      "params": {
+        "radius": 2.42,
+        "height": 0.36,
+        "segments": 22
+      },
+      "transform": {
+        "translate": [
+          0,
+          6.42,
+          -0.55
+        ]
+      },
+      "style": {
+        "stroke": "#dcecff",
+        "strokeWidth": 1.15
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "dome_cap",
+      "type": "globe",
+      "params": {
+        "radius": 2.52,
+        "latSegments": 11,
+        "lonSegments": 18,
+        "latStart": 0,
+        "latEnd": 90,
+        "lonStart": 0,
+        "lonEnd": 360
+      },
+      "transform": {
+        "translate": [
+          0,
+          6.55,
+          -0.55
+        ],
+        "scale": [
+          1.08,
+          0.48,
+          0.94
+        ]
+      },
+      "style": {
+        "stroke": "#f2f8ff",
+        "strokeWidth": 1.18
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "lantern_base",
+      "type": "cylinder",
+      "params": {
+        "radius": 0.24,
+        "height": 0.22,
+        "segments": 16
+      },
+      "transform": {
+        "translate": [
+          0,
+          7.88,
+          -0.55
+        ]
+      },
+      "style": {
+        "stroke": "#bfe2ff",
+        "strokeWidth": 0.98
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "lantern_cap",
+      "type": "globe",
+      "params": {
+        "radius": 0.3,
+        "latSegments": 7,
+        "lonSegments": 14,
+        "latStart": 0,
+        "latEnd": 90,
+        "lonStart": 0,
+        "lonEnd": 360
+      },
+      "transform": {
+        "translate": [
+          0,
+          8.03,
+          -0.55
+        ],
+        "scale": [
+          1,
+          0.46,
+          1
+        ]
+      },
+      "style": {
+        "stroke": "#9fd9ff",
+        "strokeWidth": 0.94
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "rear_hall_ridge",
+      "type": "rectangle",
+      "params": {
+        "width": 7.2,
+        "height": 0.24,
+        "depth": 1.7
+      },
+      "transform": {
+        "translate": [
+          0,
+          4.88,
+          -3.28
+        ]
+      },
+      "style": {
+        "stroke": "#b6cde6",
+        "strokeWidth": 0.92,
+        "strokeOpacity": 0.86
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_mass",
+      "type": "rectangle",
+      "params": {
+        "width": 4.25,
+        "height": 2.92,
+        "depth": 14.25
+      },
+      "transform": {
+        "translate": [
+          11.425,
+          1.82,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#d7e7fa",
+        "strokeWidth": 0.95
+      }
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_roof",
+      "type": "rectangle",
+      "params": {
+        "width": 4.49,
+        "height": 0.15,
+        "depth": 14.479839
+      },
+      "transform": {
+        "translate": [
+          11.425,
+          3.36,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#bcd6ef",
+        "strokeWidth": 0.82
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_plinth",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.28,
+        "depth": 13.905242
+      },
+      "transform": {
+        "translate": [
+          9.22,
+          0.41,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_cornice",
+      "type": "rectangle",
+      "params": {
+        "width": 0.12,
+        "height": 0.22,
+        "depth": 14.035484
+      },
+      "transform": {
+        "translate": [
+          9.22,
+          3.02,
+          1.095
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.64
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_south_cap",
+      "type": "rectangle",
+      "params": {
+        "width": 4.49,
+        "height": 0.34,
+        "depth": 0.5
+      },
+      "transform": {
+        "translate": [
+          11.425,
+          3.2,
+          8.028468
+        ]
+      },
+      "style": {
+        "stroke": "#c8dcf0",
+        "strokeWidth": 0.74
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_north_cap",
+      "type": "rectangle",
+      "params": {
+        "width": 4.49,
+        "height": 0.28,
+        "depth": 0.42
+      },
+      "transform": {
+        "translate": [
+          11.425,
+          3.1,
+          -5.861452
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_roof_step_1",
+      "type": "rectangle",
+      "params": {
+        "width": 3.7,
+        "height": 0.24,
+        "depth": 11.951613
+      },
+      "transform": {
+        "translate": [
+          11.425,
+          3.58,
+          0.826855
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.68
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_roof_step_2",
+      "type": "rectangle",
+      "params": {
+        "width": 2.9,
+        "height": 0.22,
+        "depth": 9.653226
+      },
+      "transform": {
+        "translate": [
+          11.505,
+          3.8,
+          0.482097
+        ]
+      },
+      "style": {
+        "stroke": "#9bb8d3",
+        "strokeWidth": 0.62
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_terminal_portal",
+      "type": "rectangle",
+      "params": {
+        "width": 0.08,
+        "height": 1.72,
+        "depth": 0.54
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.55,
+          7.607097
+        ]
+      },
+      "style": {
+        "stroke": "#c6e4ff",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          -4.957419
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          -5.263871
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          -5.263871
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          -4.057218
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          -4.363669
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          -4.363669
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          -3.463468
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          -3.463468
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          3.144395
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          2.837944
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          2.837944
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          4.044597
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          3.738145
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          3.738145
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          4.944798
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          4.638347
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          4.638347
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_13",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          5.845
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_13",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          5.538548
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_13",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          5.538548
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_14",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          6.745202
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_14",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          6.43875
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_14",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          6.43875
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_pilaster_15",
+      "type": "rectangle",
+      "params": {
+        "width": 0.1,
+        "height": 2.45,
+        "depth": 0.08
+      },
+      "transform": {
+        "translate": [
+          9.18,
+          1.65,
+          7.645403
+        ]
+      },
+      "style": {
+        "stroke": "#d9e8f6",
+        "strokeWidth": 0.47
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_lower_window_15",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.34,
+        "depth": 0.34
+      },
+      "transform": {
+        "translate": [
+          9.16,
+          1.45,
+          7.338952
+        ]
+      },
+      "style": {
+        "stroke": "#b8d8f4",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_court_upper_window_15",
+      "type": "rectangle",
+      "params": {
+        "width": 0.065,
+        "height": 0.52,
+        "depth": 0.3
+      },
+      "transform": {
+        "translate": [
+          9.155,
+          2.44,
+          7.338952
+        ]
+      },
+      "style": {
+        "stroke": "#a9c3dd",
+        "strokeWidth": 0.45
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_east_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          13.6,
+          1.68,
+          -4.995726
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_east_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          13.6,
+          1.68,
+          -3.895565
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_east_window_9",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          13.6,
+          1.68,
+          3.807863
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_east_window_10",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          13.6,
+          1.68,
+          4.908024
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_east_window_11",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          13.6,
+          1.68,
+          6.008952
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_east_window_12",
+      "type": "rectangle",
+      "params": {
+        "width": 0.07,
+        "height": 1.42,
+        "depth": 0.44
+      },
+      "transform": {
+        "translate": [
+          13.6,
+          1.68,
+          7.109113
+        ]
+      },
+      "style": {
+        "stroke": "#9fc1df",
+        "strokeWidth": 0.5,
+        "strokeOpacity": 0.7
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_south_window_1",
+      "type": "rectangle",
+      "params": {
+        "width": 0.48,
+        "height": 1.28,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          10.225,
+          1.65,
+          8.28129
+        ]
+      },
+      "style": {
+        "stroke": "#c6e4ff",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_south_window_2",
+      "type": "rectangle",
+      "params": {
+        "width": 0.48,
+        "height": 1.28,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          11.025,
+          1.65,
+          8.28129
+        ]
+      },
+      "style": {
+        "stroke": "#c6e4ff",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_south_window_3",
+      "type": "rectangle",
+      "params": {
+        "width": 0.48,
+        "height": 1.28,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          11.825,
+          1.65,
+          8.28129
+        ]
+      },
+      "style": {
+        "stroke": "#c6e4ff",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "add_primitive",
+      "id": "right_wing_south_window_4",
+      "type": "rectangle",
+      "params": {
+        "width": 0.48,
+        "height": 1.28,
+        "depth": 0.07
+      },
+      "transform": {
+        "translate": [
+          12.625,
+          1.65,
+          8.28129
+        ]
+      },
+      "style": {
+        "stroke": "#c6e4ff",
+        "strokeWidth": 0.58
+      },
+      "occluder": false
+    },
+    {
+      "op": "export_svg",
+      "options": {
+        "hiddenEdges": "partial"
+      }
+    }
+  ]
+}

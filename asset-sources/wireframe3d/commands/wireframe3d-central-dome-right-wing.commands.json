@@ -23,7 +23,7 @@
               "J7 Fruits and Nuts"
             ],
             "interpretation": "Right wing is the longer Chemistry/Alchemy/Lab side in column J, extending farther south from the H6 dome core.",
-            "modelScaleNote": "Wing model length is intentionally architectural rather than tile-count literal: each wing runs 18.6m north-south, matching the central core width so the Central Complex reads as a square campus block."
+            "modelScaleNote": "Right wing total Z-span is 14.25m, divided into five 2.85m parts; the unchanged shoulder aligns to parts 2 and 3."
           },
           "attachmentContract": {
             "shoulderSource": "wireframe3d-central-dome-core.commands.json",
@@ -48,23 +48,66 @@
               "center": [
                 11.425,
                 1.82,
-                -3.4
+                1.095
               ],
               "size": {
                 "width": 4.25,
                 "height": 2.92,
-                "depth": 18.6
+                "depth": 14.25
               },
               "attachesTo": "right_shoulder_ref east side",
               "westEdge": 9.3,
-              "frontZ": 5.9,
-              "rearZ": -12.7
+              "frontZ": 8.22,
+              "rearZ": -6.03,
+              "segmentZ": {
+                "count": 5,
+                "partDepth": 2.85,
+                "shoulderParts": [
+                  2,
+                  3
+                ],
+                "part2RearZ": -3.18,
+                "part3FrontZ": 2.52
+              },
+              "detailExclusionZone": {
+                "reason": "No windows or pilasters where the fixed shoulder attaches to wing parts 2 and 3.",
+                "rearZ": -3.18,
+                "frontZ": 2.52,
+                "removedDetailIds": [
+                  "right_wing_court_pilaster_3",
+                  "right_wing_court_pilaster_4",
+                  "right_wing_court_lower_window_4",
+                  "right_wing_court_upper_window_4",
+                  "right_wing_court_pilaster_5",
+                  "right_wing_court_lower_window_5",
+                  "right_wing_court_upper_window_5",
+                  "right_wing_court_pilaster_6",
+                  "right_wing_court_lower_window_6",
+                  "right_wing_court_upper_window_6",
+                  "right_wing_court_pilaster_7",
+                  "right_wing_court_lower_window_7",
+                  "right_wing_court_upper_window_7",
+                  "right_wing_court_pilaster_8",
+                  "right_wing_court_lower_window_8",
+                  "right_wing_court_upper_window_8",
+                  "right_wing_court_pilaster_9",
+                  "right_wing_court_lower_window_9",
+                  "right_wing_court_upper_window_9",
+                  "right_wing_east_window_3",
+                  "right_wing_east_window_4",
+                  "right_wing_east_window_5",
+                  "right_wing_east_window_6",
+                  "right_wing_east_window_7",
+                  "right_wing_east_window_8"
+                ]
+              },
+              "removedRightFrontPavilion": "right_wing_terminal_pavilion removed; the front-right corner should remain part of the plain wing mass."
             }
           },
-          "designIntent": "Separate right wing for the Central Complex. The wing is intentionally lengthened to match the 18.6m central core width, so the east-side Chemistry/Alchemy/Lab range reads as one long side of the square Central Complex rather than a small appendage beside the shoulder.",
+          "designIntent": "Separate right wing for the Central Complex. The wing is 2.5x the shoulder depth over Z, and the fixed shoulder aligns with wing parts 2 and 3 of five equal Z segments.",
           "photoInterpretation": {
             "courtyardPhoto": "Snowy plaza view of the right wing: longer and more repetitive than the left wing, with many inward-facing bay divisions and a heavier terminal pavilion at the far end.",
-            "modelResponse": "Lengthens the inward courtyard-facing facade to central-core width, with denser repeated bays and a stronger terminal pavilion than the left wing."
+            "modelResponse": "Keeps the corrected wing footprint and shoulder gap clean, without a separate right-front terminal pavilion."
           }
         },
         "camera": {
@@ -130,13 +173,13 @@
       "params": {
         "width": 4.25,
         "height": 2.92,
-        "depth": 18.6
+        "depth": 14.25
       },
       "transform": {
         "translate": [
           11.425,
           1.82,
-          -3.4
+          1.095
         ]
       },
       "style": {
@@ -151,13 +194,13 @@
       "params": {
         "width": 4.49,
         "height": 0.15,
-        "depth": 18.900000000000002
+        "depth": 14.479839
       },
       "transform": {
         "translate": [
           11.425,
           3.36,
-          -3.4
+          1.095
         ]
       },
       "style": {
@@ -173,13 +216,13 @@
       "params": {
         "width": 0.12,
         "height": 0.28,
-        "depth": 18.150000000000002
+        "depth": 13.905242
       },
       "transform": {
         "translate": [
           9.22,
           0.41,
-          -3.4
+          1.095
         ]
       },
       "style": {
@@ -195,13 +238,13 @@
       "params": {
         "width": 0.12,
         "height": 0.22,
-        "depth": 18.32
+        "depth": 14.035484
       },
       "transform": {
         "translate": [
           9.22,
           3.02,
-          -3.4
+          1.095
         ]
       },
       "style": {
@@ -223,7 +266,7 @@
         "translate": [
           11.425,
           3.2,
-          5.65
+          8.028468
         ]
       },
       "style": {
@@ -245,7 +288,7 @@
         "translate": [
           11.425,
           3.1,
-          -12.48
+          -5.861452
         ]
       },
       "style": {
@@ -261,13 +304,13 @@
       "params": {
         "width": 3.7,
         "height": 0.24,
-        "depth": 15.600000000000001
+        "depth": 11.951613
       },
       "transform": {
         "translate": [
           11.425,
           3.58,
-          -3.75
+          0.826855
         ]
       },
       "style": {
@@ -283,13 +326,13 @@
       "params": {
         "width": 2.9,
         "height": 0.22,
-        "depth": 12.600000000000001
+        "depth": 9.653226
       },
       "transform": {
         "translate": [
           11.505,
           3.8,
-          -4.2
+          0.482097
         ]
       },
       "style": {
@@ -297,27 +340,6 @@
         "strokeWidth": 0.62
       },
       "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_terminal_pavilion",
-      "type": "rectangle",
-      "params": {
-        "width": 1.15,
-        "height": 3.25,
-        "depth": 1.35
-      },
-      "transform": {
-        "translate": [
-          12.99,
-          1.94,
-          5.1
-        ]
-      },
-      "style": {
-        "stroke": "#e1edf9",
-        "strokeWidth": 0.86
-      }
     },
     {
       "op": "add_primitive",
@@ -332,7 +354,7 @@
         "translate": [
           9.16,
           1.55,
-          5.1
+          7.607097
         ]
       },
       "style": {
@@ -354,7 +376,7 @@
         "translate": [
           9.18,
           1.65,
-          -11.3
+          -4.957419
         ]
       },
       "style": {
@@ -376,7 +398,7 @@
         "translate": [
           9.16,
           1.45,
-          -11.7
+          -5.263871
         ]
       },
       "style": {
@@ -398,7 +420,7 @@
         "translate": [
           9.155,
           2.44,
-          -11.7
+          -5.263871
         ]
       },
       "style": {
@@ -420,7 +442,7 @@
         "translate": [
           9.18,
           1.65,
-          -10.125
+          -4.057218
         ]
       },
       "style": {
@@ -442,7 +464,7 @@
         "translate": [
           9.16,
           1.45,
-          -10.525
+          -4.363669
         ]
       },
       "style": {
@@ -464,34 +486,12 @@
         "translate": [
           9.155,
           2.44,
-          -10.525
+          -4.363669
         ]
       },
       "style": {
         "stroke": "#a9c3dd",
         "strokeWidth": 0.45
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_pilaster_3",
-      "type": "rectangle",
-      "params": {
-        "width": 0.1,
-        "height": 2.45,
-        "depth": 0.08
-      },
-      "transform": {
-        "translate": [
-          9.18,
-          1.65,
-          -8.95
-        ]
-      },
-      "style": {
-        "stroke": "#d9e8f6",
-        "strokeWidth": 0.47
       },
       "occluder": false
     },
@@ -508,7 +508,7 @@
         "translate": [
           9.16,
           1.45,
-          -9.35
+          -3.463468
         ]
       },
       "style": {
@@ -530,403 +530,7 @@
         "translate": [
           9.155,
           2.44,
-          -9.35
-        ]
-      },
-      "style": {
-        "stroke": "#a9c3dd",
-        "strokeWidth": 0.45
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_pilaster_4",
-      "type": "rectangle",
-      "params": {
-        "width": 0.1,
-        "height": 2.45,
-        "depth": 0.08
-      },
-      "transform": {
-        "translate": [
-          9.18,
-          1.65,
-          -7.775
-        ]
-      },
-      "style": {
-        "stroke": "#d9e8f6",
-        "strokeWidth": 0.47
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_lower_window_4",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.34,
-        "depth": 0.34
-      },
-      "transform": {
-        "translate": [
-          9.16,
-          1.45,
-          -8.175
-        ]
-      },
-      "style": {
-        "stroke": "#b8d8f4",
-        "strokeWidth": 0.58
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_upper_window_4",
-      "type": "rectangle",
-      "params": {
-        "width": 0.065,
-        "height": 0.52,
-        "depth": 0.3
-      },
-      "transform": {
-        "translate": [
-          9.155,
-          2.44,
-          -8.175
-        ]
-      },
-      "style": {
-        "stroke": "#a9c3dd",
-        "strokeWidth": 0.45
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_pilaster_5",
-      "type": "rectangle",
-      "params": {
-        "width": 0.1,
-        "height": 2.45,
-        "depth": 0.08
-      },
-      "transform": {
-        "translate": [
-          9.18,
-          1.65,
-          -6.6
-        ]
-      },
-      "style": {
-        "stroke": "#d9e8f6",
-        "strokeWidth": 0.47
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_lower_window_5",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.34,
-        "depth": 0.34
-      },
-      "transform": {
-        "translate": [
-          9.16,
-          1.45,
-          -7
-        ]
-      },
-      "style": {
-        "stroke": "#b8d8f4",
-        "strokeWidth": 0.58
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_upper_window_5",
-      "type": "rectangle",
-      "params": {
-        "width": 0.065,
-        "height": 0.52,
-        "depth": 0.3
-      },
-      "transform": {
-        "translate": [
-          9.155,
-          2.44,
-          -7
-        ]
-      },
-      "style": {
-        "stroke": "#a9c3dd",
-        "strokeWidth": 0.45
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_pilaster_6",
-      "type": "rectangle",
-      "params": {
-        "width": 0.1,
-        "height": 2.45,
-        "depth": 0.08
-      },
-      "transform": {
-        "translate": [
-          9.18,
-          1.65,
-          -5.425
-        ]
-      },
-      "style": {
-        "stroke": "#d9e8f6",
-        "strokeWidth": 0.47
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_lower_window_6",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.34,
-        "depth": 0.34
-      },
-      "transform": {
-        "translate": [
-          9.16,
-          1.45,
-          -5.825
-        ]
-      },
-      "style": {
-        "stroke": "#b8d8f4",
-        "strokeWidth": 0.58
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_upper_window_6",
-      "type": "rectangle",
-      "params": {
-        "width": 0.065,
-        "height": 0.52,
-        "depth": 0.3
-      },
-      "transform": {
-        "translate": [
-          9.155,
-          2.44,
-          -5.825
-        ]
-      },
-      "style": {
-        "stroke": "#a9c3dd",
-        "strokeWidth": 0.45
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_pilaster_7",
-      "type": "rectangle",
-      "params": {
-        "width": 0.1,
-        "height": 2.45,
-        "depth": 0.08
-      },
-      "transform": {
-        "translate": [
-          9.18,
-          1.65,
-          -4.25
-        ]
-      },
-      "style": {
-        "stroke": "#d9e8f6",
-        "strokeWidth": 0.47
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_lower_window_7",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.34,
-        "depth": 0.34
-      },
-      "transform": {
-        "translate": [
-          9.16,
-          1.45,
-          -4.65
-        ]
-      },
-      "style": {
-        "stroke": "#b8d8f4",
-        "strokeWidth": 0.58
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_upper_window_7",
-      "type": "rectangle",
-      "params": {
-        "width": 0.065,
-        "height": 0.52,
-        "depth": 0.3
-      },
-      "transform": {
-        "translate": [
-          9.155,
-          2.44,
-          -4.65
-        ]
-      },
-      "style": {
-        "stroke": "#a9c3dd",
-        "strokeWidth": 0.45
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_pilaster_8",
-      "type": "rectangle",
-      "params": {
-        "width": 0.1,
-        "height": 2.45,
-        "depth": 0.08
-      },
-      "transform": {
-        "translate": [
-          9.18,
-          1.65,
-          -3.075
-        ]
-      },
-      "style": {
-        "stroke": "#d9e8f6",
-        "strokeWidth": 0.47
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_lower_window_8",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.34,
-        "depth": 0.34
-      },
-      "transform": {
-        "translate": [
-          9.16,
-          1.45,
-          -3.475
-        ]
-      },
-      "style": {
-        "stroke": "#b8d8f4",
-        "strokeWidth": 0.58
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_upper_window_8",
-      "type": "rectangle",
-      "params": {
-        "width": 0.065,
-        "height": 0.52,
-        "depth": 0.3
-      },
-      "transform": {
-        "translate": [
-          9.155,
-          2.44,
-          -3.475
-        ]
-      },
-      "style": {
-        "stroke": "#a9c3dd",
-        "strokeWidth": 0.45
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_pilaster_9",
-      "type": "rectangle",
-      "params": {
-        "width": 0.1,
-        "height": 2.45,
-        "depth": 0.08
-      },
-      "transform": {
-        "translate": [
-          9.18,
-          1.65,
-          -1.9
-        ]
-      },
-      "style": {
-        "stroke": "#d9e8f6",
-        "strokeWidth": 0.47
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_lower_window_9",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.34,
-        "depth": 0.34
-      },
-      "transform": {
-        "translate": [
-          9.16,
-          1.45,
-          -2.3
-        ]
-      },
-      "style": {
-        "stroke": "#b8d8f4",
-        "strokeWidth": 0.58
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_court_upper_window_9",
-      "type": "rectangle",
-      "params": {
-        "width": 0.065,
-        "height": 0.52,
-        "depth": 0.3
-      },
-      "transform": {
-        "translate": [
-          9.155,
-          2.44,
-          -2.3
+          -3.463468
         ]
       },
       "style": {
@@ -948,7 +552,7 @@
         "translate": [
           9.18,
           1.65,
-          -0.725
+          3.144395
         ]
       },
       "style": {
@@ -970,7 +574,7 @@
         "translate": [
           9.16,
           1.45,
-          -1.125
+          2.837944
         ]
       },
       "style": {
@@ -992,7 +596,7 @@
         "translate": [
           9.155,
           2.44,
-          -1.125
+          2.837944
         ]
       },
       "style": {
@@ -1014,7 +618,7 @@
         "translate": [
           9.18,
           1.65,
-          0.45
+          4.044597
         ]
       },
       "style": {
@@ -1036,7 +640,7 @@
         "translate": [
           9.16,
           1.45,
-          0.05
+          3.738145
         ]
       },
       "style": {
@@ -1058,7 +662,7 @@
         "translate": [
           9.155,
           2.44,
-          0.05
+          3.738145
         ]
       },
       "style": {
@@ -1080,7 +684,7 @@
         "translate": [
           9.18,
           1.65,
-          1.625
+          4.944798
         ]
       },
       "style": {
@@ -1102,7 +706,7 @@
         "translate": [
           9.16,
           1.45,
-          1.225
+          4.638347
         ]
       },
       "style": {
@@ -1124,7 +728,7 @@
         "translate": [
           9.155,
           2.44,
-          1.225
+          4.638347
         ]
       },
       "style": {
@@ -1146,7 +750,7 @@
         "translate": [
           9.18,
           1.65,
-          2.8
+          5.845
         ]
       },
       "style": {
@@ -1168,7 +772,7 @@
         "translate": [
           9.16,
           1.45,
-          2.4
+          5.538548
         ]
       },
       "style": {
@@ -1190,7 +794,7 @@
         "translate": [
           9.155,
           2.44,
-          2.4
+          5.538548
         ]
       },
       "style": {
@@ -1212,7 +816,7 @@
         "translate": [
           9.18,
           1.65,
-          3.975
+          6.745202
         ]
       },
       "style": {
@@ -1234,7 +838,7 @@
         "translate": [
           9.16,
           1.45,
-          3.575
+          6.43875
         ]
       },
       "style": {
@@ -1256,7 +860,7 @@
         "translate": [
           9.155,
           2.44,
-          3.575
+          6.43875
         ]
       },
       "style": {
@@ -1278,7 +882,7 @@
         "translate": [
           9.18,
           1.65,
-          5.15
+          7.645403
         ]
       },
       "style": {
@@ -1300,7 +904,7 @@
         "translate": [
           9.16,
           1.45,
-          4.75
+          7.338952
         ]
       },
       "style": {
@@ -1322,7 +926,7 @@
         "translate": [
           9.155,
           2.44,
-          4.75
+          7.338952
         ]
       },
       "style": {
@@ -1344,7 +948,7 @@
         "translate": [
           13.6,
           1.68,
-          -11.35
+          -4.995726
         ]
       },
       "style": {
@@ -1367,145 +971,7 @@
         "translate": [
           13.6,
           1.68,
-          -9.914
-        ]
-      },
-      "style": {
-        "stroke": "#9fc1df",
-        "strokeWidth": 0.5,
-        "strokeOpacity": 0.7
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_east_window_3",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.42,
-        "depth": 0.44
-      },
-      "transform": {
-        "translate": [
-          13.6,
-          1.68,
-          -8.477
-        ]
-      },
-      "style": {
-        "stroke": "#9fc1df",
-        "strokeWidth": 0.5,
-        "strokeOpacity": 0.7
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_east_window_4",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.42,
-        "depth": 0.44
-      },
-      "transform": {
-        "translate": [
-          13.6,
-          1.68,
-          -7.041
-        ]
-      },
-      "style": {
-        "stroke": "#9fc1df",
-        "strokeWidth": 0.5,
-        "strokeOpacity": 0.7
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_east_window_5",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.42,
-        "depth": 0.44
-      },
-      "transform": {
-        "translate": [
-          13.6,
-          1.68,
-          -5.605
-        ]
-      },
-      "style": {
-        "stroke": "#9fc1df",
-        "strokeWidth": 0.5,
-        "strokeOpacity": 0.7
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_east_window_6",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.42,
-        "depth": 0.44
-      },
-      "transform": {
-        "translate": [
-          13.6,
-          1.68,
-          -4.168
-        ]
-      },
-      "style": {
-        "stroke": "#9fc1df",
-        "strokeWidth": 0.5,
-        "strokeOpacity": 0.7
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_east_window_7",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.42,
-        "depth": 0.44
-      },
-      "transform": {
-        "translate": [
-          13.6,
-          1.68,
-          -2.732
-        ]
-      },
-      "style": {
-        "stroke": "#9fc1df",
-        "strokeWidth": 0.5,
-        "strokeOpacity": 0.7
-      },
-      "occluder": false
-    },
-    {
-      "op": "add_primitive",
-      "id": "right_wing_east_window_8",
-      "type": "rectangle",
-      "params": {
-        "width": 0.07,
-        "height": 1.42,
-        "depth": 0.44
-      },
-      "transform": {
-        "translate": [
-          13.6,
-          1.68,
-          -1.295
+          -3.895565
         ]
       },
       "style": {
@@ -1528,7 +994,7 @@
         "translate": [
           13.6,
           1.68,
-          0.141
+          3.807863
         ]
       },
       "style": {
@@ -1551,7 +1017,7 @@
         "translate": [
           13.6,
           1.68,
-          1.577
+          4.908024
         ]
       },
       "style": {
@@ -1574,7 +1040,7 @@
         "translate": [
           13.6,
           1.68,
-          3.014
+          6.008952
         ]
       },
       "style": {
@@ -1597,7 +1063,7 @@
         "translate": [
           13.6,
           1.68,
-          4.45
+          7.109113
         ]
       },
       "style": {
@@ -1620,7 +1086,7 @@
         "translate": [
           10.225,
           1.65,
-          5.98
+          8.28129
         ]
       },
       "style": {
@@ -1642,7 +1108,7 @@
         "translate": [
           11.025,
           1.65,
-          5.98
+          8.28129
         ]
       },
       "style": {
@@ -1664,7 +1130,7 @@
         "translate": [
           11.825,
           1.65,
-          5.98
+          8.28129
         ]
       },
       "style": {
@@ -1686,7 +1152,7 @@
         "translate": [
           12.625,
           1.65,
-          5.98
+          8.28129
         ]
       },
       "style": {
