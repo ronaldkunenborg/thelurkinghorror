@@ -272,56 +272,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 In the map, it needs to snow across the map, on a layer that is drawn in the foreground. The vertical speed with which the snow falls is screenwide, and can vary from time to time but not too often. The wind blows from a certain direction and varies more. This affects horizontal displacement of snowflakes and starts in a given area on the side of the screen, then moves to the other side. Depending on how strong it is it may either reach the other side or peter out while moving.
 In the game, the snow is the same but the layer on which it is drawn is behind everything else.
 
-60. [pending] Add a dedicated architectural outline composition pass for the Central Complex in `src/map-prototype-2.html`, with the visual goal of pulling the campus silhouette closer to the provided blueprint image while being explicitly informed by MIT’s Central Building / Building 10 massing.
-   - Scope: Central Complex only. Keep Brown Building, Computer Center, and Temporary Lab on the existing simpler treatment for this pass.
-   - Motion rule: the architectural shell moves with `L0`/`groundFloorOffsetY` in focus mode, and stays neutral in `all` mode.
-   - Treat the new layer as presentation-only: do not change room positions, exits, layer truth, or traversal topology.
-   - Add a separate architectural shell/composition layer that visually expresses:
-     - a strong central axis
-     - a dome-adjacent central mass
-     - flanking wing masses
-     - courtyard/perimeter enclosure
-     - a front-facing entrance/forebuilding mass
-   - Use MIT Building 10 / Central Building as a near-architectural massing reference:
-     - borrow the central dome composition, axial symmetry, wing rhythm, and institutional courtyard/perimeter logic
-     - do not treat MIT as literal map truth
-     - when outline aesthetics conflict with room truth, room truth wins
-   - Implement the shell as a swappable composition layer that can support both:
-     - raster mode: AI-generated blueprint image aligned into the isometric projection
-     - vector mode: traced/polygonal shell and cutaway shapes in SVG
-   - First-pass workflow should be hybrid:
-     - generate AI blueprint-style reference/asset images for Central Complex
-     - evaluate raster integration first for silhouette/massing fit
-     - keep a clean upgrade path to traced SVG if raster is too soft or inflexible
-   - Add a compact composition model for the shell layer, independent from `ROOM_LAYOUT`, supporting:
-     - outer shell masses
-     - courtyard/cutout regions
-     - central/dome base mass
-     - front entrance mass
-     - wing masses
-     - optional subtle inner architecture traces
-   - Render order:
-     - roads / broad campus masses
-     - Central Complex architectural shell layer
-     - room shadows / room tiles / room labels
-     - exit edges
-     - legend / UI overlays
-   - Line hierarchy:
-     - shell outer contour stronger than shell detail
-     - courtyard/cutaway edges medium
-     - architectural hints subtle
-     - shell must remain subordinate to active room labels and active room contours
-   - AI prompt/output direction for source images:
-     - black-background white-line architectural blueprint / etched style
-     - MIT Central Building / Building 10 inspired composition
-     - dome axis, flanking wings, front entrance body, courtyard readability
-     - no scenery clutter, no people, no fantasy additions
-     - style/composition reference only, not literal floorplan correctness
-   - Acceptance criteria:
-     - in `L0`, Central Complex reads as an MIT-informed campus building mass rather than a single large block
-     - the shell moves coherently with `L0`
-     - room tiles/labels/exits remain readable
-     - no room-truth topology changes are introduced
+60. [pending] Redo the map prototype 2 legend. Use imagegen to create icons for each building from the png overlays, then put those in the legend with the name of each building: Brown Building, Computer Center, Temporary Lab and Central Complex. Street/Road can be left as it is. Add a checkbox to the legend below the building icons to toggle  building outlines and overlays on/off.
 
 61. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
    - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
