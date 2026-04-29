@@ -2164,8 +2164,12 @@
           drawRoadJunctionPatch(roadPolygons, roadOpacityScale);
         }
 
+        drawCentralBuildingIllustration(layerFilter);
+        /*
+        // Legacy split central-building overlays; kept here for quick comparison.
         drawCentralCoreIllustration(layerFilter);
         drawCentralCoreRightWingIllustration(layerFilter);
+        */
         drawComputerCenterIllustration(layerFilter);
         drawBrownBuildingIllustration(layerFilter);
         drawTemporaryLabIllustration(layerFilter);
@@ -2292,6 +2296,54 @@
 
         add("image", {
           href: "assets/gfx/maps/central_core_right_wing_overlay.png",
+          x: (topLeft.x + overlayOffset.x).toFixed(2),
+          y: (topLeft.y + overlayOffset.y).toFixed(2),
+          width: imgW.toFixed(2),
+          height: imgH.toFixed(2),
+          preserveAspectRatio: "xMidYMid meet",
+          style: "opacity:" + overlayOpacity.toFixed(3) + ";pointer-events:none;"
+        });
+      }
+
+      function drawCentralBuildingIllustration(layerFilter) {
+        const layerRender = buildLayerRenderContext(layerFilter);
+        const groundFloorOffsetY = layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
+
+        // Full Central Complex overlay placement guide:
+        // - Replaces the legacy split central-core / wing overlays above.
+        // - Footprint target is the map-prototype-2 central building plate: F7 through J3.
+        // - The image-box top-left is anchored to the upper-left corner of F7, then tile offsets
+        //   are applied for crop tuning.
+        const centralFootprint = {
+          bounds: { tl: parseTileLabel("F7"), br: parseTileLabel("J3") }
+        };
+        const pts = blockPoints(centralFootprint).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
+        if (!pts || pts.length !== 4) return;
+
+        const topLeft = pts[0];
+        const topRight = pts[1];
+        const topLen = Math.hypot(topRight.x - topLeft.x, topRight.y - topLeft.y) || 1;
+
+        // TUNING: move the full central building overlay here.
+        // Positive E moves east/right; positive S moves south/down-right.
+        const overlayTileOffsetE = 8 / 8;
+        const overlayTileOffsetS = -17 / 8;
+        const overlayOffset = {
+          x: ISO_BASIS_E.dx * overlayTileOffsetE + ISO_BASIS_S.dx * overlayTileOffsetS,
+          y: ISO_BASIS_E.dy * overlayTileOffsetE + ISO_BASIS_S.dy * overlayTileOffsetS
+        };
+
+        // Source PNG: central_building_overlay.png, 1454x930.
+        const imgRatio = 930 / 1454;
+        const imgW = topLen * 1.41;
+        const imgH = imgW * imgRatio;
+
+        const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
+        const depth = Math.abs(focusLevel);
+        const overlayOpacity = layerRender.focusLevel == null ? 0.76 : Math.max(0.3, 0.76 - depth * 0.12);
+
+        add("image", {
+          href: "assets/gfx/maps/central_building_overlay.png",
           x: (topLeft.x + overlayOffset.x).toFixed(2),
           y: (topLeft.y + overlayOffset.y).toFixed(2),
           width: imgW.toFixed(2),

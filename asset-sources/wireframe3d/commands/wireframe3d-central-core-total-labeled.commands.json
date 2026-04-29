@@ -4,7 +4,7 @@
       "op": "create_scene",
       "overrides": {
         "meta": {
-          "name": "central-core-total-wireframe",
+          "name": "central-core-total-wireframe-labeled",
           "units": "meters",
           "sourceReferences": [
             "data/blueprint_campus_central_complex.jpg",
@@ -175,8 +175,9 @@
             "southZ": 9.28,
             "note": "Right wing details redistributed explicitly after wing length changes; shoulder attachment zone remains clear."
           },
-          "centralCoreEdgeMode": "normal total export restored to hiddenEdges=partial",
-          "referenceImageObservation": "Compared with the pasted PNG, the central core should read as a lower horizontal portico/dome composition: broad low hall, shallow shoulder blocks, and a dome that rises from a low drum. The wings are long low courtyard bars with detail rhythms; they should not tower over or visually equal the main hall."
+          "centralCoreEdgeMode": "normal total export uses hiddenEdges=far to avoid over-aggressive central-core edge removal",
+          "referenceImageObservation": "Compared with the pasted PNG, the central core should read as a lower horizontal portico/dome composition: broad low hall, shallow shoulder blocks, and a dome that rises from a low drum. The wings are long low courtyard bars with detail rhythms; they should not tower over or visually equal the main hall.",
+          "labeledVariant": true
         },
         "camera": {
           "projection": "tile_oblique",
@@ -3165,7 +3166,17 @@
     {
       "op": "export_svg",
       "options": {
-        "hiddenEdges": "partial"
+        "hiddenEdges": "none",
+        "debugLabels": {
+          "enabled": true,
+          "faces": true,
+          "edges": true,
+          "color": "#ffd66e",
+          "halo": "#071019",
+          "fontSize": 10,
+          "minEdgeLength": 24,
+          "prefixPrimitive": true
+        }
       }
     }
   ],
