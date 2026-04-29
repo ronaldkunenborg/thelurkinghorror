@@ -43,6 +43,17 @@ body {
   overflow: hidden;
 }
 
+.ambient-snow-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.58;
+  mix-blend-mode: screen;
+}
+
 .shell-frame {
   position: relative;
   height: 100%;
@@ -59,9 +70,23 @@ body {
   transition: opacity 1000ms ease, filter 1000ms ease;
 }
 
+.ui-snow-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ui-snow-mask span {
+  position: absolute;
+  display: block;
+  background: #000;
+}
+
 .hud-group {
   position: relative;
-  z-index: 3;
+  z-index: 4;
+  isolation: isolate;
   height: 100%;
   min-height: 0;
   flex: 0 0 48%;
@@ -402,7 +427,8 @@ body {
   background: var(--panel);
   backdrop-filter: blur(14px) saturate(1.1);
   position: relative;
-  z-index: 3;
+  z-index: 4;
+  isolation: isolate;
 }
 
 .scene-pane {
@@ -417,7 +443,7 @@ body {
   border-radius: 0;
   background: transparent;
   overflow: visible;
-  z-index: 1;
+  z-index: 4;
   pointer-events: none;
 }
 
@@ -463,7 +489,7 @@ body {
 .blood-layer {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
   overflow: hidden;
 }
@@ -1433,6 +1459,10 @@ body {
     pointer-events: none;
     margin-left: 0;
     min-height: 140px;
+  }
+
+  .ambient-snow-layer {
+    opacity: 0.36;
   }
 
   .terminal-stack {

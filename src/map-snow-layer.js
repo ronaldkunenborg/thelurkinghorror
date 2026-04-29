@@ -5,6 +5,8 @@
     density: 0.00036,
     minFlakes: 240,
     maxFlakes: 820,
+    maxDensityMultiplier: 10,
+    activeArea: { x: 0, y: 0, width: 1, height: 1 },
     // Simulate one extra viewport of snow on both horizontal sides so wind
     // can blow existing flakes into view instead of creating snow at the edge.
     sideBufferScreens: 1,
@@ -36,8 +38,43 @@
       running: false,
       enabled: true,
       intensity: 1,
-      targetIntensity: 1
+      targetIntensity: 1,
+      densityMultiplier: 1,
+      particleMultiplier: 1,
+      sizeBoost: 1,
+      alphaBoost: 1,
+      foregroundBoost: 0
     };
+    const baseDensity = config.density;
+    const baseMinFlakes = config.minFlakes;
+    const baseMaxFlakes = config.maxFlakes;
+    const baseSideBufferScreens = config.sideBufferScreens;
+
+    function clamp01(value, fallback) {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return fallback;
+      return Math.max(0, Math.min(1, number));
+    }
+
+    function normalizeArea(area) {
+      const next = area || {};
+      const x = clamp01(next.x, 0);
+      const y = clamp01(next.y, 0);
+      const width = Math.max(0.01, Math.min(1 - x, clamp01(next.width, 1)));
+      const height = Math.max(0.01, Math.min(1 - y, clamp01(next.height, 1)));
+      return { x, y, width, height };
+    }
+
+    config.activeArea = normalizeArea(config.activeArea);
+
+    function getActiveArea() {
+      return {
+        x: state.width * config.activeArea.x,
+        y: state.height * config.activeArea.y,
+        width: state.width * config.activeArea.width,
+        height: state.height * config.activeArea.height
+      };
+    }
 
     function resize() {
       const rect = canvas.getBoundingClientRect();
@@ -64,40 +101,62 @@
 
     function getTargetFlakeCount(width, height) {
       if (state.intensity <= 0) return 0;
-      const simulatedWidth = width * (1 + config.sideBufferScreens * 2);
-      const fullCount = Math.max(config.minFlakes, Math.min(config.maxFlakes, Math.round(simulatedWidth * height * config.density)));
-      return Math.round(fullCount * state.intensity);
+      const area = getActiveArea();
+      const activeWidth = area.width || width;
+      const activeHeight = area.height || height;
+      const simulatedWidth = activeWidth * (1 + config.sideBufferScreens * 2);
+      const fullCount = Math.max(config.minFlakes, Math.min(config.maxFlakes, Math.round(simulatedWidth * activeHeight * config.density)));
+      return Math.round(fullCount * state.intensity * state.particleMultiplier);
     }
 
-    function createFlake(anywhere) {
-      const depth = Math.pow(Math.random(), 1.85);
-      const radius = randomBetween(0.45, 1.32) + depth * randomBetween(0.5, 2.05);
-      const sideBuffer = state.width * config.sideBufferScreens;
+    function createFlake(anywhere, windAware) {
+      const area = getActiveArea();
+      const nearBias = Math.min(0.42, state.foregroundBoost * 0.18);
+      const depth = Math.min(1, Math.pow(Math.random(), 1.85) + Math.random() * nearBias);
+      const radius = (randomBetween(0.45, 1.32) + depth * randomBetween(0.5, 2.05)) * state.sizeBoost;
+      const sideBuffer = area.width * config.sideBufferScreens;
+      const now = performance.now();
+      const wind = windAware ? getWindAt(area.x + area.width * 0.5, area.y + area.height * 0.45, now) : 0;
+      const sideSpawnChance = Math.min(0.72, Math.max(0, (Math.abs(wind) - 8) / 42));
+      let x = randomBetween(area.x - sideBuffer, area.x + area.width + sideBuffer);
+      let y = anywhere ? randomBetween(area.y - area.height * 0.08, area.y + area.height * 1.06) : randomBetween(area.y - 36, area.y - 2);
+      if (!anywhere && windAware && Math.random() < sideSpawnChance) {
+        y = randomBetween(area.y - area.height * 0.04, area.y + area.height * 0.74);
+        x =
+          wind >= 0
+            ? randomBetween(area.x - sideBuffer, area.x - sideBuffer * 0.18)
+            : randomBetween(area.x + area.width + sideBuffer * 0.18, area.x + area.width + sideBuffer);
+      } else if (!anywhere && windAware) {
+        // Give top-spawned flakes a little upwind history so side gusts do not
+        // create a vertical-looking curtain at the entry edge.
+        x -= wind * randomBetween(0.24, 0.82);
+      }
       return {
-        x: randomBetween(-sideBuffer, state.width + sideBuffer),
-        y: anywhere ? randomBetween(-state.height * 0.08, state.height * 1.06) : randomBetween(-36, -2),
+        x,
+        y,
         radius,
         depth,
-        alpha: randomBetween(0.16, 0.42) + depth * 0.4,
+        alpha: Math.min(0.92, (randomBetween(0.16, 0.42) + depth * 0.4) * state.alphaBoost),
         fallFactor: randomBetween(0.58, 1.18) + depth * 0.66,
         windFactor: randomBetween(0.45, 1.15) + depth * 0.72,
         swayPhase: randomBetween(0, Math.PI * 2),
         swaySpeed: randomBetween(0.7, 1.7),
-        swaySize: randomBetween(2, 10) + depth * 8
+        swaySize: (randomBetween(2, 10) + depth * 8) * (1 + state.foregroundBoost * 0.12)
       };
     }
 
     function resetFlake(flake, fromTop) {
-      const replacement = createFlake(false);
+      const replacement = createFlake(false, true);
       Object.assign(flake, replacement);
       if (!fromTop) {
-        const sideBuffer = state.width * config.sideBufferScreens;
-        const centerWind = getWindAt(state.width * 0.5, state.height * 0.5, performance.now());
-        flake.y = randomBetween(0, state.height);
+        const area = getActiveArea();
+        const sideBuffer = area.width * config.sideBufferScreens;
+        const centerWind = getWindAt(area.x + area.width * 0.5, area.y + area.height * 0.5, performance.now());
+        flake.y = randomBetween(area.y, area.y + area.height);
         flake.x =
           centerWind >= 0
-            ? randomBetween(-sideBuffer, -sideBuffer * 0.72)
-            : randomBetween(state.width + sideBuffer * 0.72, state.width + sideBuffer);
+            ? randomBetween(area.x - sideBuffer, area.x - sideBuffer * 0.72)
+            : randomBetween(area.x + area.width + sideBuffer * 0.72, area.x + area.width + sideBuffer);
       }
     }
 
@@ -172,13 +231,14 @@
       updateWeather(dt, now);
       const targetCount = getTargetFlakeCount(state.width, state.height);
       while (state.enabled && state.flakes.length < targetCount) {
-        state.flakes.push(createFlake(false));
+        state.flakes.push(createFlake(false, true));
       }
 
       ctx.clearRect(0, 0, state.width, state.height);
       ctx.lineCap = "round";
       for (let i = state.flakes.length - 1; i >= 0; i -= 1) {
         const flake = state.flakes[i];
+        const area = getActiveArea();
         const wind = getWindAt(flake.x, flake.y, now) * flake.windFactor;
         const sway = Math.sin(now * 0.001 * flake.swaySpeed + flake.swayPhase) * flake.swaySize;
         const vx = wind + sway;
@@ -186,17 +246,17 @@
         flake.x += vx * dt;
         flake.y += vy * dt;
 
-        const sideBuffer = state.width * config.sideBufferScreens;
-        if (flake.y > state.height + 36 || flake.x < -sideBuffer - 80 || flake.x > state.width + sideBuffer + 80) {
+        const sideBuffer = area.width * config.sideBufferScreens;
+        if (flake.y > area.y + area.height + 36 || flake.x < area.x - sideBuffer - 80 || flake.x > area.x + area.width + sideBuffer + 80) {
           if (state.enabled && state.flakes.length <= targetCount) {
-            resetFlake(flake, flake.y > state.height + 36);
+            resetFlake(flake, flake.y > area.y + area.height + 36);
           } else {
             state.flakes.splice(i, 1);
             continue;
           }
         }
 
-        if (flake.x < -12 || flake.x > state.width + 12) {
+        if (flake.x < area.x - 12 || flake.x > area.x + area.width + 12 || flake.y < area.y - 24 || flake.y > area.y + area.height + 24) {
           continue;
         }
 
@@ -254,7 +314,7 @@
       canvas.style.display = "none";
     }
 
-    function setEnabled(enabled) {
+    function setEnabled(enabled, immediate) {
       if (enabled) {
         // Ramp-up behavior: turning weather back on restarts the overlay and
         // gradually repopulates flakes over the configured ramp-up period.
@@ -262,14 +322,57 @@
         state.targetIntensity = 1;
         start();
       } else {
+        if (immediate) {
+          stop(true);
+          state.enabled = false;
+          return;
+        }
         state.enabled = false;
         state.targetIntensity = 0;
       }
     }
 
+    function setDensityMultiplier(value) {
+      const next = Math.max(1, Math.min(config.maxDensityMultiplier, Number(value) || 1));
+      state.densityMultiplier = next;
+      const normalized = (next - 1) / Math.max(1, config.maxDensityMultiplier - 1);
+      state.particleMultiplier = 1 + normalized * 2;
+      state.sizeBoost = 1 + normalized * 0.42;
+      state.alphaBoost = 1 + normalized * 0.24;
+      state.foregroundBoost = normalized;
+      if (state.running) {
+        resize();
+      }
+    }
+
+    function setActiveArea(area) {
+      config.activeArea = normalizeArea(area);
+      if (state.running) {
+        resize();
+      }
+    }
+
+    // Rendering profile hook for callers that need different weather regimes
+    // with the same snow engine. The game uses this to swap between subtle
+    // indoor snow and dense outdoor storm snow; map-prototype-2 can keep using
+    // the default profile and only adjust density via setDensityMultiplier().
+    function setProfile(profile) {
+      const next = profile || {};
+      config.density = Math.max(0.00001, Number(next.density) || baseDensity);
+      config.minFlakes = Math.max(0, Math.round(Number(next.minFlakes) || baseMinFlakes));
+      config.maxFlakes = Math.max(config.minFlakes, Math.round(Number(next.maxFlakes) || baseMaxFlakes));
+      config.sideBufferScreens = Math.max(0, Number(next.sideBufferScreens) || baseSideBufferScreens);
+      if (state.running) {
+        resize();
+      }
+    }
+
     return {
       resize,
-      setEnabled
+      setEnabled,
+      setDensityMultiplier,
+      setActiveArea,
+      setProfile
     };
   }
 

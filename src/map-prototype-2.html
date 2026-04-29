@@ -647,6 +647,11 @@
         <label><input id="toggle-floor-tiles" type="checkbox" checked /> Show floor tiles</label>
         <label><input id="toggle-weather" type="checkbox" checked /> Show weather</label>
         <label>
+          Snow
+          <input id="snow-density" type="range" min="1" max="10" step="0.25" value="1" />
+          <span id="snow-density-value">x1.00</span>
+        </label>
+        <label>
           Floor layer
           <select id="floor-filter" class="floor-select">
             <option value="all">All</option>
@@ -3792,6 +3797,11 @@
       document.getElementById("toggle-grid").addEventListener("change", draw);
       document.getElementById("toggle-floor-tiles").addEventListener("change", draw);
       document.getElementById("toggle-weather").addEventListener("change", (event) => snowLayer.setEnabled(event.target.checked));
+      document.getElementById("snow-density").addEventListener("input", (event) => {
+        const value = Number(event.target.value);
+        document.getElementById("snow-density-value").textContent = "x" + value.toFixed(2);
+        snowLayer.setDensityMultiplier(value);
+      });
       document.getElementById("floor-filter").addEventListener("change", draw);
       svg.addEventListener("mousedown", onPointerDown);
       window.addEventListener("mousemove", onPointerMove);

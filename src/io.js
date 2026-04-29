@@ -1078,7 +1078,11 @@ class GameIoController {
   }
 
   setGameMusicEnabled(enabled) {
-    this.gameMusicEnabled = !!enabled;
+    const nextEnabled = !!enabled;
+    if (this.gameMusicEnabled === nextEnabled) {
+      return;
+    }
+    this.gameMusicEnabled = nextEnabled;
     if (!this.gameMusicEnabled) {
       this._stopGameOverMusic();
       this._stopAllSoundsByClass(SOUND_CLASS_MUSIC);

@@ -8,6 +8,17 @@
   </head>
   <body>
     <main id="shell" class="shell" aria-label="Interactive fiction terminal">
+      <canvas id="ambient-snow" class="ambient-snow-layer" aria-hidden="true"></canvas>
+      <div id="ui-snow-mask" class="ui-snow-mask" aria-hidden="true">
+        <span data-mask-target=".side-actions"></span>
+        <span data-mask-target=".terminal-stack"></span>
+        <span data-mask-target=".command-sheet-panel"></span>
+        <span data-mask-target=".save-load-sheet-panel"></span>
+        <span data-mask-target=".map-sheet-panel"></span>
+        <span data-mask-target=".credits-sheet-panel"></span>
+        <span data-mask-target=".settings-sheet-panel"></span>
+        <span data-mask-target=".confirm-sheet-panel"></span>
+      </div>
       <section id="splash" class="splash" aria-live="polite">
         <div class="splash-stage">
           <div class="splash-art-panel" aria-hidden="true">
@@ -281,6 +292,10 @@
             <input id="exp-images-enabled" type="checkbox" />
             <span>Images enabled</span>
           </label>
+          <label class="settings-toggle" for="exp-snow-enabled">
+            <input id="exp-snow-enabled" type="checkbox" />
+            <span>Snow enabled</span>
+          </label>
           <div id="audio-settings-group" class="audio-settings-group">
             <p class="settings-copy settings-section-title">Audio Mix</p>
             <label class="settings-control" for="music-volume">
@@ -324,11 +339,25 @@
     <script src="./quetzal-storage.js"></script>
     <script src="./io.js"></script>
     <script src="./bundled-story.js"></script>
+    <script src="./map-snow-layer.js"></script>
     <script>
       (function bootstrapUi() {
         const splashShownAt = Date.now();
         const minimumSplashMs = 1800;
         const shellEl = document.getElementById('shell');
+        const ambientSnowCanvas = document.getElementById('ambient-snow');
+        const ambientSnowLayer =
+          ambientSnowCanvas && window.MapSnowLayer
+            ? window.MapSnowLayer.create(ambientSnowCanvas, {
+                density: 0.00013,
+                minFlakes: 42,
+                maxFlakes: 190,
+                sideBufferScreens: 0.8,
+                rampUpSeconds: 8,
+                rampDownSeconds: 8,
+                activeArea: { x: 0, y: 0, width: 1, height: 1 }
+              })
+            : null;
         const splashEl = document.getElementById('splash');
         const splashStatusEl = document.getElementById('splash-status');
         const sceneLayerA = document.getElementById('scene-layer-a');
@@ -338,6 +367,8 @@
         const bloodSplatterEl = document.getElementById('blood-splatter');
         const horrorVignetteEl = document.getElementById('horror-vignette');
         const hudGroupEl = document.querySelector('.hud-group');
+        const uiSnowMaskEl = document.getElementById('ui-snow-mask');
+        const uiSnowMaskPieces = uiSnowMaskEl ? Array.from(uiSnowMaskEl.querySelectorAll('[data-mask-target]')) : [];
         const commandSheetEl = document.getElementById('command-sheet');
         const saveLoadSheetEl = document.getElementById('save-load-sheet');
         const saveLoadTitleEl = document.getElementById('save-load-title');
@@ -365,6 +396,7 @@
         const experienceExtraSlotsEnabledEl = document.getElementById('exp-extra-slots-enabled');
         const experienceHorrorEnabledEl = document.getElementById('exp-horror-enabled');
         const experienceImagesEnabledEl = document.getElementById('exp-images-enabled');
+        const experienceSnowEnabledEl = document.getElementById('exp-snow-enabled');
         const experienceOnboardingCopyEl = document.getElementById('experience-onboarding-copy');
         const experienceOnboardingActionsEl = document.getElementById('experience-onboarding-actions');
         const experienceContinueEl = document.getElementById('experience-continue');
@@ -378,14 +410,83 @@
         const splashMusic = new Audio('./assets/audio/splash-horror-whirlguy.mp3');
         const splashMusicBaseVolume = 0.36;
         splashMusic.loop = false;
+        if (ambientSnowLayer) {
+          ambientSnowLayer.setDensityMultiplier(1);
+          ambientSnowLayer.setEnabled(false);
+        }
         splashMusic.volume = splashMusicBaseVolume;
         splashMusic.preload = 'auto';
+
+        function updateUiSnowMasks() {
+          if (!uiSnowMaskPieces.length) {
+            return;
+          }
+          const shellRect = shellEl.getBoundingClientRect();
+          for (const piece of uiSnowMaskPieces) {
+            const targetSelector = piece.dataset.maskTarget;
+            const target = targetSelector ? document.querySelector(targetSelector) : null;
+            if (!target) {
+              piece.style.display = 'none';
+              continue;
+            }
+            const targetRect = target.getBoundingClientRect();
+            if (targetRect.width <= 0 || targetRect.height <= 0) {
+              piece.style.display = 'none';
+              continue;
+            }
+            const targetStyle = window.getComputedStyle(target);
+            piece.style.display = 'block';
+            piece.style.left = Math.round(targetRect.left - shellRect.left) + 'px';
+            piece.style.top = Math.round(targetRect.top - shellRect.top) + 'px';
+            piece.style.width = Math.round(targetRect.width) + 'px';
+            piece.style.height = Math.round(targetRect.height) + 'px';
+            piece.style.borderRadius = targetStyle.borderRadius;
+          }
+        }
+
+        window.requestAnimationFrame(updateUiSnowMasks);
+        if (typeof MutationObserver === 'function') {
+          const uiSnowMaskObserver = new MutationObserver(() => {
+            window.requestAnimationFrame(updateUiSnowMasks);
+          });
+          [
+            commandSheetEl,
+            saveLoadSheetEl,
+            mapSheetEl,
+            creditsSheetEl,
+            settingsSheetEl,
+            confirmSheetEl,
+          ].filter(Boolean).forEach(element => {
+            uiSnowMaskObserver.observe(element, { attributes: true, attributeFilter: ['hidden', 'class', 'style'] });
+          });
+        }
         const EXPERIENCE_PROFILES = [
-          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false },
-          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false },
-          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false },
-          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: true, imagesEnabled: true },
+          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: true, snowDensityMultiplier: 1.75 },
+          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: true, imagesEnabled: true, snowEnabled: true, snowDensityMultiplier: 3.5 },
         ];
+        const OUTDOOR_SNOW_ROOM_IDS = new Set([16, 98, 121, 127, 145, 180, 185, 190, 222]);
+        const OUTDOOR_SNOW_DENSITY_MULTIPLIERS_BY_LEVEL = {
+          2: 6,
+          3: 10,
+        };
+        // Snow settings are layered: experience profiles choose whether snow is
+        // enabled and the indoor amount; room context can swap the engine to the
+        // outdoor storm profile while preserving the user's on/off preference.
+        const INDOOR_SNOW_PROFILE = {
+          density: 0.00013,
+          minFlakes: 42,
+          maxFlakes: 190,
+          sideBufferScreens: 0.8,
+        };
+        const OUTDOOR_SNOW_PROFILE = {
+          density: 0.00042,
+          minFlakes: 220,
+          maxFlakes: 960,
+          sideBufferScreens: 1,
+        };
+        let currentSnowRoomId = 0;
 
         const ui = new window.UiFramework({
           outputEl: document.getElementById('output'),
@@ -985,6 +1086,8 @@
         }
 
         function setRoomScene(roomName, roomObjectId, options) {
+          currentSnowRoomId = Number.isFinite(roomObjectId) ? Number(roomObjectId) : 0;
+          applySnowSettings(experienceSettings);
           const isDark = !!(options && options.isDark);
           const art = isDark ? '' : resolveRoomArt(roomName, roomObjectId);
           setSceneArt(art);
@@ -1411,6 +1514,14 @@
           return Math.max(0, Math.min(EXPERIENCE_PROFILES.length - 1, Math.round(numeric)));
         }
 
+        function clampSnowDensityMultiplier(value, fallback) {
+          const numeric = Number(value);
+          if (!Number.isFinite(numeric)) {
+            return fallback;
+          }
+          return Math.max(1, Math.min(10, numeric));
+        }
+
         function getProfile(level) {
           const index = clampProfileLevel(level, EXPERIENCE_PROFILES.length - 1);
           return EXPERIENCE_PROFILES[index];
@@ -1427,6 +1538,8 @@
             extraSlotsEnabled: typeof source.extraSlotsEnabled === 'boolean' ? source.extraSlotsEnabled : profile.extraSlotsEnabled,
             horrorExtrasEnabled: typeof source.horrorExtrasEnabled === 'boolean' ? source.horrorExtrasEnabled : profile.horrorExtrasEnabled,
             imagesEnabled: typeof source.imagesEnabled === 'boolean' ? source.imagesEnabled : profile.imagesEnabled,
+            snowEnabled: typeof source.snowEnabled === 'boolean' ? source.snowEnabled : profile.snowEnabled,
+            snowDensityMultiplier: clampSnowDensityMultiplier(source.snowDensityMultiplier, profile.snowDensityMultiplier),
           };
         }
 
@@ -1436,6 +1549,7 @@
           if (!!profile.extraSlotsEnabled === !!settings.extraSlotsEnabled) count += 1;
           if (!!profile.horrorExtrasEnabled === !!settings.horrorExtrasEnabled) count += 1;
           if (!!profile.imagesEnabled === !!settings.imagesEnabled) count += 1;
+          if (!!profile.snowEnabled === !!settings.snowEnabled) count += 1;
           return count;
         }
 
@@ -1464,7 +1578,9 @@
             normalized.musicEnabled === profile.musicEnabled &&
             normalized.extraSlotsEnabled === profile.extraSlotsEnabled &&
             normalized.horrorExtrasEnabled === profile.horrorExtrasEnabled &&
-            normalized.imagesEnabled === profile.imagesEnabled;
+            normalized.imagesEnabled === profile.imagesEnabled &&
+            normalized.snowEnabled === profile.snowEnabled &&
+            normalized.snowDensityMultiplier === profile.snowDensityMultiplier;
           experienceLevelLabelEl.textContent = exact ? 'Profile: ' + profile.label : 'Profile: Custom (' + profile.label + ' base)';
         }
 
@@ -1476,8 +1592,31 @@
           experienceExtraSlotsEnabledEl.checked = !!normalized.extraSlotsEnabled;
           experienceHorrorEnabledEl.checked = !!normalized.horrorExtrasEnabled;
           experienceImagesEnabledEl.checked = !!normalized.imagesEnabled;
+          experienceSnowEnabledEl.checked = !!normalized.snowEnabled;
           updateExperienceLevelLabel(normalized);
           syncingExperienceUi = false;
+        }
+
+        function getEffectiveSnowDensityMultiplier(settings) {
+          if (OUTDOOR_SNOW_ROOM_IDS.has(currentSnowRoomId)) {
+            return OUTDOOR_SNOW_DENSITY_MULTIPLIERS_BY_LEVEL[settings.level] || settings.snowDensityMultiplier;
+          }
+          return settings.snowDensityMultiplier;
+        }
+
+        function getEffectiveSnowProfile() {
+          return OUTDOOR_SNOW_ROOM_IDS.has(currentSnowRoomId) ? OUTDOOR_SNOW_PROFILE : INDOOR_SNOW_PROFILE;
+        }
+
+        function applySnowSettings(settings) {
+          if (!ambientSnowLayer) {
+            return;
+          }
+          if (typeof ambientSnowLayer.setProfile === 'function') {
+            ambientSnowLayer.setProfile(getEffectiveSnowProfile());
+          }
+          ambientSnowLayer.setDensityMultiplier(getEffectiveSnowDensityMultiplier(settings));
+          ambientSnowLayer.setEnabled(settings.snowEnabled);
         }
 
         function applyExperienceSettings(settings) {
@@ -1500,6 +1639,8 @@
             });
           }
           shellEl.classList.toggle('images-disabled', !normalized.imagesEnabled);
+          applySnowSettings(normalized);
+          window.requestAnimationFrame(updateUiSnowMasks);
           syncExperienceControls(normalized);
         }
 
@@ -2030,7 +2171,11 @@
             return;
           }
           const profile = getProfile(Number(experienceLevelEl.value));
-          applyExperienceSettings(profile);
+          applyExperienceSettings({
+            ...experienceSettings,
+            ...profile,
+            snowDensityMultiplier: profile.snowDensityMultiplier,
+          });
           persistExperienceSettings();
         });
         function handleExperienceToggleChange() {
@@ -2043,15 +2188,36 @@
             extraSlotsEnabled: !!experienceExtraSlotsEnabledEl.checked,
             horrorExtrasEnabled: !!experienceHorrorEnabledEl.checked,
             imagesEnabled: !!experienceImagesEnabledEl.checked,
+            snowEnabled: experienceSettings.snowEnabled,
+            snowDensityMultiplier: experienceSettings.snowDensityMultiplier,
           });
           next.level = inferBestProfileLevel(next);
+          next.snowDensityMultiplier = getProfile(next.level).snowDensityMultiplier;
           applyExperienceSettings(next);
           persistExperienceSettings();
         }
+
+        function handleSnowToggleChange() {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const next = normalizeExperienceSettings({
+            ...experienceSettings,
+            snowEnabled: !!experienceSnowEnabledEl.checked,
+          });
+          next.level = inferBestProfileLevel(next);
+          next.snowDensityMultiplier = getProfile(next.level).snowDensityMultiplier;
+          experienceSettings = next;
+          applySnowSettings(next);
+          syncExperienceControls(next);
+          persistExperienceSettings();
+        }
+
         experienceMusicEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceExtraSlotsEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceHorrorEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceImagesEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceSnowEnabledEl.addEventListener('change', handleSnowToggleChange);
         experienceContinueEl.addEventListener('click', async () => {
           experienceSelectionRequired = false;
           await persistExperienceSettings();
@@ -2060,6 +2226,10 @@
           loadBundledStoryAtStartup();
         });
         window.addEventListener('resize', () => {
+          if (ambientSnowLayer) {
+            ambientSnowLayer.resize();
+          }
+          updateUiSnowMasks();
           if (!settingsSheetEl.hidden) {
             if (!settingsOnboardingMode) {
               positionSettingsSheet();

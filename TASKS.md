@@ -266,15 +266,33 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added usage docs in `docs/WIREFRAME_3D_TOOL.md` and command validation schema in `docs/wireframe3d-command.schema.json`.
    - Added `tools/test-wireframe3d.js` coverage; verified `node tools/test-wireframe3d.js` passes.
 
+59. [done] Add snow as effect to the map-prototype-2.html and to the game itself. They are similar but not quite equal effects.
+   - Added shared canvas snow engine in `src/map-snow-layer.js` with wind gusts, variable fall speed, side-buffer spawning, density multiplier support, active-area support, and rendering profile switching.
+   - Added foreground snow to `src/map-prototype-2.html`, including temporary weather controls and a density slider from baseline to `10x` for tuning.
+   - Optimized high-density snow so the `10x` control uses a perceptual mix of particle count, size, alpha, and foreground bias instead of literal 10x particle load.
+   - Fixed wind-aware spawning so new flakes entering from the side already reflect current wind behavior instead of appearing as a vertical edge curtain.
+   - Added ambient game snow behind the main UI in `src/index.html`, using the shared engine rather than a second implementation.
+   - Added a layered composition model in `src/index.html`/`src/modern.css`: full-screen snow, opaque UI masks, horror/blood layer, then transparent UI/scene layer, preserving horror transparency while hiding snow under text UI.
+   - Added experience settings integration:
+     - Classic and Classic+ disable snow
+     - Enhanced enables light indoor snow (`1.75`)
+     - Modern enables current indoor snow (`3.5`)
+     - independent `Snow enabled` checkbox toggles snow on/off without restarting music
+   - Added outdoor storm behavior for room ids `16`, `98`, `121`, `127`, `145`, `180`, `185`, `190`, and `222`:
+     - outdoor profile uses higher density/caps than indoor
+     - Enhanced outdoor multiplier is `6`
+     - Modern outdoor multiplier is `10`
+   - Documented the snow profile API in `src/map-snow-layer.js` and the experience-vs-room layering policy near the game snow profiles.
+   - Made game snow disable use the same ramp-down behavior as the map: existing flakes drift out instead of clearing abruptly.
+   - Made `GameIoController.setGameMusicEnabled()` idempotent so unrelated settings re-application does not restart music.
+
 ## Pending Tasks
 
-59. [pending] Add snow as effect to the map-prototype-2.html and to the game itself. They are similar but not quite equal effects.
-In the map, it needs to snow across the map, on a layer that is drawn in the foreground. The vertical speed with which the snow falls is screenwide, and can vary from time to time but not too often. The wind blows from a certain direction and varies more. This affects horizontal displacement of snowflakes and starts in a given area on the side of the screen, then moves to the other side. Depending on how strong it is it may either reach the other side or peter out while moving.
-In the game, the snow is the same but the layer on which it is drawn is behind everything else.
+60. [pending] Redo the Brown Building overlay with our wireframe3d tool then create a new image using our custom GPT and imagegen.
 
-60. [pending] Redo the map prototype 2 legend. Use imagegen to create icons for each building from the png overlays, then put those in the legend with the name of each building: Brown Building, Computer Center, Temporary Lab and Central Complex. Street/Road can be left as it is. Add a checkbox to the legend below the building icons to toggle  building outlines and overlays on/off.
+61. [pending] Redo the map prototype 2 legend. Use imagegen to create icons for each building from the png overlays, then put those in the legend with the name of each building: Brown Building, Computer Center, Temporary Lab and Central Complex. Street/Road can be left as it is. Add a checkbox to the legend below the building icons to toggle  building outlines and overlays on/off.
 
-61. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
+62. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
    - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
    - Keep deterministic per-room/per-tile jitter so lines stay stable between renders.
    - Keep displacement filter only as optional subtle accent (or remove entirely if readability improves).
@@ -282,7 +300,7 @@ In the game, the snow is the same but the layer on which it is drawn is behind e
    - Document final rendering policy in map ADR and link implementation notes.
    - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.
 
-62. [pending] Add an in-game map of visited locations while adventuring.
+63. [pending] Add an in-game map of visited locations while adventuring.
    - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
    - Before UI implementation, determine structural map constraints:
@@ -298,11 +316,10 @@ In the game, the snow is the same but the layer on which it is drawn is behind e
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
 
-63. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+64. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
 
 - Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
 - Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
 - Add safe-location gating skeleton and feature flag for consultation availability
 - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
 - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
-
