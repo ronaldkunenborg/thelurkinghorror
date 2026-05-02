@@ -286,9 +286,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Made game snow disable use the same ramp-down behavior as the map: existing flakes drift out instead of clearing abruptly.
    - Made `GameIoController.setGameMusicEnabled()` idempotent so unrelated settings re-application does not restart music.
 
-## Pending Tasks
+60. [done] Redo the Brown Building overlay with our wireframe3d tool then create a new image using our custom GPT and imagegen.
+   - Added a Brown Building wireframe3d preset at `asset-sources/wireframe3d/commands/wireframe3d-brown-building.commands.json`.
+   - Generated verification artifacts at `asset-sources/wireframe3d/scenes/brown-building.scene.json`, `asset-sources/wireframe3d/svg/brown-building.svg`, and `asset-sources/wireframe3d/svg/brown-building-partial.svg`.
+   - Modeled the Brown Building as an 18-floor square 1970s concrete tower with a recessed front window grid, blinder panelized side facade, front exit, roof equipment, antenna masts, and meteorological radome.
+   - Replaced/refined `src/assets/gfx/maps/brown_building_overlay.png` from the new overlay workflow.
+   - Updated `drawBrownBuildingIllustration()` in `src/map-prototype-2.html` for the new overlay aspect ratio and added tile-fraction tuning via `overlayTileOffsetE/S`.
 
-60. [pending] Redo the Brown Building overlay with our wireframe3d tool then create a new image using our custom GPT and imagegen.
+## Pending Tasks
 
 61. [pending] Redo the map prototype 2 legend. Use imagegen to create icons for each building from the png overlays, then put those in the legend with the name of each building: Brown Building, Computer Center, Temporary Lab and Central Complex. Street/Road can be left as it is. Add a checkbox to the legend below the building icons to toggle  building outlines and overlays on/off.
 
