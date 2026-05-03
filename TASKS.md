@@ -301,15 +301,17 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Reworked the legend into a narrower vertical list, brightened building thumbnails/labels for readability, and added the red player-character marker as the Current location item.
    - Added `src/assets/gfx/maps/playercharacter.png` to `src/map-prototype-2.html` at Terminal Room (176), including a clickable Current location legend row that switches to the player layer, pans the marker into view when needed, and plays a red ping animation.
 
-## Pending Tasks
-
-62. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
-   - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
-   - Keep deterministic per-room/per-tile jitter so lines stay stable between renders.
-   - Keep displacement filter only as optional subtle accent (or remove entirely if readability improves).
-   - Tune contour hierarchy and hatch density for legibility at normal browser zoom.
-   - Document final rendering policy in map ADR and link implementation notes.
+62. [done] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
+   - Replaced filter-dominant tile wobble with geometry-first deterministic SVG contour paths in `src/map-prototype-2.html`.
+   - Kept per-room/per-tile seeded jitter so linework stays stable between redraws, layer changes, and focus changes.
+   - Used two deterministic SVG contour families based on the generated references: main family from row 1 / tile 2, and a rougher subvariant B from row 1 / tile 5 or row 2 / tile 3.
+   - Implemented `tileSketchProfile()` to assign main vs. rough-B contour families deterministically per room/tile.
+   - Added sparse fine parallel brush-hair strokes along tile sides, with two deterministic strokes per tile placed just inside or outside the contour.
+   - Removed the old front rim/depth rectangle from room tiles so the blueprint tiles read as flat 2D shapes.
+   - Tuned focus contour hierarchy to two full contour passes, a 2px-equivalent main stroke, visible 0.86px brush-hair strokes, and slightly increased focus jitter so focused tiles stay strong without looking overly regular.
    - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.
+
+## Pending Tasks
 
 63. [pending] Add an in-game map of visited locations while adventuring.
    - use map-prototype-2 as the basis for the in-game map map.
