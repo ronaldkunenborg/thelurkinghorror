@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>The Lurking Horror - Web Interpreter</title>
     <link rel="stylesheet" href="./modern.css" />
+    <link rel="stylesheet" href="./map-renderer.css" />
   </head>
   <body>
     <main id="shell" class="shell" aria-label="Interactive fiction terminal">
@@ -43,7 +44,7 @@
             <button id="save-slot" class="icon-btn" type="button" aria-label="Save game" title="Save game">
               <span class="icon-etch icon-save" aria-hidden="true"></span>
             </button>
-            <button id="map-button" class="icon-btn" type="button" aria-label="University map" title="University map">
+            <button id="map-button" class="icon-btn" type="button" aria-label="Visited location map" title="Visited location map">
               <span class="icon-etch icon-map" aria-hidden="true"></span>
             </button>
             <button id="settings-button" class="icon-btn" type="button" aria-label="Audio settings" title="Audio settings">
@@ -190,7 +191,7 @@
               <button class="btn command-chip" type="button" data-command="$GAMESOUND"><strong>$GAMESOUND</strong><span>Toggle splash and other game music.</span></button>
               <button class="btn command-chip" type="button" data-command="$DEBUG"><strong>$DEBUG</strong><span>Toggle debug-only VM and sound diagnostics.</span></button>
               <button class="btn command-chip" type="button" data-command="$DEBUG CLEAR EXPERIENCE"><strong>$DEBUG CLEAR EXPERIENCE</strong><span>Debug-only: clear saved experience settings (requires restart).</span></button>
-              <button class="btn command-chip" type="button" data-command="$MAP"><strong>$MAP</strong><span>Open the spoiler-safe university overview map.</span></button>
+              <button class="btn command-chip" type="button" data-command="$MAP"><strong>$MAP</strong><span>Open the visited-location map.</span></button>
               <button class="btn command-chip" type="button" data-command="$CREDITS"><strong>$CREDITS</strong><span>Open the credits panel.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD ON"><strong>$BLOOD ON</strong><span>Debug-only: enable low-frequency random blood spatter.</span></button>
               <button class="btn command-chip" type="button" data-command="$BLOOD OFF"><strong>$BLOOD OFF</strong><span>Debug-only: disable blood spatter effect.</span></button>
@@ -214,17 +215,26 @@
           <div id="save-load-slot-list" class="save-load-slot-list"></div>
         </div>
       </section>
-      <section id="map-sheet" class="map-sheet" aria-label="University overview map" hidden>
+      <section id="map-sheet" class="map-sheet" aria-label="Visited location map" hidden>
         <div class="map-sheet-panel">
           <div class="command-sheet-header">
-            <h2 class="command-sheet-title">University Overview Map</h2>
+            <h2 class="command-sheet-title">Visited Location Map</h2>
+            <label class="map-sheet-floor-control">
+              <span>Floor layer</span>
+              <select id="game-map-floor-filter" class="map-sheet-floor-select">
+                <option value="L+2">L+2</option>
+                <option value="L+1">L+1</option>
+                <option value="L0">L0</option>
+                <option value="L-1">L-1</option>
+                <option value="L-2">L-2</option>
+                <option value="L-3">L-3</option>
+              </select>
+            </label>
             <button id="close-map" class="btn" type="button">Close</button>
           </div>
-          <img
-            class="map-sheet-image"
-            src="./assets/gfx/maps/university_overview_map.jpg"
-            alt="Spoiler-safe overview map of the university campus buildings."
-          />
+          <div class="map-sheet-frame">
+            <svg id="game-map" class="map-sheet-map" viewBox="0 0 1600 980" preserveAspectRatio="xMinYMin meet" aria-label="Visited location map"></svg>
+          </div>
         </div>
       </section>
       <section id="credits-sheet" class="credits-sheet" aria-label="Credits" hidden>
@@ -284,6 +294,10 @@
             <input id="exp-extra-slots-enabled" type="checkbox" />
             <span>More save/load slots</span>
           </label>
+          <label class="settings-toggle" for="exp-map-enabled">
+            <input id="exp-map-enabled" type="checkbox" />
+            <span>Visited map enabled</span>
+          </label>
           <label class="settings-toggle" for="exp-horror-enabled">
             <input id="exp-horror-enabled" type="checkbox" />
             <span>Extra horror effects</span>
@@ -337,6 +351,9 @@
     <script src="./parser.js"></script>
     <script src="./vm-core.js"></script>
     <script src="./quetzal-storage.js"></script>
+    <script src="./map-prototype-2-data.js"></script>
+    <script src="./map-discovery.js"></script>
+    <script src="./map-renderer.js"></script>
     <script src="./io.js"></script>
     <script src="./bundled-story.js"></script>
     <script src="./map-snow-layer.js"></script>
@@ -375,6 +392,8 @@
         const saveLoadSubtitleEl = document.getElementById('save-load-subtitle');
         const saveLoadSlotListEl = document.getElementById('save-load-slot-list');
         const mapSheetEl = document.getElementById('map-sheet');
+        const gameMapSvgEl = document.getElementById('game-map');
+        const gameMapFloorFilterEl = document.getElementById('game-map-floor-filter');
         const creditsSheetEl = document.getElementById('credits-sheet');
         const settingsSheetEl = document.getElementById('settings-sheet');
         const confirmSheetEl = document.getElementById('confirm-sheet');
@@ -394,6 +413,7 @@
         const experienceLevelLabelEl = document.getElementById('experience-level-label');
         const experienceMusicEnabledEl = document.getElementById('exp-music-enabled');
         const experienceExtraSlotsEnabledEl = document.getElementById('exp-extra-slots-enabled');
+        const experienceMapEnabledEl = document.getElementById('exp-map-enabled');
         const experienceHorrorEnabledEl = document.getElementById('exp-horror-enabled');
         const experienceImagesEnabledEl = document.getElementById('exp-images-enabled');
         const experienceSnowEnabledEl = document.getElementById('exp-snow-enabled');
@@ -402,6 +422,8 @@
         const experienceContinueEl = document.getElementById('experience-continue');
         const closeSettingsEl = document.getElementById('close-settings');
         const audioSettingsGroupEl = document.getElementById('audio-settings-group');
+        let latestMapDiscoveryState = null;
+        let gameMapRenderer = null;
         const audioAttributionEl = document.getElementById('audio-attribution');
         const settingsStorage =
           typeof window.InterpreterSettingsStorage === 'function'
@@ -461,10 +483,10 @@
           });
         }
         const EXPERIENCE_PROFILES = [
-          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
-          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
-          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: true, snowDensityMultiplier: 1.75 },
-          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, horrorExtrasEnabled: true, imagesEnabled: true, snowEnabled: true, snowDensityMultiplier: 3.5 },
+          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, mapEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, mapEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: true, snowDensityMultiplier: 1.75 },
+          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, horrorExtrasEnabled: true, imagesEnabled: true, snowEnabled: true, snowDensityMultiplier: 3.5 },
         ];
         const OUTDOOR_SNOW_ROOM_IDS = new Set([16, 98, 121, 127, 145, 180, 185, 190, 222]);
         const OUTDOOR_SNOW_DENSITY_MULTIPLIERS_BY_LEVEL = {
@@ -1423,6 +1445,10 @@
           onRoomChanged: (roomName, roomObjectId, options) => {
             setRoomScene(roomName, roomObjectId, options);
           },
+          onMapDiscoveryChanged: state => {
+            syncGameMapState(state);
+          },
+          isMapAvailable: () => !!experienceSettings.mapEnabled,
           onBloodEffectCommand: state => {
             setBloodEffectState(state);
           },
@@ -1536,6 +1562,7 @@
             level,
             musicEnabled: typeof source.musicEnabled === 'boolean' ? source.musicEnabled : profile.musicEnabled,
             extraSlotsEnabled: typeof source.extraSlotsEnabled === 'boolean' ? source.extraSlotsEnabled : profile.extraSlotsEnabled,
+            mapEnabled: typeof source.mapEnabled === 'boolean' ? source.mapEnabled : profile.mapEnabled,
             horrorExtrasEnabled: typeof source.horrorExtrasEnabled === 'boolean' ? source.horrorExtrasEnabled : profile.horrorExtrasEnabled,
             imagesEnabled: typeof source.imagesEnabled === 'boolean' ? source.imagesEnabled : profile.imagesEnabled,
             snowEnabled: typeof source.snowEnabled === 'boolean' ? source.snowEnabled : profile.snowEnabled,
@@ -1547,6 +1574,7 @@
           let count = 0;
           if (!!profile.musicEnabled === !!settings.musicEnabled) count += 1;
           if (!!profile.extraSlotsEnabled === !!settings.extraSlotsEnabled) count += 1;
+          if (!!profile.mapEnabled === !!settings.mapEnabled) count += 1;
           if (!!profile.horrorExtrasEnabled === !!settings.horrorExtrasEnabled) count += 1;
           if (!!profile.imagesEnabled === !!settings.imagesEnabled) count += 1;
           if (!!profile.snowEnabled === !!settings.snowEnabled) count += 1;
@@ -1577,6 +1605,7 @@
           const exact =
             normalized.musicEnabled === profile.musicEnabled &&
             normalized.extraSlotsEnabled === profile.extraSlotsEnabled &&
+            normalized.mapEnabled === profile.mapEnabled &&
             normalized.horrorExtrasEnabled === profile.horrorExtrasEnabled &&
             normalized.imagesEnabled === profile.imagesEnabled &&
             normalized.snowEnabled === profile.snowEnabled &&
@@ -1590,6 +1619,7 @@
           experienceLevelEl.value = String(normalized.level);
           experienceMusicEnabledEl.checked = !!normalized.musicEnabled;
           experienceExtraSlotsEnabledEl.checked = !!normalized.extraSlotsEnabled;
+          experienceMapEnabledEl.checked = !!normalized.mapEnabled;
           experienceHorrorEnabledEl.checked = !!normalized.horrorExtrasEnabled;
           experienceImagesEnabledEl.checked = !!normalized.imagesEnabled;
           experienceSnowEnabledEl.checked = !!normalized.snowEnabled;
@@ -1625,6 +1655,13 @@
           controller.setSaveSlotCount(normalized.extraSlotsEnabled ? 5 : 1);
           if (typeof controller.setGameMusicEnabled === 'function') {
             controller.setGameMusicEnabled(normalized.musicEnabled);
+          }
+          const mapButtonEl = document.getElementById('map-button');
+          if (mapButtonEl) {
+            mapButtonEl.hidden = !normalized.mapEnabled;
+          }
+          if (!normalized.mapEnabled && !mapSheetEl.hidden) {
+            closeMapSheet();
           }
           setHorrorEffectState({ enabled: normalized.horrorExtrasEnabled });
           if (!normalized.horrorExtrasEnabled) {
@@ -2186,6 +2223,7 @@
             level: Number(experienceLevelEl.value),
             musicEnabled: !!experienceMusicEnabledEl.checked,
             extraSlotsEnabled: !!experienceExtraSlotsEnabledEl.checked,
+            mapEnabled: !!experienceMapEnabledEl.checked,
             horrorExtrasEnabled: !!experienceHorrorEnabledEl.checked,
             imagesEnabled: !!experienceImagesEnabledEl.checked,
             snowEnabled: experienceSettings.snowEnabled,
@@ -2215,6 +2253,7 @@
 
         experienceMusicEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceExtraSlotsEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceMapEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceHorrorEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceImagesEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceSnowEnabledEl.addEventListener('change', handleSnowToggleChange);
@@ -2240,8 +2279,38 @@
           }
         });
 
+        function ensureGameMapRenderer() {
+          if (gameMapRenderer || !gameMapSvgEl || !window.LhMapRenderer) {
+            return gameMapRenderer;
+          }
+          gameMapRenderer = window.LhMapRenderer.create({
+            mode: 'ingame',
+            svg: gameMapSvgEl,
+            data: window.MapPrototype2Data,
+            mapSnowLayer: window.MapSnowLayer,
+            floorSelect: gameMapFloorFilterEl,
+            legendParts: { main: true, tile: true },
+            discoveryState: latestMapDiscoveryState,
+          });
+          return gameMapRenderer;
+        }
+
+        function syncGameMapState(state) {
+          latestMapDiscoveryState = state || null;
+          if (gameMapRenderer && typeof gameMapRenderer.setDiscoveryState === 'function') {
+            gameMapRenderer.setDiscoveryState(latestMapDiscoveryState);
+          }
+        }
+
         function openMapSheet() {
           mapSheetEl.hidden = false;
+          const renderer = ensureGameMapRenderer();
+          if (renderer && typeof renderer.setDiscoveryState === 'function') {
+            renderer.setDiscoveryState(latestMapDiscoveryState);
+          }
+          if (renderer && typeof renderer.focusCurrentLocation === 'function') {
+            renderer.focusCurrentLocation();
+          }
         }
 
         function closeMapSheet() {

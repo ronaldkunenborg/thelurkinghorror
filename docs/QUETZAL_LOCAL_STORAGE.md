@@ -12,6 +12,7 @@ It is designed for local-only save/load workflows without a Node.js server.
 - Save listing, lookup, delete, and per-story clear.
 - Export of a save slot to a downloadable `.sav` file.
 - Import of a `.sav` file back into a story slot.
+- Optional interpreter-side save metadata, including visited-map discovery state.
 
 ## API summary
 
@@ -55,6 +56,7 @@ await storage.putSave({
   quetzalData: vmQuetzalBytes, // Uint8Array or ArrayBuffer
   serial: '870912',
   release: 219,
+  mapDiscovery: currentMapDiscoveryState,
 });
 
 // Export slot 0
@@ -73,4 +75,6 @@ await importSaveFileToSlot(storage, fileInput.files[0], {
 
 - This module stores raw Quetzal bytes exactly as provided by the VM.
 - Quetzal generation/parsing remains VM responsibility.
+- Local save records may include interpreter metadata such as `mapDiscovery`; exported `.sav` files remain raw Quetzal and do not include that metadata.
+- Imported `.sav` files without `mapDiscovery` use the in-game visited-map fallback described in [`IN_GAME_VISITED_MAP.md`](IN_GAME_VISITED_MAP.md).
 - Recommended story id format: include title + release + serial to avoid collisions across story revisions.

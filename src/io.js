@@ -81,6 +81,10 @@ class GameIoController {
       typeof opts.onHorrorEffectCommand === 'function' ? opts.onHorrorEffectCommand : function () {};
     this.onMapRequested =
       typeof opts.onMapRequested === 'function' ? opts.onMapRequested : function () {};
+    this.isMapAvailable =
+      typeof opts.isMapAvailable === 'function' ? opts.isMapAvailable : function () { return true; };
+    this.onMapDiscoveryChanged =
+      typeof opts.onMapDiscoveryChanged === 'function' ? opts.onMapDiscoveryChanged : function () {};
     this.onCreditsRequested =
       typeof opts.onCreditsRequested === 'function' ? opts.onCreditsRequested : function () {};
     this.onStoryQuit =
@@ -141,6 +145,9 @@ class GameIoController {
     this.importFileInput = this._createImportFileInput();
     this.restoreAudioTransitionActive = false;
     this.pendingRoomDebugAfterLook = false;
+    this.pendingMapCommand = '';
+    this.mapDiscoveryTracker = opts.mapDiscoveryTracker || this._createDefaultMapDiscoveryTracker();
+    this.lastVmRestartSerial = 0;
 
     this.ui.setCommandHandler(command => this.submitCommand(command));
     this._syncStatusDisplays();
@@ -160,6 +167,12 @@ class GameIoController {
     this.sawCurrentRoomHeadingThisCycle = false;
     this.previousVmLine = '';
     this.pendingViewReturn = null;
+    this.pendingMapCommand = '';
+    this.lastVmRestartSerial = 0;
+    if (this.mapDiscoveryTracker && typeof this.mapDiscoveryTracker.reset === 'function') {
+      this.mapDiscoveryTracker.reset();
+      this._notifyMapDiscoveryChanged();
+    }
     this.gameOverMusicActive = false;
     this.gameOverMusicStartToken += 1;
     this._stopGameOverMusic();
@@ -182,6 +195,7 @@ class GameIoController {
         onUnknownOpcode: event => this._handleUnknownOpcode(event),
       },
     });
+    this.lastVmRestartSerial = Number(this.vm.restartSerial) || 0;
 
     this.ui.clearOutput();
     this.ui.appendOutput('Story loaded: release ' + parsed.release + ', serial ' + parsed.serial, 'system');
@@ -238,6 +252,7 @@ class GameIoController {
     }
 
     this._flushVmOutputBuffer();
+    this._handleVmRestartIfNeeded();
     this._syncStatusDisplays();
     if (result.haltReason !== 'restore') {
       this.restoreAudioTransitionActive = false;
@@ -325,6 +340,7 @@ class GameIoController {
     this.sawPitchBlackThisCycle = false;
     this.sawCurrentRoomHeadingThisCycle = false;
     this.pendingRoomDebugAfterLook = this._isLookCommand(command);
+    this.pendingMapCommand = normalized;
     this.vm.provideInput(command);
     this.runVm();
   }
@@ -411,8 +427,13 @@ class GameIoController {
       return true;
     }
     if (normalized === '$MAP') {
+      if (!this.isMapAvailable()) {
+        this.ui.appendOutput('The visited-location map is disabled for this experience profile.', 'system');
+        this.ui.setStatus('Interpreter command', 'Map disabled');
+        return true;
+      }
       this.onMapRequested();
-      this.ui.appendOutput('Opened the spoiler-safe university overview map.', 'system');
+      this.ui.appendOutput('Opened the visited-location map.', 'system');
       this.ui.setStatus('Interpreter command', 'Map');
       return true;
     }
@@ -1097,6 +1118,108 @@ class GameIoController {
     return null;
   }
 
+  _createDefaultMapDiscoveryTracker() {
+    if (typeof window !== 'undefined' && typeof window.LhMapDiscoveryTracker === 'function') {
+      return new window.LhMapDiscoveryTracker({ mapData: window.MapPrototype2Data });
+    }
+    return null;
+  }
+
+  _getMapDiscoverySnapshot() {
+    if (!this.mapDiscoveryTracker || typeof this.mapDiscoveryTracker.serialize !== 'function') {
+      return null;
+    }
+    return this.mapDiscoveryTracker.serialize();
+  }
+
+  _notifyMapDiscoveryChanged() {
+    const state = this._getMapDiscoverySnapshot();
+    try {
+      this.onMapDiscoveryChanged(state);
+    } catch (error) {
+      // Keep map UI failures from interrupting the interpreter.
+    }
+  }
+
+  _handleVmRestartIfNeeded() {
+    if (!this.vm) return false;
+    const restartSerial = Number(this.vm.restartSerial) || 0;
+    if (restartSerial <= this.lastVmRestartSerial) return false;
+    this.lastVmRestartSerial = restartSerial;
+    this.pendingMapCommand = '';
+    this.lastTurnWasPitchBlack = false;
+    this.flashlightOverride = null;
+    this.pendingDarkClearRoomId = null;
+    this.sawPitchBlackThisCycle = false;
+    this.sawCurrentRoomHeadingThisCycle = false;
+    this.pendingRoomDebugAfterLook = false;
+    this.currentRoomId = -1;
+    this.currentRoomName = '';
+    this.lastSceneIsDark = null;
+    if (this.mapDiscoveryTracker && typeof this.mapDiscoveryTracker.reset === 'function') {
+      this.mapDiscoveryTracker.reset();
+      this._notifyMapDiscoveryChanged();
+    }
+    return true;
+  }
+
+  _restoreMapDiscoveryFromRecord(record) {
+    if (!this.mapDiscoveryTracker) return;
+    if (record && record.mapDiscovery && typeof this.mapDiscoveryTracker.restore === 'function') {
+      this.mapDiscoveryTracker.restore(record.mapDiscovery);
+      this._notifyMapDiscoveryChanged();
+      return;
+    }
+    if (this._restoreMapDiscoveryFromVmVisitedRooms()) {
+      return;
+    }
+    if (typeof this.mapDiscoveryTracker.reset === 'function') {
+      this.mapDiscoveryTracker.reset();
+      this._notifyMapDiscoveryChanged();
+    }
+  }
+
+  _restoreMapDiscoveryFromVmVisitedRooms() {
+    if (
+      !this.vm ||
+      !this.mapDiscoveryTracker ||
+      typeof this.vm._testAttribute !== 'function' ||
+      typeof this.mapDiscoveryTracker.getMappedRoomIds !== 'function' ||
+      typeof this.mapDiscoveryTracker.restoreVisitedRooms !== 'function'
+    ) {
+      return false;
+    }
+    try {
+      const mappedRoomIds = this.mapDiscoveryTracker.getMappedRoomIds();
+      const visitedRoomIds = mappedRoomIds.filter(roomId => this.vm._testAttribute(roomId, 6));
+      const snapshot = typeof this.vm.getStatusSnapshot === 'function' ? this.vm.getStatusSnapshot() : {};
+      const currentRoomId = snapshot && Number.isFinite(Number(snapshot.roomObjectId))
+        ? Number(snapshot.roomObjectId)
+        : 0;
+      if (!visitedRoomIds.length && !currentRoomId) {
+        return false;
+      }
+      this.mapDiscoveryTracker.restoreVisitedRooms(visitedRoomIds, { currentRoomId });
+      this._notifyMapDiscoveryChanged();
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  _observeMapDiscovery(roomId) {
+    if (!this.mapDiscoveryTracker || typeof this.mapDiscoveryTracker.observeRoom !== 'function') {
+      return;
+    }
+    const exits = this._listRoomExits(roomId);
+    this.mapDiscoveryTracker.observeRoom(roomId, {
+      command: this.pendingMapCommand,
+      exits,
+    });
+    this.pendingMapCommand = '';
+    this._notifyMapDiscoveryChanged();
+  }
+
   _createImportFileInput() {
     if (typeof document === 'undefined') {
       return null;
@@ -1478,6 +1601,7 @@ class GameIoController {
         release: compat.release,
         checksum: compat.checksum,
         sceneIsDark: !!this.lastTurnWasPitchBlack,
+        mapDiscovery: this._getMapDiscoverySnapshot(),
         quetzalData: this.vm.serializePendingSaveState(),
       });
       this.vm.completePendingSave(true);
@@ -1530,6 +1654,7 @@ class GameIoController {
         'system'
       );
       this.lastSceneIsDark = null;
+      this._restoreMapDiscoveryFromRecord(record);
       this._syncStatusDisplays();
       this._appendLightDebugOutput(
         '[LightDebug][restore] after _syncStatusDisplays lastSceneIsDark=' +
@@ -1582,6 +1707,7 @@ class GameIoController {
         release: compat.release,
         checksum: compat.checksum,
         sceneIsDark: !!this.lastTurnWasPitchBlack,
+        mapDiscovery: this._getMapDiscoverySnapshot(),
         quetzalData: this.vm.serializeSaveState(),
       });
       this.ui.appendOutput(
@@ -1667,6 +1793,7 @@ class GameIoController {
         'system'
       );
       this.lastSceneIsDark = null;
+      this._restoreMapDiscoveryFromRecord(record);
       this._syncStatusDisplays();
       this._appendLightDebugOutput(
         '[LightDebug][load] after _syncStatusDisplays lastSceneIsDark=' +
@@ -2242,6 +2369,9 @@ class GameIoController {
       this.currentRoomName = roomName;
       this.lastSceneIsDark = isDark;
       this.onRoomChanged(this.currentRoomName, this.currentRoomId, { isDark });
+      if (roomId) {
+        this._observeMapDiscovery(roomId);
+      }
     }
     this.ui.setTopbarMeta(
       roomName || '',

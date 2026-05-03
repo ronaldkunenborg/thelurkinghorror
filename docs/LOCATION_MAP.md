@@ -80,7 +80,8 @@ Decision for now:
 - keep `docs/LOCATION_MAP.md` as the full internal/reference version
 - leave hidden late-game areas and special-access routes visible here when they are known
 - do not treat this document as the default in-game map experience
-- handle any future spoiler-safe or progressive map as a separate artifact rather than weakening this reference doc
+- handle spoiler-safe or progressive map behavior as a separate artifact rather than weakening this reference doc
+- current player-facing progressive map behavior is documented in [`IN_GAME_VISITED_MAP.md`](IN_GAME_VISITED_MAP.md)
 
 ## Booklet-derived structure conclusions (for Task 45)
 

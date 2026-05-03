@@ -80,6 +80,7 @@ class Z3VM {
     this.pendingSave = null;
     this.pendingRestore = null;
     this._dictionaryMeta = null;
+    this.restartSerial = 0;
   }
 
   _makeRootFrame() {
@@ -126,6 +127,7 @@ class Z3VM {
       this.memory[i] = this.originalMemory[i];
     }
     this._dictionaryMeta = null;
+    this.restartSerial += 1;
     this._resetMachineState();
   }
 

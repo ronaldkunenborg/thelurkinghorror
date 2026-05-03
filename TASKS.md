@@ -311,30 +311,50 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Tuned focus contour hierarchy to two full contour passes, a 2px-equivalent main stroke, visible 0.86px brush-hair strokes, and slightly increased focus jitter so focused tiles stay strong without looking overly regular.
    - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.
 
+63. [done] Add an in-game map of visited locations while adventuring.
+   - Plan:
+      - Use a shared global `window.LhMapRenderer` in `src/map-renderer.js` so `map-prototype-2.html` remains a fully working prototype/debug page and the game can use the same renderer directly.
+      - Implement in phases: first extract the renderer without behavior changes, then add in-game discovery/reveal state, then wire save/load persistence and the `$MAP` modal.
+      - Render the in-game map in the existing modal overlay, not in an iframe and not in the right-side room-art pane.
+      - Use a player-truth discovery model: record rooms, visible exits, and transitions from actual successful play actions instead of precomputed full-world completeness.
+      - Ignore the three one-shot dream locations from the starting-room paper (`place`/152, `basalt`/134, `platform`/21).
+      - Keep building outlines/overlays visible from the start.
+      - Reveal visited rooms and known links only:
+         - visible exits from a visited room become known links, drawn from the source side;
+         - targets remain hidden until visited;
+         - successful traversals confirm full links;
+         - puzzle links use dashed lines;
+         - the one-way bar for Infinite Corridor -> Great Court appears only after that traversal is known.
+      - Persist discovery in local IndexedDB save-slot metadata via an optional `mapDiscovery` field.
+      - Keep `.sav` export/import pure Quetzal for compatibility; imported saves without metadata rebuild visited rooms from the VM room-visited attribute when possible, then continue discovery from the restored current room.
+   - Implementation progress:
+      - Extracted the prototype map renderer into `src/map-renderer.js` and changed `src/map-prototype-2.html` to initialize it in prototype mode.
+      - Added `src/map-discovery.js` with deterministic player-truth discovery tracking for visited rooms, visible exits, traversed links, duplicate room ids, and dream-room exclusion.
+      - Added in-game renderer mode for visited-only rooms, known-link stubs, traversed full links, current player marker placement, and prototype-free control defaults.
+      - Added reverse-edge discovery/rendering so one-sided prototype links can still reveal correctly when the engine exposes or traverses the opposite direction.
+      - Replaced the static `$MAP` modal image in `src/index.html` with the shared renderer and wired discovery updates from `GameIoController`.
+      - Persisted optional `mapDiscovery` metadata in local IndexedDB save records while keeping `.sav` export/import pure Quetzal.
+      - Added explicit renderer support for drawing the main legend and tile-direction legend independently, and enabled both legend parts on the in-game map.
+      - Enlarged the game map modal with viewport-aware width/height constraints and a smaller mobile layout.
+      - Added a metadata fallback for older/imported saves: scan mapped room object IDs for VM attribute `6` and restore visited rooms before normal map discovery resumes.
+      - Extended the metadata fallback to infer drawable route links breadth-first from Computer Center (65) when two visited tiles have a single map link and the target tile has no other known route yet.
+      - Enabled the prototype map's right-mouse floor scrub interaction on the in-game map by keeping an internal floor focus when no prototype floor select exists.
+      - Added a floor-level select to the in-game map title bar and synchronized it with right-mouse floor scrubbing and Current location focus.
+      - Added an in-legend `Show tile grid` toggle for the in-game map, defaulting off and using the same tile-grid overlay as the prototype map.
+      - Stabilized in-game map state sync so save/load metadata updates no longer reset the selected floor/view when the current map node did not change.
+      - Fixed current-location layer sync on node changes so loading into a different room updates the in-game floor focus before drawing that room tile.
+      - Reset map discovery after a story `restart` opcode so visited-map state does not survive a restarted playthrough.
+      - Added map availability as an experience setting while keeping map discovery save/load data independent from whether the map UI is enabled.
+      - Documented runtime behavior, discovery rules, save/load fallback, UI controls, and verification in `docs/IN_GAME_VISITED_MAP.md`.
+
 ## Pending Tasks
 
-63. [pending] Add an in-game map of visited locations while adventuring.
-   - use map-prototype-2 as the basis for the in-game map map.
-   - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
-   - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
-   - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
-   - Visibility rules for the in-game map: 
-      - The building outlines will be visible from the start.
-      - reveal model: visited rooms plus known links.
-      - Exits that are clearly visible when you enter a room will be denoted with continuous white edges to other areas when you enter the room. The end-tile will of course only be visible once visited.
-      - Edges that are only visible after you solve a puzzle or take action will be denoted with interrupted white edges. The end-tile will of course only be visible once visited.
-      - Edges that are one-way only (only the edge into the Great Court from the Infinite Corridor) will be shown with a 90 degree bar (as in the booklet) with the bar at 25% of the edge near the tile that you cannot return from (so close to the Great Court tile). This bar will only be shown once you are in Great Court and you can't get back.
-   - Visibility is per game. This means the save game needs to know the visited rooms. Maybe it already does?
-   - The player character is represented by a red player model. This needs to be drawn.
+65. [pending] Think about how to implement a mini-map or a continuous map displayed above the text.
 
+66. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
 
-64. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
+## Future Tasks
 
-- Add initial booklet hints dataset scaffold (source-page + topic + tier fields)
-- Add interpreter command plumbing for `hints-booklet` / consultation entry flow (placeholder output acceptable for first step)
-- Add safe-location gating skeleton and feature flag for consultation availability
-- Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
-- Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
-
-65. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
-
+64. [future] Consider hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` later.
+   - Parked for now because the in-game visited-location map covers the immediate player-support need.
+   - If revived later, likely scope includes booklet page 1-4 dataset scaffolding, `hints-booklet` command plumbing, safe-location gating, and minimal consultation state.

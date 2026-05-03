@@ -24,7 +24,9 @@ This project adds a few interpreter-level conveniences on top of standard story 
   - Shows the room preview, then waits for your next command keypress and restores the exact prior state.
 
 - `$MAP`
-  - Opens the spoiler-safe university overview map panel.
+  - Opens the in-game visited-location map when the current experience profile enables map access.
+  - Map discovery still runs and persists in save metadata even when map access is disabled.
+  - Runtime design details: [`IN_GAME_VISITED_MAP.md`](IN_GAME_VISITED_MAP.md).
 
 - `$CREDITS`
   - Opens the credits panel with game, adaptation, and asset attribution.

@@ -2,6 +2,8 @@
 
 const assert = require('assert');
 const { GameIoController } = require('../src/io.js');
+const mapData = require('../src/map-prototype-2-data.js');
+const { MapDiscoveryTracker } = require('../src/map-discovery.js');
 
 function flushAsyncWork() {
   return new Promise(resolve => setTimeout(resolve, 0));
@@ -248,7 +250,7 @@ function testGameSoundAliasWorksWithoutVmInput() {
   assert.deepStrictEqual(musicStates, [false], '$GAMESOUND should notify music preference changes');
 }
 
-function testMapCommandOpensUniversityMap() {
+function testMapCommandOpensVisitedMap() {
   const ui = createUi();
   const mapRequests = [];
   const controller = new GameIoController(ui, {
@@ -266,13 +268,163 @@ function testMapCommandOpensUniversityMap() {
     '$MAP should invoke map-open callback exactly once'
   );
   assert.ok(
-    ui.lines.includes('Opened the spoiler-safe university overview map.'),
+    ui.lines.includes('Opened the visited-location map.'),
     '$MAP should print confirmation output'
   );
   assert.deepStrictEqual(
     ui.statuses.slice(-1)[0],
     ['Interpreter command', 'Map'],
     '$MAP should update status line'
+  );
+}
+
+function testMapCommandCanBeDisabledWithoutDisablingDiscovery() {
+  const ui = createUi();
+  const mapRequests = [];
+  const controller = new GameIoController(ui, {
+    isMapAvailable() {
+      return false;
+    },
+    onMapRequested() {
+      mapRequests.push('open');
+    },
+    mapDiscoveryTracker: {
+      serialize() {
+        return { version: 1, currentNodeId: 'computer', visitedNodeIds: ['computer'] };
+      },
+    },
+  });
+  controller.vm = { haltReason: null };
+
+  controller.submitCommand('$MAP');
+
+  assert.deepStrictEqual(mapRequests, [], 'disabled map command should not open the map UI');
+  assert.ok(
+    ui.lines.includes('The visited-location map is disabled for this experience profile.'),
+    'disabled map command should explain the experience-profile restriction'
+  );
+  assert.deepStrictEqual(
+    controller._getMapDiscoverySnapshot(),
+    { version: 1, currentNodeId: 'computer', visitedNodeIds: ['computer'] },
+    'disabling map availability should not disable map discovery data'
+  );
+}
+
+function testMapDiscoveryTracksVisitedKnownAndTraversedLinks() {
+  const tracker = new MapDiscoveryTracker({ mapData });
+
+  let state = tracker.observeRoom(190, { exits: ['east'] });
+  assert.ok(state.visitedNodeIds.includes('mass'), 'Mass. Ave. should be marked visited');
+  assert.ok(
+    state.knownLinks.some(link => link.fromNodeId === 'mass' && link.toNodeId === 'ic1'),
+    'visible east exit should create a known link from Mass. Ave.'
+  );
+
+  state = tracker.observeRoom(218, { command: 'east', exits: [] });
+  assert.ok(state.visitedNodeIds.includes('ic1'), 'successful movement should visit Infinite Corridor W1');
+  assert.ok(
+    state.traversedLinks.some(link => link.fromNodeId === 'mass' && link.toNodeId === 'ic1'),
+    'successful movement should confirm the traversed link'
+  );
+
+  state = tracker.observeRoom(176, { exits: ['south'] });
+  assert.ok(
+    state.knownLinks.some(link => link.fromNodeId === 'terminal' && link.toNodeId === 'second'),
+    'visible reverse-only exits should still create known map links'
+  );
+}
+
+function testMapDiscoveryIgnoresDreamRooms() {
+  const tracker = new MapDiscoveryTracker({ mapData });
+  const state = tracker.observeRoom(152, { exits: ['down'] });
+  assert.strictEqual(state.currentNodeId, '', 'dream rooms should not become current map nodes');
+  assert.deepStrictEqual(state.visitedNodeIds, [], 'dream rooms should not be revealed');
+}
+
+function testMapDiscoveryRestoresVisitedRoomsFromVmFallback() {
+  const tracker = new MapDiscoveryTracker({ mapData });
+  const state = tracker.restoreVisitedRooms([176, 137, 152], { currentRoomId: 137 });
+
+  assert.ok(state.visitedRoomIds.includes(176), 'VM fallback should preserve visited Terminal Room');
+  assert.ok(state.visitedRoomIds.includes(137), 'VM fallback should preserve visited Second Floor');
+  assert.ok(!state.visitedRoomIds.includes(152), 'VM fallback should ignore dream rooms');
+  assert.ok(state.visitedNodeIds.includes('terminal'), 'VM fallback should reveal Terminal Room node');
+  assert.ok(state.visitedNodeIds.includes('second'), 'VM fallback should reveal Second Floor node');
+  assert.strictEqual(state.currentNodeId, 'second', 'VM fallback should restore the current map node');
+}
+
+function testMapDiscoveryFallbackInfersSingleLinksBreadthFirst() {
+  const tracker = new MapDiscoveryTracker({ mapData });
+  const state = tracker.restoreVisitedRooms([65, 137, 176], { currentRoomId: 176 });
+
+  assert.ok(
+    state.knownLinks.some(link => link.fromNodeId === 'computer' && link.toNodeId === 'second'),
+    'VM fallback should infer the unique Computer Center -> Second Floor route link'
+  );
+  assert.ok(
+    state.knownLinks.some(link => link.fromNodeId === 'second' && link.toNodeId === 'terminal'),
+    'VM fallback should continue breadth-first to Terminal Room'
+  );
+
+  const incomplete = new MapDiscoveryTracker({ mapData }).restoreVisitedRooms([65, 176], { currentRoomId: 176 });
+  assert.ok(
+    !incomplete.knownLinks.some(link => link.toNodeId === 'terminal'),
+    'VM fallback should not bridge through unvisited intermediate tiles'
+  );
+}
+
+function testRestartResetsMapDiscovery() {
+  const ui = createUi();
+  const events = [];
+  const tracker = {
+    resetCalls: 0,
+    observedRooms: [],
+    reset() {
+      this.resetCalls++;
+    },
+    serialize() {
+      return {
+        version: 1,
+        currentRoomId: this.observedRooms[this.observedRooms.length - 1] || 0,
+        visitedRoomIds: this.observedRooms.slice(),
+        visitedNodeIds: [],
+        knownLinks: [],
+        traversedLinks: [],
+      };
+    },
+    observeRoom(roomId) {
+      this.observedRooms.push(roomId);
+    },
+  };
+  const controller = new GameIoController(ui, {
+    mapDiscoveryTracker: tracker,
+    onMapDiscoveryChanged(state) {
+      events.push(state);
+    },
+  });
+  controller.currentRoomId = 137;
+  controller.currentRoomName = 'Second Floor';
+  controller.lastVmRestartSerial = 0;
+  controller.vm = {
+    restartSerial: 1,
+    run() {
+      return { haltReason: 'input', quit: false };
+    },
+    getStatusSnapshot() {
+      return { roomObjectId: 65, roomName: 'Computer Center', score: 0, moves: 0 };
+    },
+    _findPropertyAddress() {
+      return 0;
+    },
+  };
+
+  controller.runVm();
+
+  assert.strictEqual(tracker.resetCalls, 1, 'VM restart should reset map discovery metadata');
+  assert.deepStrictEqual(tracker.observedRooms, [65], 'restart should observe only the restarted current room');
+  assert.ok(
+    events.some(state => state && state.currentRoomId === 0),
+    'restart should notify the UI about the cleared map before re-observing the start room'
   );
 }
 
@@ -1000,6 +1152,11 @@ async function testSaveCommandStoresVmSnapshot() {
   const storage = createSaveStorage();
   const controller = new GameIoController(ui, {
     saveStorage: storage,
+    mapDiscoveryTracker: {
+      serialize() {
+        return { version: 1, currentNodeId: 'terminal', visitedNodeIds: ['terminal'] };
+      },
+    },
   });
   controller.storyMeta = createStoryMeta();
   controller.currentRoomName = 'Terminal Room';
@@ -1018,14 +1175,24 @@ async function testSaveCommandStoresVmSnapshot() {
   const record = await storage.getSave('lurking-horror-r219-870912', 2);
   assert.ok(record, 'save command should persist a slot');
   assert.strictEqual(record.label, 'Slot 2 - Terminal Room', 'save label should include slot and room');
+  assert.deepStrictEqual(
+    record.mapDiscovery,
+    { version: 1, currentNodeId: 'terminal', visitedNodeIds: ['terminal'] },
+    'save command should persist map discovery metadata'
+  );
   assert.ok(ui.lines.some(line => line.includes('Saved slot 2')), 'save command should report success');
 }
 
 async function testLoadCommandRestoresVmSnapshot() {
   const ui = createUi();
   const storage = createSaveStorage();
+  const mapStates = [];
   const controller = new GameIoController(ui, {
     saveStorage: storage,
+    mapDiscoveryTracker: new MapDiscoveryTracker({ mapData }),
+    onMapDiscoveryChanged(state) {
+      mapStates.push(state);
+    },
   });
   controller.storyMeta = createStoryMeta();
   let restored = null;
@@ -1037,7 +1204,10 @@ async function testLoadCommandRestoresVmSnapshot() {
       restored = Array.from(new Uint8Array(bytes));
     },
     getStatusSnapshot() {
-      return { roomName: 'Restored Room', score: 7, moves: 8 };
+      return { roomObjectId: 137, roomName: 'Second Floor', score: 7, moves: 8 };
+    },
+    _testAttribute(roomId, attribute) {
+      return attribute === 6 && (roomId === 176 || roomId === 137);
     },
   };
 
@@ -1058,8 +1228,17 @@ async function testLoadCommandRestoresVmSnapshot() {
   assert.ok(ui.lines.some(line => line.includes('Loaded slot 1')), 'load command should report success');
   assert.deepStrictEqual(
     ui.topbarMeta.slice(-1)[0],
-    ['Restored Room', '7', '8'],
+    ['Second Floor', '7', '8'],
     'load should refresh room and score metadata after restore'
+  );
+  assert.ok(
+    mapStates.some(state =>
+      state &&
+      state.visitedNodeIds.includes('terminal') &&
+      state.visitedNodeIds.includes('second') &&
+      state.currentNodeId === 'second'
+    ),
+    'load without map metadata should rebuild visited rooms from VM room attributes'
   );
 }
 
@@ -1367,6 +1546,11 @@ async function testStorySaveOpcodeStoresSuccessfulContinuation() {
   const storage = createSaveStorage();
   const controller = new GameIoController(ui, {
     saveStorage: storage,
+    mapDiscoveryTracker: {
+      serialize() {
+        return { version: 1, currentNodeId: 'terminal', visitedNodeIds: ['terminal'] };
+      },
+    },
   });
   controller.storyMeta = createStoryMeta();
   controller.currentRoomName = 'Terminal Room';
@@ -1536,7 +1720,13 @@ async function run() {
   testRoomDebugLookIncludesExits();
   testSoundInterpreterCommandWorksWithoutVmInput();
   testGameSoundAliasWorksWithoutVmInput();
-  testMapCommandOpensUniversityMap();
+  testMapCommandOpensVisitedMap();
+  testMapCommandCanBeDisabledWithoutDisablingDiscovery();
+  testMapDiscoveryTracksVisitedKnownAndTraversedLinks();
+  testMapDiscoveryIgnoresDreamRooms();
+  testMapDiscoveryRestoresVisitedRoomsFromVmFallback();
+  testMapDiscoveryFallbackInfersSingleLinksBreadthFirst();
+  testRestartResetsMapDiscovery();
   testCreditsCommandOpensCreditsPanel();
   await testSaveAndLoadCommandsWithoutSlotOpenSlotPicker();
   testSaveLoadRejectOutOfRangeSlots();

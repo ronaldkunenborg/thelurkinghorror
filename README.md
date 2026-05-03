@@ -30,7 +30,7 @@ The interpreter adds non-story commands:
 - `$DEBUG`
   Toggle debug-only VM/sound/light/blood diagnostics.
 - `$MAP`
-  Open the spoiler-safe university overview map panel.
+  Open the in-game visited-location map when enabled by the current experience profile.
 - `$CREDITS`
   Open the credits panel.
 - `$VIEW <room-id|room-name>`
@@ -118,6 +118,11 @@ These are used as map/reference material during location reconciliation work.
 - [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music.
 - [`src/assets/audio/game-over-desmae-877160.mp3`](src/assets/audio/game-over-desmae-877160.mp3) - game-over music.
 - [`src/assets/gfx/lurkinghorror/`](src/assets/gfx/lurkinghorror/) - location artwork set.
+
+## Runtime Map Notes
+
+- The in-game visited map is documented in [`docs/IN_GAME_VISITED_MAP.md`](docs/IN_GAME_VISITED_MAP.md).
+- The full technical/reference map remains [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md); it is not the default player-facing map experience.
 - [`src/assets/gfx/lurkinghorror/game_over.png`](src/assets/gfx/lurkinghorror/game_over.png) - game-over artwork.
 - [`src/assets/gfx/blood/`](src/assets/gfx/blood/) - blood-splatter overlays used by the ambient blood effect.
 
