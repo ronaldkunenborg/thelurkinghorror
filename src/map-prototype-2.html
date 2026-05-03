@@ -155,6 +155,30 @@
         dominant-baseline: central;
       }
 
+      .legend-building-icon-frame {
+        fill: rgba(24, 25, 27, 0.86);
+        stroke: rgba(232, 236, 240, 0.78);
+        stroke-width: 1.6;
+      }
+
+      .legend-building-icon {
+        opacity: 1;
+        filter: brightness(1.45) contrast(1.22);
+        pointer-events: none;
+      }
+
+      .legend-building-label {
+        fill: rgba(238, 240, 244, 0.94);
+        font-size: 38px;
+        font-family: "IM Fell English SC", Georgia, "Times New Roman", serif;
+        text-anchor: start;
+        dominant-baseline: central;
+      }
+
+      .map-fit-ignore {
+        pointer-events: none;
+      }
+
       .grid-meta-label {
         fill: var(--muted);
         font-size: 44px;
@@ -606,6 +630,7 @@
         stroke-width: 2.2;
         stroke-linecap: round;
         opacity: 0.95;
+        stroke: #f4f2ea;
       }
 
       .edge-match {
@@ -613,11 +638,23 @@
       }
 
       .edge-engine-only {
-        stroke: #5be08a;
+        stroke: #f4f2ea;
       }
 
       .edge-presentation-only {
-        stroke: #ff6f6f;
+        stroke: #f4f2ea;
+      }
+
+      .edge-puzzle {
+        stroke-dasharray: 6 16;
+        stroke-linecap: butt;
+      }
+
+      .edge-one-way-bar {
+        stroke: #f4f2ea;
+        stroke-width: 6;
+        stroke-linecap: butt;
+        opacity: 0.98;
       }
 
       .edge-depth-focus {
@@ -633,6 +670,66 @@
       .edge-depth-far {
         stroke-width: 1.3;
         opacity: 0.48;
+      }
+
+      .player-marker {
+        pointer-events: none;
+        filter: drop-shadow(0 0 8px rgba(210, 20, 20, 0.72));
+      }
+
+      .legend-action {
+        cursor: pointer;
+      }
+
+      .legend-action-hit {
+        fill: rgba(72, 18, 18, 0.18);
+        stroke: rgba(255, 80, 80, 0.42);
+        stroke-width: 1.2;
+      }
+
+      .legend-action:hover .legend-action-hit,
+      .legend-action:focus .legend-action-hit {
+        fill: rgba(92, 24, 24, 0.52);
+        stroke: rgba(255, 92, 92, 0.88);
+      }
+
+      .legend-action-target {
+        fill: none;
+        stroke: rgba(255, 92, 92, 0.92);
+        stroke-width: 2.4;
+        pointer-events: none;
+      }
+
+      .player-marker-ping {
+        fill: none;
+        stroke: rgba(255, 54, 54, 0.82);
+        stroke-width: 5;
+        pointer-events: none;
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: player-marker-ping-grow 1.15s cubic-bezier(0.12, 0, 0.16, 1) forwards,
+          player-marker-ping-fade 1.15s ease-in forwards;
+      }
+
+      @keyframes player-marker-ping-grow {
+        0% {
+          transform: scale(0.5);
+        }
+        100% {
+          transform: scale(1.34);
+        }
+      }
+
+      @keyframes player-marker-ping-fade {
+        0% {
+          opacity: 1;
+        }
+        62% {
+          opacity: 0.86;
+        }
+        100% {
+          opacity: 0;
+        }
       }
     </style>
   </head>
@@ -688,11 +785,14 @@
       let uiLayer = null;
       let legendLayer = null;
       let svgDefs = null;
+      let buildingArtworkVisible = true;
+      let playerPingUntil = 0;
+      const PLAYER_ROOM_ID = "terminal";
       const panZoom = {
         scale: 0.42,
         tx: 20,
         ty: 20,
-        minScale: 0.25,
+        minScale: 0.08,
         maxScale: 3.5,
         dragging: false,
         lastX: 0,
@@ -1395,9 +1495,9 @@
           type: "building-central",
           label: "Central Complex",
           sub: "Great Dome + Aero + Engineering + Chemistry",
-          bounds: { tl: { c: 5, rank: 7 }, br: { c: 9, rank: 3 } }
+          bounds: { tl: { c: 5, rank: 6 }, br: { c: 9, rank: 2 } }
         },
-        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 13, rank: 6 }, br: { c: 13, rank: 6 } } },
+        { id: "brown", type: "building", label: "Brown Building", sub: "18-floor skyscraper", bounds: { tl: { c: 13, rank: 5 }, br: { c: 13, rank: 5 } } },
         // Hidden placement zones for underground grouping.
         { id: "steam", type: "placement-zone", hidden: true, bounds: { tl: { c: 4, rank: 3 }, br: { c: 10, rank: 2 } } },
         { id: "wet", type: "placement-zone", hidden: true, bounds: { tl: { c: 4, rank: 1 }, br: { c: 10, rank: 1 } } },
@@ -1907,6 +2007,33 @@
       function buildLayerRenderContext(layerFilter) {
         const verticalEdgeLength = Math.hypot(STEP_E.dx, STEP_E.dy);
         const layerStep = verticalEdgeLength * 0.4875;
+        const isVerticalCommand = (command) => {
+          const s = String(command || "").toLowerCase();
+          return (s.includes("up") && !s.includes("down")) || s.includes("down");
+        };
+        const isCrossLayerEdgeCompanion = (room, focusLevel) => {
+          if (!room || !Number.isFinite(focusLevel)) return false;
+          const roomLevel = layerToLevel(room.layer);
+          if (!Number.isFinite(roomLevel)) return false;
+          for (const sourceRoom of MAP_MODEL.rooms) {
+            const sourceLayout = ROOM_LAYOUT[sourceRoom.id];
+            const sourceLevel = layerToLevel(sourceLayout && sourceLayout.layer);
+            if (!Number.isFinite(sourceLevel)) continue;
+            for (const edge of sourceRoom.edges || []) {
+              const targetLayout = ROOM_LAYOUT[edge.to];
+              const targetLevel = layerToLevel(targetLayout && targetLayout.layer);
+              if (!Number.isFinite(targetLevel) || Math.abs(sourceLevel - targetLevel) <= 1) continue;
+              const isCrossLayerPuzzle = edge.type === "puzzle" && !isVerticalCommand(edge.label);
+              const isCrossLayerVertical = isVerticalCommand(edge.label);
+              if (!isCrossLayerPuzzle && !isCrossLayerVertical) continue;
+              const sourceNearFocus = Math.abs(sourceLevel - focusLevel) <= 1;
+              const targetNearFocus = Math.abs(targetLevel - focusLevel) <= 1;
+              if (room.id === sourceRoom.id && targetNearFocus) return true;
+              if (room.id === edge.to && sourceNearFocus) return true;
+            }
+          }
+          return false;
+        };
         if (layerFilter === "all") {
           return {
             focusLevel: null,
@@ -1932,7 +2059,7 @@
           includeRoom: (room) => {
             const roomLevel = layerToLevel(room.layer);
             if (roomLevel == null) return false;
-            return Math.abs(roomLevel - focusLevel) <= 1;
+            return Math.abs(roomLevel - focusLevel) <= 1 || isCrossLayerEdgeCompanion(room, focusLevel);
           },
           layerOffsetY: (room) => {
             const roomLevel = layerToLevel(room.layer);
@@ -2005,7 +2132,7 @@
         };
       }
 
-      function drawCampusGroundOverlay(showRoads, layerFilter) {
+      function drawCampusGroundOverlay(showRoads, layerFilter, showBuildingArtwork = true) {
         const drawAllCampusLabels = () => {
           const normalize = (v) => {
             const d = Math.hypot(v.x, v.y) || 1;
@@ -2169,16 +2296,18 @@
           drawRoadJunctionPatch(roadPolygons, roadOpacityScale);
         }
 
-        drawCentralBuildingIllustration(layerFilter);
-        /*
-        // Legacy split central-building overlays; kept here for quick comparison.
-        drawCentralCoreIllustration(layerFilter);
-        drawCentralCoreRightWingIllustration(layerFilter);
-        */
-        drawComputerCenterIllustration(layerFilter);
-        drawBrownBuildingIllustration(layerFilter);
-        drawTemporaryLabIllustration(layerFilter);
-        drawBuildingOutlineOverlay(layerFilter);
+        if (showBuildingArtwork) {
+          drawCentralBuildingIllustration(layerFilter);
+          /*
+          // Legacy split central-building overlays; kept here for quick comparison.
+          drawCentralCoreIllustration(layerFilter);
+          drawCentralCoreRightWingIllustration(layerFilter);
+          */
+          drawComputerCenterIllustration(layerFilter);
+          drawBrownBuildingIllustration(layerFilter);
+          drawTemporaryLabIllustration(layerFilter);
+          drawBuildingOutlineOverlay(layerFilter);
+        }
         drawAllCampusLabels();
       }
 
@@ -2189,25 +2318,25 @@
         // Central core overlay placement guide:
         // - This raster is the central dome/core building only, not the full Central Complex
         //   campus footprint. It is anchored to the room-truth core:
-        //     G6 = Infinite Corridor W2 / room 214
-        //     H6 = Infinite Corridor W3 / room 210
-        //     I6 = Infinite Corridor W4 / room 208
-        //     row 7 = the north/upper row behind that corridor axis.
+        //     G5 = Infinite Corridor W2 / room 214
+        //     H5 = Infinite Corridor W3 / room 210
+        //     I5 = Infinite Corridor W4 / room 208
+        //     row 6 = the north/upper row behind that corridor axis.
         //   Use `parseTileLabel()` for anchors instead of numeric columns; internal columns are
-        //   zero-based (`G` is c=6), while map labels are human-readable (`G7`).
+        //   zero-based (`G` is c=6), while map labels are human-readable (`G6`).
         // - The image-box top-left corner is hard-anchored to the top-right corner (`p1`) of
-        //   tile G7, after the active floor-focus vertical offset has been applied.
+        //   tile G6, after the active floor-focus vertical offset has been applied.
         //   This is easier to inspect than guessing the visible dome axis inside the raster:
         //   if the PNG is tightly cropped, its west edge should start where the G7 tile starts.
-        // - The raster footprint intentionally covers only columns G-I and ranks 6-7. The left
-        //   front side should sit over G6, and the right front side should sit over I6.
+        // - The raster footprint intentionally covers only columns G-I and ranks 5-6. The left
+        //   front side should sit over G5, and the right front side should sit over I5.
         // - `overlayTileOffsetE` and `overlayTileOffsetS` use the same isometric tile vectors
         //   as room placement. Positive E moves east/right; negative E moves west/left.
         //   Positive S moves south/down-right. Tune these fractions before changing scale.
         // - `imgW` follows the G-I core footprint width. If the source image crop changes,
         //   update `imgRatio` from the PNG dimensions and then retune only the tile offsets.
         const coreFootprint = {
-          bounds: { tl: parseTileLabel("G7"), br: parseTileLabel("I6") }
+          bounds: { tl: parseTileLabel("G6"), br: parseTileLabel("I5") }
         };
         const pts = blockPoints(coreFootprint).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
         if (!pts || pts.length !== 4) return;
@@ -2221,7 +2350,7 @@
         //   Positive moves east/right; negative moves west/left.
         // - `overlayTileOffsetS`: south/north in whole or fractional tiles.
         //   Positive moves south/down-right; negative moves north/up-left.
-        // Current anchor: image-box top-left is attached to G7's top-right corner (`p1`),
+        // Current anchor: image-box top-left is attached to G6's top-right corner (`p1`),
         // then these offsets are applied.
         const overlayTileOffsetE = -7 / 16;
         const overlayTileOffsetS = -3 / 8;
@@ -2230,7 +2359,7 @@
           x: ISO_BASIS_E.dx * overlayTileOffsetE + ISO_BASIS_S.dx * overlayTileOffsetS,
           y: ISO_BASIS_E.dy * overlayTileOffsetE + ISO_BASIS_S.dy * overlayTileOffsetS
         };
-        const g7Tile = parseTileLabel("G7");
+        const g7Tile = parseTileLabel("G6");
         if (!g7Tile) return;
         const g7 = tileCorners(g7Tile.c, g7Tile.rank);
         const baseAnchor = {
@@ -2264,11 +2393,11 @@
         const groundFloorOffsetY = layerRender.focusLevel == null ? 0 : layerRender.focusLevel * layerRender.layerStep;
 
         // Right wing overlay placement guide:
-        // - Footprint target is the J column from J7 through J3.
-        // - The image-box top-left is anchored to the upper-left corner of J7.
+        // - Footprint target is the J column from J6 through J2.
+        // - The image-box top-left is anchored to the upper-left corner of J6.
         // - `overlayTileOffsetE` and `overlayTileOffsetS` use the same tile basis as other overlays.
         const wingFootprint = {
-          bounds: { tl: parseTileLabel("J7"), br: parseTileLabel("J3") }
+          bounds: { tl: parseTileLabel("J6"), br: parseTileLabel("J2") }
         };
         const pts = blockPoints(wingFootprint).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
         if (!pts || pts.length !== 4) return;
@@ -2316,11 +2445,11 @@
 
         // Full Central Complex overlay placement guide:
         // - Replaces the legacy split central-core / wing overlays above.
-        // - Footprint target is the map-prototype-2 central building plate: F7 through J3.
-        // - The image-box top-left is anchored to the upper-left corner of F7, then tile offsets
+        // - Footprint target is the map-prototype-2 central building plate: F6 through J2.
+        // - The image-box top-left is anchored to the upper-left corner of F6, then tile offsets
         //   are applied for crop tuning.
         const centralFootprint = {
-          bounds: { tl: parseTileLabel("F7"), br: parseTileLabel("J3") }
+          bounds: { tl: parseTileLabel("F6"), br: parseTileLabel("J2") }
         };
         const pts = blockPoints(centralFootprint).map((p) => ({ x: p.x, y: p.y + groundFloorOffsetY }));
         if (!pts || pts.length !== 4) return;
@@ -2331,17 +2460,17 @@
 
         // TUNING: move the full central building overlay here.
         // Positive E moves east/right; positive S moves south/down-right.
-        const overlayTileOffsetE = 8 / 8;
-        const overlayTileOffsetS = -17 / 8;
+        const overlayTileOffsetE = 20 / 16;
+        const overlayTileOffsetS = -28 / 8;
         const overlayOffset = {
           x: ISO_BASIS_E.dx * overlayTileOffsetE + ISO_BASIS_S.dx * overlayTileOffsetS,
           y: ISO_BASIS_E.dy * overlayTileOffsetE + ISO_BASIS_S.dy * overlayTileOffsetS
         };
 
         // Source PNG: central_building_overlay.png, 1454x930.
-        const imgRatio = 930 / 1454;
+        const imgRatio = 869 / 1454;
         const imgW = topLen * 1.41;
-        const imgH = imgW * imgRatio;
+        const imgH = imgW * imgRatio * 1.2;
 
         const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
         const depth = Math.abs(focusLevel);
@@ -2493,8 +2622,20 @@
           y: bottomMid.y + inNorm.y * baseInsetPx + eastNorm.y * lateralShiftPx + settleDownPx
         };
 
-        const imgRatio = 941 / 449;
-        const imgW = Math.max(560, topLen * 3.1);
+        // TUNING: move the Brown Building overlay here.
+        // - `overlayTileOffsetE`: east/west in whole or fractional tiles.
+        //   Positive moves east/right; negative moves west/left.
+        // - `overlayTileOffsetS`: south/north in whole or fractional tiles.
+        //   Positive moves south/down-right; negative moves north/up-left.
+        const overlayTileOffsetE = -6/8;
+        const overlayTileOffsetS = 10/8;
+        const overlayOffset = {
+          x: ISO_BASIS_E.dx * overlayTileOffsetE + ISO_BASIS_S.dx * overlayTileOffsetS,
+          y: ISO_BASIS_E.dy * overlayTileOffsetE + ISO_BASIS_S.dy * overlayTileOffsetS
+        };
+
+        const imgRatio = 1693 / 929;
+        const imgW = Math.max(560, topLen * 3.1)  * 1.5;
         const imgH = imgW * imgRatio;
 
         const focusLevel = Number.isFinite(layerRender.focusLevel) ? layerRender.focusLevel : 0;
@@ -2503,8 +2644,8 @@
 
         add("image", {
           href: "assets/gfx/maps/brown_building_overlay.png",
-          x: (baseAnchor.x - imgW * 0.5).toFixed(2),
-          y: (baseAnchor.y - imgH).toFixed(2),
+          x: (baseAnchor.x + overlayOffset.x - imgW * 0.5).toFixed(2),
+          y: (baseAnchor.y + overlayOffset.y - imgH).toFixed(2),
           width: imgW.toFixed(2),
           height: imgH.toFixed(2),
           preserveAspectRatio: "xMidYMid meet",
@@ -2512,7 +2653,7 @@
         });
       }
 
-      function drawRoomLayer(layerFilter, showRoads) {
+      function drawRoomLayer(layerFilter, showRoads, showBuildingArtwork = true) {
 
         const layerRender = buildLayerRenderContext(layerFilter);
         const visibleRooms = ROOM_TILE_METADATA
@@ -2544,7 +2685,7 @@
           // Primary insertion point: anchor overlay z-order to the absolute L0 boundary,
           // not the current focus layer.
           if (!groundOverlayDrawn && level >= 0) {
-            drawCampusGroundOverlay(showRoads, layerFilter);
+            drawCampusGroundOverlay(showRoads, layerFilter, showBuildingArtwork);
             groundOverlayDrawn = true;
           }
           const roomsAtLevel = roomsByLevel.get(level) || [];
@@ -2699,6 +2840,31 @@
             },
             idLabel
           );
+          if (room.id === PLAYER_ROOM_ID) {
+            const markerW = 54;
+            const markerH = 72;
+            const markerX = insetCenter.x - markerW * 0.5;
+            const markerY = insetCenter.y - markerH + 14;
+            add("image", {
+              class: "player-marker",
+              id: "player-map-marker",
+              href: "assets/gfx/maps/playercharacter.png",
+              x: markerX.toFixed(2),
+              y: markerY.toFixed(2),
+              width: markerW,
+              height: markerH,
+              preserveAspectRatio: "xMidYMid meet"
+            });
+            if (Date.now() < playerPingUntil) {
+              add("circle", {
+                class: "player-marker-ping",
+                cx: insetCenter.x.toFixed(2),
+                cy: (markerY + markerH * 0.62).toFixed(2),
+                r: 58,
+                opacity: 1
+              });
+            }
+          }
           }
 
           drawEdgeComparison(layerFilter, ({ fromLevel, toLevel }) => {
@@ -2712,10 +2878,22 @@
             });
           }
         }
+        drawEdgeComparison(layerFilter, ({ edge, fromLevel, toLevel, isVertical }) => {
+          if (isVertical || edge.edgeStyle !== "puzzle") return false;
+          if (!Number.isFinite(fromLevel) || !Number.isFinite(toLevel)) return false;
+          return Math.abs(fromLevel - toLevel) > 1;
+        });
+        drawEdgeComparison(layerFilter, ({ fromLevel, toLevel, isVertical }) => {
+          if (!isVertical) return false;
+          if (!Number.isFinite(fromLevel) || !Number.isFinite(toLevel)) return false;
+          if (Math.abs(fromLevel - toLevel) <= 1) return false;
+          if (!Number.isFinite(layerRender.focusLevel)) return false;
+          return fromLevel === layerRender.focusLevel || toLevel === layerRender.focusLevel;
+        });
         // Fallback for views where no room crosses the L0 boundary in this pass
         // (for example all-below, all-hidden, or sparse-filtered selections).
         if (!groundOverlayDrawn) {
-          drawCampusGroundOverlay(showRoads, layerFilter);
+          drawCampusGroundOverlay(showRoads, layerFilter, showBuildingArtwork);
         }
       }
 
@@ -2766,6 +2944,7 @@
               fromNodeId: room.id,
               toNodeId: edge.to,
               command: String(edge.label || ""),
+              presentationType: String(edge.type || ""),
               source: "presentation"
             });
           }
@@ -2775,13 +2954,25 @@
         const edgeKey = (e) => e.from + "->" + e.to + "|" + String(e.command || "").toLowerCase() + "|" + e.source;
         const presentationPairSet = new Set(presentationEdges.map(pairKey));
         const enginePairSet = new Set(ENGINE_EDGE_SNAPSHOT.map(pairKey));
+        const suppressedEnginePairSet = new Set([
+          "34->221"
+        ]);
+        const wetInsetLocationIds = new Set([15, 51, 87, 117, 131, 161, 164, 181, 184, 187, 232, 234]);
+        const isSuppressedEngineEdge = (edge) => {
+          if (suppressedEnginePairSet.has(pairKey(edge))) return true;
+          const command = String(edge.command || "").toLowerCase();
+          const isVerticalAlias = (command.includes("up") && !command.includes("down")) || command.includes("down");
+          return isVerticalAlias && wetInsetLocationIds.has(edge.from) && wetInsetLocationIds.has(edge.to);
+        };
         const combined = [];
         const seen = new Set();
 
         for (const edge of presentationEdges) {
           const typed = {
             ...edge,
-            type: enginePairSet.has(pairKey(edge)) ? "match" : "presentation-only"
+            type: enginePairSet.has(pairKey(edge)) ? "match" : "presentation-only",
+            edgeStyle: edge.presentationType === "puzzle" ? "puzzle" : "solid",
+            oneWay: edge.from === 210 && edge.to === 180
           };
           const key = edgeKey(typed);
           if (seen.has(key)) continue;
@@ -2790,11 +2981,14 @@
         }
 
         for (const edge of ENGINE_EDGE_SNAPSHOT) {
+          if (isSuppressedEngineEdge(edge)) continue;
           if (presentationPairSet.has(pairKey(edge))) continue;
           const typed = {
             ...edge,
             source: "engine",
-            type: "engine-only"
+            type: "engine-only",
+            edgeStyle: "solid",
+            oneWay: edge.from === 210 && edge.to === 180
           };
           const key = edgeKey(typed);
           if (seen.has(key)) continue;
@@ -2813,6 +3007,10 @@
           match: "edge-compare edge-match",
           "engine-only": "edge-compare edge-engine-only",
           "presentation-only": "edge-compare edge-presentation-only"
+        };
+        const edgeVisualClass = (edge, depthClass) => {
+          const styleClass = edge.edgeStyle === "puzzle" ? " edge-puzzle" : "";
+          return (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass + styleClass;
         };
 
         const primaryDir = (command) => {
@@ -2858,6 +3056,52 @@
         };
         const polylinePath = (points) =>
           points.map((p, i) => (i === 0 ? "M " : "L ") + p.x + " " + p.y).join(" ");
+        const pointAlongPolyline = (points, ratio) => {
+          if (!Array.isArray(points) || points.length < 2) return null;
+          const clampedRatio = Math.max(0, Math.min(1, ratio));
+          let total = 0;
+          for (let i = 1; i < points.length; i += 1) {
+            total += Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
+          }
+          if (total <= 0) return null;
+          let target = total * clampedRatio;
+          for (let i = 1; i < points.length; i += 1) {
+            const a = points[i - 1];
+            const b = points[i];
+            const len = Math.hypot(b.x - a.x, b.y - a.y);
+            if (len <= 0) continue;
+            if (target <= len) {
+              const t = target / len;
+              return {
+                point: { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t },
+                tangent: { x: (b.x - a.x) / len, y: (b.y - a.y) / len }
+              };
+            }
+            target -= len;
+          }
+          const last = points[points.length - 1];
+          const prev = points[points.length - 2];
+          const len = Math.hypot(last.x - prev.x, last.y - prev.y) || 1;
+          return {
+            point: { x: last.x, y: last.y },
+            tangent: { x: (last.x - prev.x) / len, y: (last.y - prev.y) / len }
+          };
+        };
+        const drawOneWayBar = (points, edge) => {
+          if (!edge.oneWay) return;
+          const marker = pointAlongPolyline(points, 0.75);
+          if (!marker) return;
+          const barHalfLength = 13;
+          const nx = -marker.tangent.y;
+          const ny = marker.tangent.x;
+          add("line", {
+            class: "edge-one-way-bar",
+            x1: marker.point.x - nx * barHalfLength,
+            y1: marker.point.y - ny * barHalfLength,
+            x2: marker.point.x + nx * barHalfLength,
+            y2: marker.point.y + ny * barHalfLength
+          });
+        };
         const lineIntersection = (a, b, c, d) => {
           const r = { x: b.x - a.x, y: b.y - a.y };
           const s = { x: d.x - c.x, y: d.y - c.y };
@@ -2901,13 +3145,28 @@
         const verticalEdgeLength = layerRender.layerStep;
         const verticalLoopSlots = new Map();
         const renderedVerticalPairs = new Set();
+        const renderedHorizontalPairs = new Set();
         const edgeDepthClass = (from, to) => {
           const fromDepth = Math.abs(Number(from?.relativeLevel || 0));
           const toDepth = Math.abs(Number(to?.relativeLevel || 0));
+          if (fromDepth < 0.25 || (to && toDepth < 0.25)) return "edge-depth-focus";
           const depth = to ? (fromDepth + toDepth) * 0.5 : fromDepth;
           if (depth < 0.25) return "edge-depth-focus";
           if (depth < 0.75) return "edge-depth-near";
           return "edge-depth-far";
+        };
+        const verticalLineLength = (from, to, dir) => {
+          const layerDelta =
+            to && Number.isFinite(from?.absoluteLevel) && Number.isFinite(to.absoluteLevel)
+              ? Math.max(1, Math.abs(to.absoluteLevel - from.absoluteLevel))
+              : 1;
+          if (dir === "down") {
+            return downVisibleLength(from) + Math.max(0, layerDelta - 1) * verticalEdgeLength;
+          }
+          if (to && Number.isFinite(from?.absoluteLevel) && Number.isFinite(to.absoluteLevel)) {
+            return layerDelta * verticalEdgeLength;
+          }
+          return verticalEdgeLength;
         };
         const curvedVerticalLoopPath = (from, dir, slot) => {
           const band = Math.floor(slot / 2);
@@ -3000,15 +3259,15 @@
             const wetLoopSourceIds = new Set([164, 15, 131, 117, 87, 51, 232, 161, 184]); // wet2..4 + wet6..11
             const isWetLoopVertical = wetLoopSourceIds.has(edge.from);
             if (isWet1Up || isWet5Down) {
-              const len = vDir === "up" ? verticalEdgeLength : downVisibleLength(from);
+              const len = verticalLineLength(from, to, vDir);
               const delta = vDir === "up" ? -len : len;
               const anchor = vDir === "up" ? centerPoint(from) : bottomMid(from);
               const sx = centerPoint(from).x;
               const sy = anchor.y;
               const d = "M " + sx + " " + sy + " L " + sx + " " + (sy + delta);
-              const depthClass = edgeDepthClass(from, null);
+              const depthClass = edgeDepthClass(from, to);
               add("path", {
-                class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
+                class: edgeVisualClass(edge, depthClass),
                 d
               });
               continue;
@@ -3021,25 +3280,34 @@
               const d = curvedVerticalLoopPath(from, vDir, slot);
               const depthClass = edgeDepthClass(from, null);
               add("path", {
-                class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
+                class: edgeVisualClass(edge, depthClass),
                 d
               });
               continue;
             }
-            const len = vDir === "up" ? verticalEdgeLength : downVisibleLength(from);
+            const len = verticalLineLength(from, to, vDir);
             const delta = vDir === "up" ? -len : len;
             const anchor = vDir === "up" ? centerPoint(from) : bottomMid(from);
             const sx = centerPoint(from).x;
             const sy = anchor.y;
             const d = "M " + sx + " " + sy + " L " + sx + " " + (sy + delta);
-            const depthClass = edgeDepthClass(from, null);
+            const depthClass = edgeDepthClass(from, to);
             add("path", {
-              class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
+              class: edgeVisualClass(edge, depthClass),
               d
             });
             continue;
           }
           if (!to) continue;
+          const horizontalPairKey = edge.oneWay
+            ? edge.from + "->" + edge.to
+            : edge.from < edge.to
+              ? edge.from + "<->" + edge.to
+              : edge.to + "<->" + edge.from;
+          if (renderedHorizontalPairs.has(horizontalPairKey)) {
+            continue;
+          }
+          renderedHorizontalPairs.add(horizontalPairKey);
           const points = orthogonalPolyline(from, to, primaryDir(edge.command));
           if (points.length >= 2) {
             points[0] = edgePointToward(from, points[1]);
@@ -3048,9 +3316,10 @@
           const d = polylinePath(points);
           const depthClass = edgeDepthClass(from, to);
           add("path", {
-            class: (edgeClassByType[edge.type] || "edge-compare edge-match") + " " + depthClass,
+            class: edgeVisualClass(edge, depthClass),
             d
           });
+          drawOneWayBar(points, edge);
         }
       }
 
@@ -3103,7 +3372,7 @@
         return [p0, p1, p2, p3];
       }
 
-      function drawCampusLayout(showRoads, layerFilter, suppressGroundOverlay) {
+      function drawCampusLayout(showRoads, layerFilter, suppressGroundOverlay, showBuildingArtwork = true) {
         const normalize = (v) => {
           const d = Math.hypot(v.x, v.y) || 1;
           return { x: v.x / d, y: v.y / d };
@@ -3255,7 +3524,7 @@
             }
           }
         }
-        if (!suppressGroundOverlay) {
+        if (!suppressGroundOverlay && showBuildingArtwork) {
           drawBuildingOutlineOverlay(layerFilter);
         }
       }
@@ -3307,17 +3576,16 @@
         }
       }
 
-      function drawLegend(x, y, target) {
-        const legendW = 940;
-        const legendBodyH = 340;
+      function drawLegend(x, y, target, showBuildingArtwork) {
+        const legendW = 520;
+        const legendBodyH = 840;
         const extraTop = 60;
         const frameY = y - extraTop;
         const frameH = legendBodyH + extraTop;
-        const iconW = 84;
-        const iconH = 44;
+        const iconW = 112;
+        const iconH = 78;
 
         addLegendBlurPanel(x, frameY, legendW, frameH, target);
-        addLegendBlurPanel(x, y, 940, 260, target);
         add("rect", {
           class: "building-frame",
           x,
@@ -3326,12 +3594,124 @@
           height: frameH
         }, null, target);
         add("text", { class: "legend-title", x: x + 28, y: frameY + 70 }, "Legend", target);
-        add("rect", { class: "campus-building campus-central", x: x + 28, y: frameY + 110, width: iconW, height: iconH }, null, target);
-        add("text", { class: "legend-item-label", x: x + 160, y: frameY + 132 }, "central complex building", target);
-        add("rect", { class: "campus-building", x: x + 28, y: frameY + 184, width: iconW, height: iconH }, null, target);
-        add("text", { class: "legend-item-label", x: x + 160, y: frameY + 206 }, "standalone building", target);
-        add("rect", { class: "campus-road", x: x + 28, y: frameY + 260, width: iconW, height: 28, rx: 10 }, null, target);
-        add("text", { class: "legend-item-label", x: x + 160, y: frameY + 274 }, "street/road", target);
+
+        const buildingItems = [
+          { label: "Central Complex", href: "assets/gfx/maps/central_building_overlay.png" },
+          { label: "Brown Building", href: "assets/gfx/maps/brown_building_overlay.png" },
+          { label: "Computer Center", href: "assets/gfx/maps/computer_center_overlay.png" },
+          { label: "Temporary Lab", href: "assets/gfx/maps/temporary_lab_overlay.png" }
+        ];
+        const rowGap = 104;
+        const startY = frameY + 112;
+        buildingItems.forEach((item, index) => {
+          const iconX = x + 28;
+          const iconY = startY + index * rowGap;
+          add(
+            "rect",
+            { class: "legend-building-icon-frame", x: iconX, y: iconY, width: iconW, height: iconH, rx: 8 },
+            null,
+            target
+          );
+          add(
+            "image",
+            {
+              class: "legend-building-icon",
+              href: item.href,
+              x: iconX + 8,
+              y: iconY + 8,
+              width: iconW - 16,
+              height: iconH - 16,
+              preserveAspectRatio: "xMidYMid meet"
+            },
+            null,
+            target
+          );
+          add("text", { class: "legend-building-label", x: iconX + iconW + 24, y: iconY + iconH * 0.5 }, item.label, target);
+        });
+
+        const roadY = startY + buildingItems.length * rowGap + 20;
+        add("rect", { class: "campus-road", x: x + 28, y: roadY, width: iconW, height: 34, rx: 10 }, null, target);
+        add("text", { class: "legend-building-label", x: x + iconW + 52, y: roadY + 18 }, "Street / road", target);
+
+        const playerY = roadY + 82;
+        const playerAction = add("g", { class: "legend-action", tabindex: 0, role: "button", "aria-label": "Show current location" }, null, target);
+        add("rect", {
+          class: "legend-action-hit",
+          x: x + 18,
+          y: playerY - 10,
+          width: legendW - 36,
+          height: iconH + 20,
+          rx: 8
+        }, null, playerAction);
+        add("rect", { class: "legend-building-icon-frame", x: x + 28, y: playerY, width: iconW, height: iconH, rx: 8 }, null, playerAction);
+        add(
+          "image",
+          {
+            class: "player-marker",
+            href: "assets/gfx/maps/playercharacter.png",
+            x: x + 28 + iconW * 0.5 - 27,
+            y: playerY + iconH * 0.5 - 36,
+            width: 54,
+            height: 72,
+            preserveAspectRatio: "xMidYMid meet"
+          },
+          null,
+          playerAction
+        );
+        add("text", { class: "legend-building-label", x: x + iconW + 52, y: playerY + iconH * 0.5 }, "Current location", playerAction);
+        const targetX = x + legendW - 34;
+        const targetY = playerY + iconH * 0.5;
+        add("circle", { class: "legend-action-target", cx: targetX, cy: targetY, r: 15 }, null, playerAction);
+        add("line", { class: "legend-action-target", x1: targetX - 23, y1: targetY, x2: targetX - 9, y2: targetY }, null, playerAction);
+        add("line", { class: "legend-action-target", x1: targetX + 9, y1: targetY, x2: targetX + 23, y2: targetY }, null, playerAction);
+        add("line", { class: "legend-action-target", x1: targetX, y1: targetY - 23, x2: targetX, y2: targetY - 9 }, null, playerAction);
+        add("line", { class: "legend-action-target", x1: targetX, y1: targetY + 9, x2: targetX, y2: targetY + 23 }, null, playerAction);
+        playerAction.addEventListener("click", (event) => {
+          event.stopPropagation();
+          focusPlayerLocation();
+        });
+        playerAction.addEventListener("keydown", (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          focusPlayerLocation();
+        });
+
+        const fo = add(
+          "foreignObject",
+          {
+            x: x + 28,
+            y: playerY + 104,
+            width: legendW - 56,
+            height: 86,
+            "pointer-events": "auto"
+          },
+          null,
+          target
+        );
+        const label = document.createElementNS("http://www.w3.org/1999/xhtml", "label");
+        label.style.display = "flex";
+        label.style.alignItems = "center";
+        label.style.gap = "18px";
+        label.style.height = "100%";
+        label.style.color = "rgba(234, 238, 244, 0.9)";
+        label.style.font = "34px Georgia, 'Times New Roman', serif";
+        label.style.cursor = "pointer";
+        label.style.userSelect = "none";
+        const input = document.createElementNS("http://www.w3.org/1999/xhtml", "input");
+        input.setAttribute("type", "checkbox");
+        input.checked = Boolean(showBuildingArtwork);
+        input.style.width = "34px";
+        input.style.height = "34px";
+        input.style.accentColor = "#d8cfb3";
+        input.addEventListener("change", (event) => {
+          buildingArtworkVisible = event.target.checked;
+          draw();
+        });
+        const span = document.createElementNS("http://www.w3.org/1999/xhtml", "span");
+        span.textContent = "Show building overlays";
+        label.appendChild(input);
+        label.appendChild(span);
+        fo.appendChild(label);
       }
 
       function drawDirectionArrow(x, y, dx, dy, label, stroke, target) {
@@ -3376,6 +3756,7 @@
         });
 
         if (showGrid) {
+          const gridLayer = add("g", { class: "map-fit-ignore tile-grid-layer" });
           for (let c = 0; c < TILE_GRID.cols; c += 1) {
             for (let r = 0; r < TILE_GRID.rows; r += 1) {
               const p0 = anchorAt(c, r);
@@ -3386,7 +3767,7 @@
               add("polygon", {
                 class: className,
                 points: p0.x + "," + p0.y + " " + p1.x + "," + p1.y + " " + p2.x + "," + p2.y + " " + p3.x + "," + p3.y
-              });
+              }, null, gridLayer);
 
               const center = {
                 x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
@@ -3394,7 +3775,7 @@
               };
               const file = colToLetters(c);
               const rank = TILE_GRID.rows - r; // A1 = bottom-left
-              add("text", { class: "tile-grid-coord", x: center.x, y: center.y }, file + rank);
+              add("text", { class: "tile-grid-coord", x: center.x, y: center.y }, file + rank, gridLayer);
             }
           }
           for (let c = 0; c <= TILE_GRID.cols; c += 1) {
@@ -3405,7 +3786,7 @@
                 cx: p.x,
                 cy: p.y,
                 r: 2.2
-              });
+              }, null, gridLayer);
             }
           }
         }
@@ -3594,7 +3975,7 @@
         roadGrainFilter.appendChild(roadBlend);
         defs.appendChild(roadGrainFilter);
 
-        add("rect", { x: 0, y: 0, width: WORLD_W, height: WORLD_H, fill: "transparent" });
+        add("rect", { class: "world-hitbox", x: 0, y: 0, width: WORLD_W, height: WORLD_H, fill: "transparent" });
 
         const showRoads = document.getElementById("toggle-roads").checked;
         const showLegend = document.getElementById("toggle-legend").checked;
@@ -3603,8 +3984,8 @@
         const floorFilter = document.getElementById("floor-filter").value;
         const hudPadding = 20;
         const hudScale = 0.33;
-        const legendW = 940;
-        const legendH = 340;
+        const legendW = 520;
+        const legendH = 900;
         const tileLegendW = 940;
         const tileLegendH = 620;
         const hudTotalW = Math.max(legendW, tileLegendW);
@@ -3616,11 +3997,11 @@
         const tileLegendX = 0;
         const tileLegendY = legendH + 12;
         legendLayer.setAttribute("transform", "translate(" + legendX.toFixed(2) + " " + legendY.toFixed(2) + ") scale(" + hudScale + ")");
-        drawCampusLayout(showRoads, floorFilter, showFloorTiles);
+        drawCampusLayout(showRoads, floorFilter, showFloorTiles, buildingArtworkVisible);
         if (showFloorTiles) {
-          drawRoomLayer(floorFilter, showRoads);
+          drawRoomLayer(floorFilter, showRoads, buildingArtworkVisible);
         }
-        if (showLegend) drawLegend(0, 0, legendLayer);
+        if (showLegend) drawLegend(0, 0, legendLayer, buildingArtworkVisible);
         if (showGrid || showLegend) drawPlacementGridAndLegend(showGrid, showLegend, tileLegendX, tileLegendY, legendLayer);
 
         if (!panZoom.hasUserMoved) {
@@ -3652,50 +4033,125 @@
         );
       }
 
-      function setInitialView() {
-        const rect = svg.getBoundingClientRect();
-        if (!CAMPUS_BLOCKS.length) return;
-        const allPoints = CAMPUS_BLOCKS.flatMap((block) => blockPoints(block));
-        if (!allPoints.length) return;
+      function ensurePlayerMarkerVisible() {
+        const marker = document.getElementById("player-map-marker");
+        if (!marker) return;
+        let box;
+        try {
+          box = marker.getBBox();
+        } catch (error) {
+          return;
+        }
+        if (!box || !Number.isFinite(box.x) || !Number.isFinite(box.y)) return;
+        const viewBox = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : { width: 1600, height: 980 };
+        const viewportW = Number.isFinite(viewBox.width) && viewBox.width > 0 ? viewBox.width : 1600;
+        const viewportH = Number.isFinite(viewBox.height) && viewBox.height > 0 ? viewBox.height : 980;
+        const markerScreen = {
+          x1: box.x * panZoom.scale + panZoom.tx,
+          y1: box.y * panZoom.scale + panZoom.ty,
+          x2: (box.x + box.width) * panZoom.scale + panZoom.tx,
+          y2: (box.y + box.height) * panZoom.scale + panZoom.ty
+        };
+        const margin = 54;
+        const bounds = {
+          left: margin,
+          top: margin,
+          right: viewportW - margin,
+          bottom: viewportH - margin
+        };
+        let dx = 0;
+        let dy = 0;
+        if (markerScreen.x1 < bounds.left) dx = bounds.left - markerScreen.x1;
+        if (markerScreen.x2 > bounds.right) dx = bounds.right - markerScreen.x2;
+        if (markerScreen.y1 < bounds.top) dy = bounds.top - markerScreen.y1;
+        if (markerScreen.y2 > bounds.bottom) dy = bounds.bottom - markerScreen.y2;
+        if (!dx && !dy) return;
+        panZoom.tx += dx;
+        panZoom.ty += dy;
+        applyTransform();
+      }
 
-        const minX = Math.min(...allPoints.map((p) => p.x)) - 180;
-        const maxX = Math.max(...allPoints.map((p) => p.x)) + 180;
-        const minY = Math.min(...allPoints.map((p) => p.y)) - 140;
-        const maxY = Math.max(...allPoints.map((p) => p.y)) + 160;
+      function focusPlayerLocation() {
+        const playerLayout = MapPrototype2Data.ROOM_LAYOUT[PLAYER_ROOM_ID];
+        const floorFilterEl = document.getElementById("floor-filter");
+        const floorTilesEl = document.getElementById("toggle-floor-tiles");
+        if (floorTilesEl) floorTilesEl.checked = true;
+        if (floorFilterEl && playerLayout && playerLayout.layer) floorFilterEl.value = playerLayout.layer;
+        playerPingUntil = Date.now() + 950;
+        panZoom.hasUserMoved = true;
+        draw();
+        ensurePlayerMarkerVisible();
+        window.setTimeout(() => {
+          if (Date.now() >= playerPingUntil) draw();
+        }, 1000);
+      }
+
+      function setInitialView() {
+        const viewBox = svg.viewBox && svg.viewBox.baseVal ? svg.viewBox.baseVal : { width: 1600, height: 980 };
+        const viewportW = Number.isFinite(viewBox.width) && viewBox.width > 0 ? viewBox.width : 1600;
+        const viewportH = Number.isFinite(viewBox.height) && viewBox.height > 0 ? viewBox.height : 980;
+        const contentBoxes = Array.from(viewport.children)
+          .filter(
+            (el) =>
+              !(
+                el.classList &&
+                (el.classList.contains("world-hitbox") || el.classList.contains("map-fit-ignore"))
+              )
+          )
+          .map((el) => {
+            try {
+              return el.getBBox();
+            } catch (error) {
+              return null;
+            }
+          })
+          .filter(
+            (box) =>
+              box &&
+              Number.isFinite(box.x) &&
+              Number.isFinite(box.y) &&
+              Number.isFinite(box.width) &&
+              Number.isFinite(box.height) &&
+              (box.width > 0 || box.height > 0)
+          );
+        let minX;
+        let maxX;
+        let minY;
+        let maxY;
+        if (contentBoxes.length) {
+          minX = Math.min(...contentBoxes.map((box) => box.x));
+          maxX = Math.max(...contentBoxes.map((box) => box.x + box.width));
+          minY = Math.min(...contentBoxes.map((box) => box.y));
+          maxY = Math.max(...contentBoxes.map((box) => box.y + box.height));
+        } else {
+          if (!CAMPUS_BLOCKS.length) return;
+          const allPoints = CAMPUS_BLOCKS.flatMap((block) => blockPoints(block));
+          if (!allPoints.length) return;
+          minX = Math.min(...allPoints.map((p) => p.x));
+          maxX = Math.max(...allPoints.map((p) => p.x));
+          minY = Math.min(...allPoints.map((p) => p.y));
+          maxY = Math.max(...allPoints.map((p) => p.y));
+        }
+
+        minX -= 24;
+        maxX += 84;
+        minY -= 18;
+        maxY += 84;
         const mapW = Math.max(1, maxX - minX);
         const mapH = Math.max(1, maxY - minY);
 
         const outerPadX = 24;
         const outerPadTop = 16;
         const outerPadBottom = 20;
-        const usableW = Math.max(1, rect.width - outerPadX * 2);
-        const usableH = Math.max(1, rect.height - outerPadTop - outerPadBottom);
+        const usableW = Math.max(1, viewportW - outerPadX * 2);
+        const usableH = Math.max(1, viewportH - outerPadTop - outerPadBottom);
 
         const fitScale = Math.min(usableW / mapW, usableH / mapH);
         panZoom.scale = clamp(fitScale, panZoom.minScale, panZoom.maxScale);
 
-        const anchorAtByRow = (col, rowFromTop) => ({
-          x: TILE_GRID.originX + col * STEP_E.dx + rowFromTop * STEP_S.dx,
-          y: TILE_GRID.originY + col * STEP_E.dy + rowFromTop * STEP_S.dy
-        });
-        const tileCenter = (fileIndex, rank) => {
-          const rowFromTop = TILE_GRID.rows - rank;
-          const p0 = anchorAtByRow(fileIndex, rowFromTop);
-          return {
-            x: p0.x + (ISO_BASIS_E.dx + ISO_BASIS_S.dx) * 0.5,
-            y: p0.y + (ISO_BASIS_E.dy + ISO_BASIS_S.dy) * 0.5
-          };
-        };
-        // Focus start view three tiles right of the original midpoint between G6 and H6.
-        const left_tile = tileCenter(8, 6);  // F6
-        const right_tile = tileCenter(9, 6); // G6
-        const target = {
-          x: (left_tile.x + right_tile.x) / 2,
-          y: (left_tile.y + right_tile.y) / 2
-        };
-
-        panZoom.tx = rect.width / 2 - target.x * panZoom.scale;
-        panZoom.ty = rect.height / 2 - target.y * panZoom.scale;
+        const initialCenterTileOffsetX = STEP_E.dx * panZoom.scale;
+        panZoom.tx = outerPadX + (usableW - mapW * panZoom.scale) * 0.5 - minX * panZoom.scale + initialCenterTileOffsetX;
+        panZoom.ty = outerPadTop + (usableH - mapH * panZoom.scale) * 0.5 - minY * panZoom.scale;
         applyTransform();
       }
 

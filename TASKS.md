@@ -292,10 +292,16 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Modeled the Brown Building as an 18-floor square 1970s concrete tower with a recessed front window grid, blinder panelized side facade, front exit, roof equipment, antenna masts, and meteorological radome.
    - Replaced/refined `src/assets/gfx/maps/brown_building_overlay.png` from the new overlay workflow.
    - Updated `drawBrownBuildingIllustration()` in `src/map-prototype-2.html` for the new overlay aspect ratio and added tile-fraction tuning via `overlayTileOffsetE/S`.
+   - multiplied Brown Building size by 2 because it's much bigger than central building.
+
+61. [done] Redo the map prototype 2 legend.
+   - Replaced the old generic building legend with building-specific PNG thumbnails and labels for Central Complex, Brown Building, Computer Center, and Temporary Lab.
+   - Kept the street/road legend item as a road swatch.
+   - Added a legend checkbox that toggles building overlay art and outline overlays on/off without affecting floor tiles or roads.
+   - Reworked the legend into a narrower vertical list, brightened building thumbnails/labels for readability, and added the red player-character marker as the Current location item.
+   - Added `src/assets/gfx/maps/playercharacter.png` to `src/map-prototype-2.html` at Terminal Room (176), including a clickable Current location legend row that switches to the player layer, pans the marker into view when needed, and plays a red ping animation.
 
 ## Pending Tasks
-
-61. [pending] Redo the map prototype 2 legend. Use imagegen to create icons for each building from the png overlays, then put those in the legend with the name of each building: Brown Building, Computer Center, Temporary Lab and Central Complex. Street/Road can be left as it is. Add a checkbox to the legend below the building icons to toggle  building outlines and overlays on/off.
 
 62. [pending] Rework map tile linework toward blueprint-like hand-drawn contours (Task 56 style follow-up).
    - Replace filter-dominant wobble as primary style driver with geometry-first multi-stroke contours per tile.
@@ -306,20 +312,19 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Research + rationale documented in `docs/ADR-0003-map-handdrawn-line-strategy.md`.
 
 63. [pending] Add an in-game map of visited locations while adventuring.
-   - Keep this feature independent from `docs/LOCATION_MAP.md`; docs are reference only, not runtime source-of-truth for in-game map behavior.
+   - use map-prototype-2 as the basis for the in-game map map.
    - Use a player-truth discovery model: record rooms and transitions from actual successful play actions instead of precomputed full-world completeness.
-   - Before UI implementation, determine structural map constraints:
-     - how many vertical levels are present in the university map
-     - what distinct area groupings should be modeled (for example main building, brown building/computer lab, temporary lab, and other separable clusters)
-   - Booklet-pages 3/4 discovery pass completed:
-     - vertical model baseline: 6 practical level bands (`L+2`, `L+1`, `L0`, `L-1`, `L-2`, `L-3`)
-     - area model baseline: 9 groups (including separate `Wet Tunnels + Inner Lair` and special `Dream` inset)
-     - full rationale and section diagrams documented in `docs/LOCATION_MAP.md`
-   - Decide whether the in-game map should expose only visited rooms, visited rooms plus known links, or some other progressive reveal model.
-   - The map should likely be isometric, and with different layers for height, and 8 directions for exits for each room.
-   - The distinct areas should be distinct when showing the map: if you are in one integrated area, you don't see the other areas unless you've been there.
    - There is no need to make a map of the 3 areas you go to from the starting room when you read the paper, as it is "just a dream", very small, and accessible only once.
    - The in-game map needs space. Possibly on the right, but then we need to integrate the images more into the main text. Needs brainstorming.
+   - Visibility rules for the in-game map: 
+      - The building outlines will be visible from the start.
+      - reveal model: visited rooms plus known links.
+      - Exits that are clearly visible when you enter a room will be denoted with continuous white edges to other areas when you enter the room. The end-tile will of course only be visible once visited.
+      - Edges that are only visible after you solve a puzzle or take action will be denoted with interrupted white edges. The end-tile will of course only be visible once visited.
+      - Edges that are one-way only (only the edge into the Great Court from the Infinite Corridor) will be shown with a 90 degree bar (as in the booklet) with the bar at 25% of the edge near the tile that you cannot return from (so close to the Great Court tile). This bar will only be shown once you are in Great Court and you can't get back.
+   - Visibility is per game. This means the save game needs to know the visited rooms. Maybe it already does?
+   - The player character is represented by a red player model. This needs to be drawn.
+
 
 64. [pending] implement hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` (booklet pages 1-4).
 
@@ -328,3 +333,6 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
 - Add safe-location gating skeleton and feature flag for consultation availability
 - Persist minimal interpreter-side consultation state (per-topic view count/tier baseline)
 - Keep booklet/hint handling separate from Task 43 experience mode: do not couple hint availability to classic/modern profile selection, and keep the spoiler-safe `$MAP` behavior independent.
+
+65. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
+

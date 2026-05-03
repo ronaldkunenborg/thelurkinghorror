@@ -91,7 +91,7 @@
               { to: "temp_lab", label: "up" }
             ]
           },
-          { id: "dead", label: "Dead Storage", section: "C", layer: "L-1", x: 3100, y: 1080, edges: [{ to: "ancient", label: "east" }] },
+          { id: "dead", label: "Dead Storage", section: "C", layer: "L-1", x: 3100, y: 1080, edges: [{ to: "ancient", label: "east", type: "puzzle" }] },
           { id: "ancient", label: "Ancient Storage", section: "C", layer: "L-1", x: 3370, y: 1080, edges: [{ to: "brick", label: "down" }] },
           {
             id: "elev_lm1",
@@ -116,7 +116,7 @@
             ]
           },
           { id: "reno", label: "Renovated Cave", section: "C", layer: "L-2", x: 3370, y: 1360, edges: [{ to: "altar", label: "down" }] },
-          { id: "cinder", label: "Cinderblock Tunnel", section: "C", layer: "L-2", x: 3370, y: 1570, edges: [] },
+          { id: "cinder", label: "Cinderblock Tunnel", section: "C", layer: "L-2", x: 3370, y: 1570, edges: [{ to: "lab", label: "puzzle", type: "puzzle" }] },
           { id: "altar", label: "Before the Altar [SFX]", section: "C", layer: "L-2", x: 3130, y: 1460, edges: [] },
 
           // Section B
@@ -165,19 +165,19 @@
             x: 1480,
             y: 760,
             edges: [
-              { to: "chem", label: "south" },
+              { to: "chem", label: "south", type: "puzzle" },
               { to: "fn", label: "north", type: "puzzle" }
             ]
           },
           { id: "aero_lobby", label: "Aero Lobby", section: "B", layer: "L0", x: 680, y: 660, edges: [{ to: "ic1", label: "south" }] },
           { id: "eng", label: "Engineering Building", section: "B", layer: "L0", x: 680, y: 860, edges: [{ to: "ic1", label: "north" }] },
-          { id: "gd", label: "Great Dome", section: "B", layer: "L+1", x: 1080, y: 480, edges: [{ to: "td", label: "up" }] },
-          { id: "td", label: "Top of Dome", section: "B", layer: "L+1", x: 1080, y: 390, edges: [{ to: "rgd", label: "up" }] },
+          { id: "gd", label: "Great Dome", section: "B", layer: "L+1", x: 1080, y: 480, edges: [{ to: "td", label: "up", type: "puzzle" }] },
+          { id: "td", label: "Top of Dome", section: "B", layer: "L+1", x: 1080, y: 390, edges: [{ to: "rgd", label: "up", type: "puzzle" }] },
           { id: "rgd", label: "Roof of Great Dome", section: "B", layer: "L+2", x: 1080, y: 180, edges: [{ to: "ogd", label: "up" }] },
           { id: "ogd", label: "On the Great Dome", section: "B", layer: "L+2", x: 1280, y: 180, edges: [{ to: "rgd", label: "down" }] },
           { id: "great_court", label: "Great Court", section: "B", layer: "L0", x: 1080, y: 860, edges: [] },
-          { id: "chem", label: "Chemistry Building", section: "B", layer: "L0", x: 1480, y: 860, edges: [{ to: "alc", label: "south" }] },
-          { id: "alc", label: "Dept. of Alchemy", section: "B", layer: "L0", x: 1480, y: 1000, edges: [{ to: "lab", label: "south" }] },
+          { id: "chem", label: "Chemistry Building", section: "B", layer: "L0", x: 1480, y: 860, edges: [{ to: "ic5", label: "north", type: "puzzle" }, { to: "alc", label: "south", type: "puzzle" }] },
+          { id: "alc", label: "Dept. of Alchemy", section: "B", layer: "L0", x: 1480, y: 1000, edges: [{ to: "lab", label: "south", type: "puzzle" }] },
           {
             id: "lab",
             label: "Lab",
@@ -185,9 +185,9 @@
             layer: "L0",
             x: 1480,
             y: 1140,
-            edges: []
+            edges: [{ to: "cinder", label: "puzzle", type: "puzzle" }]
           },
-          { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "cp", label: "east" }] },
+          { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "ic5", label: "south", type: "puzzle" }, { to: "cp", label: "east" }] },
           { id: "cp", label: "Cluttered Passage", section: "R", layer: "L-1", x: 1940, y: 670, edges: [{ to: "brown_b", label: "southeast" }] },
           {
             id: "brown",
@@ -211,7 +211,7 @@
             y: 1140,
             edges: [{ to: "cp", label: "northwest" }]
           },
-          { id: "top_floor", label: "Top Floor", section: "R", layer: "L+1", x: 1760, y: 520, edges: [{ to: "sky_roof", label: "up" }] },
+          { id: "top_floor", label: "Top Floor", section: "R", layer: "L+1", x: 1760, y: 520, edges: [{ to: "sky_roof", label: "up", type: "puzzle" }] },
           { id: "sky_roof", label: "Skyscraper Roof", section: "R", layer: "L+2", x: 1760, y: 240, edges: [{ to: "inside_dome", label: "up" }] },
           { id: "inside_dome", label: "Inside Dome", section: "R", layer: "L+2", x: 1980, y: 240, edges: [] },
           { id: "small_court", label: "Small Courtyard", section: "R", layer: "L0", x: 1760, y: 980, edges: [] },
@@ -229,7 +229,7 @@
               { to: "large_chamber", label: "down" }
             ]
           },
-          { id: "tunnel_entry", label: "Tunnel Entrance", section: "D", layer: "L-2", x: 3890, y: 1460, edges: [{ to: "steam1", label: "east" }] },
+          { id: "tunnel_entry", label: "Tunnel Entrance", section: "D", layer: "L-2", x: 3890, y: 1460, edges: [{ to: "steam1", label: "east", type: "puzzle" }] },
           {
             id: "steam1",
             label: "Steam Tunnel [S1]",
@@ -256,7 +256,7 @@
             ]
           },
           { id: "steam3", label: "Steam Tunnel [S3]", section: "D", layer: "L-2", x: 4700, y: 1460, edges: [{ to: "steam4", label: "east" }] },
-          { id: "steam4", label: "Steam Tunnel [S4]", section: "D", layer: "L-2", x: 5400, y: 1460, edges: [{ to: "steam5", label: "east" }] },
+          { id: "steam4", label: "Steam Tunnel [S4]", section: "D", layer: "L-2", x: 5400, y: 1460, edges: [{ to: "steam3", label: "west" }, { to: "steam5", label: "east" }] },
           {
             id: "steam5",
             label: "Steam Tunnel [S5]",
@@ -298,7 +298,7 @@
             layer: "L-3",
             x: 3500,
             y: 1760,
-            edges: [{ to: "wet1", label: "down" }]
+            edges: [{ to: "wet1", label: "down", type: "puzzle" }]
           },
           { id: "inner_lair", label: "Inner Lair", section: "D", layer: "L-3", x: 4920, y: 2360, edges: [] },
           {
@@ -308,7 +308,7 @@
             layer: "L-3",
             x: 4720,
             y: 2360,
-            edges: [{ to: "inner_lair", label: "east" }]
+            edges: [{ to: "inner_lair", label: "east", type: "puzzle" }]
           },
 
           // Section F
@@ -459,26 +459,26 @@
         basalt: { building: "central", layer: "L+2", tile: "D10" }, // [134] Basalt Bowl
         platform: { building: "central", layer: "L+2", tile: "D9" }, // [21] At Platform
 
-        // Central complex (L0 anchor at 210 = E7)
-        mass: { building: "central", layer: "L0", tile: "E6" }, // [190] Mass. Ave.
-        ic1: { building: "central", layer: "L0", tile: "F6" }, // [218] Infinite Corridor
-        ic2: { building: "central", layer: "L0", tile: "G6" }, // [214] Infinite Corridor
-        ic3: { building: "central", layer: "L0", tile: "H6" }, // [210] Infinite Corridor
-        ic4: { building: "central", layer: "L0", tile: "I6" }, // [208] Infinite Corridor
-        ic5: { building: "central", layer: "L0", tile: "J6" }, // [206] Infinite Corridor
-        aero_lobby: { building: "central", layer: "L0", tile: "F7" }, // [136] Aero Lobby
-        eng: { building: "central", layer: "L0", tile: "F5" }, // [38] Engineering Building
-        gd: { building: "central", layer: "L+1", tile: "H6" }, // [249] Great Dome
-        td: { building: "central", layer: "L+2", tile: "H6" }, // [213] Top of Dome
-        rgd: { building: "central", layer: "L+3", tile: "H6" }, // [121] Roof of Great Dome
-        ogd: { building: "central", layer: "L+4", tile: "H6" }, // [145] On the Great Dome
-        great_court: { building: "central", layer: "L0", tile: "H4" }, // [180] Great Court
-        chem: { building: "central", layer: "L0", tile: "J5" }, // [248] Chemistry Building
-        alc: { building: "central", layer: "L0", tile: "J4" }, // [174] Department of Alchemy
-        lab: { building: "central", layer: "L0", tile: "J3" }, // [42] Lab
-        fn: { building: "central", layer: "L0", tile: "J7" }, // [150] Fruits and Nuts
-        stair: { building: "central", layer: "L-1", tile: "F7" }, // [35] Stairway
-        aero_b: { building: "central", layer: "L-1", tile: "G7" }, // [158] Aero Basement
+        // Central complex (L0 anchor at 210 = H5 after row-7-and-below shift)
+        mass: { building: "central", layer: "L0", tile: "E5" }, // [190] Mass. Ave.
+        ic1: { building: "central", layer: "L0", tile: "F5" }, // [218] Infinite Corridor
+        ic2: { building: "central", layer: "L0", tile: "G5" }, // [214] Infinite Corridor
+        ic3: { building: "central", layer: "L0", tile: "H5" }, // [210] Infinite Corridor
+        ic4: { building: "central", layer: "L0", tile: "I5" }, // [208] Infinite Corridor
+        ic5: { building: "central", layer: "L0", tile: "J5" }, // [206] Infinite Corridor
+        aero_lobby: { building: "central", layer: "L0", tile: "F6" }, // [136] Aero Lobby
+        eng: { building: "central", layer: "L0", tile: "F4" }, // [38] Engineering Building
+        gd: { building: "central", layer: "L+1", tile: "H5" }, // [249] Great Dome
+        td: { building: "central", layer: "L+2", tile: "H5" }, // [213] Top of Dome
+        rgd: { building: "central", layer: "L+3", tile: "H5" }, // [121] Roof of Great Dome
+        ogd: { building: "central", layer: "L+4", tile: "H5" }, // [145] On the Great Dome
+        great_court: { building: "central", layer: "L0", tile: "H3" }, // [180] Great Court
+        chem: { building: "central", layer: "L0", tile: "J4" }, // [248] Chemistry Building
+        alc: { building: "central", layer: "L0", tile: "J3" }, // [174] Department of Alchemy
+        lab: { building: "central", layer: "L0", tile: "J2" }, // [42] Lab
+        fn: { building: "central", layer: "L0", tile: "J6" }, // [150] Fruits and Nuts
+        stair: { building: "central", layer: "L-1", tile: "F6" }, // [35] Stairway
+        aero_b: { building: "central", layer: "L-1", tile: "G6" }, // [158] Aero Basement
 
         // Computer center building + Smith Street anchors
         smith1: { building: "computer", layer: "L0", tile: "H11" }, // [185] Smith Street
@@ -499,49 +499,49 @@
         temp_lab: { building: "temp", layer: "L0", tile: "J9" }, // [140] Temporary Lab
         temp_b: { building: "temp", layer: "L-1", tile: "J9" }, // [202] Temporary Basement
         dead: { building: "temp", layer: "L-1", tile: "K9" }, // [47] Dead Storage
-        ancient: { building: "temp", layer: "L-1", tile: "L10" }, // [171] Ancient Storage
+        ancient: { building: "temp", layer: "L-1", tile: "L9" }, // [171] Ancient Storage
 
         // Brown building cluster
-        cp: { building: "brown", layer: "L-1", tile: "M7" }, // [179] Cluttered Passage
-        brown: { building: "brown", layer: "L0", tile: "N6" }, // [240] Brown Building
-        small_court: { building: "brown", layer: "L0", tile: "N5" }, // [16] Small Courtyard
-        brown_b: { building: "brown", layer: "L-1", tile: "N6" }, // [200] Brown Basement
-        top_floor: { building: "brown", layer: "L+1", tile: "N6" }, // [195] Top Floor
-        sky_roof: { building: "brown", layer: "L+2", tile: "N6" }, // [222] Skyscraper Roof
-        inside_dome: { building: "brown", layer: "L+3", tile: "N6" }, // [109] Inside Dome
+        cp: { building: "brown", layer: "L-1", tile: "M6" }, // [179] Cluttered Passage
+        brown: { building: "brown", layer: "L0", tile: "N5" }, // [240] Brown Building
+        small_court: { building: "brown", layer: "L0", tile: "N4" }, // [16] Small Courtyard
+        brown_b: { building: "brown", layer: "L-1", tile: "N5" }, // [200] Brown Basement
+        top_floor: { building: "brown", layer: "L+1", tile: "N5" }, // [195] Top Floor
+        sky_roof: { building: "brown", layer: "L+2", tile: "N5" }, // [222] Skyscraper Roof
+        inside_dome: { building: "brown", layer: "L+3", tile: "N5" }, // [109] Inside Dome
 
         // Steam / utility underground
-        muddy: { building: "steam", layer: "L-3", tile: "B8" }, // [39] Muddy Tunnel
-        tunnel_entry: { building: "steam", layer: "L-3", tile: "C8" }, // [34] Tunnel Entrance
-        steam1: { building: "steam", layer: "L-3", tile: "D8" }, // [66] Steam Tunnel
-        steam2: { building: "steam", layer: "L-3", tile: "E8" }, // [78] Steam Tunnel
-        steam3: { building: "steam", layer: "L-3", tile: "F8" }, // [138] Steam Tunnel
-        steam4: { building: "steam", layer: "L-3", tile: "G8" }, // [221] Steam Tunnel
-        steam5: { building: "steam", layer: "L-3", tile: "H8" }, // [227] Steam Tunnel
-        sub: { building: "steam", layer: "L-2", tile: "F7" }, // [142] Subbasement
-        tomb: { building: "steam", layer: "L-2", tile: "E8" }, // [9] Tomb
-        large_chamber: { building: "steam", layer: "L-4", tile: "B8" }, // [99] Large Chamber
-        concrete_box: { building: "steam", layer: "L-4", tile: "H8" }, // [37] Concrete Box
+        muddy: { building: "steam", layer: "L-3", tile: "B7" }, // [39] Muddy Tunnel
+        tunnel_entry: { building: "steam", layer: "L-3", tile: "C7" }, // [34] Tunnel Entrance
+        steam1: { building: "steam", layer: "L-3", tile: "D7" }, // [66] Steam Tunnel
+        steam2: { building: "steam", layer: "L-3", tile: "E7" }, // [78] Steam Tunnel
+        steam3: { building: "steam", layer: "L-3", tile: "F7" }, // [138] Steam Tunnel
+        steam4: { building: "steam", layer: "L-3", tile: "G7" }, // [221] Steam Tunnel
+        steam5: { building: "steam", layer: "L-3", tile: "H7" }, // [227] Steam Tunnel
+        sub: { building: "steam", layer: "L-2", tile: "F6" }, // [142] Subbasement
+        tomb: { building: "steam", layer: "L-2", tile: "E7" }, // [9] Tomb
+        large_chamber: { building: "steam", layer: "L-4", tile: "B7" }, // [99] Large Chamber
+        concrete_box: { building: "steam", layer: "L-4", tile: "H7" }, // [37] Concrete Box
 
         // Wet tunnel cluster
-        wet1: { building: "wet", layer: "L-5", tile: "B8" }, // [187] Wet Tunnel
-        wet2: { building: "wet", layer: "L-5", tile: "B7" }, // [164] Wet Tunnel
-        wet3: { building: "wet", layer: "L-5", tile: "B6" }, // [15] Wet Tunnel
-        wet4: { building: "wet", layer: "L-5", tile: "B5" }, // [131] Wet Tunnel
-        wet5: { building: "wet", layer: "L-5", tile: "B4" }, // [234] Wet Tunnel
-        wet6: { building: "wet", layer: "L-5", tile: "A7" }, // [117] Wet Tunnel
-        wet7: { building: "wet", layer: "L-5", tile: "C7" }, // [87] Wet Tunnel
-        wet8: { building: "wet", layer: "L-5", tile: "A6" }, // [51] Wet Tunnel
-        wet9: { building: "wet", layer: "L-5", tile: "A5" }, // [232] Wet Tunnel
-        wet10: { building: "wet", layer: "L-5", tile: "C5" }, // [161] Wet Tunnel
-        wet11: { building: "wet", layer: "L-5", tile: "A4" }, // [184] Wet Tunnel
-        wet_lair_link: { building: "wet", layer: "L-6", tile: "B4" }, // [181] Wet Tunnel
-        inner_lair: { building: "wet", layer: "L-6", tile: "C4" }, // [69] Inner Lair
+        wet1: { building: "wet", layer: "L-5", tile: "B7" }, // [187] Wet Tunnel
+        wet2: { building: "wet", layer: "L-5", tile: "B6" }, // [164] Wet Tunnel
+        wet3: { building: "wet", layer: "L-5", tile: "B5" }, // [15] Wet Tunnel
+        wet4: { building: "wet", layer: "L-5", tile: "B4" }, // [131] Wet Tunnel
+        wet5: { building: "wet", layer: "L-5", tile: "B3" }, // [234] Wet Tunnel
+        wet6: { building: "wet", layer: "L-5", tile: "A6" }, // [117] Wet Tunnel
+        wet7: { building: "wet", layer: "L-5", tile: "C6" }, // [87] Wet Tunnel
+        wet8: { building: "wet", layer: "L-5", tile: "A5" }, // [51] Wet Tunnel
+        wet9: { building: "wet", layer: "L-5", tile: "A4" }, // [232] Wet Tunnel
+        wet10: { building: "wet", layer: "L-5", tile: "C4" }, // [161] Wet Tunnel
+        wet11: { building: "wet", layer: "L-5", tile: "A3" }, // [184] Wet Tunnel
+        wet_lair_link: { building: "wet", layer: "L-6", tile: "B3" }, // [181] Wet Tunnel
+        inner_lair: { building: "wet", layer: "L-6", tile: "C3" }, // [69] Inner Lair
 
         // Brick/altar branch
-        brick: { building: "brick", layer: "L-2", tile: "L10" }, // [25] Brick Tunnel
+        brick: { building: "brick", layer: "L-2", tile: "L9" }, // [25] Brick Tunnel
         reno: { building: "brick", layer: "L-2", tile: "L11" }, // [201] Renovated Cave
-        cinder: { building: "brick", layer: "L-2", tile: "L9" }, // [17] Cinderblock Tunnel
+        cinder: { building: "brick", layer: "L-2", tile: "J2" }, // [17] Cinderblock Tunnel
         altar: { building: "brick", layer: "L-3", tile: "L11" } // [149] Before the Altar
       };
 
@@ -568,17 +568,17 @@
     ["aero_lobby", "stair", "down"],
     ["altar", "reno", "up"],
     ["gd", "ic3", "down"],
-    ["td", "gd", "down"],
-    ["rgd", "td", "down"],
+    ["td", "gd", "down", "puzzle"],
+    ["rgd", "td", "down", "puzzle"],
     ["brown_b", "brown", "up"],
     ["top_floor", "brown", "down"],
-    ["sky_roof", "top_floor", "down"],
+    ["sky_roof", "top_floor", "down", "puzzle"],
     ["inside_dome", "sky_roof", "down"],
     ["large_chamber", "muddy", "up"],
     ["concrete_box", "steam5", "up", "puzzle"],
     ["stair", "sub", "down"],
     ["steam2", "tomb", "up", "puzzle"],
-    ["wet1", "large_chamber", "up"]
+    ["wet1", "large_chamber", "up", "puzzle"]
   ].forEach(([fromId, toId, label, type]) => ensureRoomEdge(fromId, toId, label, type));
 
   const VERTICAL_EDGE_TEST_EXCEPTIONS = {
