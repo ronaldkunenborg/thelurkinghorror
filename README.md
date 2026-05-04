@@ -25,6 +25,8 @@ The interpreter adds non-story commands:
 
 - `$SOUND`
   Toggle in-game sound effects only.
+- `$SFX <1-18>`
+  Trigger a specific The Lurking Horror sound effect by ID.
 - `$GAMESOUND`
   Toggle splash/interpreter-managed game music.
 - `$DEBUG`
@@ -187,3 +189,7 @@ Useful local checks:
   published on Newgrounds Audio Portal:
   https://www.newgrounds.com/audio/listen/877160
   License deed: https://creativecommons.org/licenses/by-nc-nd/3.0/
+- Sound effect 1 source: **freesound_community** (Pixabay profile):
+  https://pixabay.com/users/freesound_community-46691455/
+- Sound effect 2 source: **universfield** (Pixabay profile):
+  https://pixabay.com/users/universfield-28281460/

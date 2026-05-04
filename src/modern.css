@@ -1118,8 +1118,8 @@ body {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(2, 4, 8, 0.82);
-  backdrop-filter: blur(8px);
+  background: rgba(4, 8, 14, 0.42);
+  backdrop-filter: blur(5px);
 }
 
 .map-sheet-panel {
@@ -1151,6 +1151,27 @@ body {
   cursor: grab;
   touch-action: none;
   user-select: none;
+}
+
+@media (min-width: 1800px) and (min-aspect-ratio: 16/10) {
+  .map-sheet {
+    place-items: start center;
+    padding: 16px 24px 20px;
+    background:
+      radial-gradient(120% 110% at 25% 50%, rgba(10, 18, 32, 0.22) 0%, rgba(6, 10, 18, 0.3) 58%),
+      linear-gradient(90deg, rgba(8, 14, 24, 0.16) 0%, rgba(6, 10, 18, 0.24) 68%, rgba(4, 8, 14, 0.3) 100%);
+    backdrop-filter: blur(4px);
+  }
+
+  .map-sheet-panel {
+    width: min(66vw, 1580px);
+    max-height: calc(100vh - 28px);
+    transform: translateX(-8%);
+  }
+
+  .map-sheet-frame {
+    height: min(88vh, 1120px);
+  }
 }
 
 .credits-sheet[hidden] {

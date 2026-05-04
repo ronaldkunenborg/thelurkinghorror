@@ -250,6 +250,67 @@ function testGameSoundAliasWorksWithoutVmInput() {
   assert.deepStrictEqual(musicStates, [false], '$GAMESOUND should notify music preference changes');
 }
 
+function testSfxCommandTriggersMappedPlayback() {
+  const ui = createUi();
+  const fakeAudio = {
+    loop: false,
+    paused: true,
+    currentTime: 0,
+    playCalls: 0,
+    pauseCalls: 0,
+    addEventListener() {},
+    play() {
+      this.paused = false;
+      this.playCalls++;
+      return Promise.resolve();
+    },
+    pause() {
+      this.paused = true;
+      this.pauseCalls++;
+    },
+  };
+  const controller = new GameIoController(ui, {
+    soundCatalog: {
+      6: { src: './s6.wav', loop: false },
+    },
+    audioFactory() {
+      return fakeAudio;
+    },
+  });
+  controller.vm = { haltReason: null };
+
+  controller.submitCommand('$SFX 6');
+
+  assert.strictEqual(fakeAudio.playCalls, 1, '$SFX should trigger mapped audio playback');
+  assert.ok(
+    ui.lines.some(line => line.includes('[SFX command] Triggering sound effect #6.')),
+    '$SFX should print command confirmation'
+  );
+  assert.deepStrictEqual(
+    ui.statuses.slice(-1)[0],
+    ['Interpreter command', 'SFX #6'],
+    '$SFX should update status line'
+  );
+}
+
+function testSfxCommandRejectsOutOfRangeIds() {
+  const ui = createUi();
+  const controller = new GameIoController(ui);
+  controller.vm = { haltReason: null };
+
+  controller.submitCommand('$SFX 19');
+
+  assert.ok(
+    ui.lines.includes('Invalid sound-effect number. Valid range for The Lurking Horror is 1-18.'),
+    '$SFX should reject IDs outside TLH range'
+  );
+  assert.deepStrictEqual(
+    ui.statuses.slice(-1)[0],
+    ['Interpreter command', 'SFX range'],
+    '$SFX range rejection should update status line'
+  );
+}
+
 function testMapCommandOpensVisitedMap() {
   const ui = createUi();
   const mapRequests = [];
@@ -780,7 +841,7 @@ function testStartingNewSampleStopsPreviousSample() {
   assert.strictEqual(audioBySrc['./b.wav'].playCalls, 1, 'new sample should start playing');
 }
 
-function testDefaultSfxLoopsUntilExplicitStop() {
+function testDefaultSfxIsOneShotUnlessConfigured() {
   const ui = createUi();
   const fakeAudio = {
     loop: false,
@@ -809,18 +870,18 @@ function testDefaultSfxLoopsUntilExplicitStop() {
   });
 
   controller._handleVmSoundEffect({ number: 10, effect: 2 });
-  assert.strictEqual(fakeAudio.loop, true, 'unclassified game sound should default to looping');
+  assert.strictEqual(fakeAudio.loop, false, 'unclassified game sound should default to one-shot');
   assert.strictEqual(fakeAudio.playCalls, 1, 'start should trigger playback');
 
   controller._handleVmSoundEffect({ number: 10, effect: 2 });
   assert.strictEqual(
     fakeAudio.playCalls,
     1,
-    'repeated start for the same active sample should keep current loop without restart'
+    'repeated start for the same active sample should not restart playback while active'
   );
 
   controller._handleVmSoundEffect({ number: 10, effect: 3 });
-  assert.strictEqual(fakeAudio.pauseCalls, 1, 'explicit stop should halt looping sample');
+  assert.strictEqual(fakeAudio.pauseCalls, 1, 'explicit stop should halt active sample');
 }
 
 function testMusicAndSfxUseSeparateReplacementGroups() {
@@ -866,7 +927,7 @@ function testMusicAndSfxUseSeparateReplacementGroups() {
 
   assert.strictEqual(audioBySrc['./music-a.mp3'].pauseCalls, 0, 'starting SFX should not stop active music');
   assert.strictEqual(audioBySrc['./music-a.mp3'].loop, false, 'music should default to non-looping');
-  assert.strictEqual(audioBySrc['./sfx-a.wav'].loop, true, 'SFX should default to looping');
+  assert.strictEqual(audioBySrc['./sfx-a.wav'].loop, false, 'SFX should default to one-shot');
 
   controller._handleVmSoundEffect({ number: 3, effect: 2 });
   assert.strictEqual(audioBySrc['./music-a.mp3'].pauseCalls, 1, 'new music should replace old music');
@@ -1720,6 +1781,8 @@ async function run() {
   testRoomDebugLookIncludesExits();
   testSoundInterpreterCommandWorksWithoutVmInput();
   testGameSoundAliasWorksWithoutVmInput();
+  testSfxCommandTriggersMappedPlayback();
+  testSfxCommandRejectsOutOfRangeIds();
   testMapCommandOpensVisitedMap();
   testMapCommandCanBeDisabledWithoutDisablingDiscovery();
   testMapDiscoveryTracksVisitedKnownAndTraversedLinks();
@@ -1741,7 +1804,7 @@ async function run() {
   testQuitHaltInvokesStoryQuitCallback();
   testSameRoomLightRecoveryClearsDarkScene();
   testStartingNewSampleStopsPreviousSample();
-  testDefaultSfxLoopsUntilExplicitStop();
+  testDefaultSfxIsOneShotUnlessConfigured();
   testMusicAndSfxUseSeparateReplacementGroups();
   testGameOverMusicStartsOnlyOnDeathBanner();
   testGameOverMusicStopsOnRecoveryCommand();

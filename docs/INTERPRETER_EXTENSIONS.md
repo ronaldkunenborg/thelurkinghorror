@@ -8,6 +8,11 @@ This project adds a few interpreter-level conveniences on top of standard story 
   - Toggles in-game sound playback on/off at interpreter level.
   - This controls whether `sound_effect` events from the story actually play audio.
 
+- `$SFX <sound-effect-number>`
+  - Triggers a synthetic `start` event for a specific The Lurking Horror sound effect ID.
+  - Valid range is `1` to `18`.
+  - Intended for quick audio verification without stepping to a story location that emits the effect naturally.
+
 - `$SOUNDSTATS`
   - Prints collected sound event diagnostics for the current session.
   - Output includes:
@@ -57,7 +62,7 @@ This line reflects all currently captured event fields from VM `sound_effect` ha
 Interpreter playback now distinguishes between two sound classes:
 
 - `sfx` (default)
-  - Default loop behavior: **on** (continues until explicit `stop` or replacement by another `sfx` start).
+  - Default loop behavior: **off** unless explicitly configured or overridden by story-specific compatibility rules.
 - `music`
   - Default loop behavior: **off** unless explicitly configured with `loop: true`.
 
@@ -69,6 +74,59 @@ Replacement is class-aware:
 
 - Starting a new `sfx` stops active `sfx` but leaves active `music` untouched.
 - Starting new `music` replaces active `music`.
+
+## The Lurking Horror (Frotz Compatibility)
+
+For `The Lurking Horror`, sound handling should follow Frotz `sound.c` behavior as the compatibility baseline:
+
+- Source:
+  - https://gitlab.com/DavidGriffith/frotz/-/blob/master/src/common/sound.c
+
+- Effect codes:
+  - `1` = prepare
+  - `2` = play/start
+  - `3` = stop
+  - `4` = finish-with
+
+- TLH-specific repeat handling (from `lh_repeats` in Frotz):
+  - `3 -> 0x01`
+  - `4 -> 0xff`
+  - `6 -> 0x01`
+  - `7 -> 0x01`
+  - `8 -> 0x01`
+  - `9 -> 0x01`
+  - `10 -> 0xff`
+  - `11 -> 0x01`
+  - `12 -> 0x01`
+  - `13 -> 0xff`
+  - `15 -> 0xff`
+  - `16 -> 0xff`
+  - `17 -> 0xff`
+  - `18 -> 0xff`
+  - (`0x01` = one-shot, `0xff` = loop indefinitely)
+
+- TLH queue rule for fast back-to-back effects:
+  - Sound IDs `9` and `16` are delayed via `next_sample`/`next_volume`.
+  - If a play request for `9` or `16` arrives while another sample is playing, it is queued to start after `end_of_sound`.
+  - If a non-play effect arrives for `9`/`16`, Frotz does not queue it.
+
+- Known TLH sample numbering notes:
+  - No sample files are associated with IDs `1`, `2`, `5`, or `14` in the original TLH sample set.
+  - The 14 sample files correspond to IDs `3` through `18` (with the gaps above).
+  - Commonly identified names:
+    - `3`: Drone (`S-DRONE`)
+    - `4`: Attack (`S-ATTACK`)
+    - `6`: Psycho (`S-PSYCHO`)
+    - `7`: Monster (`S-MONSTR`)
+    - `8`: Voice (`S-VOICE`)
+    - `9`: Zombie (`S-ZOMBIE`) - notable for timing/queue handling in modern interpreters.
+    - `10`: Cretin (`S-CRETIN`)
+    - `16`: looping effect that also needs special queue handling in modern interpreters.
+
+Notes:
+
+- This is intentionally story-specific behavior (`story_id == LURKING_HORROR` in Frotz), not a generic rule for all Z-machine games.
+- For V3 stories like TLH, the optional fourth `@sound_effect` operand is not part of the V3 opcode contract and should not be interpreted as in V5+.
 
 ## Sound Asset Source
 

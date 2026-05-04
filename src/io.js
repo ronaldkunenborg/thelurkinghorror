@@ -26,22 +26,26 @@ const ROOM_EXIT_PROPERTY_COMMANDS = [
   { propertyId: 31, command: 'north' },
 ];
 const DEFAULT_SOUND_CATALOG = {
-  3: { src: './assets/soundfx/blorb/s3.wav', class: SOUND_CLASS_SFX },
-  4: { src: './assets/soundfx/blorb/s4.wav', class: SOUND_CLASS_SFX },
-  6: { src: './assets/soundfx/blorb/s6.wav', class: SOUND_CLASS_SFX },
-  7: { src: './assets/soundfx/blorb/s7.wav', class: SOUND_CLASS_SFX },
-  8: { src: './assets/soundfx/blorb/s8.wav', class: SOUND_CLASS_SFX },
-  9: { src: './assets/soundfx/blorb/s9.wav', class: SOUND_CLASS_SFX },
-  10: { src: './assets/soundfx/blorb/s10.wav', class: SOUND_CLASS_SFX },
-  11: { src: './assets/soundfx/blorb/s11.wav', class: SOUND_CLASS_SFX },
-  12: { src: './assets/soundfx/blorb/s12.wav', class: SOUND_CLASS_SFX },
-  13: { src: './assets/soundfx/blorb/s13.wav', class: SOUND_CLASS_SFX },
-  15: { src: './assets/soundfx/blorb/s15.wav', class: SOUND_CLASS_SFX },
-  16: { src: './assets/soundfx/blorb/s16.wav', class: SOUND_CLASS_SFX },
-  17: { src: './assets/soundfx/blorb/s17.wav', class: SOUND_CLASS_SFX },
-  18: { src: './assets/soundfx/blorb/s18.wav', class: SOUND_CLASS_SFX },
+  1: { src: './assets/soundfx/freesound_community-wrong-47985.wav', class: SOUND_CLASS_SFX, loop: false },
+  2: { src: './assets/soundfx/universfield-wrong-answer-129254.wav', class: SOUND_CLASS_SFX, loop: false },
+  3: { src: './assets/soundfx/blorb/s3.wav', class: SOUND_CLASS_SFX, loop: false },
+  4: { src: './assets/soundfx/blorb/s4.wav', class: SOUND_CLASS_SFX, loop: false },
+  6: { src: './assets/soundfx/blorb/s6.wav', class: SOUND_CLASS_SFX, loop: false },
+  7: { src: './assets/soundfx/blorb/s7.wav', class: SOUND_CLASS_SFX, loop: false },
+  8: { src: './assets/soundfx/blorb/s8.wav', class: SOUND_CLASS_SFX, loop: false },
+  9: { src: './assets/soundfx/blorb/s9.wav', class: SOUND_CLASS_SFX, loop: false },
+  10: { src: './assets/soundfx/blorb/s10.wav', class: SOUND_CLASS_SFX, loop: false },
+  11: { src: './assets/soundfx/blorb/s11.wav', class: SOUND_CLASS_SFX, loop: false },
+  12: { src: './assets/soundfx/blorb/s12.wav', class: SOUND_CLASS_SFX, loop: false },
+  13: { src: './assets/soundfx/blorb/s13.wav', class: SOUND_CLASS_SFX, loop: false },
+  15: { src: './assets/soundfx/blorb/s15.wav', class: SOUND_CLASS_SFX, loop: false },
+  16: { src: './assets/soundfx/blorb/s16.wav', class: SOUND_CLASS_SFX, loop: false },
+  17: { src: './assets/soundfx/blorb/s17.wav', class: SOUND_CLASS_SFX, loop: false },
+  18: { src: './assets/soundfx/blorb/s18.wav', class: SOUND_CLASS_SFX, loop: false },
   [GAME_OVER_MUSIC_ID]: { src: './assets/audio/game-over-desmae-877160.mp3', class: SOUND_CLASS_MUSIC },
 };
+const TLH_LOOPING_SOUND_IDS = new Set([4, 10, 13, 15, 16, 17, 18]);
+const TLH_QUEUED_SOUND_IDS = new Set([9, 16]);
 
 class GameIoController {
   constructor(ui, options) {
@@ -148,6 +152,7 @@ class GameIoController {
     this.pendingMapCommand = '';
     this.mapDiscoveryTracker = opts.mapDiscoveryTracker || this._createDefaultMapDiscoveryTracker();
     this.lastVmRestartSerial = 0;
+    this.pendingTlhSample = null;
 
     this.ui.setCommandHandler(command => this.submitCommand(command));
     this._syncStatusDisplays();
@@ -358,6 +363,9 @@ class GameIoController {
     }
     if (normalized === '$SOUND') {
       return this._toggleSoundEffects();
+    }
+    if (normalized.startsWith('$SFX')) {
+      return this._handleSfxCommand(original);
     }
     if (normalized === '$GAMESOUND') {
       return this._toggleGameMusic();
@@ -584,6 +592,32 @@ class GameIoController {
       );
       this.ui.setStatus('Interpreter command', this.gameMusicEnabled ? 'Music on' : 'Music off');
       return true;
+  }
+
+  _handleSfxCommand(command) {
+    const parts = String(command || '').trim().split(/\s+/).filter(Boolean);
+    if (parts.length !== 2) {
+      this.ui.appendOutput('Usage: $SFX <sound-effect-number 1-18>', 'error');
+      this.ui.setStatus('Interpreter command', 'SFX usage');
+      return true;
+    }
+    const soundId = Number(parts[1]);
+    if (!Number.isInteger(soundId) || soundId < 1 || soundId > 18) {
+      this.ui.appendOutput('Invalid sound-effect number. Valid range for The Lurking Horror is 1-18.', 'error');
+      this.ui.setStatus('Interpreter command', 'SFX range');
+      return true;
+    }
+    this.ui.appendOutput('[SFX command] Triggering sound effect #' + soundId + '.', 'system');
+    this._handleVmSoundEffect({
+      number: soundId,
+      effect: SOUND_EFFECT_START,
+      volumeRaw: 8,
+      volumeSigned: 8,
+      routine: null,
+      operandCount: 3,
+    });
+    this.ui.setStatus('Interpreter command', 'SFX #' + soundId);
+    return true;
   }
 
   _handleFlashlightCommand(command) {
@@ -2208,11 +2242,14 @@ class GameIoController {
     const isEnabledForClass = this._isEnabledForSoundClass(soundClass);
     const mappedSrc = soundDef && soundDef.src ? soundDef.src : 'none';
     const gain = this._resolveSoundGain(soundDef, volumeRaw, volumeSigned);
+    const loopInfo = this._describeEffectiveLoopSetting(number, soundDef);
     this._appendDebugOutput(
       '[SFX debug] id=' + number +
       ' effect=' + this._soundEffectName(effect) +
       ' sound=' + (isEnabledForClass ? 'on' : 'off') +
       ' mapped=' + mappedSrc +
+      ' effectiveLoop=' + String(loopInfo.loop) +
+      ' loopReason=' + loopInfo.reason +
       ' gain=' + (gain === null ? 'default' : gain.toFixed(3)) +
       ' volumeRaw=' + (volumeRaw === null ? 'none' : volumeRaw) +
       ' volumeSigned=' + (volumeSigned === null ? 'none' : volumeSigned) +
@@ -2240,6 +2277,17 @@ class GameIoController {
     }
 
     if (effect !== SOUND_EFFECT_START) {
+      return;
+    }
+
+    if (this._isTlhQueuedSound(number)) {
+      this.pendingTlhSample = {
+        number,
+        gain,
+      };
+      if (!this._hasActiveSfxPlayback()) {
+        this._playPendingTlhSample();
+      }
       return;
     }
 
@@ -2470,9 +2518,8 @@ class GameIoController {
     if (typeof soundDef?.loop === 'boolean') {
       return soundDef.loop;
     }
-    // Default: game sound effects loop until explicit stop or replacement.
-    // Music defaults to one-shot unless its catalog entry explicitly enables looping.
-    return this._resolveSoundClass(soundDef) === SOUND_CLASS_SFX;
+    // Conservative default for unmapped behavior: one-shot.
+    return false;
   }
 
   _ensureAudioForSound(number, soundDef) {
@@ -2495,6 +2542,7 @@ class GameIoController {
     if (typeof audio.addEventListener === 'function') {
       audio.addEventListener('ended', () => {
         this.activeSounds.delete(number);
+        this._handleSoundEnded(number);
       });
       audio.addEventListener('error', () => {
         this._appendDebugOutput(
@@ -2507,7 +2555,7 @@ class GameIoController {
 
   _applySoundParams(audio, soundDef, gain) {
     const soundClass = this._resolveSoundClass(soundDef);
-    const shouldLoop = this._resolveLoopSetting(soundDef);
+    const shouldLoop = this._resolveEffectiveLoopSetting(soundDef, Number(soundDef && soundDef.id), null);
     if (typeof audio.loop === 'boolean' || typeof audio.loop === 'undefined') {
       audio.loop = shouldLoop;
     }
@@ -2525,7 +2573,7 @@ class GameIoController {
     if (!audio) {
       return;
     }
-    this._applySoundParams(audio, soundDef, gain);
+    this._applySoundParams(audio, Object.assign({}, soundDef, { id: number }), gain);
     if (typeof audio.load === 'function') {
       audio.load();
     }
@@ -2537,7 +2585,7 @@ class GameIoController {
     if (!audio) {
       return;
     }
-    this._applySoundParams(audio, soundDef, opts.gain);
+    this._applySoundParams(audio, Object.assign({}, soundDef, { id: number }), opts.gain);
 
     const shouldRestart = !!opts.restart;
     const isActivelyPlaying = !!audio && typeof audio.paused === 'boolean' ? !audio.paused : false;
@@ -2681,8 +2729,104 @@ class GameIoController {
       if (!audio || typeof audio.volume !== 'number') {
         continue;
       }
-      this._applySoundParams(audio, soundDef, null);
+      this._applySoundParams(audio, Object.assign({}, soundDef, { id: number }), null);
     }
+  }
+
+  _resolveEffectiveLoopSetting(soundDef, number, effect) {
+    if (typeof soundDef?.loop === 'boolean') {
+      return soundDef.loop;
+    }
+    const soundNumber = Number.isFinite(number) ? number : 0;
+    if (
+      this._isLurkingHorrorStory() &&
+      this._resolveSoundClass(soundDef) === SOUND_CLASS_SFX &&
+      soundNumber > 0
+    ) {
+      return TLH_LOOPING_SOUND_IDS.has(soundNumber);
+    }
+    return this._resolveLoopSetting(soundDef, effect);
+  }
+
+  _describeEffectiveLoopSetting(number, soundDef) {
+    if (typeof soundDef?.loop === 'boolean') {
+      return { loop: soundDef.loop, reason: 'catalog' };
+    }
+    const soundNumber = Number(number) || 0;
+    if (
+      this._isLurkingHorrorStory() &&
+      this._resolveSoundClass(soundDef) === SOUND_CLASS_SFX &&
+      soundNumber > 0
+    ) {
+      return {
+        loop: TLH_LOOPING_SOUND_IDS.has(soundNumber),
+        reason: 'tlh-frotz',
+      };
+    }
+    return { loop: this._resolveLoopSetting(soundDef), reason: 'default' };
+  }
+
+  _isLurkingHorrorStory() {
+    const release = Number(this.storyMeta && this.storyMeta.release);
+    const serial = String(this.storyMeta && this.storyMeta.serial ? this.storyMeta.serial : '');
+    return release === 219 && serial === '870912';
+  }
+
+  _isTlhQueuedSound(number) {
+    if (!this._isLurkingHorrorStory()) {
+      return false;
+    }
+    return TLH_QUEUED_SOUND_IDS.has(Number(number));
+  }
+
+  _hasActiveSfxPlayback() {
+    const activeIds = Array.from(this.activeSounds.keys());
+    for (const number of activeIds) {
+      const soundDef = this.soundCatalog[number];
+      if (this._resolveSoundClass(soundDef) !== SOUND_CLASS_SFX) {
+        continue;
+      }
+      const audio = this.activeSounds.get(number);
+      if (!audio) {
+        continue;
+      }
+      if (typeof audio.paused === 'boolean') {
+        if (!audio.paused) {
+          return true;
+        }
+        continue;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  _playPendingTlhSample() {
+    if (!this.pendingTlhSample) {
+      return;
+    }
+    const pending = this.pendingTlhSample;
+    this.pendingTlhSample = null;
+    const number = Number(pending.number) || 0;
+    const soundDef = this.soundCatalog[number];
+    if (!number || !soundDef || !soundDef.src) {
+      return;
+    }
+    this._stopAllSoundsExcept(number, SOUND_CLASS_SFX);
+    this._playSound(number, soundDef, {
+      gain: pending.gain,
+      restart: false,
+    });
+  }
+
+  _handleSoundEnded(number) {
+    if (!this._isLurkingHorrorStory()) {
+      return;
+    }
+    if (!Number(number)) {
+      return;
+    }
+    this._playPendingTlhSample();
   }
 
   _prepareAudioForRestore() {
