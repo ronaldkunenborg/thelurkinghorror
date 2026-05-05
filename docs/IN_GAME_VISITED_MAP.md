@@ -27,6 +27,7 @@ The tracker records player-visible truth rather than revealing the complete refe
 - Successful movement between two mapped nodes confirms a full traversed link.
 - Puzzle links keep the dashed/puzzle style from the prototype/booklet map.
 - The Infinite Corridor to Great Court one-way marker is preserved once that link is known.
+- The visible south door from `Infinite Corridor [W3]` reveals a normal stub toward Great Court; the locked-door warning upgrades that known stub with the one-way marker without revealing the Great Court tile.
 - Dream-only rooms from the starting-room paper (`place`/152, `basalt`/134, `platform`/21) are excluded from normal map discovery.
 
 Repeated room IDs are resolved against the previous mapped node and movement command when possible. Reverse-only prototype links can still be discovered when the VM exposes or traverses the opposite direction.
@@ -70,7 +71,7 @@ Relevant test coverage:
 - `tools/test-map-prototype-2-layout.js`
   - Validates map-prototype-2 layout rules, especially vertical edge consistency.
 - `tools/test-io-controller-output.js`
-  - Covers `$MAP`, map availability gating, discovery tracking, VM fallback, restart reset, and save/load metadata behavior.
+  - Covers `$MAP`, map availability gating, discovery tracking, the Great Court warning link, VM fallback, restart reset, and save/load metadata behavior.
 - `tools/test-integration.js`
   - Runs real parser/VM/controller startup and command smoke tests.
 - `tools/test-vm-core.js`

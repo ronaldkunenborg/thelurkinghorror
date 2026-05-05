@@ -187,7 +187,7 @@
             y: 1140,
             edges: [{ to: "cinder", label: "puzzle", type: "puzzle" }]
           },
-          { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "ic5", label: "south", type: "puzzle" }, { to: "cp", label: "east" }] },
+          { id: "fn", label: "Fruits and Nuts", section: "B", layer: "L0", x: 1480, y: 670, edges: [{ to: "ic5", label: "south", type: "puzzle" }, { to: "cp", label: "east", discoveryCommands: ["down"] }] },
           { id: "cp", label: "Cluttered Passage", section: "R", layer: "L-1", x: 1940, y: 670, edges: [{ to: "brown_b", label: "southeast" }] },
           {
             id: "brown",
@@ -229,7 +229,7 @@
               { to: "large_chamber", label: "down" }
             ]
           },
-          { id: "tunnel_entry", label: "Tunnel Entrance", section: "D", layer: "L-2", x: 3890, y: 1460, edges: [{ to: "steam1", label: "east", type: "puzzle" }] },
+          { id: "tunnel_entry", label: "Tunnel Entrance", section: "D", layer: "L-2", x: 3890, y: 1460, edges: [{ to: "steam1", label: "east" }] },
           {
             id: "steam1",
             label: "Steam Tunnel [S1]",
@@ -238,7 +238,7 @@
             x: 4120,
             y: 1460,
             edges: [
-              { to: "tunnel_entry", label: "west/puzzle", type: "puzzle" },
+              { to: "tunnel_entry", label: "west" },
               { to: "steam2", label: "east" }
             ]
           },
@@ -426,11 +426,11 @@
         small_court: 16,
         muddy: 39,
         tunnel_entry: 34,
-        steam1: 66,
-        steam2: 78,
-        steam3: 138,
-        steam4: 221,
-        steam5: 227,
+        steam1: 221,
+        steam2: 227,
+        steam3: 66,
+        steam4: 78,
+        steam5: 138,
         concrete_box: 37,
         sub: 142,
         tomb: 9,
@@ -513,11 +513,11 @@
         // Steam / utility underground
         muddy: { building: "steam", layer: "L-3", tile: "B7" }, // [39] Muddy Tunnel
         tunnel_entry: { building: "steam", layer: "L-3", tile: "C7" }, // [34] Tunnel Entrance
-        steam1: { building: "steam", layer: "L-3", tile: "D7" }, // [66] Steam Tunnel
-        steam2: { building: "steam", layer: "L-3", tile: "E7" }, // [78] Steam Tunnel
-        steam3: { building: "steam", layer: "L-3", tile: "F7" }, // [138] Steam Tunnel
-        steam4: { building: "steam", layer: "L-3", tile: "G7" }, // [221] Steam Tunnel
-        steam5: { building: "steam", layer: "L-3", tile: "H7" }, // [227] Steam Tunnel
+        steam1: { building: "steam", layer: "L-3", tile: "D7" }, // [221] Steam Tunnel
+        steam2: { building: "steam", layer: "L-3", tile: "E7" }, // [227] Steam Tunnel
+        steam3: { building: "steam", layer: "L-3", tile: "F7" }, // [66] Steam Tunnel
+        steam4: { building: "steam", layer: "L-3", tile: "G7" }, // [78] Steam Tunnel
+        steam5: { building: "steam", layer: "L-3", tile: "H7" }, // [138] Steam Tunnel
         sub: { building: "steam", layer: "L-2", tile: "F6" }, // [142] Subbasement
         tomb: { building: "steam", layer: "L-2", tile: "E7" }, // [9] Tomb
         large_chamber: { building: "steam", layer: "L-4", tile: "B7" }, // [99] Large Chamber

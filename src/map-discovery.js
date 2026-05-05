@@ -22,6 +22,14 @@
     return tokens.includes(normalized);
   }
 
+  function commandMatchesEdge(command, edge) {
+    const normalized = normalizeCommand(command);
+    if (!normalized || !edge) return false;
+    if (commandMatchesLabel(normalized, edge.label)) return true;
+    const discoveryCommands = Array.isArray(edge.discoveryCommands) ? edge.discoveryCommands : [];
+    return discoveryCommands.map(normalizeCommand).includes(normalized);
+  }
+
   const OPPOSITE_COMMAND = {
     north: "south",
     south: "north",
@@ -40,6 +48,11 @@
   function reverseCommandMatchesLabel(command, label) {
     const opposite = OPPOSITE_COMMAND[normalizeCommand(command)];
     return !!opposite && commandMatchesLabel(opposite, label);
+  }
+
+  function reverseCommandMatchesEdge(command, edge) {
+    const opposite = OPPOSITE_COMMAND[normalizeCommand(command)];
+    return !!opposite && commandMatchesEdge(opposite, edge);
   }
 
   function primaryCommandFromLabel(label) {
@@ -273,19 +286,38 @@
       const exitCommands = new Set((Array.isArray(exits) ? exits : []).map(normalizeCommand).filter(Boolean));
       for (const edge of room.edges) {
         if (!edge || !edge.to || DREAM_NODE_IDS.has(String(edge.to))) continue;
-        const matchingCommand = Array.from(exitCommands).find((command) => commandMatchesLabel(command, edge.label));
+        const matchingCommand = Array.from(exitCommands).find((command) => commandMatchesEdge(command, edge));
         if (!matchingCommand) continue;
-        this._putLink(this.knownLinks, this._edgeToLink(id, edge, matchingCommand));
+        const knownEdge = id === "ic3" && String(edge.to) === "great_court"
+          ? { to: edge.to, type: edge.type, oneWay: false }
+          : edge;
+        this._putLink(this.knownLinks, this._edgeToLink(id, knownEdge, matchingCommand));
       }
       const incoming = this.incomingEdgesByNodeId.get(id) || [];
       for (const candidate of incoming) {
-        const matchingCommand = Array.from(exitCommands).find((command) => reverseCommandMatchesLabel(command, candidate.edge.label));
+        const matchingCommand = Array.from(exitCommands).find((command) => reverseCommandMatchesEdge(command, candidate.edge));
         if (!matchingCommand) continue;
         this._putLink(
           this.knownLinks,
           this._edgeToLink(id, { to: candidate.fromNodeId, type: candidate.edge.type }, matchingCommand)
         );
       }
+    }
+
+    recordKnownLink(fromNodeId, toNodeId, options) {
+      const fromId = String(fromNodeId || "");
+      const toId = String(toNodeId || "");
+      const from = this.roomByNodeId.get(fromId);
+      if (!from || !Array.isArray(from.edges) || !this.roomByNodeId.has(toId)) return this.serialize();
+      const opts = options || {};
+      const edge = from.edges.find((candidate) => String(candidate && candidate.to) === toId);
+      if (!edge) return this.serialize();
+      this._putLink(this.knownLinks, this._edgeToLink(fromId, {
+        to: toId,
+        type: opts.type || edge.type,
+        oneWay: opts.oneWay
+      }, opts.command || edge.label));
+      return this.serialize();
     }
 
     resolveNodeId(roomId, previousNodeId, command) {
@@ -295,7 +327,7 @@
       const previous = this.roomByNodeId.get(String(previousNodeId || ""));
       if (previous && Array.isArray(previous.edges)) {
         const matched = previous.edges.find((edge) =>
-          candidates.includes(String(edge.to)) && commandMatchesLabel(command, edge.label)
+          candidates.includes(String(edge.to)) && commandMatchesEdge(command, edge)
         );
         if (matched) return String(matched.to);
       }
@@ -308,10 +340,10 @@
       const from = this.roomByNodeId.get(String(fromNodeId || ""));
       if (!from || !Array.isArray(from.edges)) return;
       const edge = from.edges.find((candidate) =>
-        String(candidate.to) === String(toNodeId) && commandMatchesLabel(command, candidate.label)
+        String(candidate.to) === String(toNodeId) && commandMatchesEdge(command, candidate)
       );
       const reverseEdge = edge ? null : (this.incomingEdgesByNodeId.get(String(fromNodeId)) || []).find((candidate) =>
-        String(candidate.fromNodeId) === String(toNodeId) && reverseCommandMatchesLabel(command, candidate.edge.label)
+        String(candidate.fromNodeId) === String(toNodeId) && reverseCommandMatchesEdge(command, candidate.edge)
       );
       if (!edge && !reverseEdge) return;
       const link = edge
@@ -327,7 +359,9 @@
         toNodeId: String(edge.to),
         command: normalizeCommand(command || edge.label),
         type: String(edge.type || ""),
-        oneWay: fromNodeId === "ic3" && String(edge.to) === "great_court"
+        oneWay: Object.prototype.hasOwnProperty.call(edge, "oneWay")
+          ? !!edge.oneWay
+          : (fromNodeId === "ic3" && String(edge.to) === "great_court")
       };
     }
 

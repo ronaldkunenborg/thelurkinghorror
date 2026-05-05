@@ -439,7 +439,7 @@ Inference rule used here: if a routine-driven `exit` has exactly one standard in
   - `Infinite Corridor <-> Fruits and Nuts` (`206`/`150`)
 - Consistent with booklet, but room-id-specific confirmation is limited by repeated labels/inset numbering:
   - `Large Chamber down -> Wet Tunnel [Inset 1]` (`99 -> 187`) is now explicitly represented in prototype v1 as the entry into the inset chain.
-  - Steam-tunnel chain inferences (`78 -> 66`, `138 -> 78`, `221 -> 34`, `227 -> 221`) are consistent with the linear Steam Tunnel sequence, but identical `Steam Tunnel` labels limit exact per-id validation from the booklet alone.
+  - Steam-tunnel chain IDs have now been save-validated from the Tomb route: `34 -> 221 -> 227 -> 66 -> 78 -> 138`, with `9 down -> 227` and `227 up -> 9`.
   - Infinite-corridor east-links (`208 -> 206`, `210 -> 208`, `214 -> 210`, `218 -> 214`) are consistent with the five-node corridor spine ordering, though booklet labels these nodes generically as `Infinite Corridor`.
 - No inferred reverse-link currently contradicts the booklet maps.
 
@@ -451,11 +451,11 @@ Inference rule used here: if a routine-driven `exit` has exactly one standard in
 
 ### Confirmed puzzle exits
 
-- `9` Tomb: `down` (p22, len 5)
+- `9` Tomb: `down` (p22, len 5) -> `227` Steam Tunnel; save-validated with `../data/test-saves/in-steam.sav`
 - `17` Cinderblock Tunnel: `up` (p23, len 3)
 - `25` Brick Tunnel: `up` (p23, len 3) -> `171` Ancient Storage; puzzle-gated initially, then unlocked for return travel after solve state changes.
 - `47` Dead Storage: `enter` (p21, len 3)
-- `66` Steam Tunnel: `west` (p25, len 3) -> `34` Tunnel Entrance (booklet-reconciled puzzle/restricted passage)
+- `227` Steam Tunnel: `up` -> `9` Tomb; save-validated with `../data/test-saves/tomb-to-steam.sav`
 - `110` Third Floor: `north` (p31, len 2)
 - `171` Ancient Storage: `down` (p22, len 3)
 

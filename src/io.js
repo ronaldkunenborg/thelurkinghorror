@@ -2,6 +2,8 @@
 
 const COMPUTER_HELP_NOTE =
   'Note: according to the manual, the login is 872325412 and the password is uhlersoth.';
+const GREAT_COURT_LOCKED_DOOR_WARNING =
+  "Remember, this is one of the doors that's always locked at night. You won't be able to get back in if you go out.";
 const SOUND_EFFECT_PREPARE = 1;
 const SOUND_EFFECT_START = 2;
 const SOUND_EFFECT_STOP = 3;
@@ -2083,6 +2085,9 @@ class GameIoController {
     if (this._isComputerHelpHintLine(line)) {
       this.ui.appendOutput(COMPUTER_HELP_NOTE, 'system');
     }
+    if (this._isGreatCourtLockedDoorWarningLine(line)) {
+      this._recordGreatCourtWarningMapLink();
+    }
     if (this._isDeathBannerLine(line)) {
       this._startGameOverMusic();
     }
@@ -2215,6 +2220,24 @@ class GameIoController {
   _isComputerHelpHintLine(line) {
     const normalized = String(line || '').toLowerCase();
     return normalized.includes('login your-user-id') && normalized.includes('password your-password');
+  }
+
+  _isGreatCourtLockedDoorWarningLine(line) {
+    return String(line || '').replace(/\s+/g, ' ').trim() === GREAT_COURT_LOCKED_DOOR_WARNING;
+  }
+
+  _recordGreatCourtWarningMapLink() {
+    if (
+      !this.mapDiscoveryTracker ||
+      typeof this.mapDiscoveryTracker.recordKnownLink !== 'function'
+    ) {
+      return;
+    }
+    this.mapDiscoveryTracker.recordKnownLink('ic3', 'great_court', {
+      command: 'south',
+      oneWay: true,
+    });
+    this._notifyMapDiscoveryChanged();
   }
 
   _handleVmSoundEffect(event) {

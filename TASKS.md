@@ -347,14 +347,42 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
       - Added map availability as an experience setting while keeping map discovery save/load data independent from whether the map UI is enabled.
       - Documented runtime behavior, discovery rules, save/load fallback, UI controls, and verification in `docs/IN_GAME_VISITED_MAP.md`.
 
+65. [done] Fix steam tunnel linkages! From tomb you end up in the wrong ID (or it is incorrect on the map).
+   - Used the supplied test saves in `../data/test-saves/` to validate the real VM room IDs around the Tomb/Steam Tunnel transition.
+   - Confirmed `in-steam.sav` starts in `Tomb (9)` and `down` reaches `Steam Tunnel (227)`.
+   - Confirmed `tomb-to-steam.sav` starts in `Steam Tunnel (227)` and `up` returns to `Tomb (9)`.
+   - Re-mapped the Steam Tunnel sequence in `src/map-prototype-2-data.js` to `34 -> 221 -> 227 -> 66 -> 78 -> 138`, so `steam2` is now the true Tomb-connected room.
+   - Removed the incorrect puzzle styling from the ordinary `34 <-> 221` east/west connection.
+   - Updated `docs/LOCATION_MAP.md` with the save-validated steam-chain notes.
+   - Verified `node tools/test-map-prototype-2-layout.js` passes.
+
+69. [done] Reveal Great Court one-way marker when the game warns about the locked night door.
+   - Added warning-text detection in `src/io.js` for the locked-night-door message.
+   - Added `MapDiscoveryTracker.recordKnownLink()` so story-learned links can be recorded without visiting the destination.
+   - Kept the visible south-door stub as a normal known link, then upgraded it to one-way when the warning appears, while keeping the Great Court tile hidden until entry.
+   - Updated the renderer so one-way bars also render on discovered link stubs, not only full traversed/revealed links.
+   - Documented the behavior in `docs/IN_GAME_VISITED_MAP.md`.
+   - Added regression coverage in `tools/test-io-controller-output.js`; verified `node tools/test-io-controller-output.js` and `node tools/test-map-prototype-2-layout.js` pass.
+
 ## Pending Tasks
 
-65. [pending] Think about how to implement a mini-map or a continuous map displayed above the text.
+66. [pending] Think about how to implement a mini-map or a continuous map displayed above the text. The current map could be "enhanced" and the minimap above the text (1/3 of the height of the screen) could be fully modern.
 
-66. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
+67. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
+
+68. [pending] Review and clarify the save-file format.
+   - Investigate whether exported `.sav` files should be pure Quetzal/IFZS, internal `TLHS` VM snapshots, or both with distinct extensions.
+   - Reconcile current docs that describe exported saves as pure Quetzal with observed `TLHS` files in `../data/test-saves/`.
+   - Decide whether import/export UX, file naming, compatibility checks, and docs need changes.
+
+69. [pending] Discuss: show left items and items in a room on the map using icons or a different system? Showing them prevents the use of a notebook which we don't want any player to do in the modern version.
+
+71. [pending] Create better icons with imagegen, instead of the current glyphs.
 
 ## Future Tasks
 
 64. [future] Consider hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` later.
    - Parked for now because the in-game visited-location map covers the immediate player-support need.
    - If revived later, likely scope includes booklet page 1-4 dataset scaffolding, `hints-booklet` command plumbing, safe-location gating, and minimal consultation state.
+
+70. [pending] redo Fruits and Nuts picture, the stairway should go DOWN, not UP.

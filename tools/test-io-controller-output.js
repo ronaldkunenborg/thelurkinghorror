@@ -395,6 +395,89 @@ function testMapDiscoveryTracksVisitedKnownAndTraversedLinks() {
   );
 }
 
+function testMapDiscoveryMatchesPresentationEdgeDiscoveryCommands() {
+  const tracker = new MapDiscoveryTracker({ mapData });
+
+  let state = tracker.observeRoom(150, { exits: ['down'] });
+  assert.ok(
+    state.knownLinks.some(link => link.fromNodeId === 'fn' && link.toNodeId === 'cp'),
+    'VM down exit from Fruits and Nuts should reveal the horizontal presentation link to Cluttered Passage'
+  );
+
+  state = tracker.observeRoom(179, { command: 'down', exits: ['up'] });
+  assert.ok(
+    state.traversedLinks.some(link => link.fromNodeId === 'fn' && link.toNodeId === 'cp'),
+    'VM down traversal should confirm the horizontal presentation link to Cluttered Passage'
+  );
+
+  state = tracker.observeRoom(179, { exits: ['up'] });
+  assert.ok(
+    state.knownLinks.some(link => link.fromNodeId === 'cp' && link.toNodeId === 'fn'),
+    'VM up exit from Cluttered Passage should reveal the reverse horizontal presentation link'
+  );
+}
+
+function testMapDiscoveryCanRecordKnownOneWayWarningLinkWithoutVisitingTarget() {
+  const tracker = new MapDiscoveryTracker({ mapData });
+  let state = tracker.observeRoom(210, { exits: ['south'] });
+
+  const visibleDoorLink = state.knownLinks.find(link => link.fromNodeId === 'ic3' && link.toNodeId === 'great_court');
+  assert.ok(visibleDoorLink, 'visible south door should reveal the Great Court link');
+  assert.strictEqual(
+    visibleDoorLink.oneWay,
+    false,
+    'visible south door alone should not mark the Great Court link one-way before the warning'
+  );
+
+  state = tracker.recordKnownLink('ic3', 'great_court', {
+    command: 'south',
+    oneWay: true,
+  });
+
+  assert.ok(state.visitedNodeIds.includes('ic3'), 'current Infinite Corridor node should remain visited');
+  assert.ok(!state.visitedNodeIds.includes('great_court'), 'warning should not reveal Great Court as visited');
+  assert.ok(
+    state.knownLinks.some(link =>
+      link.fromNodeId === 'ic3' &&
+      link.toNodeId === 'great_court' &&
+      link.command === 'south' &&
+      link.oneWay === true
+    ),
+    'warning should reveal the one-way Great Court link'
+  );
+  assert.ok(
+    !state.traversedLinks.some(link => link.fromNodeId === 'ic3' && link.toNodeId === 'great_court'),
+    'warning should not mark the Great Court link as traversed'
+  );
+}
+
+function testGreatCourtWarningRevealsOneWayMapLink() {
+  const ui = createUi();
+  const tracker = new MapDiscoveryTracker({ mapData });
+  const events = [];
+  const controller = new GameIoController(ui, {
+    mapDiscoveryTracker: tracker,
+    onMapDiscoveryChanged(state) {
+      events.push(state);
+    },
+  });
+
+  tracker.observeRoom(210, { exits: [] });
+  controller._appendVmLine("Remember, this is one of the doors that's always locked at night. You won't be able to get back in if you go out.");
+
+  const state = tracker.serialize();
+  assert.ok(
+    state.knownLinks.some(link =>
+      link.fromNodeId === 'ic3' &&
+      link.toNodeId === 'great_court' &&
+      link.oneWay === true
+    ),
+    'Great Court warning should reveal the one-way link'
+  );
+  assert.ok(!state.visitedNodeIds.includes('great_court'), 'Great Court tile should remain hidden until visited');
+  assert.ok(events.length > 0, 'warning should notify the map renderer');
+}
+
 function testMapDiscoveryIgnoresDreamRooms() {
   const tracker = new MapDiscoveryTracker({ mapData });
   const state = tracker.observeRoom(152, { exits: ['down'] });
@@ -1786,6 +1869,9 @@ async function run() {
   testMapCommandOpensVisitedMap();
   testMapCommandCanBeDisabledWithoutDisablingDiscovery();
   testMapDiscoveryTracksVisitedKnownAndTraversedLinks();
+  testMapDiscoveryMatchesPresentationEdgeDiscoveryCommands();
+  testMapDiscoveryCanRecordKnownOneWayWarningLinkWithoutVisitingTarget();
+  testGreatCourtWarningRevealsOneWayMapLink();
   testMapDiscoveryIgnoresDreamRooms();
   testMapDiscoveryRestoresVisitedRoomsFromVmFallback();
   testMapDiscoveryFallbackInfersSingleLinksBreadthFirst();

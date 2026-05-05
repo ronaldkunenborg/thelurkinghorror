@@ -2467,6 +2467,16 @@
 
         const pairKey = (e) => e.from + "->" + e.to;
         const edgeKey = (e) => e.from + "->" + e.to + "|" + String(e.command || "").toLowerCase() + "|" + e.source;
+        const intrinsicOneWay = (edge) => edge.from === 210 && edge.to === 180;
+        const discoveredOneWay = (edge) => {
+          if (!isInGameMode()) return intrinsicOneWay(edge);
+          if (!edge.fromNodeId || !edge.toNodeId) return false;
+          const key = discoveryLinkKey(edge.fromNodeId, edge.toNodeId);
+          const link = [...discoveryState.knownLinks, ...discoveryState.traversedLinks].find((candidate) =>
+            discoveryLinkKey(candidate.fromNodeId, candidate.toNodeId) === key
+          );
+          return !!(link && link.oneWay);
+        };
         const presentationPairSet = new Set(presentationEdges.map(pairKey));
         const enginePairSet = new Set(ENGINE_EDGE_SNAPSHOT.map(pairKey));
         const suppressedEnginePairSet = new Set([
@@ -2487,7 +2497,7 @@
             ...edge,
             type: enginePairSet.has(pairKey(edge)) ? "match" : "presentation-only",
             edgeStyle: edge.presentationType === "puzzle" ? "puzzle" : "solid",
-            oneWay: edge.from === 210 && edge.to === 180
+            oneWay: discoveredOneWay(edge)
           };
           const key = edgeKey(typed);
           if (seen.has(key)) continue;
@@ -2503,7 +2513,7 @@
             source: "engine",
             type: "engine-only",
             edgeStyle: "solid",
-            oneWay: edge.from === 210 && edge.to === 180
+            oneWay: discoveredOneWay(edge)
           };
           const key = edgeKey(typed);
           if (seen.has(key)) continue;
@@ -2884,7 +2894,7 @@
             class: edgeVisualClass(edge, depthClass),
             d
           });
-          if (discoveryStatus === "full") drawOneWayBar(points, edge);
+          if (discoveryStatus === "full" || discoveryStatus === "stub") drawOneWayBar(visiblePoints, edge);
         }
       }
 
