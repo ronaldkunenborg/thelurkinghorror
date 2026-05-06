@@ -118,7 +118,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Implemented idle disturbances:
      - rare UI glyph icon swap using new custom glyph assets
      - rare peripheral dim pulse (`#horror-vignette`) with short animation window
-   - Added and wired an initial 8-glyph SVG set under `src/assets/gfx/glyphs/` matching ids from `docs/HORROR_GLYPH_SET_PLAN.md`.
+   - Added and wired an initial 8-glyph SVG set under `src/assets/gfx/glyphs/` matching ids from `docs/HORROR_GLYPH_SET_PLAN.md`; this was later replaced by the imagegen PNG set in task 71.
    - Added debug controls in `src/io.js`:
      - `$HORROR ON|OFF`
      - `$HORROR NOW RUNES|ART|UI|DIM`
@@ -224,7 +224,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Added selective vertical-edge rendering rules: straight screen-vertical for generic up/down, Tunnel Entrance/Muddy exception (34<->39), and wet-tunnel loop/straight mixed exceptions.
    - Hid Dream-only rooms (`place`, `basalt`, `platform`) from map rendering while preserving source data.
    - Documented map-rendering decisions in `docs/ADR-0002-map-direction-alias-rendering.md` and linked ADR from `README.md`/`docs/LOCATION_MAP.md`.
-   - Extracted shared map data into `src/map-prototype-2-data.js` for browser + Node reuse.
+   - Extracted shared map data into `src/map-data.js` for browser + Node reuse.
    - Added `tools/test-map-prototype-2-layout.js` to validate ROOM_LAYOUT + vertical edge reciprocity with only agreed wet-tunnel exceptions; test currently passes.
 
 55. [done] Rebuild campus-road rendering in `src/map-prototype-2.html` to match the blueprint-road reference style.
@@ -351,7 +351,7 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Used the supplied test saves in `../data/test-saves/` to validate the real VM room IDs around the Tomb/Steam Tunnel transition.
    - Confirmed `in-steam.sav` starts in `Tomb (9)` and `down` reaches `Steam Tunnel (227)`.
    - Confirmed `tomb-to-steam.sav` starts in `Steam Tunnel (227)` and `up` returns to `Tomb (9)`.
-   - Re-mapped the Steam Tunnel sequence in `src/map-prototype-2-data.js` to `34 -> 221 -> 227 -> 66 -> 78 -> 138`, so `steam2` is now the true Tomb-connected room.
+   - Re-mapped the Steam Tunnel sequence in `src/map-data.js` to `34 -> 221 -> 227 -> 66 -> 78 -> 138`, so `steam2` is now the true Tomb-connected room.
    - Removed the incorrect puzzle styling from the ordinary `34 <-> 221` east/west connection.
    - Updated `docs/LOCATION_MAP.md` with the save-validated steam-chain notes.
    - Verified `node tools/test-map-prototype-2-layout.js` passes.
@@ -364,25 +364,63 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Documented the behavior in `docs/IN_GAME_VISITED_MAP.md`.
    - Added regression coverage in `tools/test-io-controller-output.js`; verified `node tools/test-io-controller-output.js` and `node tools/test-map-prototype-2-layout.js` pass.
 
+66. [done] Implement an optional inline visited-map above the terminal text, with resizable height.
+   - Added persisted experience settings for `mapMode` (`modal`/`inline`) and `inlineMapHeightRatio`.
+   - Added a map display selector to Experience & Audio Settings while keeping the current modal `$MAP` flow available.
+   - Added an inline map container above `#output` in `.terminal-stack`, using a second compact shared `LhMapRenderer` instance with the same discovery state.
+   - Added a horizontal resize handle between inline map and transcript; drag updates the map-height ratio with min/max bounds and double-click resets to one third.
+   - Kept inline map compact by disabling modal-scale legend parts in the inline renderer while preserving the full modal map for inspection.
+   - Wired renderer refresh on discovery updates, mode switches, resize, and drag changes.
+   - Added responsive CSS so the text/input stack keeps usable space on narrower viewports.
+   - Documented the inline mode in `docs/IN_GAME_VISITED_MAP.md`.
+   - Verified `node tools/test-io-controller-output.js`, `node tools/test-map-prototype-2-layout.js`, and `node tools/test-integration.js` pass.
+
+68. [done] Make load/save Quetzal-compliant.
+   - VM `serializeSaveState()` and story `save` opcode continuations now write `FORM`/`IFZS` Quetzal containers.
+   - Quetzal payload includes standard story identity (`IFhd`), compressed dynamic memory (`CMem`), stack frames (`Stks`), and a private `LHSv` chunk for local interpreter state that Quetzal does not otherwise carry.
+   - VM restore accepts `IFZS` saves only; older bare `TLHS` snapshots were removed in task 74.
+   - Import/export helpers now treat `.sav` as Quetzal-only and reject non-`IFZS` bytes.
+   - Updated save-format docs in `docs/QUETZAL_LOCAL_STORAGE.md` and `docs/ADR-0001-quetzal-local-storage.md`.
+   - Added regression coverage for `IFZS` save shape and Quetzal storage export guards.
+
+69. [done] Decide whether to show left items or room items on the map.
+   - Decision: do not automatically show room items, dropped items, or left-behind objects on the normal map.
+   - Rationale: the visited map should support navigation and spatial memory, not become an automatic object checklist that replaces text-adventure note-taking.
+   - Dropped items are not an exception for now: sometimes the player intentionally discards unneeded objects, and an automatic persistent marker would become map clutter.
+   - Possible future direction: consider a separate manual notes/markers layer where the player explicitly marks a room or "I left something here", but keep it player-authored rather than auto-filled.
+
+70. [done] Use the Enochian font for horror text-flicker effects.
+   - Chose `Enochian-BGlG.woff2` over `EnochianPlain-10GB.woff2` after terminal-size comparison because it is thinner and more scratchy.
+   - Added the runtime `@font-face` for `src/assets/fonts/Enochian-BGlG.woff2`.
+   - Changed rune flicker from ASCII character substitution to a whole-line temporary Enochian font treatment with CSS flicker.
+   - Added Enochian font attribution to in-game credits/settings attribution and `README.md`.
+   - Documented the font decision and license note in `docs/ASSET_DECISIONS.md`.
+
+71. [done] Replace the initial horror glyph icons with imagegen PNG glyphs.
+   - Generated and sliced a new 8-glyph imagegen set matching the existing glyph ids.
+   - Replaced the original SVG glyph assets with PNG glyph assets under `src/assets/gfx/glyphs/`.
+   - Updated the runtime glyph manifest in `src/index.html` to load `.png` glyph art.
+   - Updated `docs/HORROR_GLYPH_SET_PLAN.md` to reflect the PNG runtime asset strategy.
+
+73. [done] Add a crossfade + glitch transition between normal action button PNGs and temporary horror glyph PNGs.
+   - Kept action button behavior unchanged; the effect only alters the visual contents of the `.icon-etch` span.
+   - Layered the normal button icon and selected horror glyph icon during the transition so the swap reads as a brief visual corruption rather than an instant replacement.
+   - Added CSS crossfade animations with small opacity/blur/contrast/translate jitter and a scanline-like glitch overlay.
+   - Left the horror glyph visible for the existing 5-10 second duration, with a reverse transition back to the normal icon.
+   - Avoided changing button border/background styling during the swap.
+
+74. [done] Remove legacy bare `TLHS` save support.
+   - Removed the VM restore fallback and old internal serializer for bare `TLHS` snapshots.
+   - Renamed the private Quetzal interpreter-state chunk from `TLHS` to `LHSv` to avoid treating `TLHS` as a current save concept.
+   - Removed legacy `TLHS` format detection/export messaging from `src/quetzal-storage.js`.
+   - Updated save-format docs and tests so `.sav` means Quetzal/IFZS only.
+
 ## Pending Tasks
 
-66. [pending] Think about how to implement a mini-map or a continuous map displayed above the text. The current map could be "enhanced" and the minimap above the text (1/3 of the height of the screen) could be fully modern.
-
 67. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
-
-68. [pending] Review and clarify the save-file format.
-   - Investigate whether exported `.sav` files should be pure Quetzal/IFZS, internal `TLHS` VM snapshots, or both with distinct extensions.
-   - Reconcile current docs that describe exported saves as pure Quetzal with observed `TLHS` files in `../data/test-saves/`.
-   - Decide whether import/export UX, file naming, compatibility checks, and docs need changes.
-
-69. [pending] Discuss: show left items and items in a room on the map using icons or a different system? Showing them prevents the use of a notebook which we don't want any player to do in the modern version.
-
-71. [pending] Create better icons with imagegen, instead of the current glyphs.
 
 ## Future Tasks
 
 64. [future] Consider hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` later.
    - Parked for now because the in-game visited-location map covers the immediate player-support need.
    - If revived later, likely scope includes booklet page 1-4 dataset scaffolding, `hints-booklet` command plumbing, safe-location gating, and minimal consultation state.
-
-70. [pending] redo Fruits and Nuts picture, the stairway should go DOWN, not UP.
