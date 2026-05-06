@@ -1,9 +1,9 @@
-/* Shared map-prototype-2 data for browser + node tests. */
+/* Shared map data for browser + node tests. */
 (function (root, factory) {
   if (typeof module === "object" && module.exports) {
     module.exports = factory();
   } else {
-    root.MapPrototype2Data = factory();
+    root.LhMapData = factory();
   }
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   const MAP_ROOMS = [

@@ -4,7 +4,7 @@ The in-game map is a progressive, player-facing map built from the calibrated `m
 
 ## Runtime components
 
-- `src/map-prototype-2-data.js`
+- `src/map-data.js`
   - Shared map model used by the prototype page, renderer, discovery tracker, and Node tests.
 - `src/map-renderer.js`
   - Shared SVG renderer exposed as `window.LhMapRenderer`.
@@ -51,6 +51,7 @@ This fallback restores useful visited-room context while avoiding full-world spo
 - Imported `.sav` files therefore do not carry `mapDiscovery`; they use the VM-state fallback above.
 - Story `restart` resets interpreter-side map discovery and then observes the restarted current room.
 - Experience settings may disable map UI availability, but discovery and save/load persistence continue independently.
+- Experience settings also persist map display mode (`modal` or `inline`) and the inline map height ratio.
 
 ## In-game UI
 
@@ -59,6 +60,8 @@ The game map is rendered in the existing modal map sheet in `src/index.html`.
 Controls and affordances:
 
 - `$MAP` and the action-rail map button open the visited map when map UI is enabled for the current experience profile.
+- The optional inline map mode renders a compact visited map above the terminal transcript while keeping the modal map available for full inspection.
+- The inline map starts near one third of the terminal text area and can be resized with the horizontal drag handle between map and transcript.
 - The title bar includes a floor-level selector synchronized with right-mouse vertical floor scrubbing.
 - The legend includes clickable `Current location`; it focuses the player layer, pans the player marker into view, and plays a red ping.
 - The legend also includes view toggles for building overlays and the tile grid.

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enochian Font Specimen</title>
+  <style>
+    @font-face {
+      font-family: "Enochian BGlG";
+      src: url("./Enochian-BGlG.woff2") format("woff2");
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "Enochian Plain";
+      src: url("./EnochianPlain-10GB.woff2") format("woff2");
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: dark;
+      --bg: #05070a;
+      --panel: #0b1017;
+      --line: rgba(236, 242, 248, 0.16);
+      --text: #e8edf2;
+      --muted: #9faab5;
+      --accent: #ffdc97;
+      --terminal: 15px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 36%),
+        var(--bg);
+      color: var(--text);
+      font-family: Consolas, "Lucida Console", "Courier New", monospace;
+      line-height: 1.55;
+      padding: 28px;
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    h1,
+    h2 {
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 15px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .note {
+      color: var(--muted);
+      margin: 0 0 24px;
+      max-width: 760px;
+    }
+
+    section {
+      border-top: 1px solid var(--line);
+      padding: 22px 0;
+    }
+
+    .sample {
+      border: 1px solid var(--line);
+      background: rgba(3, 5, 8, 0.72);
+      padding: 14px 16px;
+      margin: 12px 0;
+    }
+
+    .label {
+      color: var(--muted);
+      font-family: Consolas, "Lucida Console", "Courier New", monospace;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .bglg {
+      font-family: "Enochian BGlG", Consolas, monospace;
+    }
+
+    .plain {
+      font-family: "Enochian Plain", Consolas, monospace;
+    }
+
+    .terminal-size {
+      font-size: var(--terminal);
+    }
+
+    .pt12 {
+      font-size: 12pt;
+    }
+
+    .pt16 {
+      font-size: 16pt;
+    }
+
+    .pt20 {
+      font-size: 20pt;
+    }
+
+    .pt24 {
+      font-size: 24pt;
+    }
+
+    .letters {
+      word-break: break-word;
+    }
+
+    .alternating p {
+      margin: 0 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Enochian Font Specimen</h1>
+    <p class="note">Compare both Enochian webfonts at terminal scale through 24pt. The alternating section uses the same text in both fonts so flicker/readability can be judged in context.</p>
+
+    <section>
+      <h2>Two Paragraphs</h2>
+      <div class="sample terminal-size bglg">
+        <div class="label">Enochian-BGlG.woff2, terminal size</div>
+        <p>The cold machine room hummed beneath the campus. Something old moved behind the concrete, counting each footstep in a language the terminal was never meant to print.</p>
+      </div>
+      <div class="sample terminal-size plain">
+        <div class="label">EnochianPlain-10GB.woff2, terminal size</div>
+        <p>The cold machine room hummed beneath the campus. Something old moved behind the concrete, counting each footstep in a language the terminal was never meant to print.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Uppercase And Lowercase</h2>
+      <div class="sample terminal-size bglg letters">
+        <div class="label">Enochian-BGlG.woff2, terminal size</div>
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />
+        abcdefghijklmnopqrstuvwxyz
+      </div>
+      <div class="sample terminal-size plain letters">
+        <div class="label">EnochianPlain-10GB.woff2, terminal size</div>
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />
+        abcdefghijklmnopqrstuvwxyz
+      </div>
+      <div class="sample pt24 bglg letters">
+        <div class="label">Enochian-BGlG.woff2, 24pt</div>
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />
+        abcdefghijklmnopqrstuvwxyz
+      </div>
+      <div class="sample pt24 plain letters">
+        <div class="label">EnochianPlain-10GB.woff2, 24pt</div>
+        ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />
+        abcdefghijklmnopqrstuvwxyz
+      </div>
+    </section>
+
+    <section class="alternating">
+      <h2>Alternating Same Text</h2>
+      <div class="sample terminal-size bglg">
+        <div class="label">Enochian-BGlG.woff2, terminal size</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      </div>
+      <div class="sample terminal-size plain">
+        <div class="label">EnochianPlain-10GB.woff2, terminal size</div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      </div>
+      <div class="sample pt12 bglg">
+        <div class="label">Enochian-BGlG.woff2, 12pt</div>
+        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      </div>
+      <div class="sample pt12 plain">
+        <div class="label">EnochianPlain-10GB.woff2, 12pt</div>
+        <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      </div>
+      <div class="sample pt16 bglg">
+        <div class="label">Enochian-BGlG.woff2, 16pt</div>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+      </div>
+      <div class="sample pt16 plain">
+        <div class="label">EnochianPlain-10GB.woff2, 16pt</div>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+      </div>
+      <div class="sample pt20 bglg">
+        <div class="label">Enochian-BGlG.woff2, 20pt</div>
+        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+      <div class="sample pt20 plain">
+        <div class="label">EnochianPlain-10GB.woff2, 20pt</div>
+        <p>Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+      </div>
+      <div class="sample pt24 bglg">
+        <div class="label">Enochian-BGlG.woff2, 24pt</div>
+        <p>The passage flickers once, and the printed words become a diagram of something locked below the school.</p>
+      </div>
+      <div class="sample pt24 plain">
+        <div class="label">EnochianPlain-10GB.woff2, 24pt</div>
+        <p>The passage flickers once, and the printed words become a diagram of something locked below the school.</p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

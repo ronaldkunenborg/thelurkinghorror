@@ -71,7 +71,7 @@
   class MapDiscoveryTracker {
     constructor(options) {
       const opts = options || {};
-      this.mapData = opts.mapData || root.MapPrototype2Data || {};
+      this.mapData = opts.mapData || root.LhMapData || {};
       this.roomByNodeId = new Map();
       this.nodeIdsByRoomId = new Map();
       this.incomingEdgesByNodeId = new Map();

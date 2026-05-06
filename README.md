@@ -193,3 +193,6 @@ Useful local checks:
   https://pixabay.com/users/freesound_community-46691455/
 - Sound effect 2 source: **universfield** (Pixabay profile):
   https://pixabay.com/users/universfield-28281460/
+- Enochian font: **Enochian** by **Digital Type Foundry**
+  (Freeware, Non-Commercial), published on FontSpace:
+  https://www.fontspace.com/enochian-font-f6183

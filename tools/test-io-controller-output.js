@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const { GameIoController } = require('../src/io.js');
-const mapData = require('../src/map-prototype-2-data.js');
+const mapData = require('../src/map-data.js');
 const { MapDiscoveryTracker } = require('../src/map-discovery.js');
 
 function flushAsyncWork() {

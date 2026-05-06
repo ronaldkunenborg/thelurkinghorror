@@ -2,7 +2,7 @@
 
 const assert = require('assert');
 const path = require('path');
-const data = require(path.join(__dirname, '..', 'src', 'map-prototype-2-data.js'));
+const data = require(path.join(__dirname, '..', 'src', 'map-data.js'));
 
 const HIDDEN_ROOMS = new Set(['place', 'basalt', 'platform']);
 

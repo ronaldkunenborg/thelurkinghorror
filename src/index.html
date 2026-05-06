@@ -13,6 +13,7 @@
       <div id="ui-snow-mask" class="ui-snow-mask" aria-hidden="true">
         <span data-mask-target=".side-actions"></span>
         <span data-mask-target=".terminal-stack"></span>
+        <span data-mask-target=".inline-map-panel"></span>
         <span data-mask-target=".command-sheet-panel"></span>
         <span data-mask-target=".save-load-sheet-panel"></span>
         <span data-mask-target=".map-sheet-panel"></span>
@@ -39,22 +40,22 @@
           <aside class="side-actions" aria-label="Game actions">
             <span class="side-actions-title">Actions</span>
             <button id="load-slot" class="icon-btn" type="button" aria-label="Load game" title="Load game">
-              <span class="icon-etch icon-load" aria-hidden="true"></span>
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_load.png" alt="" /></span>
             </button>
             <button id="save-slot" class="icon-btn" type="button" aria-label="Save game" title="Save game">
-              <span class="icon-etch icon-save" aria-hidden="true"></span>
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_save.png" alt="" /></span>
             </button>
-            <button id="map-button" class="icon-btn" type="button" aria-label="Visited location map" title="Visited location map">
-              <span class="icon-etch icon-map" aria-hidden="true"></span>
+            <button id="map-button" class="icon-btn" type="button" aria-label="Location map" title="Location map">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_map.png" alt="" /></span>
             </button>
-            <button id="settings-button" class="icon-btn" type="button" aria-label="Audio settings" title="Audio settings">
-              <span class="icon-etch icon-gear" aria-hidden="true"></span>
+            <button id="settings-button" class="icon-btn" type="button" aria-label="Settings" title="Settings">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_settings.png" alt="" /></span>
             </button>
             <button id="credits-button" class="icon-btn" type="button" aria-label="Credits" title="Credits">
-              <span class="icon-etch icon-credits" aria-hidden="true"></span>
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_credits.png" alt="" /></span>
             </button>
             <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
-              <span class="icon-etch icon-help" aria-hidden="true">?</span>
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_commands.png" alt="" /></span>
             </button>
           </aside>
 
@@ -69,6 +70,11 @@
                 <span>Moves<strong id="topbar-moves">--</strong></span>
               </div>
             </header>
+
+            <section id="inline-map-panel" class="inline-map-panel" aria-label="Inline visited location map" hidden>
+              <svg id="inline-game-map" class="inline-map-svg" viewBox="0 0 1600 980" preserveAspectRatio="xMinYMin meet" aria-label="Inline visited location map"></svg>
+            </section>
+            <button id="inline-map-resize" class="inline-map-resize" type="button" aria-label="Resize inline map" title="Drag to resize inline map. Double-click to reset." hidden></button>
 
             <section id="output" class="output" aria-live="polite"></section>
 
@@ -120,6 +126,8 @@
                 <button class="btn command-chip" type="button" data-command="down"><strong>down (d)</strong><span>Go down a level or ladder.</span></button>
                 <button class="btn command-chip" type="button" data-command="enter"><strong>enter</strong><span>Enter a room, vehicle, or area.</span></button>
                 <button class="btn command-chip" type="button" data-command="exit"><strong>exit</strong><span>Leave the current enclosed area.</span></button>
+                <button class="btn command-chip" type="button" data-command="in"><strong>in</strong><span>Go inward, often into the elevator or another enclosed area.</span></button>
+                <button class="btn command-chip" type="button" data-command="out"><strong>out</strong><span>Go outward, often out of the elevator or another enclosed area.</span></button>
               </div>
             </div>
             <div class="command-subsection">
@@ -159,6 +167,7 @@
               <h4>System And Meta</h4>
               <div class="command-grid">
                 <button class="btn command-chip" type="button" data-command="score"><strong>score</strong><span>Check score and moves in-story.</span></button>
+                <button class="btn command-chip" type="button" data-command="version"><strong>version</strong><span>Show the story and interpreter version information.</span></button>
                 <button class="btn command-chip" type="button" data-command="save"><strong>save</strong><span>Story save; writes the game-native save to slot 0 only.</span></button>
                 <button class="btn command-chip" type="button" data-command="restore"><strong>restore</strong><span>Story restore; reads the game-native save from slot 0 only.</span></button>
                 <button class="btn command-chip" type="button" data-command="time"><strong>time (t)</strong><span>Ask the game for the current in-world time.</span></button>
@@ -166,6 +175,9 @@
                 <button class="btn command-chip" type="button" data-command="again"><strong>again (g)</strong><span>Repeat the previous command after at least one turn.</span></button>
                 <button class="btn command-chip" type="button" data-command="oops"><strong>oops (o)</strong><span>Correct the last command's typo by following with a replacement word.</span></button>
                 <button class="btn command-chip" type="button" data-command="yes"><strong>yes (y)</strong><span>Answer confirmation prompts affirmatively.</span></button>
+                <button class="btn command-chip" type="button" data-command="brief"><strong>brief</strong><span>Default room text: full descriptions for new locations, names only for visited ones.</span></button>
+                <button class="btn command-chip" type="button" data-command="superbrief"><strong>superbrief</strong><span>Show only the location name when entering any room.</span></button>
+                <button class="btn command-chip" type="button" data-command="verbose"><strong>verbose</strong><span>Always show the full room description when entering a location.</span></button>
                 <button class="btn command-chip" type="button" data-command="restart"><strong>restart</strong><span>Restart the current story session.</span></button>
                 <button class="btn command-chip" type="button" data-command="quit"><strong>quit (q)</strong><span>Quit the story.</span></button>
               </div>
@@ -278,6 +290,14 @@
             <h3>Visual Assets</h3>
             <p>Room art and effects art were mostly created by Dall-E 3 using ChatGPT 5.4 for curated prompts. A minority was created by Z-Image Turbo using NightCafe.studio. Some images were manually edited.  Glyphs were custom-built by Codex 5.3.</p>
           </div>
+          <div class="credits-group">
+            <h3>Font Attribution</h3>
+            <p>
+              Enochian font: Enochian by Fontspace user Digital Type Foundry
+              (Freeware, Non-Commercial),
+              <a href="https://www.fontspace.com/enochian-font-f6183" target="_blank" rel="noopener noreferrer">FontSpace</a>.
+            </p>
+          </div>
         </div>
       </section>
       <section id="settings-sheet" class="settings-sheet" aria-label="Audio settings" hidden>
@@ -304,6 +324,13 @@
           <label class="settings-toggle" for="exp-map-enabled">
             <input id="exp-map-enabled" type="checkbox" />
             <span>Visited map enabled</span>
+          </label>
+          <label class="settings-control" for="exp-map-mode">
+            <span class="volume-label">Map Display</span>
+            <select id="exp-map-mode" class="settings-select">
+              <option value="modal">Modal only</option>
+              <option value="inline">Inline above text</option>
+            </select>
           </label>
           <label class="settings-toggle" for="exp-horror-enabled">
             <input id="exp-horror-enabled" type="checkbox" />
@@ -336,6 +363,8 @@
             <a href="https://www.newgrounds.com/audio/listen/877160" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
             Sound effect 1: <a href="https://pixabay.com/users/freesound_community-46691455/" target="_blank" rel="noopener noreferrer">freesound_community</a>.
             Sound effect 2: <a href="https://pixabay.com/users/universfield-28281460/" target="_blank" rel="noopener noreferrer">universfield</a>.
+            Enochian font: Digital Type Foundry
+            (<a href="https://www.fontspace.com/enochian-font-f6183" target="_blank" rel="noopener noreferrer">Freeware, Non-Commercial</a>).
           </p>
           <div id="experience-onboarding-actions" class="settings-actions" hidden>
             <button id="experience-continue" class="btn btn-accent" type="button">Enter Game</button>
@@ -360,7 +389,7 @@
     <script src="./parser.js"></script>
     <script src="./vm-core.js"></script>
     <script src="./quetzal-storage.js"></script>
-    <script src="./map-prototype-2-data.js"></script>
+    <script src="./map-data.js"></script>
     <script src="./map-discovery.js"></script>
     <script src="./map-renderer.js"></script>
     <script src="./io.js"></script>
@@ -390,6 +419,7 @@
         const sceneLayerB = document.getElementById('scene-layer-b');
         const sceneLayers = [sceneLayerA, sceneLayerB];
         const scenePaneEl = document.querySelector('.scene-pane');
+        const terminalStackEl = document.querySelector('.terminal-stack');
         const bloodSplatterEl = document.getElementById('blood-splatter');
         const horrorVignetteEl = document.getElementById('horror-vignette');
         const hudGroupEl = document.querySelector('.hud-group');
@@ -403,6 +433,9 @@
         const mapSheetEl = document.getElementById('map-sheet');
         const gameMapSvgEl = document.getElementById('game-map');
         const gameMapFloorFilterEl = document.getElementById('game-map-floor-filter');
+        const inlineMapPanelEl = document.getElementById('inline-map-panel');
+        const inlineMapSvgEl = document.getElementById('inline-game-map');
+        const inlineMapResizeEl = document.getElementById('inline-map-resize');
         const creditsSheetEl = document.getElementById('credits-sheet');
         const settingsSheetEl = document.getElementById('settings-sheet');
         const confirmSheetEl = document.getElementById('confirm-sheet');
@@ -423,6 +456,7 @@
         const experienceMusicEnabledEl = document.getElementById('exp-music-enabled');
         const experienceExtraSlotsEnabledEl = document.getElementById('exp-extra-slots-enabled');
         const experienceMapEnabledEl = document.getElementById('exp-map-enabled');
+        const experienceMapModeEl = document.getElementById('exp-map-mode');
         const experienceHorrorEnabledEl = document.getElementById('exp-horror-enabled');
         const experienceImagesEnabledEl = document.getElementById('exp-images-enabled');
         const experienceSnowEnabledEl = document.getElementById('exp-snow-enabled');
@@ -433,6 +467,8 @@
         const audioSettingsGroupEl = document.getElementById('audio-settings-group');
         let latestMapDiscoveryState = null;
         let gameMapRenderer = null;
+        let inlineMapRenderer = null;
+        let inlineMapResizeState = null;
         const audioAttributionEl = document.getElementById('audio-attribution');
         const settingsStorage =
           typeof window.InterpreterSettingsStorage === 'function'
@@ -492,10 +528,10 @@
           });
         }
         const EXPERIENCE_PROFILES = [
-          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, mapEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
-          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, mapEnabled: false, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
-          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: true, snowDensityMultiplier: 1.75 },
-          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, horrorExtrasEnabled: true, imagesEnabled: true, snowEnabled: true, snowDensityMultiplier: 3.5 },
+          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, mapEnabled: false, mapMode: 'modal', horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, mapEnabled: false, mapMode: 'modal', horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, mapMode: 'modal', horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: true, snowDensityMultiplier: 1.75 },
+          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, mapMode: 'inline', horrorExtrasEnabled: true, imagesEnabled: true, snowEnabled: true, snowDensityMultiplier: 3.5 },
         ];
         const OUTDOOR_SNOW_ROOM_IDS = new Set([16, 98, 121, 127, 145, 180, 185, 190, 222]);
         const OUTDOOR_SNOW_DENSITY_MULTIPLIERS_BY_LEVEL = {
@@ -551,44 +587,28 @@
         let bloodEffectFirstDelayMs = null;
         let ambientBloodAutostarted = false;
         const HORROR_GLYPH_ART = [
-          './assets/gfx/glyphs/glyph_forked_spine.svg',
-          './assets/gfx/glyphs/glyph_broken_halo.svg',
-          './assets/gfx/glyphs/glyph_hook_spiral.svg',
-          './assets/gfx/glyphs/glyph_ladder_thorn.svg',
-          './assets/gfx/glyphs/glyph_split_eye.svg',
-          './assets/gfx/glyphs/glyph_crowned_knot.svg',
-          './assets/gfx/glyphs/glyph_bent_trident.svg',
-          './assets/gfx/glyphs/glyph_sealed_door.svg',
+          './assets/gfx/glyphs/glyph_forked_spine.png',
+          './assets/gfx/glyphs/glyph_broken_halo.png',
+          './assets/gfx/glyphs/glyph_hook_spiral.png',
+          './assets/gfx/glyphs/glyph_ladder_thorn.png',
+          './assets/gfx/glyphs/glyph_split_eye.png',
+          './assets/gfx/glyphs/glyph_crowned_knot.png',
+          './assets/gfx/glyphs/glyph_bent_trident.png',
+          './assets/gfx/glyphs/glyph_sealed_door.png',
         ];
-        const HORROR_TEXT_MAP = {
-          A: '/\\',
-          E: '[-',
-          H: '][',
-          I: '|',
-          K: '|<',
-          M: '/\\/\\',
-          N: '|\\|',
-          O: '()',
-          R: '|2',
-          S: '5',
-          T: '+',
-          V: '\\/',
-          W: '\\/\\/',
-          X: '><',
-          Y: "'/",
-        };
         const HORROR_CONFIG = {
           roomEntryDelayMs: 500,
           chanceRoomRunes: 0.05,
           chanceRoomArtJump: 0.03,
           chanceIdleUiGlyphSwap: 0.015,
           chanceIdleDimPulse: 0.025,
-          durationRunesMinMs: 240,
-          durationRunesMaxMs: 450,
+          durationRunesMinMs: 700,
+          durationRunesMaxMs: 1800,
           durationArtJumpMinMs: 60,
           durationArtJumpMaxMs: 120,
-          durationUiSwapMinMs: 1000,
-          durationUiSwapMaxMs: 2000,
+          durationUiSwapMinMs: 5000,
+          durationUiSwapMaxMs: 10000,
+          durationUiSwapTransitionMs: 650,
           durationDimMinMs: 980,
           durationDimMaxMs: 1960,
           idleRollMinMs: 20000,
@@ -697,10 +717,13 @@
         let gameOverSceneFadeTimer = 0;
 
         function resolveRoomArt(roomName, roomObjectId) {
+          if (!Number.isFinite(roomObjectId) || roomObjectId <= 0) {
+            return '';
+          }
           if (roomObjectId && ROOM_ART_BY_ID[roomObjectId]) {
             return ROOM_ART_BY_ID[roomObjectId];
           }
-          if (Number.isFinite(roomObjectId) && !roomArtMissingIds.has(roomObjectId)) {
+          if (!roomArtMissingIds.has(roomObjectId)) {
             roomArtMissingIds.add(roomObjectId);
             console.warn(
               '[RoomArt] No mapped artwork for room id',
@@ -886,41 +909,19 @@
           }, randomIdleRollDelayMs());
         }
 
-        function runeCorruptText(text) {
-          const source = String(text || '');
-          if (!source) {
-            return source;
-          }
-          const chars = source.split('');
-          const candidateIndexes = [];
-          for (let i = 0; i < chars.length; i++) {
-            if (/[A-Za-z]/.test(chars[i])) {
-              candidateIndexes.push(i);
-            }
-          }
-          if (candidateIndexes.length === 0) {
-            return source;
-          }
-          const ratio = 0.15 + (Math.random() * 0.2);
-          const targetCount = Math.max(1, Math.floor(candidateIndexes.length * ratio));
-          for (let pass = 0; pass < targetCount; pass++) {
-            const pick = candidateIndexes[Math.floor(Math.random() * candidateIndexes.length)];
-            const key = chars[pick].toUpperCase();
-            if (!HORROR_TEXT_MAP[key]) {
-              continue;
-            }
-            chars[pick] = HORROR_TEXT_MAP[key];
-          }
-          return chars.join('');
-        }
-
         function triggerHorrorRuneFlicker(force) {
           const shouldForce = !!force;
           if (!shouldForce && !isHorrorCooldownReady('runes', HORROR_CONFIG.cooldownRunesMs)) {
             return false;
           }
           const eligibleLines = Array.from(ui.outputEl.querySelectorAll('.line'))
-            .filter(line => !line.classList.contains('command'));
+            .filter(line => {
+              if (line.classList.contains('system') || line.classList.contains('error')) {
+                return false;
+              }
+              const text = String(line.textContent || '');
+              return text.trim().length > 0 && /[A-Za-z]/.test(text);
+            });
           if (eligibleLines.length === 0) {
             return false;
           }
@@ -935,7 +936,6 @@
             return false;
           }
           markHorrorEffectFired('runes');
-          line.textContent = runeCorruptText(originalText);
           line.classList.add('horror-rune-flicker');
           setTimeout(() => {
             line.textContent = originalText;
@@ -980,7 +980,9 @@
           if (!span) {
             return false;
           }
-          const durationMs = randomIntInclusive(HORROR_CONFIG.durationUiSwapMinMs, HORROR_CONFIG.durationUiSwapMaxMs);
+          const glyphHoldMs = randomIntInclusive(HORROR_CONFIG.durationUiSwapMinMs, HORROR_CONFIG.durationUiSwapMaxMs);
+          const transitionMs = HORROR_CONFIG.durationUiSwapTransitionMs;
+          const durationMs = glyphHoldMs + transitionMs * 2;
           if (!acquireHorrorEffect('ui', durationMs)) {
             return false;
           }
@@ -988,13 +990,26 @@
           const originalClass = span.className;
           const originalHtml = span.innerHTML;
           const glyphArt = HORROR_GLYPH_ART[Math.floor(Math.random() * HORROR_GLYPH_ART.length)];
-          span.className = 'icon-etch icon-etch-glyph';
-          span.innerHTML = '<img class="horror-glyph-icon" src="' + glyphArt + '" alt="" />';
-          button.classList.add('icon-btn-horror');
+          const glyphHtml = '<img class="horror-glyph-icon" src="' + glyphArt + '" alt="" />';
+          span.className = 'icon-etch icon-etch-glyph icon-glyph-morph is-morphing-in';
+          span.innerHTML =
+            '<span class="glyph-morph-layer glyph-morph-normal">' + originalHtml + '</span>' +
+            '<span class="glyph-morph-layer glyph-morph-glyph">' + glyphHtml + '</span>' +
+            '<span class="glyph-morph-noise" aria-hidden="true"></span>';
+          setTimeout(() => {
+            span.className = 'icon-etch icon-etch-glyph';
+            span.innerHTML = glyphHtml;
+          }, transitionMs);
+          setTimeout(() => {
+            span.className = 'icon-etch icon-etch-glyph icon-glyph-morph is-morphing-out';
+            span.innerHTML =
+              '<span class="glyph-morph-layer glyph-morph-glyph">' + glyphHtml + '</span>' +
+              '<span class="glyph-morph-layer glyph-morph-normal">' + originalHtml + '</span>' +
+              '<span class="glyph-morph-noise" aria-hidden="true"></span>';
+          }, transitionMs + glyphHoldMs);
           setTimeout(() => {
             span.className = originalClass;
             span.innerHTML = originalHtml;
-            button.classList.remove('icon-btn-horror');
             releaseHorrorEffect('ui');
           }, durationMs);
           return true;
@@ -1557,6 +1572,19 @@
           return Math.max(1, Math.min(10, numeric));
         }
 
+        function normalizeMapMode(value) {
+          return String(value || '').toLowerCase() === 'inline' ? 'inline' : 'modal';
+        }
+
+        function clampInlineMapHeightRatio(value, fallback) {
+          const numeric = Number(value);
+          const base = Number.isFinite(Number(fallback)) ? Number(fallback) : 0.33;
+          if (!Number.isFinite(numeric)) {
+            return Math.max(0.18, Math.min(0.55, base));
+          }
+          return Math.max(0.18, Math.min(0.55, numeric));
+        }
+
         function getProfile(level) {
           const index = clampProfileLevel(level, EXPERIENCE_PROFILES.length - 1);
           return EXPERIENCE_PROFILES[index];
@@ -1572,6 +1600,8 @@
             musicEnabled: typeof source.musicEnabled === 'boolean' ? source.musicEnabled : profile.musicEnabled,
             extraSlotsEnabled: typeof source.extraSlotsEnabled === 'boolean' ? source.extraSlotsEnabled : profile.extraSlotsEnabled,
             mapEnabled: typeof source.mapEnabled === 'boolean' ? source.mapEnabled : profile.mapEnabled,
+            mapMode: normalizeMapMode(source.mapMode || profile.mapMode),
+            inlineMapHeightRatio: clampInlineMapHeightRatio(source.inlineMapHeightRatio, 0.33),
             horrorExtrasEnabled: typeof source.horrorExtrasEnabled === 'boolean' ? source.horrorExtrasEnabled : profile.horrorExtrasEnabled,
             imagesEnabled: typeof source.imagesEnabled === 'boolean' ? source.imagesEnabled : profile.imagesEnabled,
             snowEnabled: typeof source.snowEnabled === 'boolean' ? source.snowEnabled : profile.snowEnabled,
@@ -1584,6 +1614,7 @@
           if (!!profile.musicEnabled === !!settings.musicEnabled) count += 1;
           if (!!profile.extraSlotsEnabled === !!settings.extraSlotsEnabled) count += 1;
           if (!!profile.mapEnabled === !!settings.mapEnabled) count += 1;
+          if (!settings.mapEnabled || normalizeMapMode(profile.mapMode) === normalizeMapMode(settings.mapMode)) count += 1;
           if (!!profile.horrorExtrasEnabled === !!settings.horrorExtrasEnabled) count += 1;
           if (!!profile.imagesEnabled === !!settings.imagesEnabled) count += 1;
           if (!!profile.snowEnabled === !!settings.snowEnabled) count += 1;
@@ -1615,6 +1646,7 @@
             normalized.musicEnabled === profile.musicEnabled &&
             normalized.extraSlotsEnabled === profile.extraSlotsEnabled &&
             normalized.mapEnabled === profile.mapEnabled &&
+            normalized.mapMode === normalizeMapMode(profile.mapMode) &&
             normalized.horrorExtrasEnabled === profile.horrorExtrasEnabled &&
             normalized.imagesEnabled === profile.imagesEnabled &&
             normalized.snowEnabled === profile.snowEnabled &&
@@ -1629,6 +1661,8 @@
           experienceMusicEnabledEl.checked = !!normalized.musicEnabled;
           experienceExtraSlotsEnabledEl.checked = !!normalized.extraSlotsEnabled;
           experienceMapEnabledEl.checked = !!normalized.mapEnabled;
+          experienceMapModeEl.value = normalized.mapMode;
+          experienceMapModeEl.disabled = !normalized.mapEnabled;
           experienceHorrorEnabledEl.checked = !!normalized.horrorExtrasEnabled;
           experienceImagesEnabledEl.checked = !!normalized.imagesEnabled;
           experienceSnowEnabledEl.checked = !!normalized.snowEnabled;
@@ -1658,6 +1692,47 @@
           ambientSnowLayer.setEnabled(settings.snowEnabled);
         }
 
+        function isInlineMapActive(settings) {
+          const normalized = normalizeExperienceSettings(settings || experienceSettings);
+          return !!normalized.mapEnabled && normalized.mapMode === 'inline';
+        }
+
+        function applyInlineMapHeight(ratio) {
+          if (!terminalStackEl) {
+            return;
+          }
+          const normalizedRatio = clampInlineMapHeightRatio(ratio, 0.33);
+          terminalStackEl.style.setProperty('--inline-map-height', Math.round(normalizedRatio * 1000) / 10 + '%');
+          if (inlineMapRenderer && typeof inlineMapRenderer.draw === 'function') {
+            window.requestAnimationFrame(() => inlineMapRenderer.draw());
+          }
+          updateUiSnowMasks();
+        }
+
+        function syncInlineMapVisibility(settings) {
+          const active = isInlineMapActive(settings);
+          if (terminalStackEl) {
+            terminalStackEl.classList.toggle('map-inline', active);
+          }
+          if (inlineMapPanelEl) {
+            inlineMapPanelEl.hidden = !active;
+          }
+          if (inlineMapResizeEl) {
+            inlineMapResizeEl.hidden = !active;
+          }
+          if (!active) {
+            return;
+          }
+          applyInlineMapHeight(settings.inlineMapHeightRatio);
+          const renderer = ensureInlineMapRenderer();
+          if (renderer && typeof renderer.setDiscoveryState === 'function') {
+            renderer.setDiscoveryState(latestMapDiscoveryState);
+          }
+          if (renderer && typeof renderer.focusCurrentLocation === 'function') {
+            window.requestAnimationFrame(() => renderer.focusCurrentLocation());
+          }
+        }
+
         function applyExperienceSettings(settings) {
           const normalized = normalizeExperienceSettings(settings);
           experienceSettings = normalized;
@@ -1672,6 +1747,7 @@
           if (!normalized.mapEnabled && !mapSheetEl.hidden) {
             closeMapSheet();
           }
+          syncInlineMapVisibility(normalized);
           setHorrorEffectState({ enabled: normalized.horrorExtrasEnabled });
           if (!normalized.horrorExtrasEnabled) {
             setBloodEffectState({ enabled: false });
@@ -2233,6 +2309,8 @@
             musicEnabled: !!experienceMusicEnabledEl.checked,
             extraSlotsEnabled: !!experienceExtraSlotsEnabledEl.checked,
             mapEnabled: !!experienceMapEnabledEl.checked,
+            mapMode: normalizeMapMode(experienceMapModeEl.value),
+            inlineMapHeightRatio: experienceSettings.inlineMapHeightRatio,
             horrorExtrasEnabled: !!experienceHorrorEnabledEl.checked,
             imagesEnabled: !!experienceImagesEnabledEl.checked,
             snowEnabled: experienceSettings.snowEnabled,
@@ -2240,6 +2318,19 @@
           });
           next.level = inferBestProfileLevel(next);
           next.snowDensityMultiplier = getProfile(next.level).snowDensityMultiplier;
+          applyExperienceSettings(next);
+          persistExperienceSettings();
+        }
+
+        function handleMapModeChange() {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const next = normalizeExperienceSettings({
+            ...experienceSettings,
+            mapMode: normalizeMapMode(experienceMapModeEl.value),
+          });
+          next.level = inferBestProfileLevel(next);
           applyExperienceSettings(next);
           persistExperienceSettings();
         }
@@ -2263,6 +2354,7 @@
         experienceMusicEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceExtraSlotsEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceMapEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceMapModeEl.addEventListener('change', handleMapModeChange);
         experienceHorrorEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceImagesEnabledEl.addEventListener('change', handleExperienceToggleChange);
         experienceSnowEnabledEl.addEventListener('change', handleSnowToggleChange);
@@ -2286,6 +2378,9 @@
           if (horrorVignetteEl && horrorVignetteEl.classList.contains('is-flickering')) {
             positionHorrorVignetteToImageBounds();
           }
+          if (isInlineMapActive(experienceSettings)) {
+            applyInlineMapHeight(experienceSettings.inlineMapHeightRatio);
+          }
         });
 
         function ensureGameMapRenderer() {
@@ -2295,7 +2390,7 @@
           gameMapRenderer = window.LhMapRenderer.create({
             mode: 'ingame',
             svg: gameMapSvgEl,
-            data: window.MapPrototype2Data,
+            data: window.LhMapData,
             mapSnowLayer: window.MapSnowLayer,
             floorSelect: gameMapFloorFilterEl,
             legendParts: { main: true, tile: true },
@@ -2304,11 +2399,109 @@
           return gameMapRenderer;
         }
 
+        function ensureInlineMapRenderer() {
+          if (inlineMapRenderer || !inlineMapSvgEl || !window.LhMapRenderer) {
+            return inlineMapRenderer;
+          }
+          inlineMapRenderer = window.LhMapRenderer.create({
+            mode: 'ingame',
+            svg: inlineMapSvgEl,
+            data: window.LhMapData,
+            mapSnowLayer: window.MapSnowLayer,
+            legendParts: { main: false, tile: false },
+            discoveryState: latestMapDiscoveryState,
+          });
+          return inlineMapRenderer;
+        }
+
         function syncGameMapState(state) {
           latestMapDiscoveryState = state || null;
           if (gameMapRenderer && typeof gameMapRenderer.setDiscoveryState === 'function') {
             gameMapRenderer.setDiscoveryState(latestMapDiscoveryState);
           }
+          if (inlineMapRenderer && typeof inlineMapRenderer.setDiscoveryState === 'function') {
+            inlineMapRenderer.setDiscoveryState(latestMapDiscoveryState);
+          } else if (isInlineMapActive(experienceSettings)) {
+            const renderer = ensureInlineMapRenderer();
+            if (renderer && typeof renderer.setDiscoveryState === 'function') {
+              renderer.setDiscoveryState(latestMapDiscoveryState);
+            }
+          }
+        }
+
+        function computeInlineMapResizeBounds() {
+          const stackRect = terminalStackEl ? terminalStackEl.getBoundingClientRect() : { height: 0 };
+          const totalHeight = Number(stackRect.height) || 0;
+          const minPx = 120;
+          const maxPx = Math.max(minPx, Math.min(totalHeight * 0.55, totalHeight - 220));
+          return { totalHeight, minPx, maxPx };
+        }
+
+        function setInlineMapHeightFromClientY(clientY, persist) {
+          if (!inlineMapResizeState || !terminalStackEl) {
+            return;
+          }
+          const bounds = computeInlineMapResizeBounds();
+          if (bounds.totalHeight <= 0) {
+            return;
+          }
+          const delta = Number(clientY) - inlineMapResizeState.startY;
+          const nextPx = Math.max(bounds.minPx, Math.min(bounds.maxPx, inlineMapResizeState.startHeightPx + delta));
+          const nextRatio = clampInlineMapHeightRatio(nextPx / bounds.totalHeight, 0.33);
+          experienceSettings = normalizeExperienceSettings({
+            ...experienceSettings,
+            inlineMapHeightRatio: nextRatio,
+          });
+          applyInlineMapHeight(nextRatio);
+          if (persist) {
+            persistExperienceSettings();
+          }
+        }
+
+        function beginInlineMapResize(event) {
+          if (!isInlineMapActive(experienceSettings) || !inlineMapPanelEl) {
+            return;
+          }
+          const bounds = computeInlineMapResizeBounds();
+          if (bounds.totalHeight <= 0) {
+            return;
+          }
+          event.preventDefault();
+          const panelRect = inlineMapPanelEl.getBoundingClientRect();
+          inlineMapResizeState = {
+            startY: Number(event.clientY),
+            startHeightPx: Math.max(bounds.minPx, Math.min(bounds.maxPx, panelRect.height || bounds.totalHeight * experienceSettings.inlineMapHeightRatio)),
+          };
+          document.body.classList.add('is-resizing-inline-map');
+          window.addEventListener('pointermove', handleInlineMapResizeMove);
+          window.addEventListener('pointerup', endInlineMapResize);
+          window.addEventListener('pointercancel', endInlineMapResize);
+        }
+
+        function handleInlineMapResizeMove(event) {
+          setInlineMapHeightFromClientY(event.clientY, false);
+        }
+
+        function endInlineMapResize(event) {
+          if (event && Number.isFinite(Number(event.clientY))) {
+            setInlineMapHeightFromClientY(event.clientY, true);
+          } else {
+            persistExperienceSettings();
+          }
+          inlineMapResizeState = null;
+          document.body.classList.remove('is-resizing-inline-map');
+          window.removeEventListener('pointermove', handleInlineMapResizeMove);
+          window.removeEventListener('pointerup', endInlineMapResize);
+          window.removeEventListener('pointercancel', endInlineMapResize);
+        }
+
+        function resetInlineMapHeight() {
+          experienceSettings = normalizeExperienceSettings({
+            ...experienceSettings,
+            inlineMapHeightRatio: 0.33,
+          });
+          applyInlineMapHeight(experienceSettings.inlineMapHeightRatio);
+          persistExperienceSettings();
         }
 
         function openMapSheet() {
@@ -2329,6 +2522,13 @@
 
         document.getElementById('map-button').addEventListener('click', openMapSheet);
         document.getElementById('close-map').addEventListener('click', closeMapSheet);
+        if (inlineMapResizeEl) {
+          inlineMapResizeEl.addEventListener('pointerdown', beginInlineMapResize);
+          inlineMapResizeEl.addEventListener('dblclick', event => {
+            event.preventDefault();
+            resetInlineMapHeight();
+          });
+        }
         mapSheetEl.addEventListener('click', event => {
           if (event.target === mapSheetEl) {
             closeMapSheet();

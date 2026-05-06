@@ -37,7 +37,7 @@
       const WORLD_H = 4200;
       const opts = options || {};
       const documentRef = opts.document || root.document;
-      const MapPrototype2Data = opts.data || root.MapPrototype2Data;
+      const LhMapData = opts.data || root.LhMapData;
       const mapSnowLayer = opts.mapSnowLayer || root.MapSnowLayer;
       const svg = opts.svg || (documentRef ? documentRef.getElementById("map") : null);
       const snowCanvas = opts.snowCanvas || (documentRef ? documentRef.getElementById("map-snow") : null);
@@ -46,7 +46,7 @@
         : { setEnabled() {}, setDensityMultiplier() {}, resize() {} });
       const externalFloorSelect = opts.floorSelect || null;
       if (!svg) throw new Error("LhMapRenderer requires an SVG element");
-      if (!MapPrototype2Data) throw new Error("LhMapRenderer requires map prototype data");
+      if (!LhMapData) throw new Error("LhMapRenderer requires map data");
       let rendererMode = opts.mode === "ingame" ? "ingame" : "prototype";
       let discoveryState = normalizeDiscoveryState(opts.discoveryState);
       let legendParts = normalizeLegendParts(opts.legendParts);
@@ -68,7 +68,8 @@
         dragging: false,
         lastX: 0,
         lastY: 0,
-        hasUserMoved: false
+        hasUserMoved: false,
+        hasInitializedView: false
       };
       const floorDrag = {
         active: false,
@@ -109,7 +110,7 @@
       }
 
       function currentPlayerLayer() {
-        const layout = MapPrototype2Data.ROOM_LAYOUT[currentPlayerNodeId()];
+        const layout = LhMapData.ROOM_LAYOUT[currentPlayerNodeId()];
         return layout && layout.layer ? layout.layer : "L0";
       }
 
@@ -178,7 +179,7 @@
           { id: "L-2", y: 1300, h: 320 },
           { id: "L-3", y: 1690, h: 1220 }
         ],
-        rooms: MapPrototype2Data.MAP_ROOMS.map((room) => ({ ...room, edges: (room.edges || []).map((edge) => ({ ...edge })) }))
+        rooms: LhMapData.MAP_ROOMS.map((room) => ({ ...room, edges: (room.edges || []).map((edge) => ({ ...edge })) }))
       };
 
       const CANONICAL_LOCATIONS = [
@@ -255,7 +256,7 @@
         { id: 249, name: "Great Dome" }
       ];
 
-      const LOCATION_ID_BY_NODE_ID = { ...MapPrototype2Data.LOCATION_ID_BY_NODE_ID };
+      const LOCATION_ID_BY_NODE_ID = { ...LhMapData.LOCATION_ID_BY_NODE_ID };
 
       // Wet-tunnel inset numbering is now mapped to concrete engine ids in this prototype.
       const PRESERVE_CUSTOM_LABEL_IDS = new Set([66, 78, 98, 138, 185, 206, 208, 210, 214, 218, 221, 227]);
@@ -1306,7 +1307,7 @@
       // Core rule (authoritative): L0 tiles are leading for planar position.
       // - Cardinal directions (N/E/S/W + diagonals) move across tiles.
       // - Up/Down only changes layer and keeps the same tile.
-      const ROOM_LAYOUT = { ...MapPrototype2Data.ROOM_LAYOUT };
+      const ROOM_LAYOUT = { ...LhMapData.ROOM_LAYOUT };
 
       const ROOM_LAYOUT_UNKNOWN = {};
 
@@ -3668,7 +3669,7 @@
       }
 
       function focusPlayerLocation() {
-        const playerLayout = MapPrototype2Data.ROOM_LAYOUT[currentPlayerNodeId()];
+        const playerLayout = LhMapData.ROOM_LAYOUT[currentPlayerNodeId()];
         const floorFilterEl = getControl("floor-filter");
         const floorTilesEl = getControl("toggle-floor-tiles");
         if (floorTilesEl) floorTilesEl.checked = true;
@@ -3749,6 +3750,7 @@
         const initialCenterTileOffsetX = STEP_E.dx * panZoom.scale;
         panZoom.tx = outerPadX + (usableW - mapW * panZoom.scale) * 0.5 - minX * panZoom.scale + initialCenterTileOffsetX;
         panZoom.ty = outerPadTop + (usableH - mapH * panZoom.scale) * 0.5 - minY * panZoom.scale;
+        panZoom.hasInitializedView = true;
         applyTransform();
       }
 
@@ -3888,7 +3890,7 @@
 
       return {
         draw,
-        focusCurrentLocation,
+        focusCurrentLocation: focusPlayerLocation,
         setMode(mode) {
           rendererMode = mode === "ingame" ? "ingame" : "prototype";
           if (rendererMode === "ingame") {
@@ -3897,6 +3899,7 @@
             inGameFloorFilter = "";
           }
           panZoom.hasUserMoved = false;
+          panZoom.hasInitializedView = false;
           draw();
         },
         setDiscoveryState(state) {
@@ -3906,10 +3909,14 @@
           if (rendererMode === "ingame" && (previousNodeId !== nextNodeId || !inGameFloorFilter)) {
             setCurrentMapLayer(currentPlayerLayer());
           }
+          const shouldPreserveViewport = panZoom.hasInitializedView && Number.isFinite(panZoom.scale);
           if (previousNodeId !== nextNodeId) {
-            panZoom.hasUserMoved = false;
+            panZoom.hasUserMoved = shouldPreserveViewport;
           }
           draw();
+          if (rendererMode === "ingame" && previousNodeId !== nextNodeId && shouldPreserveViewport) {
+            ensurePlayerMarkerVisible();
+          }
         },
         setLegendParts(parts) {
           legendParts = normalizeLegendParts(parts);

@@ -13,6 +13,12 @@
   --radius: 14px;
 }
 
+@font-face {
+  font-family: "LhEnochian";
+  src: url("./assets/fonts/Enochian-BGlG.woff2") format("woff2");
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -29,6 +35,11 @@ body {
   background: var(--bg-0);
   display: block;
   padding: var(--viewport-pad);
+}
+
+body.is-resizing-inline-map {
+  cursor: ns-resize;
+  user-select: none;
 }
 
 .shell {
@@ -131,7 +142,7 @@ body {
   position: relative;
   width: 52px;
   height: 52px;
-  border: 1px solid rgba(235, 244, 255, 0.16);
+  border: 0;
   border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(12, 15, 20, 0.94), rgba(2, 3, 5, 0.98));
@@ -170,8 +181,19 @@ body {
 }
 
 .icon-btn:hover {
-  border-color: rgba(255, 255, 255, 0.36);
+  background:
+    linear-gradient(180deg, rgba(24, 30, 38, 0.96), rgba(8, 11, 16, 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    0 16px 28px rgba(0, 0, 0, 0.42);
   transform: translateY(-1px);
+}
+
+.icon-btn:hover .action-icon-img,
+.icon-btn:hover .horror-glyph-icon {
+  filter:
+    brightness(1.16)
+    drop-shadow(0 0 5px rgba(255, 255, 255, 0.24));
 }
 
 .icon-btn:focus-visible {
@@ -202,26 +224,206 @@ body {
   box-sizing: border-box;
 }
 
+.icon-etch.icon-action::before,
+.icon-etch.icon-action::after,
 .icon-etch.icon-etch-glyph::before,
 .icon-etch.icon-etch-glyph::after {
   display: none;
 }
 
+.icon-etch.icon-action,
+.icon-etch.icon-etch-glyph {
+  width: 52px;
+  height: 52px;
+}
+
+.action-icon-img,
 .horror-glyph-icon {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.28));
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.2));
 }
 
-.icon-btn.icon-btn-horror {
-  border-color: rgba(255, 220, 151, 0.62);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 220, 151, 0.12),
-    0 0 0 2px rgba(255, 220, 151, 0.16),
-    0 14px 24px rgba(0, 0, 0, 0.35);
+.icon-glyph-morph {
+  overflow: hidden;
+}
+
+.glyph-morph-layer,
+.glyph-morph-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.glyph-morph-layer {
+  transform-origin: 50% 50%;
+}
+
+.glyph-morph-layer .action-icon-img,
+.glyph-morph-layer .horror-glyph-icon {
+  filter:
+    contrast(1.08)
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.22));
+}
+
+.glyph-morph-noise {
+  opacity: 0;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0 12%,
+      rgba(255, 255, 255, 0.42) 12% 15%,
+      transparent 15% 31%,
+      rgba(140, 247, 214, 0.22) 31% 34%,
+      transparent 34% 58%,
+      rgba(255, 220, 151, 0.26) 58% 61%,
+      transparent 61% 100%
+    );
+  mix-blend-mode: screen;
+}
+
+.icon-glyph-morph.is-morphing-in .glyph-morph-normal {
+  animation: glyphNormalOut 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-in .glyph-morph-glyph {
+  animation: glyphGlyphIn 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-out .glyph-morph-glyph {
+  animation: glyphGlyphOut 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-out .glyph-morph-normal {
+  animation: glyphNormalIn 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-in .glyph-morph-noise,
+.icon-glyph-morph.is-morphing-out .glyph-morph-noise {
+  animation: glyphMorphNoise 650ms steps(5, end) forwards;
+}
+
+@keyframes glyphNormalOut {
+  0% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+
+  38% {
+    opacity: 0.72;
+    filter: blur(0.7px) contrast(1.35);
+    transform: translateX(-1px);
+  }
+
+  61% {
+    opacity: 0.34;
+    filter: blur(1.2px) contrast(1.6);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(0.4px) contrast(1.1);
+    transform: translateX(0);
+  }
+}
+
+@keyframes glyphGlyphIn {
+  0% {
+    opacity: 0;
+    filter: blur(1.1px) contrast(1.6);
+    transform: translateX(1px);
+  }
+
+  32% {
+    opacity: 0.22;
+    filter: blur(0.8px) contrast(1.5);
+    transform: translateX(-1px);
+  }
+
+  68% {
+    opacity: 0.88;
+    filter: blur(0.3px) contrast(1.25);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+}
+
+@keyframes glyphGlyphOut {
+  0% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+
+  44% {
+    opacity: 0.82;
+    filter: blur(0.5px) contrast(1.42);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(1px) contrast(1.55);
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes glyphNormalIn {
+  0% {
+    opacity: 0;
+    filter: blur(0.8px) contrast(1.45);
+    transform: translateX(-1px);
+  }
+
+  54% {
+    opacity: 0.58;
+    filter: blur(0.4px) contrast(1.25);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+}
+
+@keyframes glyphMorphNoise {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  18% {
+    opacity: 0.2;
+    transform: translateY(-3px);
+  }
+
+  34% {
+    opacity: 0.52;
+    transform: translateY(5px);
+  }
+
+  57% {
+    opacity: 0.16;
+    transform: translateY(-1px);
+  }
+
+  73% {
+    opacity: 0.36;
+    transform: translateY(2px);
+  }
 }
 
 .icon-folder::before {
@@ -429,6 +631,73 @@ body {
   position: relative;
   z-index: 4;
   isolation: isolate;
+}
+
+.terminal-stack.map-inline {
+  grid-template-rows: auto var(--inline-map-height, 33%) 10px minmax(0, 1fr) auto auto;
+}
+
+.inline-map-panel[hidden],
+.inline-map-resize[hidden] {
+  display: none;
+}
+
+.inline-map-panel {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--panel-border);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(140, 247, 214, 0.05), transparent 36%),
+    rgba(2, 4, 7, 0.68);
+}
+
+.inline-map-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.inline-map-resize {
+  position: relative;
+  min-height: 10px;
+  height: 10px;
+  border: 0;
+  border-top: 1px solid rgba(220, 236, 250, 0.18);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.45);
+  background:
+    linear-gradient(90deg, transparent, rgba(140, 247, 214, 0.22), transparent),
+    rgba(6, 10, 16, 0.38);
+  cursor: ns-resize;
+  padding: 0;
+}
+
+.inline-map-resize::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 72px;
+  height: 2px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: rgba(233, 237, 242, 0.42);
+  box-shadow:
+    0 -3px 0 rgba(233, 237, 242, 0.14),
+    0 3px 0 rgba(233, 237, 242, 0.14);
+}
+
+.inline-map-resize:hover::before,
+.inline-map-resize:focus-visible::before {
+  background: rgba(140, 247, 214, 0.74);
+}
+
+.inline-map-resize:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(140, 247, 214, 0.28);
 }
 
 .scene-pane {
@@ -677,11 +946,101 @@ body {
 }
 
 .line.horror-rune-flicker {
-  color: rgba(255, 220, 151, 0.92);
-  letter-spacing: 0.02em;
-  text-shadow:
-    0 0 1px rgba(255, 220, 151, 0.4),
-    0 0 10px rgba(255, 220, 151, 0.26);
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  font-family: "LhEnochian", "Cascadia Code", "Fira Code", "Consolas", "Courier New", monospace;
+  letter-spacing: 0.035em;
+  animation: horror-rune-line-flicker 780ms steps(5, end) infinite;
+}
+
+.line.horror-rune-flicker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0 18%,
+      currentColor 18% 20%,
+      transparent 20% 38%,
+      currentColor 38% 40%,
+      transparent 40% 67%,
+      currentColor 67% 69%,
+      transparent 69% 100%
+    );
+  mix-blend-mode: screen;
+  animation: horror-rune-scanline 780ms steps(5, end) infinite;
+}
+
+@keyframes horror-rune-line-flicker {
+  0%,
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+
+  12% {
+    opacity: 0.88;
+    filter: blur(0.35px) contrast(1.35);
+    transform: translateX(-1px);
+  }
+
+  24% {
+    opacity: 1;
+    filter: blur(0) contrast(1.1);
+    transform: translateX(1px);
+  }
+
+  39% {
+    opacity: 0.74;
+    filter: blur(0.7px) contrast(1.55);
+    transform: translateX(0);
+  }
+
+  52% {
+    opacity: 1;
+    filter: blur(0) contrast(1.25);
+    transform: translateX(-0.5px);
+  }
+
+  71% {
+    opacity: 0.82;
+    filter: blur(0.25px) contrast(1.45);
+    transform: translateX(1px);
+  }
+}
+
+@keyframes horror-rune-scanline {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  16% {
+    opacity: 0.08;
+    transform: translateY(-2px);
+  }
+
+  33% {
+    opacity: 0.22;
+    transform: translateY(3px);
+  }
+
+  58% {
+    opacity: 0.05;
+    transform: translateY(-1px);
+  }
+
+  76% {
+    opacity: 0.16;
+    transform: translateY(1px);
+  }
 }
 
 .status {
@@ -1330,6 +1689,23 @@ body {
   height: 16px;
 }
 
+.settings-select {
+  width: 100%;
+  border: 1px solid rgba(145, 197, 255, 0.3);
+  border-radius: 8px;
+  background: rgba(8, 16, 28, 0.92);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 0.86rem;
+  padding: 8px 10px;
+}
+
+.settings-select:focus-visible {
+  outline: none;
+  border-color: rgba(140, 247, 214, 0.74);
+  box-shadow: 0 0 0 2px rgba(140, 247, 214, 0.18);
+}
+
 .audio-settings-group {
   margin-top: 6px;
   padding-top: 4px;
@@ -1550,6 +1926,10 @@ body {
   .terminal-stack {
     width: 100%;
     margin-left: 0;
+  }
+
+  .terminal-stack.map-inline {
+    grid-template-rows: auto minmax(120px, var(--inline-map-height, 28%)) 10px minmax(180px, 1fr) auto auto;
   }
 
   .output {

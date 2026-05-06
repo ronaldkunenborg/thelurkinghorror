@@ -1156,7 +1156,7 @@ class GameIoController {
 
   _createDefaultMapDiscoveryTracker() {
     if (typeof window !== 'undefined' && typeof window.LhMapDiscoveryTracker === 'function') {
-      return new window.LhMapDiscoveryTracker({ mapData: window.MapPrototype2Data });
+      return new window.LhMapDiscoveryTracker({ mapData: window.LhMapData });
     }
     return null;
   }
