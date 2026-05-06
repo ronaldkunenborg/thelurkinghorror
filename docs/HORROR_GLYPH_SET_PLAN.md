@@ -133,7 +133,7 @@ Each glyph should have a stable id, a preferred UI usage role, and a rough inten
 - target icon box: roughly `24x24` to `30x30`
 - stroke count should stay low enough for fast recognition
 - each glyph should still read at a glance when shown for only `100-200ms`
-- prefer SVG so we can animate opacity, blur, and swaps cleanly
+- use PNG glyph art for the runtime icon swaps; animate opacity, blur, and button state in CSS around the image
 
 ## Usage rules
 
@@ -147,14 +147,14 @@ Each glyph should have a stable id, a preferred UI usage role, and a rough inten
 
 For output-text flicker:
 
-- use a separate rune-text substitution table derived from the same glyph language
-- corrupt only a small visible slice of text
+- use `src/assets/fonts/Enochian-BGlG.woff2` for temporary text transformation
+- transform one whole visible line at a time rather than substituting individual ASCII characters
 - restore the original text immediately after the flash
 - prefer suggestion over readability loss
 
 ## Text substitution plan
 
-The text-flicker system should not try to become a full alternate alphabet. It only needs enough substitutions to make a brief visible slice feel wrong.
+The text-flicker system should not try to become a full alternate alphabet. It briefly renders a normal output or command line in the Enochian font, then restores the original text.
 
 Substitution goals:
 
@@ -163,40 +163,23 @@ Substitution goals:
 - favor uppercase-looking angular forms for visual impact
 - avoid substituting punctuation and numbers in the first pass
 
-Recommended first-pass substitution table:
+Selected font:
 
-- `A -> /\`
-- `E -> [-`
-- `H -> ][`
-- `I -> |`
-- `K -> |<`
-- `M -> /\\/\\`
-- `N -> |\\|`
-- `O -> ()`
-- `R -> |2`
-- `S -> 5`
-- `T -> +`
-- `V -> \\/`
-- `W -> \\/\\/`
-- `X -> ><`
-- `Y -> '/`
-
-Letters to usually leave unchanged:
-
-- `b`, `c`, `d`, `f`, `g`, `j`, `l`, `p`, `q`, `u`, `z`
+- `Enochian-BGlG.woff2`
+- Compared against `EnochianPlain-10GB.woff2`; the chosen font is thinner and more scratchy at terminal size.
+- See `docs/ASSET_DECISIONS.md` for attribution and license notes.
 
 Corruption rules:
 
-- corrupt only `15-35%` of characters in the chosen slice
-- prefer noun-heavy or recent visible output lines
-- corrupt at most one short slice per event
+- transform one recent visible output or command line per event
+- use a brief flicker/glitch animation so the horror comes from the interruption rather than random character gaps
 - restore from the original text source immediately after the flicker
 
 ## Implementation shape
 
 Suggested asset strategy:
 
-- store glyph SVGs under `src/assets/gfx/glyphs/`
+- store glyph PNGs under `src/assets/gfx/glyphs/`
 - keep a small manifest of glyph ids in `src/index.html` or a dedicated helper module
 - allow random selection plus debug forcing by glyph id
 
@@ -256,7 +239,7 @@ Suggested scheduler rules:
 
 The first implementation pass only needs:
 
-- 8 monochrome SVG glyphs
+- 8 monochrome PNG glyphs
 - icon-swap support for one rail button at a time
 - optional text-corruption character map sharing the same visual language
 - debug commands/hooks to preview glyphs and flashes on demand
