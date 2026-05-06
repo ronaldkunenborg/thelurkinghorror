@@ -33,7 +33,7 @@ Helper functions:
 
 ## Typical integration flow
 
-1. VM produces Quetzal bytes for current state.
+1. VM produces `FORM`/`IFZS` Quetzal bytes for current state.
 2. Store bytes with `putSave(...)`.
 3. User clicks export button:
    - read save record
@@ -73,8 +73,10 @@ await importSaveFileToSlot(storage, fileInput.files[0], {
 
 ## Notes
 
-- This module stores raw Quetzal bytes exactly as provided by the VM.
-- Quetzal generation/parsing remains VM responsibility.
+- This module stores raw save bytes exactly as provided by the VM. New saves are `FORM`/`IFZS` Quetzal files.
+- Quetzal generation/parsing remains VM responsibility. The VM writes `IFhd`, compressed `CMem`, `Stks`, and a private `LHSv` chunk for local interpreter state that Quetzal does not otherwise carry.
+- Bare `TLHS` files were an older internal snapshot format and are no longer supported.
 - Local save records may include interpreter metadata such as `mapDiscovery`; exported `.sav` files remain raw Quetzal and do not include that metadata.
+- Import/export helpers reject non-`IFZS` files so the `.sav` workflow stays Quetzal-compliant.
 - Imported `.sav` files without `mapDiscovery` use the in-game visited-map fallback described in [`IN_GAME_VISITED_MAP.md`](IN_GAME_VISITED_MAP.md).
 - Recommended story id format: include title + release + serial to avoid collisions across story revisions.

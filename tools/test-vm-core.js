@@ -56,6 +56,12 @@ function createVm(programBytes, options) {
   });
 }
 
+function ascii(bytes, offset, length) {
+  return Array.from(bytes.subarray(offset, offset + length))
+    .map(code => String.fromCharCode(code))
+    .join('');
+}
+
 function testDecoderAndArithmetic() {
   // add 7 5 -> g0 ; and 6 3 -> g1 ; or 1 2 -> g2 ; sub 10 4 -> g3 ; quit
   const program = [
@@ -330,6 +336,13 @@ function testSaveStateRoundTripRestoresVmState() {
 
   const saved = vm.serializeSaveState();
 
+  assert.strictEqual(ascii(saved, 0, 4), 'FORM', 'new VM saves should be IFF FORM files');
+  assert.strictEqual(ascii(saved, 8, 4), 'IFZS', 'new VM saves should use the Quetzal IFZS FORM type');
+  assert.ok(ascii(saved, 12, saved.length - 12).includes('IFhd'), 'Quetzal save should include IFhd');
+  assert.ok(ascii(saved, 12, saved.length - 12).includes('CMem'), 'Quetzal save should include CMem');
+  assert.ok(ascii(saved, 12, saved.length - 12).includes('Stks'), 'Quetzal save should include Stks');
+  assert.ok(ascii(saved, 12, saved.length - 12).includes('LHSv'), 'Quetzal save should include local interpreter state');
+
   vm.write8(0x80, 0x00);
   vm.pc = 0;
   vm.halted = false;
@@ -350,6 +363,17 @@ function testSaveStateRoundTripRestoresVmState() {
   assert.strictEqual(vm.callStack.length, 1, 'restore should restore call stack frames');
   assert.strictEqual(vm.callStack[0].locals[0], 9, 'restore should restore frame locals');
   assert.strictEqual(vm.currentFrame.locals[0], 0x2222, 'restore should restore current frame locals');
+}
+
+function testLegacySnapshotFormatIsRejected() {
+  const vm = createVm([0xba], { size: 0x500 });
+  const legacyBytes = new Uint8Array([0x54, 0x4c, 0x48, 0x53, 0x00, 0x01, 0x00, 0x00]);
+
+  assert.throws(
+    () => vm.restoreSaveState(legacyBytes),
+    /Unsupported save file format/,
+    'bare legacy snapshots should no longer be accepted as save files'
+  );
 }
 
 function testSaveOpcodeSerializesSuccessfulBranchContinuation() {
@@ -467,6 +491,7 @@ function run() {
   testRestartRestoresDynamicMemoryAndPc();
   testStatusSnapshotExposesRoomScoreAndMoves();
   testSaveStateRoundTripRestoresVmState();
+  testLegacySnapshotFormatIsRejected();
   testSaveOpcodeSerializesSuccessfulBranchContinuation();
   testSaveOpcodeCompletionAppliesSuccessAndFailureBranches();
   testRestoreOpcodeCompletionAppliesFailureBranch();

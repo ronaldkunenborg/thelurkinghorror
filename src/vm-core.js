@@ -172,22 +172,234 @@ class Z3VM {
     };
   }
 
-  _serializeSnapshot(snapshot) {
-    const encoder = new TextEncoder();
-    const payloadBytes = encoder.encode(JSON.stringify(snapshot));
-    const out = new Uint8Array(8 + payloadBytes.length);
-    out[0] = 0x54; // T
-    out[1] = 0x4c; // L
-    out[2] = 0x48; // H
-    out[3] = 0x53; // S
-    write16(out, 4, 1);
-    write16(out, 6, payloadBytes.length);
-    out.set(payloadBytes, 8);
+  _storyRelease() {
+    return read16(this.originalMemory, 0x02);
+  }
+
+  _storySerialBytes() {
+    return this.originalMemory.subarray(0x12, 0x18);
+  }
+
+  _storyChecksum() {
+    return read16(this.originalMemory, 0x1c);
+  }
+
+  _writeChunk(target, offset, type, payload) {
+    for (let i = 0; i < 4; i++) {
+      target[offset + i] = type.charCodeAt(i) & 0xff;
+    }
+    write32(target, offset + 4, payload.length);
+    target.set(payload, offset + 8);
+    return offset + 8 + payload.length + (payload.length % 2);
+  }
+
+  _createChunk(type, payload) {
+    const data = payload instanceof Uint8Array ? payload : new Uint8Array(payload || 0);
+    return {
+      type,
+      payload: data,
+      totalLength: 8 + data.length + (data.length % 2),
+    };
+  }
+
+  _serializeQuetzal(snapshot) {
+    const dynamicMemory = Uint8Array.from(snapshot.dynamicMemory || []);
+    if (dynamicMemory.length !== this.staticBase) {
+      throw new Error('Save is incompatible with current story memory layout');
+    }
+
+    const ifhd = new Uint8Array(13);
+    write16(ifhd, 0, this._storyRelease());
+    ifhd.set(this._storySerialBytes(), 2);
+    write16(ifhd, 8, this._storyChecksum());
+    const pc = snapshot.pc >>> 0;
+    ifhd[10] = (pc >>> 16) & 0xff;
+    ifhd[11] = (pc >>> 8) & 0xff;
+    ifhd[12] = pc & 0xff;
+
+    const compressedMemory = this._compressQuetzalMemory(dynamicMemory);
+    const stks = this._serializeQuetzalStacks(snapshot);
+    const privateState = this._serializeQuetzalPrivateState(snapshot);
+    const chunks = [
+      this._createChunk('IFhd', ifhd),
+      this._createChunk('CMem', compressedMemory),
+      this._createChunk('Stks', stks),
+      this._createChunk('LHSv', privateState),
+    ];
+    const formPayloadLength = 4 + chunks.reduce((sum, chunk) => sum + chunk.totalLength, 0);
+    const out = new Uint8Array(8 + formPayloadLength);
+    out[0] = 0x46; // F
+    out[1] = 0x4f; // O
+    out[2] = 0x52; // R
+    out[3] = 0x4d; // M
+    write32(out, 4, formPayloadLength);
+    out[8] = 0x49; // I
+    out[9] = 0x46; // F
+    out[10] = 0x5a; // Z
+    out[11] = 0x53; // S
+    let offset = 12;
+    for (const chunk of chunks) {
+      offset = this._writeChunk(out, offset, chunk.type, chunk.payload);
+    }
     return out;
   }
 
+  _compressQuetzalMemory(dynamicMemory) {
+    const out = [];
+    const source = dynamicMemory instanceof Uint8Array ? dynamicMemory : new Uint8Array(dynamicMemory || 0);
+    let i = 0;
+    while (i < source.length) {
+      const diff = (source[i] ^ this.originalMemory[i]) & 0xff;
+      if (diff !== 0) {
+        out.push(diff);
+        i += 1;
+        continue;
+      }
+      let runLength = 1;
+      while (
+        i + runLength < source.length &&
+        runLength < 256 &&
+        ((source[i + runLength] ^ this.originalMemory[i + runLength]) & 0xff) === 0
+      ) {
+        runLength += 1;
+      }
+      out.push(0, runLength - 1);
+      i += runLength;
+    }
+    return Uint8Array.from(out);
+  }
+
+  _decompressQuetzalMemory(payload) {
+    const out = new Uint8Array(this.staticBase);
+    out.set(this.originalMemory.subarray(0, this.staticBase));
+    let cursor = 0;
+    for (let i = 0; i < payload.length && cursor < out.length; i++) {
+      const value = payload[i] & 0xff;
+      if (value === 0) {
+        const extraZeros = i + 1 < payload.length ? (payload[++i] & 0xff) : 0;
+        cursor += extraZeros + 1;
+      } else {
+        out[cursor] = (out[cursor] ^ value) & 0xff;
+        cursor += 1;
+      }
+    }
+    if (cursor > out.length) {
+      throw new Error('Quetzal compressed memory exceeds dynamic memory size');
+    }
+    return out;
+  }
+
+  _serializeQuetzalStacks(snapshot) {
+    const frames = [];
+    const callStack = Array.isArray(snapshot.callStack) ? snapshot.callStack : [];
+    for (const frame of callStack) {
+      frames.push({ frame, evalStack: [] });
+    }
+    frames.push({
+      frame: snapshot.currentFrame || this._captureFrame(this._makeRootFrame()),
+      evalStack: Array.isArray(snapshot.evalStack) ? snapshot.evalStack : [],
+    });
+
+    let total = 0;
+    for (const entry of frames) {
+      total += 8 + 30 + entry.evalStack.length * 2;
+    }
+    const out = new Uint8Array(total);
+    let offset = 0;
+    for (const entry of frames) {
+      const frame = entry.frame || {};
+      const returnPc = Number.isFinite(frame.returnPc) ? (frame.returnPc >>> 0) : 0;
+      const storeVar = Number.isFinite(frame.storeVar) && frame.storeVar >= 0 ? (frame.storeVar & 0xff) : 0;
+      const flags = 15 | (Number.isFinite(frame.storeVar) && frame.storeVar >= 0 ? 0 : 0x10);
+      out[offset++] = (returnPc >>> 16) & 0xff;
+      out[offset++] = (returnPc >>> 8) & 0xff;
+      out[offset++] = returnPc & 0xff;
+      out[offset++] = flags;
+      out[offset++] = storeVar;
+      out[offset++] = 0;
+      write16(out, offset, entry.evalStack.length);
+      offset += 2;
+      const locals = Array.isArray(frame.locals) ? frame.locals : [];
+      for (let i = 0; i < 15; i++) {
+        write16(out, offset, u16(locals[i] || 0));
+        offset += 2;
+      }
+      for (const value of entry.evalStack) {
+        write16(out, offset, u16(value));
+        offset += 2;
+      }
+    }
+    return out;
+  }
+
+  _restoreQuetzalStacks(payload) {
+    const frames = [];
+    let offset = 0;
+    while (offset < payload.length) {
+      if (offset + 8 > payload.length) {
+        throw new Error('Quetzal stack frame is truncated');
+      }
+      const returnPc = ((payload[offset] << 16) | (payload[offset + 1] << 8) | payload[offset + 2]) >>> 0;
+      const flags = payload[offset + 3] & 0xff;
+      const localsCount = flags & 0x0f;
+      const storeVar = (flags & 0x10) ? -1 : (payload[offset + 4] & 0xff);
+      const evalCount = read16(payload, offset + 6);
+      offset += 8;
+      if (offset + localsCount * 2 + evalCount * 2 > payload.length) {
+        throw new Error('Quetzal stack frame payload is truncated');
+      }
+      const frame = this._makeRootFrame();
+      frame.returnPc = returnPc;
+      frame.storeVar = storeVar;
+      for (let i = 0; i < localsCount && i < frame.locals.length; i++) {
+        frame.locals[i] = read16(payload, offset);
+        offset += 2;
+      }
+      offset += Math.max(0, localsCount - frame.locals.length) * 2;
+      const evalStack = [];
+      for (let i = 0; i < evalCount; i++) {
+        evalStack.push(read16(payload, offset));
+        offset += 2;
+      }
+      frames.push({ frame, evalStack });
+    }
+    if (!frames.length) {
+      return {
+        currentFrame: this._captureFrame(this._makeRootFrame()),
+        callStack: [],
+        evalStack: [],
+      };
+    }
+    return {
+      currentFrame: this._captureFrame(frames[frames.length - 1].frame),
+      callStack: frames.slice(0, -1).map(entry => this._captureFrame(entry.frame)),
+      evalStack: frames[frames.length - 1].evalStack,
+    };
+  }
+
+  _serializeQuetzalPrivateState(snapshot) {
+    const encoder = new TextEncoder();
+    return encoder.encode(JSON.stringify({
+      version: 1,
+      halted: !!snapshot.halted,
+      lastQuit: !!snapshot.lastQuit,
+      haltReason: snapshot.haltReason || null,
+      pendingInput: snapshot.pendingInput || null,
+    }));
+  }
+
+  _parseQuetzalPrivateState(payload) {
+    try {
+      const decoder = new TextDecoder();
+      const parsed = JSON.parse(decoder.decode(payload));
+      return parsed && parsed.version === 1 ? parsed : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
   serializeSaveState() {
-    return this._serializeSnapshot(this.createSaveState());
+    return this._serializeQuetzal(this.createSaveState());
   }
 
   _capturePendingBranch(inst) {
@@ -278,7 +490,7 @@ class Z3VM {
     snapshot.halted = false;
     snapshot.haltReason = null;
     this._applyPendingBranchState(snapshot, this.pendingSave, true);
-    return this._serializeSnapshot(snapshot);
+    return this._serializeQuetzal(snapshot);
   }
 
   restoreSaveState(bytes) {
@@ -286,46 +498,73 @@ class Z3VM {
     if (data.length < 8) {
       throw new Error('Save data is too small');
     }
-    if (data[0] !== 0x54 || data[1] !== 0x4c || data[2] !== 0x48 || data[3] !== 0x53) {
-      throw new Error('Unsupported save file format');
+    if (data[0] === 0x46 && data[1] === 0x4f && data[2] === 0x52 && data[3] === 0x4d) {
+      return this._restoreQuetzalSaveState(data);
     }
-    const formatVersion = read16(data, 4);
-    if (formatVersion !== 1) {
-      throw new Error('Unsupported save format version: ' + formatVersion);
-    }
-    const payloadLength = read16(data, 6);
-    if (data.length !== 8 + payloadLength) {
-      throw new Error('Save payload length mismatch');
-    }
+    throw new Error('Unsupported save file format');
+  }
 
-    const decoder = new TextDecoder();
-    const snapshot = JSON.parse(decoder.decode(data.subarray(8)));
-    const dynamicMemory = Array.isArray(snapshot.dynamicMemory) ? snapshot.dynamicMemory : null;
+  _restoreQuetzalSaveState(data) {
+    if (data.length < 12) {
+      throw new Error('Quetzal save data is too small');
+    }
+    const formLength = read32(data, 4);
+    if (formLength + 8 > data.length) {
+      throw new Error('Quetzal FORM length exceeds file size');
+    }
+    if (data[8] !== 0x49 || data[9] !== 0x46 || data[10] !== 0x5a || data[11] !== 0x53) {
+      throw new Error('Unsupported FORM type in save file');
+    }
+    const chunks = {};
+    let offset = 12;
+    const end = 8 + formLength;
+    while (offset + 8 <= end) {
+      const type = String.fromCharCode(data[offset], data[offset + 1], data[offset + 2], data[offset + 3]);
+      const length = read32(data, offset + 4);
+      const payloadStart = offset + 8;
+      const payloadEnd = payloadStart + length;
+      if (payloadEnd > end || payloadEnd > data.length) {
+        throw new Error('Quetzal chunk ' + type + ' exceeds FORM bounds');
+      }
+      chunks[type] = data.subarray(payloadStart, payloadEnd);
+      offset = payloadEnd + (length % 2);
+    }
+    const ifhd = chunks.IFhd;
+    if (!ifhd || ifhd.length < 13) {
+      throw new Error('Quetzal save missing IFhd chunk');
+    }
+    const release = read16(ifhd, 0);
+    const serial = Array.from(ifhd.subarray(2, 8)).map(code => String.fromCharCode(code)).join('');
+    const currentSerial = Array.from(this._storySerialBytes()).map(code => String.fromCharCode(code)).join('');
+    const checksum = read16(ifhd, 8);
+    if (release !== this._storyRelease() || serial !== currentSerial || checksum !== this._storyChecksum()) {
+      throw new Error('Save is incompatible with current story');
+    }
+    const pc = ((ifhd[10] << 16) | (ifhd[11] << 8) | ifhd[12]) >>> 0;
+    const dynamicMemory = chunks.CMem
+      ? this._decompressQuetzalMemory(chunks.CMem)
+      : (chunks.UMem ? Uint8Array.from(chunks.UMem) : null);
     if (!dynamicMemory || dynamicMemory.length !== this.staticBase) {
       throw new Error('Save is incompatible with current story memory layout');
     }
-
     for (let i = 0; i < dynamicMemory.length; i++) {
       this.memory[i] = dynamicMemory[i] & 0xff;
     }
-
-    this.pc = Number.isFinite(snapshot.pc) ? (snapshot.pc >>> 0) : this.header.initialPc;
-    this.halted = !!snapshot.halted;
-    this.lastQuit = !!snapshot.lastQuit;
-    this.haltReason = snapshot.haltReason || null;
-    this.pendingInput = snapshot.pendingInput
+    const stackState = chunks.Stks ? this._restoreQuetzalStacks(chunks.Stks) : null;
+    const privateState = chunks.LHSv ? this._parseQuetzalPrivateState(chunks.LHSv) : null;
+    this.pc = pc;
+    this.halted = !!(privateState && privateState.halted);
+    this.lastQuit = !!(privateState && privateState.lastQuit);
+    this.haltReason = privateState && privateState.haltReason ? privateState.haltReason : null;
+    this.pendingInput = privateState && privateState.pendingInput
       ? {
-          textAddr: Number(snapshot.pendingInput.textAddr) >>> 0,
-          parseAddr: Number(snapshot.pendingInput.parseAddr) >>> 0,
+          textAddr: Number(privateState.pendingInput.textAddr) >>> 0,
+          parseAddr: Number(privateState.pendingInput.parseAddr) >>> 0,
         }
       : null;
-    this.evalStack = Array.isArray(snapshot.evalStack)
-      ? snapshot.evalStack.map(value => u16(value))
-      : [];
-    this.callStack = Array.isArray(snapshot.callStack)
-      ? snapshot.callStack.map(frame => this._restoreFrame(frame))
-      : [];
-    this.currentFrame = this._restoreFrame(snapshot.currentFrame);
+    this.evalStack = stackState ? stackState.evalStack.map(value => u16(value)) : [];
+    this.callStack = stackState ? stackState.callStack.map(frame => this._restoreFrame(frame)) : [];
+    this.currentFrame = this._restoreFrame(stackState ? stackState.currentFrame : null);
     this.pendingSave = null;
     this.pendingRestore = null;
     this._dictionaryMeta = null;

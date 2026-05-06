@@ -43,6 +43,31 @@ function cloneArrayBuffer(bytes) {
   return copy.buffer;
 }
 
+function read32be(bytes, address) {
+  return (
+    ((bytes[address] << 24) >>> 0) |
+    (bytes[address + 1] << 16) |
+    (bytes[address + 2] << 8) |
+    bytes[address + 3]
+  ) >>> 0;
+}
+
+function isIfzsQuetzalData(data) {
+  let bytes;
+  try {
+    bytes = toUint8Array(data);
+  } catch (error) {
+    return false;
+  }
+  const formLength = bytes.length >= 8 ? read32be(bytes, 4) : 0;
+  return (
+    bytes.length >= 12 &&
+    8 + formLength <= bytes.length &&
+    bytes[0] === 0x46 && bytes[1] === 0x4f && bytes[2] === 0x52 && bytes[3] === 0x4d &&
+    bytes[8] === 0x49 && bytes[9] === 0x46 && bytes[10] === 0x5a && bytes[11] === 0x53
+  );
+}
+
 function sanitizeFilenamePart(text) {
   return String(text || '')
     .trim()
@@ -328,6 +353,8 @@ class InterpreterSettingsStorage {
           musicEnabled: !!input.musicEnabled,
           extraSlotsEnabled: !!input.extraSlotsEnabled,
           mapEnabled: !!input.mapEnabled,
+          mapMode: input.mapMode === 'inline' ? 'inline' : 'modal',
+          inlineMapHeightRatio: Number.isFinite(Number(input.inlineMapHeightRatio)) ? Number(input.inlineMapHeightRatio) : 0.33,
           horrorExtrasEnabled: !!input.horrorExtrasEnabled,
           imagesEnabled: !!input.imagesEnabled,
           snowEnabled: !!input.snowEnabled,
@@ -353,6 +380,9 @@ class InterpreterSettingsStorage {
 function createSaveBlob(record) {
   if (!record || !record.quetzalData) {
     throw new Error('createSaveBlob requires a save record with quetzalData');
+  }
+  if (!isIfzsQuetzalData(record.quetzalData)) {
+    throw new Error('Save slot is not Quetzal/IFZS; load and re-save it before exporting .sav');
   }
   return new Blob([record.quetzalData], { type: 'application/octet-stream' });
 }
@@ -399,6 +429,9 @@ async function importSaveFileToSlot(storage, file, metadata) {
   }
 
   const quetzalData = new Uint8Array(await file.arrayBuffer());
+  if (!isIfzsQuetzalData(quetzalData)) {
+    throw new Error('Imported save is not a Quetzal/IFZS .sav file');
+  }
   return storage.putSave({
     storyId: meta.storyId,
     slot: meta.slot,
@@ -416,6 +449,7 @@ if (typeof module !== 'undefined' && module.exports) {
     QuetzalStorage,
     InterpreterSettingsStorage,
     createSaveBlob,
+    isIfzsQuetzalData,
     suggestSaveFilename,
     exportSaveToFile,
     importSaveFileToSlot,
@@ -427,5 +461,6 @@ if (typeof window !== 'undefined') {
   window.InterpreterSettingsStorage = InterpreterSettingsStorage;
   window.exportSaveToFile = exportSaveToFile;
   window.importSaveFileToSlot = importSaveFileToSlot;
+  window.isIfzsQuetzalData = isIfzsQuetzalData;
   window.suggestSaveFilename = suggestSaveFilename;
 }

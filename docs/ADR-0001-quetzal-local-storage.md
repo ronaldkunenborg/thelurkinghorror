@@ -44,4 +44,6 @@ Trade-offs:
 ## Implementation notes
 
 - Reference module: `src/quetzal-storage.js`
+- Current VM saves are `FORM`/`IFZS` Quetzal containers with `IFhd`, `CMem`, `Stks`, and a private `LHSv` chunk for interpreter-only transient state.
+- Older bare `TLHS` snapshots are no longer accepted by the VM restore path; import/export treats `.sav` as Quetzal-only.
 - Supporting documentation: `docs/QUETZAL_LOCAL_STORAGE.md`
