@@ -1,4 +1,5 @@
-.map-sheet-map {
+.map-sheet-map,
+.inline-map-svg {
   --bg: #0b0b0b;
   --panel: #151515;
   --panel-line: #4a4a4a;
