@@ -1,0 +1,508 @@
+.side-actions {
+  width: 84px;
+  height: 100%;
+  border: 1px solid var(--panel-border);
+  border-top-color: var(--panel-border-top);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.06), transparent 22%),
+    linear-gradient(180deg, rgba(7, 10, 14, 0.24), rgba(3, 5, 8, 0.34));
+  backdrop-filter: blur(12px) saturate(1.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 8px;
+}
+
+.volume-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.volume-slider {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.icon-btn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, rgba(12, 15, 20, 0.94), rgba(2, 3, 5, 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.02),
+    0 14px 24px rgba(0, 0, 0, 0.35);
+  color: #f5f7fa;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.icon-btn::before,
+.icon-btn::after {
+  content: "";
+  position: absolute;
+  inset: auto;
+  pointer-events: none;
+}
+
+.icon-btn::before {
+  left: 8px;
+  right: 8px;
+  top: 10px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.18), transparent);
+  transform: rotate(-8deg);
+}
+
+.icon-btn::after {
+  left: 10px;
+  right: 10px;
+  bottom: 11px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  transform: rotate(6deg);
+}
+
+.icon-btn:hover {
+  background:
+    linear-gradient(180deg, rgba(24, 30, 38, 0.96), rgba(8, 11, 16, 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    0 16px 28px rgba(0, 0, 0, 0.42);
+  transform: translateY(-1px);
+}
+
+.icon-btn:hover .action-icon-img,
+.icon-btn:hover .horror-glyph-icon {
+  filter:
+    brightness(1.16)
+    drop-shadow(0 0 5px rgba(255, 255, 255, 0.24));
+}
+
+.icon-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(140, 247, 214, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 14px 24px rgba(0, 0, 0, 0.35);
+}
+
+.icon-etch {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 30px;
+  height: 30px;
+  color: #f3f5f7;
+  text-shadow:
+    0 0 1px rgba(255, 255, 255, 0.7),
+    0 0 10px rgba(255, 255, 255, 0.1);
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.08));
+}
+
+.icon-etch::before,
+.icon-etch::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.icon-etch.icon-action::before,
+.icon-etch.icon-action::after,
+.icon-etch.icon-etch-glyph::before,
+.icon-etch.icon-etch-glyph::after {
+  display: none;
+}
+
+.icon-etch.icon-action,
+.icon-etch.icon-etch-glyph {
+  width: 52px;
+  height: 52px;
+}
+
+.action-icon-img,
+.horror-glyph-icon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.2));
+}
+
+.icon-glyph-morph {
+  overflow: hidden;
+}
+
+.glyph-morph-layer,
+.glyph-morph-noise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.glyph-morph-layer {
+  transform-origin: 50% 50%;
+}
+
+.glyph-morph-layer .action-icon-img,
+.glyph-morph-layer .horror-glyph-icon {
+  filter:
+    contrast(1.08)
+    drop-shadow(0 0 4px rgba(255, 255, 255, 0.22));
+}
+
+.glyph-morph-noise {
+  opacity: 0;
+  background:
+    linear-gradient(
+      180deg,
+      transparent 0 12%,
+      rgba(255, 255, 255, 0.42) 12% 15%,
+      transparent 15% 31%,
+      rgba(140, 247, 214, 0.22) 31% 34%,
+      transparent 34% 58%,
+      rgba(255, 220, 151, 0.26) 58% 61%,
+      transparent 61% 100%
+    );
+  mix-blend-mode: screen;
+}
+
+.icon-glyph-morph.is-morphing-in .glyph-morph-normal {
+  animation: glyphNormalOut 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-in .glyph-morph-glyph {
+  animation: glyphGlyphIn 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-out .glyph-morph-glyph {
+  animation: glyphGlyphOut 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-out .glyph-morph-normal {
+  animation: glyphNormalIn 650ms steps(4, end) forwards;
+}
+
+.icon-glyph-morph.is-morphing-in .glyph-morph-noise,
+.icon-glyph-morph.is-morphing-out .glyph-morph-noise {
+  animation: glyphMorphNoise 650ms steps(5, end) forwards;
+}
+
+@keyframes glyphNormalOut {
+  0% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+
+  38% {
+    opacity: 0.72;
+    filter: blur(0.7px) contrast(1.35);
+    transform: translateX(-1px);
+  }
+
+  61% {
+    opacity: 0.34;
+    filter: blur(1.2px) contrast(1.6);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(0.4px) contrast(1.1);
+    transform: translateX(0);
+  }
+}
+
+@keyframes glyphGlyphIn {
+  0% {
+    opacity: 0;
+    filter: blur(1.1px) contrast(1.6);
+    transform: translateX(1px);
+  }
+
+  32% {
+    opacity: 0.22;
+    filter: blur(0.8px) contrast(1.5);
+    transform: translateX(-1px);
+  }
+
+  68% {
+    opacity: 0.88;
+    filter: blur(0.3px) contrast(1.25);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+}
+
+@keyframes glyphGlyphOut {
+  0% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+
+  44% {
+    opacity: 0.82;
+    filter: blur(0.5px) contrast(1.42);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 0;
+    filter: blur(1px) contrast(1.55);
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes glyphNormalIn {
+  0% {
+    opacity: 0;
+    filter: blur(0.8px) contrast(1.45);
+    transform: translateX(-1px);
+  }
+
+  54% {
+    opacity: 0.58;
+    filter: blur(0.4px) contrast(1.25);
+    transform: translateX(1px);
+  }
+
+  100% {
+    opacity: 1;
+    filter: blur(0) contrast(1);
+    transform: translateX(0);
+  }
+}
+
+@keyframes glyphMorphNoise {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  18% {
+    opacity: 0.2;
+    transform: translateY(-3px);
+  }
+
+  34% {
+    opacity: 0.52;
+    transform: translateY(5px);
+  }
+
+  57% {
+    opacity: 0.16;
+    transform: translateY(-1px);
+  }
+
+  73% {
+    opacity: 0.36;
+    transform: translateY(2px);
+  }
+}
+
+.icon-folder::before {
+  left: 2px;
+  top: 10px;
+  width: 25px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-radius: 4px 5px 5px 4px;
+  border-top-width: 1px;
+  transform: skew(-12deg) rotate(-2deg);
+}
+
+.icon-folder::after {
+  left: 6px;
+  top: 5px;
+  width: 11px;
+  height: 7px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-right: 0;
+  border-radius: 5px 0 0 0;
+  transform: skew(-15deg) rotate(-3deg);
+}
+
+.icon-save::before {
+  left: 6px;
+  top: 4px;
+  width: 18px;
+  height: 21px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  clip-path: polygon(0 0, 76% 0, 100% 24%, 100% 100%, 0 100%);
+  box-shadow:
+    inset 0 8px 0 -6px currentColor;
+}
+
+.icon-save::after {
+  left: 10px;
+  top: 14px;
+  width: 8px;
+  height: 6px;
+  border: 2px solid currentColor;
+  border-radius: 1px;
+  box-shadow:
+    0 -7px 0 -4px currentColor;
+}
+
+.icon-load::before {
+  left: 6px;
+  top: 4px;
+  width: 18px;
+  height: 21px;
+  border: 2px solid currentColor;
+  border-radius: 3px;
+  clip-path: polygon(0 0, 76% 0, 100% 24%, 100% 100%, 0 100%);
+  box-shadow:
+    inset 0 8px 0 -6px currentColor;
+}
+
+.icon-load::after {
+  left: 11px;
+  top: 9px;
+  width: 8px;
+  height: 12px;
+  background: currentColor;
+  clip-path: polygon(
+    38% 0%,
+    62% 0%,
+    62% 52%,
+    100% 52%,
+    50% 100%,
+    0% 52%,
+    38% 52%
+  );
+}
+
+.icon-help {
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  top: 2px;
+}
+
+.icon-gear::before {
+  left: 8px;
+  top: 8px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  box-shadow:
+    0 -9px 0 -4px currentColor,
+    0 9px 0 -4px currentColor,
+    9px 0 0 -4px currentColor,
+    -9px 0 0 -4px currentColor,
+    6px 6px 0 -4px currentColor,
+    -6px 6px 0 -4px currentColor,
+    6px -6px 0 -4px currentColor,
+    -6px -6px 0 -4px currentColor;
+}
+
+.icon-gear::after {
+  left: 13px;
+  top: 13px;
+  width: 4px;
+  height: 4px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.icon-map::before {
+  left: 3px;
+  top: 6px;
+  width: 24px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-radius: 3px 5px 4px 3px;
+  clip-path: polygon(0 4%, 33% 0, 66% 8%, 100% 0, 100% 96%, 66% 100%, 33% 92%, 0 100%);
+}
+
+.icon-map::after {
+  left: 8px;
+  top: 8px;
+  width: 12px;
+  height: 12px;
+  border-left: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  border-radius: 50% 50% 50% 50% / 56% 56% 44% 44%;
+  box-shadow:
+    5px 6px 0 -4px currentColor;
+  opacity: 0.95;
+}
+
+.icon-credits {
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  top: 2px;
+}
+
+.icon-credits::before {
+  content: "i";
+  font-style: normal;
+  transform: translateY(-1px);
+}
+
+.icon-credits::after {
+  display: none;
+}
+
+.icon-trash::before {
+  left: 8px;
+  top: 8px;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-top: 0;
+  border-radius: 0 0 3px 3px;
+}
+
+.icon-trash::after {
+  left: 9px;
+  top: 5px;
+  width: 12px;
+  height: 3px;
+  border: 2px solid currentColor;
+  border-bottom: 0;
+  border-radius: 2px 2px 0 0;
+}
+
+.side-actions-title {
+  font-size: 0.73rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin-bottom: 2px;
+}

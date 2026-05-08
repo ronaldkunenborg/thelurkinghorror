@@ -1,0 +1,22 @@
+<section id="map-sheet" class="map-sheet" aria-label="Visited location map" hidden>
+        <div class="map-sheet-panel">
+          <div class="command-sheet-header">
+            <h2 class="command-sheet-title">Visited Location Map</h2>
+            <label class="map-sheet-floor-control">
+              <span>Floor layer</span>
+              <select id="game-map-floor-filter" class="map-sheet-floor-select">
+                <option value="L+2">L+2</option>
+                <option value="L+1">L+1</option>
+                <option value="L0">L0</option>
+                <option value="L-1">L-1</option>
+                <option value="L-2">L-2</option>
+                <option value="L-3">L-3</option>
+              </select>
+            </label>
+            <button id="close-map" class="btn" type="button">Close</button>
+          </div>
+          <div class="map-sheet-frame">
+            <svg id="game-map" class="map-sheet-map" viewBox="0 0 1600 980" preserveAspectRatio="xMinYMin meet" aria-label="Visited location map"></svg>
+          </div>
+        </div>
+      </section>

@@ -415,9 +415,33 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Removed legacy `TLHS` format detection/export messaging from `src/quetzal-storage.js`.
    - Updated save-format docs and tests so `.sav` means Quetzal/IFZS only.
 
+67. [done] Play victory music and show a dedicated victory visual when the story reaches `<FINISH>`.
+   - Added victory music mapping for `src/assets/audio/743416_Game-over-victory.mp3` as a non-looping `music` class track.
+   - Added victory artwork `src/assets/gfx/lurkinghorror/game_over_victory.png` to the ending scene flow.
+   - Confirmed the canonical ZIL source has the supplied victory text immediately followed by `<FINISH>`.
+   - Detects the canonical victory text across VM output-line boundaries before the quit halt arrives.
+   - Keeps victory completion on a dedicated ending screen instead of returning to splash through the ordinary story-quit callback.
+   - Added in-game settings/credits attribution and README/docs asset attribution for the victory track.
+   - Added regression coverage in `tools/test-io-controller-output.js` for victory music/visual callback, split-line detection, quit suppression, and game-music disable behavior.
+
+75. [done] Turn the final PC paper paragraph into Enochian text before the first dream transition.
+   - Source-verified in `pc.zil`: `ODD-PAPER-F` / `I-COMPULSION` prints `COMPDESCS`; after the fourth page, the next MORE action prints `You faint, and when you awaken...` and then executes `GOTO ,YUGGOTH`.
+   - Trigger paragraph:
+     `The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?`
+   - Added deterministic trigger detection in `src/io.js` for the exact fourth-page paragraph.
+   - Added `story-enochian-reveal` output styling in `src/modern.css`, reusing the existing `LhEnochian` font and rune flicker visual language.
+   - Split the scripted story reveal from ambient rune flicker: the story animation runs once and then leaves the line settled in Enochian text for the rest of the delay.
+   - Updated `src/ui-framework.js` so `appendOutput()` returns the created line element while preserving existing callers.
+   - Revised the reveal timing: after the fourth-page text appears normally, input and subsequent VM output are blocked for 2 seconds; the line then changes into Enochian and grows/brights over 2 seconds; only after that does the prompt return.
+   - The subsequent final `click more` then continues immediately into `You faint...` and the Yuggoth room text.
+   - Kept this effect separate from random ambient horror scheduling/cooldowns.
+   - Added controller regression coverage for Enochian styling, immediate delayed-output behavior, next-turn delayed-output behavior, and non-trigger output behavior.
+   - Verified with a real VM command sequence through the PC/YAK paper flow:
+     `turn computer on`, `login 872325412`, `password uhlersoth`, `edit paper`, `click paper`, `read paper`, `click more`, `click more`, `click more`, then final `click more`.
+
 ## Pending Tasks
 
-67. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
+76. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
 
 ## Future Tasks
 

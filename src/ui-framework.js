@@ -55,6 +55,7 @@ class UiFramework {
     line.textContent = text;
     this.outputEl.appendChild(line);
     this.outputEl.scrollTop = this.outputEl.scrollHeight;
+    return line;
   }
 
   clearOutput() {
@@ -62,12 +63,22 @@ class UiFramework {
   }
 
   focusInput() {
+    if (this.inputEl.disabled) {
+      return;
+    }
     this.inputEl.focus();
   }
 
   setInputValue(text) {
     this.inputEl.value = text || '';
     this.focusInput();
+  }
+
+  setInputEnabled(enabled) {
+    this.inputEl.disabled = !enabled;
+    if (enabled) {
+      this.focusInput();
+    }
   }
 
   setCommandHandler(handler) {
@@ -118,6 +129,9 @@ class UiFramework {
       }
       if (event.key === 'Enter') {
         event.preventDefault();
+        if (this.inputEl.disabled) {
+          return;
+        }
         const command = this.inputEl.value.trim();
         if (!command) {
           return;

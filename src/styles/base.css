@@ -1,0 +1,109 @@
+:root {
+  --bg-0: #000000;
+  --viewport-pad: clamp(10px, 2vw, 20px);
+  --panel: rgba(4, 6, 9, 0.26);
+  --panel-border: rgba(190, 214, 234, 0.12);
+  --panel-border-top: rgba(220, 236, 250, 0.3);
+  --text-main: #e9edf2;
+  --text-dim: #a8b5c2;
+  --accent: #8cf7d6;
+  --accent-2: #ffdc97;
+  --danger: #ff7e7e;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.7);
+  --radius: 14px;
+}
+
+@font-face {
+  font-family: "LhEnochian";
+  src: url("../assets/fonts/Enochian-BGlG.woff2") format("woff2");
+  font-display: swap;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: "Cascadia Code", "Fira Code", "Consolas", "Courier New", monospace;
+  color: var(--text-main);
+  background: var(--bg-0);
+  display: block;
+  padding: var(--viewport-pad);
+}
+
+body.is-resizing-inline-map {
+  cursor: ns-resize;
+  user-select: none;
+}
+
+.shell {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: calc(100vh - (var(--viewport-pad) * 2));
+  border: none;
+  border-radius: var(--radius);
+  background: #000;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.ambient-snow-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.58;
+  mix-blend-mode: screen;
+}
+
+.shell-frame {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  padding: 12px;
+  align-items: stretch;
+  justify-content: flex-end;
+  z-index: 2;
+  opacity: 0;
+  filter: blur(14px);
+  transition: opacity 1000ms ease, filter 1000ms ease;
+}
+
+.ui-snow-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.ui-snow-mask span {
+  position: absolute;
+  display: block;
+  background: #000;
+}
+
+.hud-group {
+  position: relative;
+  z-index: 4;
+  isolation: isolate;
+  height: 100%;
+  min-height: 0;
+  flex: 0 0 48%;
+  max-width: 48%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+}

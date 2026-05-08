@@ -1,0 +1,148 @@
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 700px) {
+  body {
+    padding: 0;
+  }
+
+  .shell {
+    height: 100%;
+    border-radius: 0;
+  }
+
+  .shell-frame {
+    padding: 8px;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: flex-start;
+  }
+
+  .hud-group {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 auto;
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
+  }
+
+  .shell.images-disabled .hud-group {
+    flex: 0 0 auto;
+    max-width: 100%;
+  }
+
+  .side-actions {
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .icon-btn {
+    flex: 0 0 auto;
+  }
+
+  .side-actions-title {
+    writing-mode: horizontal-tb;
+    transform: none;
+    margin-right: 6px;
+  }
+
+  .scene-pane {
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    flex: 0 0 auto;
+    height: min(220px, 30vh);
+    pointer-events: none;
+    margin-left: 0;
+    min-height: 140px;
+  }
+
+  .map-sheet {
+    padding: 8px;
+  }
+
+  .map-sheet-panel {
+    width: 100%;
+    max-height: calc(100vh - 16px);
+    padding: 10px;
+  }
+
+  .map-sheet-frame {
+    height: min(78vh, 680px);
+  }
+
+  .map-sheet .command-sheet-header {
+    flex-wrap: wrap;
+  }
+
+  .map-sheet-floor-control {
+    order: 3;
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+
+  .ambient-snow-layer {
+    opacity: 0.36;
+  }
+
+  .terminal-stack {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .terminal-stack.map-inline {
+    grid-template-rows: auto minmax(120px, var(--inline-map-height, 28%)) 10px minmax(180px, 1fr) auto auto;
+  }
+
+  .output {
+    padding: 14px 12px 16px;
+    font-size: 0.95rem;
+  }
+
+  .input-row {
+    gap: 8px;
+    padding: 10px 10px 12px;
+  }
+
+  .splash {
+    padding: 8px;
+  }
+
+  .splash-stage {
+    width: 100%;
+    min-height: min(94vh, 820px);
+  }
+
+  .splash-art-panel {
+    inset: 0;
+  }
+
+  .splash-panel {
+    padding: 16px 12px 20px;
+  }
+
+  .splash-copy {
+    max-width: 30rem;
+  }
+
+  .settings-sheet {
+    --settings-left: 5px;
+    --settings-width: calc(100% - 10px);
+  }
+}

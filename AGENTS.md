@@ -21,6 +21,8 @@
 
 - Map-rendering exception: only for Tunnel Entrance (34) <-> Muddy Tunnel (39), suppress `up/down` edge rendering and keep only horizontal (`east/west`) rendering on the map.
 
+- Please check https://github.com/historicalsource/lurkinghorror/blob/master/yuggoth.zil for game-code related questions first. The foldercontains the entire game source code.
+
 ## Git commit message format
 
 - Always use real newlines in commit bodies.

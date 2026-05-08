@@ -119,6 +119,7 @@ These are used as map/reference material during location reconciliation work.
 
 - [`src/assets/audio/splash-horror-whirlguy.mp3`](src/assets/audio/splash-horror-whirlguy.mp3) - splash music.
 - [`src/assets/audio/game-over-desmae-877160.mp3`](src/assets/audio/game-over-desmae-877160.mp3) - game-over music.
+- [`src/assets/audio/743416_Game-over-victory.mp3`](src/assets/audio/743416_Game-over-victory.mp3) - victory music.
 - [`src/assets/gfx/lurkinghorror/`](src/assets/gfx/lurkinghorror/) - location artwork set.
 
 ## Runtime Map Notes
@@ -126,6 +127,7 @@ These are used as map/reference material during location reconciliation work.
 - The in-game visited map is documented in [`docs/IN_GAME_VISITED_MAP.md`](docs/IN_GAME_VISITED_MAP.md).
 - The full technical/reference map remains [`docs/LOCATION_MAP.md`](docs/LOCATION_MAP.md); it is not the default player-facing map experience.
 - [`src/assets/gfx/lurkinghorror/game_over.png`](src/assets/gfx/lurkinghorror/game_over.png) - game-over artwork.
+- [`src/assets/gfx/lurkinghorror/game_over_victory.png`](src/assets/gfx/lurkinghorror/game_over_victory.png) - victory artwork.
 - [`src/assets/gfx/blood/`](src/assets/gfx/blood/) - blood-splatter overlays used by the ambient blood effect.
 
 ## Installation
@@ -189,6 +191,10 @@ Useful local checks:
   published on Newgrounds Audio Portal:
   https://www.newgrounds.com/audio/listen/877160
   License deed: https://creativecommons.org/licenses/by-nc-nd/3.0/
+- Victory music: Newgrounds Audio Portal entry 743416 (CC BY-NC-ND 3.0),
+  attribution details:
+  https://www.newgrounds.com/audio/listen/743416
+  Legal code: https://creativecommons.org/licenses/by-nc-nd/3.0/legalcode
 - Sound effect 1 source: **freesound_community** (Pixabay profile):
   https://pixabay.com/users/freesound_community-46691455/
 - Sound effect 2 source: **universfield** (Pixabay profile):

@@ -1,0 +1,2220 @@
+      (function bootstrapUi() {
+        const splashShownAt = Date.now();
+        const minimumSplashMs = 1800;
+        const shellEl = document.getElementById('shell');
+        const ambientSnowCanvas = document.getElementById('ambient-snow');
+        const ambientSnowLayer =
+          ambientSnowCanvas && window.MapSnowLayer
+            ? window.MapSnowLayer.create(ambientSnowCanvas, {
+                density: 0.00013,
+                minFlakes: 42,
+                maxFlakes: 190,
+                sideBufferScreens: 0.8,
+                rampUpSeconds: 8,
+                rampDownSeconds: 8,
+                activeArea: { x: 0, y: 0, width: 1, height: 1 }
+              })
+            : null;
+        const splashEl = document.getElementById('splash');
+        const splashStatusEl = document.getElementById('splash-status');
+        const sceneLayerA = document.getElementById('scene-layer-a');
+        const sceneLayerB = document.getElementById('scene-layer-b');
+        const sceneLayers = [sceneLayerA, sceneLayerB];
+        const scenePaneEl = document.querySelector('.scene-pane');
+        const terminalStackEl = document.querySelector('.terminal-stack');
+        const bloodSplatterEl = document.getElementById('blood-splatter');
+        const horrorVignetteEl = document.getElementById('horror-vignette');
+        const hudGroupEl = document.querySelector('.hud-group');
+        const uiSnowMaskEl = document.getElementById('ui-snow-mask');
+        const uiSnowMaskPieces = uiSnowMaskEl ? Array.from(uiSnowMaskEl.querySelectorAll('[data-mask-target]')) : [];
+        const commandSheetEl = document.getElementById('command-sheet');
+        const saveLoadSheetEl = document.getElementById('save-load-sheet');
+        const saveLoadTitleEl = document.getElementById('save-load-title');
+        const saveLoadSubtitleEl = document.getElementById('save-load-subtitle');
+        const saveLoadSlotListEl = document.getElementById('save-load-slot-list');
+        const mapSheetEl = document.getElementById('map-sheet');
+        const gameMapSvgEl = document.getElementById('game-map');
+        const gameMapFloorFilterEl = document.getElementById('game-map-floor-filter');
+        const inlineMapPanelEl = document.getElementById('inline-map-panel');
+        const inlineMapSvgEl = document.getElementById('inline-game-map');
+        const inlineMapResizeEl = document.getElementById('inline-map-resize');
+        const creditsSheetEl = document.getElementById('credits-sheet');
+        const settingsSheetEl = document.getElementById('settings-sheet');
+        const confirmSheetEl = document.getElementById('confirm-sheet');
+        const confirmMessageEl = document.getElementById('confirm-message');
+        const settingsButtonEl = document.getElementById('settings-button');
+        const actionIconButtons = [
+          document.getElementById('load-slot'),
+          document.getElementById('save-slot'),
+          document.getElementById('map-button'),
+          document.getElementById('settings-button'),
+          document.getElementById('credits-button'),
+          document.getElementById('commands-button'),
+        ].filter(Boolean);
+        const musicVolumeEl = document.getElementById('music-volume');
+        const sfxVolumeEl = document.getElementById('sfx-volume');
+        const experienceLevelEl = document.getElementById('experience-level');
+        const experienceLevelLabelEl = document.getElementById('experience-level-label');
+        const experienceMusicEnabledEl = document.getElementById('exp-music-enabled');
+        const experienceExtraSlotsEnabledEl = document.getElementById('exp-extra-slots-enabled');
+        const experienceMapEnabledEl = document.getElementById('exp-map-enabled');
+        const experienceMapModeEl = document.getElementById('exp-map-mode');
+        const experienceHorrorEnabledEl = document.getElementById('exp-horror-enabled');
+        const experienceImagesEnabledEl = document.getElementById('exp-images-enabled');
+        const experienceSnowEnabledEl = document.getElementById('exp-snow-enabled');
+        const experienceOnboardingCopyEl = document.getElementById('experience-onboarding-copy');
+        const experienceOnboardingActionsEl = document.getElementById('experience-onboarding-actions');
+        const experienceContinueEl = document.getElementById('experience-continue');
+        const closeSettingsEl = document.getElementById('close-settings');
+        const audioSettingsGroupEl = document.getElementById('audio-settings-group');
+        let latestMapDiscoveryState = null;
+        let gameMapRenderer = null;
+        let inlineMapRenderer = null;
+        let inlineMapResizeState = null;
+        const audioAttributionEl = document.getElementById('audio-attribution');
+        const settingsStorage =
+          typeof window.InterpreterSettingsStorage === 'function'
+            ? new window.InterpreterSettingsStorage()
+            : null;
+        const splashMusic = new Audio('./assets/audio/splash-horror-whirlguy.mp3');
+        const splashMusicBaseVolume = 0.36;
+        splashMusic.loop = false;
+        if (ambientSnowLayer) {
+          ambientSnowLayer.setDensityMultiplier(1);
+          ambientSnowLayer.setEnabled(false);
+        }
+        splashMusic.volume = splashMusicBaseVolume;
+        splashMusic.preload = 'auto';
+
+        function updateUiSnowMasks() {
+          if (!uiSnowMaskPieces.length) {
+            return;
+          }
+          const shellRect = shellEl.getBoundingClientRect();
+          for (const piece of uiSnowMaskPieces) {
+            const targetSelector = piece.dataset.maskTarget;
+            const target = targetSelector ? document.querySelector(targetSelector) : null;
+            if (!target) {
+              piece.style.display = 'none';
+              continue;
+            }
+            const targetRect = target.getBoundingClientRect();
+            if (targetRect.width <= 0 || targetRect.height <= 0) {
+              piece.style.display = 'none';
+              continue;
+            }
+            const targetStyle = window.getComputedStyle(target);
+            piece.style.display = 'block';
+            piece.style.left = Math.round(targetRect.left - shellRect.left) + 'px';
+            piece.style.top = Math.round(targetRect.top - shellRect.top) + 'px';
+            piece.style.width = Math.round(targetRect.width) + 'px';
+            piece.style.height = Math.round(targetRect.height) + 'px';
+            piece.style.borderRadius = targetStyle.borderRadius;
+          }
+        }
+
+        window.requestAnimationFrame(updateUiSnowMasks);
+        if (typeof MutationObserver === 'function') {
+          const uiSnowMaskObserver = new MutationObserver(() => {
+            window.requestAnimationFrame(updateUiSnowMasks);
+          });
+          [
+            commandSheetEl,
+            saveLoadSheetEl,
+            mapSheetEl,
+            creditsSheetEl,
+            settingsSheetEl,
+            confirmSheetEl,
+          ].filter(Boolean).forEach(element => {
+            uiSnowMaskObserver.observe(element, { attributes: true, attributeFilter: ['hidden', 'class', 'style'] });
+          });
+        }
+        const EXPERIENCE_PROFILES = [
+          { level: 0, label: 'Classic', musicEnabled: false, extraSlotsEnabled: false, mapEnabled: false, mapMode: 'modal', horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 1, label: 'Classic+', musicEnabled: false, extraSlotsEnabled: true, mapEnabled: false, mapMode: 'modal', horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: false, snowDensityMultiplier: 1 },
+          { level: 2, label: 'Enhanced', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, mapMode: 'modal', horrorExtrasEnabled: false, imagesEnabled: false, snowEnabled: true, snowDensityMultiplier: 1.75 },
+          { level: 3, label: 'Modern', musicEnabled: true, extraSlotsEnabled: true, mapEnabled: true, mapMode: 'inline', horrorExtrasEnabled: true, imagesEnabled: true, snowEnabled: true, snowDensityMultiplier: 3.5 },
+        ];
+        const OUTDOOR_SNOW_ROOM_IDS = new Set([16, 98, 121, 127, 145, 180, 185, 190, 222]);
+        const OUTDOOR_SNOW_DENSITY_MULTIPLIERS_BY_LEVEL = {
+          2: 6,
+          3: 10,
+        };
+        // Snow settings are layered: experience profiles choose whether snow is
+        // enabled and the indoor amount; room context can swap the engine to the
+        // outdoor storm profile while preserving the user's on/off preference.
+        const INDOOR_SNOW_PROFILE = {
+          density: 0.00013,
+          minFlakes: 42,
+          maxFlakes: 190,
+          sideBufferScreens: 0.8,
+        };
+        const OUTDOOR_SNOW_PROFILE = {
+          density: 0.00042,
+          minFlakes: 220,
+          maxFlakes: 960,
+          sideBufferScreens: 1,
+        };
+        let currentSnowRoomId = 0;
+
+        const ui = new window.UiFramework({
+          outputEl: document.getElementById('output'),
+          inputEl: document.getElementById('command-input'),
+          promptEl: document.getElementById('prompt'),
+          statusLeftEl: document.getElementById('status-left'),
+          statusRightEl: document.getElementById('status-right'),
+          topbarRoomEl: document.getElementById('topbar-room'),
+          topbarScoreEl: document.getElementById('topbar-score'),
+          topbarMovesEl: document.getElementById('topbar-moves'),
+          prompt: '>',
+        });
+        let saveLoadSheetMode = 'save';
+        let confirmResolver = null;
+        let lastSavedSlotFlash = null;
+        let lastSavedSlotFlashTimer = 0;
+
+        let activeSceneIndex = 0;
+        const BLOOD_SPLATTER_ART = [
+          './assets/gfx/blood/bloodsplatter_small_1.png',
+          './assets/gfx/blood/bloodsplatter_small_2.png',
+          './assets/gfx/blood/bloodsplatter_mediumlarge.png',
+          './assets/gfx/blood/bloodsplatter_large.png',
+          './assets/gfx/blood/bloodsplatter_double.png',
+        ];
+        let bloodEffectEnabled = false;
+        let bloodEffectMode = 'random';
+        let bloodEffectFixedIndex = 1;
+        let bloodEffectTimer = 0;
+        let bloodEffectHideTimer = 0;
+        let bloodEffectFirstDelayMs = null;
+        let ambientBloodAutostarted = false;
+        const HORROR_GLYPH_ART = [
+          './assets/gfx/glyphs/glyph_forked_spine.png',
+          './assets/gfx/glyphs/glyph_broken_halo.png',
+          './assets/gfx/glyphs/glyph_hook_spiral.png',
+          './assets/gfx/glyphs/glyph_ladder_thorn.png',
+          './assets/gfx/glyphs/glyph_split_eye.png',
+          './assets/gfx/glyphs/glyph_crowned_knot.png',
+          './assets/gfx/glyphs/glyph_bent_trident.png',
+          './assets/gfx/glyphs/glyph_sealed_door.png',
+        ];
+        const HORROR_CONFIG = {
+          roomEntryDelayMs: 500,
+          chanceRoomRunes: 0.05,
+          chanceRoomArtJump: 0.03,
+          chanceIdleUiGlyphSwap: 0.015,
+          chanceIdleDimPulse: 0.025,
+          durationRunesMinMs: 700,
+          durationRunesMaxMs: 1800,
+          durationArtJumpMinMs: 60,
+          durationArtJumpMaxMs: 120,
+          durationUiSwapMinMs: 5000,
+          durationUiSwapMaxMs: 10000,
+          durationUiSwapTransitionMs: 650,
+          durationDimMinMs: 980,
+          durationDimMaxMs: 1960,
+          idleRollMinMs: 20000,
+          idleRollMaxMs: 35000,
+          cooldownRunesMs: 90000,
+          cooldownArtMs: 120000,
+          cooldownUiMs: 180000,
+          cooldownDimMs: 150000,
+        };
+        const horrorState = {
+          enabled: true,
+          activeEffect: '',
+          idleRollTimer: 0,
+          roomEntryTimer: 0,
+          activeReleaseTimer: 0,
+          dimTimers: [],
+          lastAt: {
+            runes: 0,
+            art: 0,
+            ui: 0,
+            dim: 0,
+          },
+          counts: {
+            runes: 0,
+            art: 0,
+            ui: 0,
+            dim: 0,
+          },
+        };
+        const ROOM_ART_BY_ID = {
+          9: './assets/gfx/lurkinghorror/tomb_9.jpg',
+          15: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          16: './assets/gfx/lurkinghorror/small_courtyard_16.jpg',
+          17: './assets/gfx/lurkinghorror/cinderblock_tunnel_17.jpg',
+          21: './assets/gfx/lurkinghorror/at_platform_21.jpg',
+          25: './assets/gfx/lurkinghorror/brick_tunnel_25.jpg',
+          27: './assets/gfx/lurkinghorror/basement_27.jpg',
+          33: './assets/gfx/lurkinghorror/kitchen_33.jpg',
+          34: './assets/gfx/lurkinghorror/tunnel_entrance_34.jpg',
+          35: './assets/gfx/lurkinghorror/stairway_35.jpg',
+          37: './assets/gfx/lurkinghorror/concrete_box_37.jpg',
+          38: './assets/gfx/lurkinghorror/engineering_building_38.jpg',
+          39: './assets/gfx/lurkinghorror/muddy_tunnel_39.jpg',
+          42: './assets/gfx/lurkinghorror/lab_42.jpg',
+          47: './assets/gfx/lurkinghorror/dead_storage_47.jpg',
+          51: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          65: './assets/gfx/lurkinghorror/computer_center_65.jpg',
+          66: './assets/gfx/lurkinghorror/steam_tunnel_66.jpg',
+          69: './assets/gfx/lurkinghorror/inner_lair_69.jpg',
+          78: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          87: './assets/gfx/lurkinghorror/tunnel_bend.jpg',
+          98: './assets/gfx/lurkinghorror/smith_street_98.jpg',
+          99: './assets/gfx/lurkinghorror/large_chamber_99.jpg',
+          109: './assets/gfx/lurkinghorror/inside_dome_109.png',
+          110: './assets/gfx/lurkinghorror/third_floor_110.png',
+          117: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          121: './assets/gfx/lurkinghorror/roof_of_great_dome_121.png',
+          124: './assets/gfx/lurkinghorror/elevator_124.jpg',
+          127: './assets/gfx/lurkinghorror/roof_127.png',
+          131: './assets/gfx/lurkinghorror/tunnel_bend.jpg',
+          134: './assets/gfx/lurkinghorror/basalt_bowl_134.jpg',
+          136: './assets/gfx/lurkinghorror/aero_lobby_136.png',
+          137: './assets/gfx/lurkinghorror/second_floor_137.jpg',
+          138: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          140: './assets/gfx/lurkinghorror/temporary_lab_140.png',
+          142: './assets/gfx/lurkinghorror/subbasement_142.png',
+          145: './assets/gfx/lurkinghorror/on_the_great_dome_145.jpg',
+          149: './assets/gfx/lurkinghorror/before_the_altar_149.jpg',
+          150: './assets/gfx/lurkinghorror/fruits_and_nuts_150.png',
+          152: './assets/gfx/lurkinghorror/place_dream_threshold_152.jpg',
+          158: './assets/gfx/lurkinghorror/aero_basement_158.png',
+          161: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          164: './assets/gfx/lurkinghorror/tunnel_crackedseam.jpg',
+          171: './assets/gfx/lurkinghorror/ancient_storage_171.png',
+          174: './assets/gfx/lurkinghorror/department_of_alchemy_174.png',
+          176: './assets/gfx/lurkinghorror/terminal_room_176.jpg',
+          179: './assets/gfx/lurkinghorror/cluttered_passage_179.png',
+          180: './assets/gfx/lurkinghorror/great_court_180.png',
+          181: './assets/gfx/lurkinghorror/tunnel_slimemold.jpg',
+          184: './assets/gfx/lurkinghorror/tunnel_recess.jpg',
+          185: './assets/gfx/lurkinghorror/smith_street_185.jpg',
+          187: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          190: './assets/gfx/lurkinghorror/mass_ave_190.png',
+          195: './assets/gfx/lurkinghorror/top_floor_195.png',
+          200: './assets/gfx/lurkinghorror/brown_basement_200.png',
+          201: './assets/gfx/lurkinghorror/renovated_cave_201.jpg',
+          202: './assets/gfx/lurkinghorror/temporary_basement_202.png',
+          206: './assets/gfx/lurkinghorror/infinite_corridor_206.png',
+          208: './assets/gfx/lurkinghorror/infinite_corridor_208.png',
+          210: './assets/gfx/lurkinghorror/infinite_corridor_210.png',
+          213: './assets/gfx/lurkinghorror/top_of_dome_213.png',
+          214: './assets/gfx/lurkinghorror/infinite_corridor_214.jpg',
+          218: './assets/gfx/lurkinghorror/infinite_corridor_218.jpg',
+          221: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          222: './assets/gfx/lurkinghorror/skyscraper_roof_222.png',
+          227: './assets/gfx/lurkinghorror/steam_tunnel.jpg',
+          232: './assets/gfx/lurkinghorror/tunnel_strand.jpg',
+          234: './assets/gfx/lurkinghorror/tunnel_standard.jpg',
+          240: './assets/gfx/lurkinghorror/brown_building_240.png',
+          248: './assets/gfx/lurkinghorror/chemistry_building_248.png',
+          249: './assets/gfx/lurkinghorror/great_dome_249.jpg',
+        };
+        const roomArtMissingIds = new Set();
+        const GAME_OVER_ART = './assets/gfx/lurkinghorror/game_over.png';
+        const WIN_GAME_ART = './assets/gfx/lurkinghorror/game_over_victory.png';
+        let currentRoomArt = '';
+        let gameOverSceneFadeTimer = 0;
+
+        function resolveRoomArt(roomName, roomObjectId) {
+          if (!Number.isFinite(roomObjectId) || roomObjectId <= 0) {
+            return '';
+          }
+          if (roomObjectId && ROOM_ART_BY_ID[roomObjectId]) {
+            return ROOM_ART_BY_ID[roomObjectId];
+          }
+          if (!roomArtMissingIds.has(roomObjectId)) {
+            roomArtMissingIds.add(roomObjectId);
+            console.warn(
+              '[RoomArt] No mapped artwork for room id',
+              roomObjectId,
+              roomName ? '(' + roomName + ')' : ''
+            );
+          }
+          return '';
+        }
+
+        function randomSceneOffsetPercent() {
+          return ((Math.random() * 2 - 1) * 10).toFixed(2);
+        }
+
+        function randomIntInclusive(min, max) {
+          return min + Math.floor(Math.random() * ((max - min) + 1));
+        }
+
+        function randomIdleRollDelayMs() {
+          return HORROR_CONFIG.idleRollMinMs +
+            Math.floor(Math.random() * (HORROR_CONFIG.idleRollMaxMs - HORROR_CONFIG.idleRollMinMs + 1));
+        }
+
+        function clearHorrorDimTimers() {
+          if (!horrorState.dimTimers.length) {
+            return;
+          }
+          for (const timer of horrorState.dimTimers) {
+            clearTimeout(timer);
+          }
+          horrorState.dimTimers = [];
+        }
+
+        function queueHorrorDimTimer(fn, delayMs) {
+          const timer = setTimeout(fn, Math.max(0, Math.floor(delayMs)));
+          horrorState.dimTimers.push(timer);
+          return timer;
+        }
+
+        function positionHorrorVignetteToImageBounds() {
+          if (!horrorVignetteEl) {
+            return;
+          }
+          // The scene art uses centered background images at ~50% width; we constrain
+          // fluorescent flicker to that visual image region instead of the whole UI.
+          horrorVignetteEl.style.left = '25%';
+          horrorVignetteEl.style.top = '25%';
+          horrorVignetteEl.style.width = '50%';
+          horrorVignetteEl.style.height = '50%';
+        }
+
+        function playHorrorDimFlicker(totalMs) {
+          if (!horrorVignetteEl) {
+            return 0;
+          }
+          clearHorrorDimTimers();
+          positionHorrorVignetteToImageBounds();
+          horrorVignetteEl.classList.add('is-flickering');
+          horrorVignetteEl.style.opacity = '0';
+
+          let t = 0;
+          const burstCount = randomIntInclusive(3, 6);
+          for (let burst = 0; burst < burstCount; burst++) {
+            const attempts = randomIntInclusive(2, 4);
+            for (let step = 0; step < attempts; step++) {
+              t += randomIntInclusive(55, 130);
+              const rampBase = 0.12 + ((step + 1) / attempts) * (0.42 + (Math.random() * 0.18));
+              const rampOpacity = Math.min(0.78, rampBase);
+              queueHorrorDimTimer(() => {
+                horrorVignetteEl.style.opacity = String(rampOpacity);
+              }, t);
+            }
+            t += randomIntInclusive(18, 55);
+            queueHorrorDimTimer(() => {
+              horrorVignetteEl.style.opacity = '1';
+            }, t);
+            t += randomIntInclusive(26, 80);
+            queueHorrorDimTimer(() => {
+              horrorVignetteEl.style.opacity = '0';
+            }, t);
+            if (burst < (burstCount - 1)) {
+              t += randomIntInclusive(90, 260);
+            }
+          }
+
+          const endAt = Math.max(t, totalMs);
+          queueHorrorDimTimer(() => {
+            horrorVignetteEl.style.opacity = '0';
+            horrorVignetteEl.classList.remove('is-flickering');
+            clearHorrorDimTimers();
+          }, endAt + 20);
+
+          return endAt;
+        }
+
+        function isHorrorSuppressed() {
+          if (!splashHidden) {
+            return true;
+          }
+          if (!commandSheetEl.hidden || !saveLoadSheetEl.hidden || !mapSheetEl.hidden || !creditsSheetEl.hidden || !confirmSheetEl.hidden) {
+            return true;
+          }
+          if (!settingsSheetEl.hidden) {
+            return true;
+          }
+          if (bloodSplatterEl.classList.contains('is-visible')) {
+            return true;
+          }
+          if (String(ui.inputEl.value || '').trim().length > 0) {
+            return true;
+          }
+          return false;
+        }
+
+        function clearHorrorTimers() {
+          if (horrorState.idleRollTimer) {
+            clearTimeout(horrorState.idleRollTimer);
+            horrorState.idleRollTimer = 0;
+          }
+          if (horrorState.roomEntryTimer) {
+            clearTimeout(horrorState.roomEntryTimer);
+            horrorState.roomEntryTimer = 0;
+          }
+          if (horrorState.activeReleaseTimer) {
+            clearTimeout(horrorState.activeReleaseTimer);
+            horrorState.activeReleaseTimer = 0;
+          }
+          clearHorrorDimTimers();
+        }
+
+        function releaseHorrorEffect(effectName) {
+          if (horrorState.activeEffect !== effectName) {
+            return;
+          }
+          horrorState.activeEffect = '';
+          if (horrorState.activeReleaseTimer) {
+            clearTimeout(horrorState.activeReleaseTimer);
+            horrorState.activeReleaseTimer = 0;
+          }
+        }
+
+        function acquireHorrorEffect(effectName, minDurationMs) {
+          if (!horrorState.enabled || horrorState.activeEffect) {
+            return false;
+          }
+          if (isHorrorSuppressed()) {
+            return false;
+          }
+          horrorState.activeEffect = effectName;
+          const durationMs = Math.max(40, Number(minDurationMs) || 40);
+          if (horrorState.activeReleaseTimer) {
+            clearTimeout(horrorState.activeReleaseTimer);
+          }
+          horrorState.activeReleaseTimer = setTimeout(() => {
+            releaseHorrorEffect(effectName);
+          }, durationMs + 40);
+          return true;
+        }
+
+        function isHorrorCooldownReady(effectName, cooldownMs) {
+          const now = Date.now();
+          const previous = horrorState.lastAt[effectName] || 0;
+          return (now - previous) >= cooldownMs;
+        }
+
+        function markHorrorEffectFired(effectName) {
+          horrorState.lastAt[effectName] = Date.now();
+          if (horrorState.counts[effectName] !== undefined) {
+            horrorState.counts[effectName] += 1;
+          }
+        }
+
+        function scheduleHorrorIdleRoll() {
+          if (!horrorState.enabled) {
+            return;
+          }
+          if (horrorState.idleRollTimer) {
+            clearTimeout(horrorState.idleRollTimer);
+          }
+          horrorState.idleRollTimer = setTimeout(() => {
+            horrorState.idleRollTimer = 0;
+            runHorrorIdleRoll();
+          }, randomIdleRollDelayMs());
+        }
+
+        function triggerHorrorRuneFlicker(force) {
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('runes', HORROR_CONFIG.cooldownRunesMs)) {
+            return false;
+          }
+          const eligibleLines = Array.from(ui.outputEl.querySelectorAll('.line'))
+            .filter(line => {
+              if (line.classList.contains('system') || line.classList.contains('error')) {
+                return false;
+              }
+              const text = String(line.textContent || '');
+              return text.trim().length > 0 && /[A-Za-z]/.test(text);
+            });
+          if (eligibleLines.length === 0) {
+            return false;
+          }
+          const focusPool = eligibleLines.slice(Math.max(0, eligibleLines.length - 6));
+          const line = focusPool[Math.floor(Math.random() * focusPool.length)];
+          const originalText = String(line.textContent || '');
+          if (!originalText.trim()) {
+            return false;
+          }
+          const durationMs = randomIntInclusive(HORROR_CONFIG.durationRunesMinMs, HORROR_CONFIG.durationRunesMaxMs);
+          if (!acquireHorrorEffect('runes', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('runes');
+          line.classList.add('horror-rune-flicker');
+          setTimeout(() => {
+            line.textContent = originalText;
+            line.classList.remove('horror-rune-flicker');
+            releaseHorrorEffect('runes');
+          }, durationMs);
+          return true;
+        }
+
+        function triggerHorrorArtMicroJump(layerEl, force) {
+          const layer = layerEl || sceneLayers[activeSceneIndex];
+          if (!layer) {
+            return false;
+          }
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('art', HORROR_CONFIG.cooldownArtMs)) {
+            return false;
+          }
+          const durationMs = randomIntInclusive(HORROR_CONFIG.durationArtJumpMinMs, HORROR_CONFIG.durationArtJumpMaxMs);
+          if (!acquireHorrorEffect('art', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('art');
+          layer.classList.add('scene-layer-horror-jump');
+          setTimeout(() => {
+            layer.classList.remove('scene-layer-horror-jump');
+            releaseHorrorEffect('art');
+          }, durationMs);
+          return true;
+        }
+
+        function triggerHorrorUiGlyphSwap(force) {
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('ui', HORROR_CONFIG.cooldownUiMs)) {
+            return false;
+          }
+          if (actionIconButtons.length === 0 || HORROR_GLYPH_ART.length === 0) {
+            return false;
+          }
+          const button = actionIconButtons[Math.floor(Math.random() * actionIconButtons.length)];
+          const span = button.querySelector('.icon-etch');
+          if (!span) {
+            return false;
+          }
+          const glyphHoldMs = randomIntInclusive(HORROR_CONFIG.durationUiSwapMinMs, HORROR_CONFIG.durationUiSwapMaxMs);
+          const transitionMs = HORROR_CONFIG.durationUiSwapTransitionMs;
+          const durationMs = glyphHoldMs + transitionMs * 2;
+          if (!acquireHorrorEffect('ui', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('ui');
+          const originalClass = span.className;
+          const originalHtml = span.innerHTML;
+          const glyphArt = HORROR_GLYPH_ART[Math.floor(Math.random() * HORROR_GLYPH_ART.length)];
+          const glyphHtml = '<img class="horror-glyph-icon" src="' + glyphArt + '" alt="" />';
+          span.className = 'icon-etch icon-etch-glyph icon-glyph-morph is-morphing-in';
+          span.innerHTML =
+            '<span class="glyph-morph-layer glyph-morph-normal">' + originalHtml + '</span>' +
+            '<span class="glyph-morph-layer glyph-morph-glyph">' + glyphHtml + '</span>' +
+            '<span class="glyph-morph-noise" aria-hidden="true"></span>';
+          setTimeout(() => {
+            span.className = 'icon-etch icon-etch-glyph';
+            span.innerHTML = glyphHtml;
+          }, transitionMs);
+          setTimeout(() => {
+            span.className = 'icon-etch icon-etch-glyph icon-glyph-morph is-morphing-out';
+            span.innerHTML =
+              '<span class="glyph-morph-layer glyph-morph-glyph">' + glyphHtml + '</span>' +
+              '<span class="glyph-morph-layer glyph-morph-normal">' + originalHtml + '</span>' +
+              '<span class="glyph-morph-noise" aria-hidden="true"></span>';
+          }, transitionMs + glyphHoldMs);
+          setTimeout(() => {
+            span.className = originalClass;
+            span.innerHTML = originalHtml;
+            releaseHorrorEffect('ui');
+          }, durationMs);
+          return true;
+        }
+
+        function triggerHorrorDimPulse(force) {
+          const shouldForce = !!force;
+          if (!shouldForce && !isHorrorCooldownReady('dim', HORROR_CONFIG.cooldownDimMs)) {
+            return false;
+          }
+          if (!horrorVignetteEl) {
+            return false;
+          }
+          const durationMs = randomIntInclusive(HORROR_CONFIG.durationDimMinMs, HORROR_CONFIG.durationDimMaxMs);
+          if (!acquireHorrorEffect('dim', durationMs)) {
+            return false;
+          }
+          markHorrorEffectFired('dim');
+          const actualDurationMs = playHorrorDimFlicker(durationMs);
+          setTimeout(() => {
+            releaseHorrorEffect('dim');
+          }, Math.max(durationMs, actualDurationMs));
+          return true;
+        }
+
+        function runHorrorIdleRoll() {
+          if (!horrorState.enabled) {
+            return;
+          }
+          if (!isHorrorSuppressed() && !horrorState.activeEffect) {
+            const uiRoll = Math.random();
+            if (uiRoll < HORROR_CONFIG.chanceIdleUiGlyphSwap) {
+              triggerHorrorUiGlyphSwap(false);
+            } else {
+              const dimRoll = Math.random();
+              if (dimRoll < HORROR_CONFIG.chanceIdleDimPulse) {
+                triggerHorrorDimPulse(false);
+              }
+            }
+          }
+          scheduleHorrorIdleRoll();
+        }
+
+        function scheduleRoomEntryHorror(layerEl) {
+          if (!horrorState.enabled) {
+            return;
+          }
+          if (horrorState.roomEntryTimer) {
+            clearTimeout(horrorState.roomEntryTimer);
+            horrorState.roomEntryTimer = 0;
+          }
+          horrorState.roomEntryTimer = setTimeout(() => {
+            horrorState.roomEntryTimer = 0;
+            if (isHorrorSuppressed() || horrorState.activeEffect) {
+              return;
+            }
+            const runeRoll = Math.random();
+            if (runeRoll < HORROR_CONFIG.chanceRoomRunes) {
+              triggerHorrorRuneFlicker(false);
+              return;
+            }
+            const artRoll = Math.random();
+            if (artRoll < HORROR_CONFIG.chanceRoomArtJump) {
+              triggerHorrorArtMicroJump(layerEl, false);
+            }
+          }, HORROR_CONFIG.roomEntryDelayMs);
+        }
+
+        function setHorrorEffectState(state) {
+          const next = state || {};
+          const action = String(next.action || '').toLowerCase();
+          if (action === 'set-enabled') {
+            horrorState.enabled = !!next.enabled;
+            if (!horrorState.enabled) {
+              clearHorrorTimers();
+              if (horrorVignetteEl) {
+                horrorVignetteEl.classList.remove('is-flickering');
+                horrorVignetteEl.style.opacity = '0';
+              }
+              horrorState.activeEffect = '';
+              return { enabled: horrorState.enabled };
+            }
+            if (splashHidden) {
+              scheduleHorrorIdleRoll();
+            }
+            return { enabled: horrorState.enabled };
+          }
+          if (action === 'force') {
+            const effect = String(next.effect || '').toLowerCase();
+            let applied = false;
+            if (effect === 'runes') {
+              applied = triggerHorrorRuneFlicker(true);
+            } else if (effect === 'art') {
+              applied = triggerHorrorArtMicroJump(sceneLayers[activeSceneIndex], true);
+            } else if (effect === 'ui') {
+              applied = triggerHorrorUiGlyphSwap(true);
+            } else if (effect === 'dim') {
+              applied = triggerHorrorDimPulse(true);
+            }
+            return {
+              applied,
+              enabled: horrorState.enabled,
+              activeEffect: horrorState.activeEffect,
+            };
+          }
+          if (action === 'stats') {
+            return {
+              enabled: horrorState.enabled,
+              activeEffect: horrorState.activeEffect,
+              countRunes: horrorState.counts.runes,
+              countArt: horrorState.counts.art,
+              countUi: horrorState.counts.ui,
+              countDim: horrorState.counts.dim,
+            };
+          }
+          return {
+            enabled: horrorState.enabled,
+            activeEffect: horrorState.activeEffect,
+          };
+        }
+
+        function setRoomScene(roomName, roomObjectId, options) {
+          currentSnowRoomId = Number.isFinite(roomObjectId) ? Number(roomObjectId) : 0;
+          applySnowSettings(experienceSettings);
+          const isDark = !!(options && options.isDark);
+          const art = isDark ? '' : resolveRoomArt(roomName, roomObjectId);
+          setSceneArt(art);
+        }
+
+        function setSceneLayerTransition(layer, durationMs) {
+          if (!layer) {
+            return;
+          }
+          if (!Number.isFinite(durationMs)) {
+            layer.style.transition = '';
+            return;
+          }
+          const ms = Math.max(0, Number(durationMs));
+          layer.style.transition = 'opacity ' + ms + 'ms ease, transform ' + ms + 'ms ease';
+        }
+
+        function setSceneArt(art, options) {
+          const opts = options || {};
+          if (art === currentRoomArt) {
+            return;
+          }
+          currentRoomArt = art;
+          const nextIndex = (activeSceneIndex + 1) % sceneLayers.length;
+          const nextLayer = sceneLayers[nextIndex];
+          const prevLayer = sceneLayers[activeSceneIndex];
+
+          if (!art) {
+            setSceneLayerTransition(prevLayer, opts.durationMs);
+            setSceneLayerTransition(nextLayer, opts.durationMs);
+            prevLayer.style.opacity = '0';
+            nextLayer.style.opacity = '0';
+            prevLayer.classList.remove('scene-layer-game-over');
+            nextLayer.classList.remove('scene-layer-game-over');
+            return;
+          }
+
+          const offsetX = randomSceneOffsetPercent();
+          const offsetY = randomSceneOffsetPercent();
+          setSceneLayerTransition(nextLayer, opts.durationMs);
+          setSceneLayerTransition(prevLayer, opts.durationMs);
+          nextLayer.style.backgroundImage = 'url("' + art + '")';
+          nextLayer.style.backgroundPosition = 'calc(50% + ' + offsetX + '%) calc(50% + ' + offsetY + '%)';
+          nextLayer.style.transform = 'scale(1.02)';
+          nextLayer.classList.toggle('scene-layer-game-over', !!opts.gameOver);
+          prevLayer.classList.remove('scene-layer-game-over');
+          nextLayer.style.opacity = '1';
+          prevLayer.style.opacity = '0';
+          activeSceneIndex = nextIndex;
+          scheduleRoomEntryHorror(nextLayer);
+        }
+
+        function fadeOutCurrentScene(durationMs) {
+          const ms = Number.isFinite(durationMs) ? Math.max(0, Number(durationMs)) : 2000;
+          if (gameOverSceneFadeTimer) {
+            clearTimeout(gameOverSceneFadeTimer);
+            gameOverSceneFadeTimer = 0;
+          }
+          if (!currentRoomArt) {
+            return Promise.resolve();
+          }
+          const layer = sceneLayers[activeSceneIndex];
+          setSceneLayerTransition(layer, ms);
+          layer.style.opacity = '0';
+          return new Promise(resolve => {
+            gameOverSceneFadeTimer = setTimeout(() => {
+              gameOverSceneFadeTimer = 0;
+              resolve();
+            }, ms);
+          });
+        }
+
+        function setGameOverScene() {
+          setSceneArt(GAME_OVER_ART, { durationMs: 2000, gameOver: true });
+        }
+
+        function setWinGameScene() {
+          setSceneArt(WIN_GAME_ART, { durationMs: 2000, gameOver: true });
+        }
+
+        function clearBloodTimers() {
+          if (bloodEffectTimer) {
+            clearTimeout(bloodEffectTimer);
+            bloodEffectTimer = 0;
+          }
+          if (bloodEffectHideTimer) {
+            clearTimeout(bloodEffectHideTimer);
+            bloodEffectHideTimer = 0;
+          }
+        }
+
+        function hideBloodSplatter() {
+          bloodSplatterEl.classList.remove('is-visible');
+        }
+
+        function pickBloodSplatterIndex() {
+          if (bloodEffectMode === 'fixed') {
+            return Math.max(1, Math.min(BLOOD_SPLATTER_ART.length, bloodEffectFixedIndex));
+          }
+          return Math.floor(Math.random() * BLOOD_SPLATTER_ART.length) + 1;
+        }
+
+        function scheduleNextBloodSplatter() {
+          if (!bloodEffectEnabled) {
+            return;
+          }
+          let nextDelayMs;
+          if (bloodEffectFirstDelayMs !== null && Number.isFinite(bloodEffectFirstDelayMs)) {
+            nextDelayMs = Math.max(0, Math.floor(bloodEffectFirstDelayMs));
+            bloodEffectFirstDelayMs = null;
+          } else {
+            nextDelayMs = 30000 + Math.floor(Math.random() * 45000);
+          }
+          bloodEffectTimer = setTimeout(() => {
+            showBloodSplatter();
+          }, nextDelayMs);
+        }
+
+        function appendBloodDebug(message) {
+          if (!window.gameController || !window.gameController.debugEnabled) {
+            return;
+          }
+          ui.appendOutput('[BloodDebug] ' + message, 'system');
+        }
+
+        function showBloodSplatter(forcedIndex, options) {
+          if (!bloodEffectEnabled) {
+            return;
+          }
+          const opts = options || {};
+          clearBloodTimers();
+          const selected = forcedIndex || pickBloodSplatterIndex();
+          const clampedIndex = Math.max(1, Math.min(BLOOD_SPLATTER_ART.length, selected));
+          const art = BLOOD_SPLATTER_ART[clampedIndex - 1];
+          const top = 2 + Math.random() * 96;
+          const rotation = (Math.random() * 44) - 22;
+          const left = 2 + Math.random() * 96;
+          const scale = 0.74 + Math.random() * 0.52;
+          let finalLeft = left;
+          let finalTop = top;
+          let corrected = false;
+          let correctionDirection = 'none';
+          let correctionShift = 0;
+          let layerSizeText = 'n/a';
+          let pictureRangeText = 'n/a';
+          let splatterSizeText = 'n/a';
+          let initialPlacementText = '[' + left.toFixed(2) + ',' + top.toFixed(2) + ']';
+
+          if (bloodSplatterEl.parentElement && scenePaneEl) {
+            const layerRect = bloodSplatterEl.parentElement.getBoundingClientRect();
+            const sceneRect = scenePaneEl.getBoundingClientRect();
+            layerSizeText = layerRect.width.toFixed(1) + 'x' + layerRect.height.toFixed(1);
+            if (layerRect.width > 0 && layerRect.height > 0) {
+              const sceneLeft = ((sceneRect.left - layerRect.left) / layerRect.width) * 100;
+              const sceneRight = ((sceneRect.right - layerRect.left) / layerRect.width) * 100;
+              const sceneTop = ((sceneRect.top - layerRect.top) / layerRect.height) * 100;
+              const sceneBottom = ((sceneRect.bottom - layerRect.top) / layerRect.height) * 100;
+
+              // The visible scene image is centered and covers ~50% of scene pane in each axis.
+              const sceneWidth = Math.max(0, sceneRight - sceneLeft);
+              const sceneHeight = Math.max(0, sceneBottom - sceneTop);
+              const pictureLeft = sceneLeft + (sceneWidth * 0.25);
+              const pictureRight = sceneLeft + (sceneWidth * 0.75);
+              const pictureTop = sceneTop + (sceneHeight * 0.25);
+              const pictureBottom = sceneTop + (sceneHeight * 0.75);
+              pictureRangeText =
+                '[' + pictureLeft.toFixed(2) + ',' + pictureRight.toFixed(2) + ',' +
+                pictureTop.toFixed(2) + ',' + pictureBottom.toFixed(2) + ']';
+
+              const baseWidthPx = Math.max(120, Math.min(layerRect.width * 0.26, 280));
+              const splatterWidthPx = baseWidthPx * scale;
+              // Approximate blood PNGs as roughly square for collision math.
+              const splatterHeightPx = splatterWidthPx;
+              const halfW = (splatterWidthPx / layerRect.width) * 50;
+              const halfH = (splatterHeightPx / layerRect.height) * 50;
+              splatterSizeText = '[' + (halfW * 2).toFixed(2) + ',' + (halfH * 2).toFixed(2) + ']';
+
+              const splatterLeft = finalLeft - halfW;
+              const splatterRight = finalLeft + halfW;
+              const splatterTop = finalTop - halfH;
+              const splatterBottom = finalTop + halfH;
+
+              const intersectsPicture =
+                splatterRight > pictureLeft &&
+                splatterLeft < pictureRight &&
+                splatterBottom > pictureTop &&
+                splatterTop < pictureBottom;
+
+              if (intersectsPicture) {
+                const maxOverlap = 0.25;
+                const candidates = [];
+
+                // Keep y, shift x to satisfy overlap constraint at left picture edge.
+                candidates.push({
+                  dir: 'left',
+                  x: pictureLeft - (halfW * (1 - maxOverlap)),
+                  y: finalTop,
+                });
+                // Keep y, shift x to satisfy overlap constraint at right picture edge.
+                candidates.push({
+                  dir: 'right',
+                  x: pictureRight + (halfW * (1 - maxOverlap)),
+                  y: finalTop,
+                });
+                // Keep x, shift y to satisfy overlap constraint at top picture edge.
+                candidates.push({
+                  dir: 'top',
+                  x: finalLeft,
+                  y: pictureTop - (halfH * (1 - maxOverlap)),
+                });
+                // Keep x, shift y to satisfy overlap constraint at bottom picture edge.
+                candidates.push({
+                  dir: 'bottom',
+                  x: finalLeft,
+                  y: pictureBottom + (halfH * (1 - maxOverlap)),
+                });
+
+                let best = null;
+                for (const candidate of candidates) {
+                  const clampedX = Math.max(2, Math.min(98, candidate.x));
+                  const clampedY = Math.max(2, Math.min(98, candidate.y));
+                  const dx = clampedX - finalLeft;
+                  const dy = clampedY - finalTop;
+                  const distance = Math.hypot(dx, dy);
+                  if (!best || distance < best.distance) {
+                    best = {
+                      dir: candidate.dir,
+                      x: clampedX,
+                      y: clampedY,
+                      distance,
+                    };
+                  }
+                }
+
+                if (best) {
+                  correctionDirection = best.dir;
+                  finalLeft = best.x;
+                  finalTop = best.y;
+                  correctionShift = best.distance;
+                }
+                corrected = true;
+              }
+
+              finalLeft = Math.max(2, Math.min(98, finalLeft));
+              finalTop = Math.max(2, Math.min(98, finalTop));
+            }
+          }
+          appendBloodDebug(
+            'area layer=' + layerSizeText +
+            ' picture[L,R,T,B]=' + pictureRangeText +
+            ' splatter[W,H]=' + splatterSizeText +
+            ' initial=' + initialPlacementText +
+            ' corrected=' + String(corrected) +
+            ' dir=' + correctionDirection +
+            ' shift=' + correctionShift.toFixed(2)
+          );
+          bloodSplatterEl.src = art;
+          bloodSplatterEl.style.top = finalTop.toFixed(2) + '%';
+          bloodSplatterEl.style.left = finalLeft.toFixed(2) + '%';
+          bloodSplatterEl.style.transform = 'translate(-50%, -50%) rotate(' + rotation.toFixed(2) + 'deg) scale(' + scale.toFixed(2) + ')';
+          appendBloodDebug(
+            'place art=' + clampedIndex +
+            ' top=' + finalTop.toFixed(2) +
+            ' left=' + finalLeft.toFixed(2) +
+            ' rot=' + rotation.toFixed(2) +
+            ' scale=' + scale.toFixed(2)
+          );
+          bloodSplatterEl.classList.add('is-visible');
+          bloodEffectHideTimer = setTimeout(() => {
+            hideBloodSplatter();
+            scheduleNextBloodSplatter();
+          }, 7000 + Math.floor(Math.random() * 5000));
+        }
+
+        function setBloodEffectState(state) {
+          const next = state || {};
+          bloodEffectEnabled = !!next.enabled;
+          if (next.mode === 'fixed' || next.mode === 'random') {
+            bloodEffectMode = next.mode;
+          }
+          if (Number.isFinite(next.index)) {
+            bloodEffectFixedIndex = Math.max(1, Math.min(BLOOD_SPLATTER_ART.length, Number(next.index)));
+          }
+          bloodEffectFirstDelayMs = Number.isFinite(next.firstDelayMs) ? Number(next.firstDelayMs) : null;
+          clearBloodTimers();
+          if (!bloodEffectEnabled) {
+            hideBloodSplatter();
+            return;
+          }
+          if (next.immediate) {
+            if (bloodEffectMode === 'fixed') {
+              showBloodSplatter(bloodEffectFixedIndex, { forceOverlap: true });
+            } else {
+              showBloodSplatter();
+            }
+            return;
+          }
+          scheduleNextBloodSplatter();
+        }
+
+        const controller = new window.GameIoController(ui, {
+          onSoundEvent: event => {
+            const soundEvent = event || {};
+            const effect = Number(soundEvent.resolvedEffect || soundEvent.effect || 0);
+            if (effect !== 2) {
+              return;
+            }
+            if (String(soundEvent.soundClass || '').toLowerCase() === 'music') {
+              return;
+            }
+            stopSplashMusicWithFade({ resetToStart: true, markEnded: true });
+          },
+          onGameMusicPreferenceChanged: enabled => {
+            if (!enabled) {
+              stopSplashMusicWithFade({ resetToStart: true, markEnded: false });
+              return;
+            }
+            if (typeof splashMusic.currentTime === 'number') {
+              splashMusic.currentTime = 0;
+            }
+            startSplashMusic();
+          },
+          onBeforeGameOverMusicStart: () => {
+            return Promise.all([
+              stopSplashMusicWithFade({
+                resetToStart: true,
+                markEnded: true,
+                durationMs: 2000,
+                onlyIfPlaying: true,
+              }),
+              fadeOutCurrentScene(2000),
+            ]);
+          },
+          onGameOver: () => {
+            setGameOverScene();
+          },
+          onBeforeWinGameMusicStart: () => {
+            return Promise.all([
+              stopSplashMusicWithFade({
+                resetToStart: true,
+                markEnded: true,
+                durationMs: 2000,
+                onlyIfPlaying: true,
+              }),
+              fadeOutCurrentScene(2000),
+            ]);
+          },
+          onWinGame: () => {
+            setWinGameScene();
+          },
+          onRoomChanged: (roomName, roomObjectId, options) => {
+            setRoomScene(roomName, roomObjectId, options);
+          },
+          onMapDiscoveryChanged: state => {
+            syncGameMapState(state);
+          },
+          isMapAvailable: () => !!experienceSettings.mapEnabled,
+          onBloodEffectCommand: state => {
+            setBloodEffectState(state);
+          },
+          onHorrorEffectCommand: state => {
+            return setHorrorEffectState(state);
+          },
+          onMapRequested: () => {
+            openMapSheet();
+          },
+          onCreditsRequested: () => {
+            openCreditsSheet();
+          },
+          onStoryQuit: () => {
+            returnToSplashAfterQuit();
+          },
+          onSaveLoadMenuRequested: payload => {
+            openSaveLoadSheet(payload);
+          },
+          onConfirmDestructiveAction: payload => {
+            return openConfirmSheet(payload);
+          },
+          onSaveSlotsChanged: payload => {
+            const info = payload || {};
+            if (info.action === 'save' && Number.isFinite(info.slot)) {
+              flashSavedSlot(info.slot);
+            }
+            if (!saveLoadSheetEl.hidden) {
+              controller.requestSaveLoadMenu(saveLoadSheetMode);
+            }
+          },
+          onClearExperienceRequested: async () => {
+            if (!settingsStorage || typeof settingsStorage.clearExperienceSettings !== 'function') {
+              return false;
+            }
+            await settingsStorage.clearExperienceSettings();
+            return true;
+          },
+        });
+        ui.appendOutput('Booting interpreter shell...', 'system');
+        ui.setStatus('Loading bundled story', 'Booting');
+
+        ui.focusInput();
+        window.appUi = ui;
+        window.gameController = controller;
+
+        window.addEventListener(
+          'keydown',
+          event => {
+            if (!controller || typeof controller.isViewPreviewActive !== 'function') {
+              return;
+            }
+            if (!controller.isViewPreviewActive()) {
+              return;
+            }
+            const ignored = new Set([
+              'Shift',
+              'Control',
+              'Alt',
+              'Meta',
+              'CapsLock',
+              'NumLock',
+              'ScrollLock',
+            ]);
+            if (ignored.has(String(event.key || ''))) {
+              return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof controller.acknowledgeViewPreview === 'function') {
+              controller.acknowledgeViewPreview();
+            }
+          },
+          true
+        );
+
+        function clampVolume(value, fallback) {
+          const numeric = Number(value);
+          if (!Number.isFinite(numeric)) {
+            return fallback;
+          }
+          return Math.max(0, Math.min(1, numeric));
+        }
+
+        function clampProfileLevel(value, fallback) {
+          const numeric = Number(value);
+          if (!Number.isFinite(numeric)) {
+            return fallback;
+          }
+          return Math.max(0, Math.min(EXPERIENCE_PROFILES.length - 1, Math.round(numeric)));
+        }
+
+        function clampSnowDensityMultiplier(value, fallback) {
+          const numeric = Number(value);
+          if (!Number.isFinite(numeric)) {
+            return fallback;
+          }
+          return Math.max(1, Math.min(10, numeric));
+        }
+
+        function normalizeMapMode(value) {
+          return String(value || '').toLowerCase() === 'inline' ? 'inline' : 'modal';
+        }
+
+        function clampInlineMapHeightRatio(value, fallback) {
+          const numeric = Number(value);
+          const base = Number.isFinite(Number(fallback)) ? Number(fallback) : 0.33;
+          if (!Number.isFinite(numeric)) {
+            return Math.max(0.18, Math.min(0.55, base));
+          }
+          return Math.max(0.18, Math.min(0.55, numeric));
+        }
+
+        function getProfile(level) {
+          const index = clampProfileLevel(level, EXPERIENCE_PROFILES.length - 1);
+          return EXPERIENCE_PROFILES[index];
+        }
+
+        function normalizeExperienceSettings(input) {
+          const fallback = getProfile(EXPERIENCE_PROFILES.length - 1);
+          const level = clampProfileLevel(input && input.level, fallback.level);
+          const profile = getProfile(level);
+          const source = input || {};
+          return {
+            level,
+            musicEnabled: typeof source.musicEnabled === 'boolean' ? source.musicEnabled : profile.musicEnabled,
+            extraSlotsEnabled: typeof source.extraSlotsEnabled === 'boolean' ? source.extraSlotsEnabled : profile.extraSlotsEnabled,
+            mapEnabled: typeof source.mapEnabled === 'boolean' ? source.mapEnabled : profile.mapEnabled,
+            mapMode: normalizeMapMode(source.mapMode || profile.mapMode),
+            inlineMapHeightRatio: clampInlineMapHeightRatio(source.inlineMapHeightRatio, 0.33),
+            horrorExtrasEnabled: typeof source.horrorExtrasEnabled === 'boolean' ? source.horrorExtrasEnabled : profile.horrorExtrasEnabled,
+            imagesEnabled: typeof source.imagesEnabled === 'boolean' ? source.imagesEnabled : profile.imagesEnabled,
+            snowEnabled: typeof source.snowEnabled === 'boolean' ? source.snowEnabled : profile.snowEnabled,
+            snowDensityMultiplier: clampSnowDensityMultiplier(source.snowDensityMultiplier, profile.snowDensityMultiplier),
+          };
+        }
+
+        function countProfileMatches(profile, settings) {
+          let count = 0;
+          if (!!profile.musicEnabled === !!settings.musicEnabled) count += 1;
+          if (!!profile.extraSlotsEnabled === !!settings.extraSlotsEnabled) count += 1;
+          if (!!profile.mapEnabled === !!settings.mapEnabled) count += 1;
+          if (!settings.mapEnabled || normalizeMapMode(profile.mapMode) === normalizeMapMode(settings.mapMode)) count += 1;
+          if (!!profile.horrorExtrasEnabled === !!settings.horrorExtrasEnabled) count += 1;
+          if (!!profile.imagesEnabled === !!settings.imagesEnabled) count += 1;
+          if (!!profile.snowEnabled === !!settings.snowEnabled) count += 1;
+          return count;
+        }
+
+        function inferBestProfileLevel(settings) {
+          let best = EXPERIENCE_PROFILES[0];
+          let bestCount = -1;
+          for (const profile of EXPERIENCE_PROFILES) {
+            const count = countProfileMatches(profile, settings);
+            if (count > bestCount || (count === bestCount && profile.level > best.level)) {
+              best = profile;
+              bestCount = count;
+            }
+          }
+          return best.level;
+        }
+
+        let experienceSettings = normalizeExperienceSettings(null);
+        let experienceSelectionRequired = false;
+        let settingsOnboardingMode = false;
+        let syncingExperienceUi = false;
+
+        function updateExperienceLevelLabel(settings) {
+          const normalized = normalizeExperienceSettings(settings);
+          const profile = getProfile(normalized.level);
+          const exact =
+            normalized.musicEnabled === profile.musicEnabled &&
+            normalized.extraSlotsEnabled === profile.extraSlotsEnabled &&
+            normalized.mapEnabled === profile.mapEnabled &&
+            normalized.mapMode === normalizeMapMode(profile.mapMode) &&
+            normalized.horrorExtrasEnabled === profile.horrorExtrasEnabled &&
+            normalized.imagesEnabled === profile.imagesEnabled &&
+            normalized.snowEnabled === profile.snowEnabled &&
+            normalized.snowDensityMultiplier === profile.snowDensityMultiplier;
+          experienceLevelLabelEl.textContent = exact ? 'Profile: ' + profile.label : 'Profile: Custom (' + profile.label + ' base)';
+        }
+
+        function syncExperienceControls(settings) {
+          const normalized = normalizeExperienceSettings(settings);
+          syncingExperienceUi = true;
+          experienceLevelEl.value = String(normalized.level);
+          experienceMusicEnabledEl.checked = !!normalized.musicEnabled;
+          experienceExtraSlotsEnabledEl.checked = !!normalized.extraSlotsEnabled;
+          experienceMapEnabledEl.checked = !!normalized.mapEnabled;
+          experienceMapModeEl.value = normalized.mapMode;
+          experienceMapModeEl.disabled = !normalized.mapEnabled;
+          experienceHorrorEnabledEl.checked = !!normalized.horrorExtrasEnabled;
+          experienceImagesEnabledEl.checked = !!normalized.imagesEnabled;
+          experienceSnowEnabledEl.checked = !!normalized.snowEnabled;
+          updateExperienceLevelLabel(normalized);
+          syncingExperienceUi = false;
+        }
+
+        function getEffectiveSnowDensityMultiplier(settings) {
+          if (OUTDOOR_SNOW_ROOM_IDS.has(currentSnowRoomId)) {
+            return OUTDOOR_SNOW_DENSITY_MULTIPLIERS_BY_LEVEL[settings.level] || settings.snowDensityMultiplier;
+          }
+          return settings.snowDensityMultiplier;
+        }
+
+        function getEffectiveSnowProfile() {
+          return OUTDOOR_SNOW_ROOM_IDS.has(currentSnowRoomId) ? OUTDOOR_SNOW_PROFILE : INDOOR_SNOW_PROFILE;
+        }
+
+        function applySnowSettings(settings) {
+          if (!ambientSnowLayer) {
+            return;
+          }
+          if (typeof ambientSnowLayer.setProfile === 'function') {
+            ambientSnowLayer.setProfile(getEffectiveSnowProfile());
+          }
+          ambientSnowLayer.setDensityMultiplier(getEffectiveSnowDensityMultiplier(settings));
+          ambientSnowLayer.setEnabled(settings.snowEnabled);
+        }
+
+        function isInlineMapActive(settings) {
+          const normalized = normalizeExperienceSettings(settings || experienceSettings);
+          return !!normalized.mapEnabled && normalized.mapMode === 'inline';
+        }
+
+        function applyInlineMapHeight(ratio) {
+          if (!terminalStackEl) {
+            return;
+          }
+          const normalizedRatio = clampInlineMapHeightRatio(ratio, 0.33);
+          terminalStackEl.style.setProperty('--inline-map-height', Math.round(normalizedRatio * 1000) / 10 + '%');
+          if (inlineMapRenderer && typeof inlineMapRenderer.draw === 'function') {
+            window.requestAnimationFrame(() => inlineMapRenderer.draw());
+          }
+          updateUiSnowMasks();
+        }
+
+        function syncInlineMapVisibility(settings) {
+          const active = isInlineMapActive(settings);
+          if (terminalStackEl) {
+            terminalStackEl.classList.toggle('map-inline', active);
+          }
+          if (inlineMapPanelEl) {
+            inlineMapPanelEl.hidden = !active;
+          }
+          if (inlineMapResizeEl) {
+            inlineMapResizeEl.hidden = !active;
+          }
+          if (!active) {
+            return;
+          }
+          applyInlineMapHeight(settings.inlineMapHeightRatio);
+          const renderer = ensureInlineMapRenderer();
+          if (renderer && typeof renderer.setDiscoveryState === 'function') {
+            renderer.setDiscoveryState(latestMapDiscoveryState);
+          }
+          if (renderer && typeof renderer.focusCurrentLocation === 'function') {
+            window.requestAnimationFrame(() => renderer.focusCurrentLocation());
+          }
+        }
+
+        function applyExperienceSettings(settings) {
+          const normalized = normalizeExperienceSettings(settings);
+          experienceSettings = normalized;
+          controller.setSaveSlotCount(normalized.extraSlotsEnabled ? 5 : 1);
+          if (typeof controller.setGameMusicEnabled === 'function') {
+            controller.setGameMusicEnabled(normalized.musicEnabled);
+          }
+          const mapButtonEl = document.getElementById('map-button');
+          if (mapButtonEl) {
+            mapButtonEl.hidden = !normalized.mapEnabled;
+          }
+          if (!normalized.mapEnabled && !mapSheetEl.hidden) {
+            closeMapSheet();
+          }
+          syncInlineMapVisibility(normalized);
+          setHorrorEffectState({ enabled: normalized.horrorExtrasEnabled });
+          if (!normalized.horrorExtrasEnabled) {
+            setBloodEffectState({ enabled: false });
+          } else if (splashHidden && !ambientBloodAutostarted) {
+            ambientBloodAutostarted = true;
+            setBloodEffectState({
+              enabled: true,
+              mode: 'random',
+              immediate: false,
+              firstDelayMs: 60000 + Math.floor(Math.random() * 30000),
+            });
+          }
+          shellEl.classList.toggle('images-disabled', !normalized.imagesEnabled);
+          applySnowSettings(normalized);
+          window.requestAnimationFrame(updateUiSnowMasks);
+          syncExperienceControls(normalized);
+        }
+
+        async function persistExperienceSettings() {
+          if (!settingsStorage || typeof settingsStorage.putExperienceSettings !== 'function') {
+            return;
+          }
+          try {
+            await settingsStorage.putExperienceSettings(experienceSettings);
+          } catch (error) {
+            ui.appendOutput('Experience settings could not be saved locally: ' + error.message, 'error');
+          }
+        }
+
+        async function loadExperienceSettings() {
+          if (!settingsStorage || typeof settingsStorage.getExperienceSettings !== 'function') {
+            applyExperienceSettings(normalizeExperienceSettings(null));
+            experienceSelectionRequired = true;
+            return;
+          }
+          try {
+            const saved = await settingsStorage.getExperienceSettings();
+            if (!saved) {
+              applyExperienceSettings(normalizeExperienceSettings(null));
+              experienceSelectionRequired = true;
+              return;
+            }
+            applyExperienceSettings(saved);
+            experienceSelectionRequired = false;
+          } catch (error) {
+            ui.appendOutput('Experience settings could not be loaded locally: ' + error.message, 'error');
+            applyExperienceSettings(normalizeExperienceSettings(null));
+            experienceSelectionRequired = true;
+          }
+        }
+
+        function updateVolumeSliders() {
+          musicVolumeEl.value = String(Math.round(controller.gameMusicVolume * 100));
+          sfxVolumeEl.value = String(Math.round(controller.sfxVolume * 100));
+        }
+
+        async function persistAudioSettings() {
+          if (!settingsStorage || typeof settingsStorage.putAudioSettings !== 'function') {
+            return;
+          }
+          try {
+            await settingsStorage.putAudioSettings({
+              gameMusicVolume: controller.gameMusicVolume,
+              sfxVolume: controller.sfxVolume,
+            });
+          } catch (error) {
+            ui.appendOutput('Audio settings could not be saved locally: ' + error.message, 'error');
+          }
+        }
+
+        async function loadAudioSettings() {
+          updateVolumeSliders();
+          if (!settingsStorage || typeof settingsStorage.getAudioSettings !== 'function') {
+            return;
+          }
+          try {
+            const saved = await settingsStorage.getAudioSettings();
+            if (!saved) {
+              return;
+            }
+            const musicVolume = clampVolume(saved.gameMusicVolume, controller.gameMusicVolume);
+            const sfxVolume = clampVolume(saved.sfxVolume, controller.sfxVolume);
+            controller.setGameMusicVolume(musicVolume);
+            controller.setSoundEffectsVolume(sfxVolume);
+            splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+            updateVolumeSliders();
+          } catch (error) {
+            ui.appendOutput('Audio settings could not be loaded locally: ' + error.message, 'error');
+          }
+        }
+
+        function positionSettingsSheet() {
+          const buttonRect = settingsButtonEl.getBoundingClientRect();
+          const shellRect = shellEl.getBoundingClientRect();
+          const margin = 5;
+          const panelWidth = Math.min(420, Math.max(280, shellRect.width - (margin * 2)));
+          let left = buttonRect.left + (buttonRect.width / 2) - (panelWidth / 2) - shellRect.left;
+          left = Math.max(margin, Math.min(left, shellRect.width - panelWidth - margin));
+          const top = Math.max(
+            margin,
+            Math.min(
+              buttonRect.bottom + 10 - shellRect.top,
+              shellRect.height - 260
+            )
+          );
+          settingsSheetEl.style.setProperty('--settings-left', Math.round(left) + 'px');
+          settingsSheetEl.style.setProperty('--settings-top', Math.round(top) + 'px');
+          settingsSheetEl.style.setProperty('--settings-width', Math.round(panelWidth) + 'px');
+          settingsSheetEl.style.setProperty(
+            '--settings-center-x',
+            Math.round((buttonRect.left + (buttonRect.width / 2)) - shellRect.left) + 'px'
+          );
+          settingsSheetEl.style.setProperty(
+            '--settings-center-y',
+            Math.round((buttonRect.top + (buttonRect.height / 2)) - shellRect.top) + 'px'
+          );
+        }
+
+        function setSettingsSheetMode(onboarding) {
+          settingsOnboardingMode = !!onboarding;
+          settingsSheetEl.classList.toggle('is-onboarding', settingsOnboardingMode);
+          experienceOnboardingCopyEl.hidden = !settingsOnboardingMode;
+          experienceOnboardingActionsEl.hidden = !settingsOnboardingMode;
+          audioSettingsGroupEl.hidden = settingsOnboardingMode;
+          audioAttributionEl.hidden = settingsOnboardingMode;
+          closeSettingsEl.hidden = settingsOnboardingMode;
+        }
+
+        function setSplashStatus(message, isError) {
+          splashStatusEl.textContent = message;
+          const isReadyPrompt = !isError && /^Press any key to /i.test(String(message || ''));
+          splashStatusEl.className = isError ? 'splash-status error' : isReadyPrompt ? 'splash-status ready' : 'splash-status';
+        }
+
+        let splashDismissReady = false;
+        let splashHidden = false;
+        let bundledStartupStarted = false;
+        let splashMusicStarted = false;
+        let splashMusicEnded = false;
+        let splashMusicFadeFrame = 0;
+        let splashMusicNeedsGesture = false;
+        splashMusic.addEventListener('ended', () => {
+          splashMusicEnded = true;
+          splashMusicNeedsGesture = false;
+        });
+
+        function registerSplashMusicGestureRetry() {
+          function retryStart() {
+            if (splashMusicEnded || !controller.gameMusicEnabled || !splashMusicNeedsGesture) {
+              return;
+            }
+            splashMusicNeedsGesture = false;
+            startSplashMusic();
+          }
+          window.addEventListener('pointerdown', retryStart, { once: true, capture: true });
+          window.addEventListener('keydown', retryStart, { once: true, capture: true });
+          window.addEventListener('touchstart', retryStart, { once: true, capture: true });
+        }
+
+        function startSplashMusic() {
+          if (splashMusicEnded || !controller.gameMusicEnabled) {
+            return;
+          }
+          cancelSplashMusicFade(true);
+          splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+          if (!splashMusic.paused) {
+            splashMusicStarted = true;
+            return;
+          }
+          const playResult = splashMusic.play();
+          if (playResult && typeof playResult.then === 'function') {
+            playResult
+              .then(() => {
+                splashMusicStarted = true;
+                splashMusicNeedsGesture = false;
+              })
+              .catch(() => {
+                splashMusicNeedsGesture = true;
+                registerSplashMusicGestureRetry();
+              });
+          } else {
+            splashMusicStarted = true;
+          }
+        }
+
+        function cancelSplashMusicFade(restoreVolume) {
+          if (!splashMusicFadeFrame) {
+            if (restoreVolume) {
+              splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+            }
+            return;
+          }
+          cancelAnimationFrame(splashMusicFadeFrame);
+          splashMusicFadeFrame = 0;
+          if (restoreVolume) {
+            splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+          }
+        }
+
+        function stopSplashMusicWithFade(options) {
+          const opts = options || {};
+          if (splashMusicEnded) {
+            return Promise.resolve();
+          }
+          if (opts.onlyIfPlaying && splashMusic.paused) {
+            return Promise.resolve();
+          }
+          cancelSplashMusicFade(false);
+          const resetToStart = opts.resetToStart !== false;
+          const markEnded = !!opts.markEnded;
+          const startVolume = splashMusic.volume;
+          const durationMs = Number.isFinite(opts.durationMs) ? Math.max(0, Number(opts.durationMs)) : 420;
+          const startAt = performance.now();
+
+          return new Promise(resolve => {
+            function finishFade() {
+              splashMusic.pause();
+              if (resetToStart && typeof splashMusic.currentTime === 'number') {
+                splashMusic.currentTime = 0;
+              }
+              splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+              splashMusicFadeFrame = 0;
+              splashMusicEnded = markEnded;
+              resolve();
+            }
+
+            if (durationMs <= 0 || startVolume <= 0) {
+              finishFade();
+              return;
+            }
+
+            function fadeFrame(now) {
+              const progress = Math.min(1, (now - startAt) / durationMs);
+              splashMusic.volume = startVolume * (1 - progress);
+              if (progress < 1) {
+                splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+                return;
+              }
+              finishFade();
+            }
+
+            splashMusicFadeFrame = requestAnimationFrame(fadeFrame);
+          });
+        }
+
+        function hideSplash() {
+          if (splashHidden) {
+            return;
+          }
+          splashHidden = true;
+          shellEl.classList.add('ready');
+          if (!ambientBloodAutostarted && experienceSettings.horrorExtrasEnabled) {
+            ambientBloodAutostarted = true;
+            setBloodEffectState({
+              enabled: true,
+              mode: 'random',
+              immediate: false,
+              firstDelayMs: 60000 + Math.floor(Math.random() * 30000),
+            });
+          }
+          scheduleHorrorIdleRoll();
+          window.removeEventListener('keydown', handleSplashDismiss);
+        }
+
+        function handleSplashDismiss(event) {
+          if (!splashDismissReady) {
+            return;
+          }
+          if (event.type === 'keydown' && event.key === 'Tab') {
+            return;
+          }
+          if (experienceSelectionRequired) {
+            splashDismissReady = false;
+            window.removeEventListener('keydown', handleSplashDismiss);
+            openSettingsSheet({ onboarding: true });
+            return;
+          }
+          hideSplash();
+          ui.focusInput();
+        }
+
+        function armSplashDismiss() {
+          if (splashDismissReady) {
+            return;
+          }
+          splashDismissReady = true;
+          if (experienceSelectionRequired) {
+            setSplashStatus('Press any key to choose experience', false);
+          } else {
+            setSplashStatus('Press any key to enter', false);
+          }
+          window.addEventListener('keydown', handleSplashDismiss);
+        }
+
+        async function loadBundledStoryAtStartup() {
+          if (bundledStartupStarted) {
+            return;
+          }
+          bundledStartupStarted = true;
+          setSplashStatus('Loading...', false);
+          startSplashMusic();
+          try {
+            await controller.loadBundledStory();
+            const remaining = Math.max(0, minimumSplashMs - (Date.now() - splashShownAt));
+            window.setTimeout(armSplashDismiss, remaining);
+          } catch (error) {
+            bundledStartupStarted = false;
+            const message = error && error.message ? error.message : 'Unknown load error.';
+            setSplashStatus('Load error: ' + message, true);
+            ui.appendOutput('Failed to load bundled story: ' + message, 'error');
+            ui.setStatus('Load failed', 'Error');
+          }
+        }
+
+        function returnToSplashAfterQuit() {
+          splashDismissReady = false;
+          splashHidden = false;
+          bundledStartupStarted = false;
+          shellEl.classList.remove('ready');
+
+          // Close open overlays so splash is the only active surface after quit.
+          commandSheetEl.hidden = true;
+          saveLoadSheetEl.hidden = true;
+          mapSheetEl.hidden = true;
+          creditsSheetEl.hidden = true;
+          confirmSheetEl.hidden = true;
+          if (!settingsOnboardingMode) {
+            settingsSheetEl.hidden = true;
+          }
+
+          clearBloodTimers();
+          hideBloodSplatter();
+          clearHorrorTimers();
+          if (horrorVignetteEl) {
+            horrorVignetteEl.classList.remove('is-flickering');
+            horrorVignetteEl.style.opacity = '0';
+          }
+
+          // Re-arm splash music for a fresh splash cycle.
+          splashMusicEnded = false;
+          splashMusicNeedsGesture = false;
+          cancelSplashMusicFade(true);
+          if (typeof splashMusic.currentTime === 'number') {
+            splashMusic.currentTime = 0;
+          }
+
+          setSplashStatus('Loading...', false);
+          loadBundledStoryAtStartup();
+        }
+        document.getElementById('save-slot').addEventListener('click', () => controller.requestSaveLoadMenu('save'));
+        document.getElementById('load-slot').addEventListener('click', () => controller.requestSaveLoadMenu('load'));
+        musicVolumeEl.addEventListener('input', () => {
+          const volume = Number(musicVolumeEl.value) / 100;
+          controller.setGameMusicVolume(volume);
+          splashMusic.volume = splashMusicBaseVolume * controller.gameMusicVolume;
+          persistAudioSettings();
+        });
+        sfxVolumeEl.addEventListener('input', () => {
+          const volume = Number(sfxVolumeEl.value) / 100;
+          controller.setSoundEffectsVolume(volume);
+          persistAudioSettings();
+        });
+
+        function openCommandSheet() {
+          commandSheetEl.hidden = false;
+        }
+
+        function closeCommandSheet() {
+          commandSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('commands-button').addEventListener('click', openCommandSheet);
+        document.getElementById('close-commands').addEventListener('click', closeCommandSheet);
+        commandSheetEl.addEventListener('click', event => {
+          if (event.target === commandSheetEl) {
+            closeCommandSheet();
+          }
+        });
+        commandSheetEl.addEventListener('click', event => {
+          const trigger = event.target.closest('[data-command]');
+          if (!trigger) {
+            return;
+          }
+          ui.setInputValue(trigger.dataset.command || '');
+          closeCommandSheet();
+        });
+
+        function formatSlotValue(value, fallback) {
+          if (value === null || value === undefined || value === '') {
+            return fallback;
+          }
+          return String(value);
+        }
+
+        function renderSaveLoadSlots(payload) {
+          const data = payload || { mode: 'save', current: null, slots: [] };
+          saveLoadSheetMode = data.mode === 'load' ? 'load' : 'save';
+          saveLoadTitleEl.textContent = saveLoadSheetMode === 'save' ? 'Save Slots' : 'Load Slots';
+          const current = data.current || {};
+          saveLoadSubtitleEl.textContent =
+            'Current: score ' +
+            formatSlotValue(Number.isFinite(current.score) ? current.score : '', '?') +
+            ', moves ' +
+            formatSlotValue(Number.isFinite(current.moves) ? current.moves : '', '?') +
+            '.';
+          saveLoadSlotListEl.innerHTML = '';
+          const slots = Array.isArray(data.slots) ? data.slots : [];
+          for (const slot of slots) {
+            if (slot.slot === 1) {
+              const divider = document.createElement('div');
+              divider.className = 'save-load-slot-divider';
+              saveLoadSlotListEl.appendChild(divider);
+            }
+            const showSavedFlash = lastSavedSlotFlash === slot.slot;
+            const row = document.createElement('div');
+            row.className = 'save-load-slot-row';
+            row.innerHTML =
+              '<button type="button" class="save-load-slot' +
+                (slot.slot === 0 ? ' save-load-slot-primary' : '') +
+                '" data-slot="' + slot.slot + '"' +
+                (slot.disabled ? ' disabled' : '') + '>' +
+                '<span class="save-load-slot-main">Slot ' + slot.slot + (slot.slot === 0 ? ' <span class="save-load-slot-badge">Story save/restore</span>' : '') + '</span>' +
+                '<span class="save-load-slot-meta">' +
+                  (slot.occupied
+                    ? ('loc ' + formatSlotValue(slot.roomName, '?') +
+                      ' | score ' + formatSlotValue(Number.isFinite(slot.score) ? slot.score : '', '?') +
+                      ' | moves ' + formatSlotValue(Number.isFinite(slot.moves) ? slot.moves : '', '?') +
+                      ' | time ' + formatSlotValue(slot.timeText, '?'))
+                    : 'Empty slot') +
+                '</span>' +
+                (slot.destructive ? '<span class="save-load-slot-warning">Destructive action</span>' : '') +
+                (showSavedFlash
+                  ? '<span class="save-load-slot-savecheck" title="Saved"><svg class="slot-icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"></path></svg></span>'
+                  : '') +
+              '</button>' +
+              '<div class="save-load-slot-tools">' +
+                '<button type="button" class="save-load-slot-tool save-load-slot-tool-icon" data-slot-action="export" data-slot="' + slot.slot + '"' + (!slot.occupied ? ' disabled' : '') + ' title="Export slot" aria-label="Export slot">' +
+                  '<svg class="slot-icon-arrow" viewBox="0 0 24 24" aria-hidden="true">' +
+                    '<path d="M12 3v12"></path>' +
+                    '<path d="M8 7l4-4 4 4"></path>' +
+                    '<path d="M4 15v5h16v-5"></path>' +
+                  '</svg>' +
+                '</button>' +
+                '<button type="button" class="save-load-slot-tool save-load-slot-tool-icon" data-slot-action="import" data-slot="' + slot.slot + '" title="Import into slot" aria-label="Import into slot">' +
+                  '<svg class="slot-icon-arrow" viewBox="0 0 24 24" aria-hidden="true">' +
+                    '<path d="M12 21V9"></path>' +
+                    '<path d="M8 17l4 4 4-4"></path>' +
+                    '<path d="M4 9V4h16v5"></path>' +
+                  '</svg>' +
+                '</button>' +
+                '<button type="button" class="save-load-slot-tool save-load-slot-tool-danger" data-slot-action="delete" data-slot="' + slot.slot + '"' + (!slot.occupied ? ' disabled' : '') + ' title="Delete slot" aria-label="Delete slot">' +
+                  '<svg class="slot-icon-trash" viewBox="0 0 24 24" aria-hidden="true">' +
+                    '<path d="M4 7h16"></path>' +
+                    '<path d="M9 7V5h6v2"></path>' +
+                    '<rect x="7" y="7" width="10" height="12" rx="1.5"></rect>' +
+                    '<path d="M10 10v6"></path>' +
+                    '<path d="M14 10v6"></path>' +
+                  '</svg>' +
+                '</button>' +
+              '</div>';
+            saveLoadSlotListEl.appendChild(row);
+          }
+        }
+
+        function flashSavedSlot(slot) {
+          lastSavedSlotFlash = Number(slot);
+          if (lastSavedSlotFlashTimer) {
+            clearTimeout(lastSavedSlotFlashTimer);
+          }
+          lastSavedSlotFlashTimer = setTimeout(() => {
+            lastSavedSlotFlash = null;
+            lastSavedSlotFlashTimer = 0;
+            if (!saveLoadSheetEl.hidden) {
+              controller.requestSaveLoadMenu(saveLoadSheetMode);
+            }
+          }, 2500);
+        }
+
+        function openSaveLoadSheet(payload) {
+          renderSaveLoadSlots(payload);
+          saveLoadSheetEl.hidden = false;
+        }
+
+        function closeSaveLoadSheet() {
+          saveLoadSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('close-save-load').addEventListener('click', closeSaveLoadSheet);
+        saveLoadSheetEl.addEventListener('click', async event => {
+          if (event.target === saveLoadSheetEl) {
+            closeSaveLoadSheet();
+            return;
+          }
+          const toolButton = event.target.closest('[data-slot-action]');
+          if (toolButton && !toolButton.disabled) {
+            const slot = Number(toolButton.dataset.slot);
+            const action = String(toolButton.dataset.slotAction || '');
+            if (Number.isFinite(slot) && slot >= 0 && action) {
+              await controller.executeSlotToolAction(action, slot);
+            }
+            return;
+          }
+          const slotButton = event.target.closest('.save-load-slot');
+          if (!slotButton || slotButton.disabled) {
+            return;
+          }
+          const slot = Number(slotButton.dataset.slot);
+          if (!Number.isFinite(slot) || slot < 0) {
+            return;
+          }
+          await controller.executeSaveLoadAction(saveLoadSheetMode, slot);
+          closeSaveLoadSheet();
+        });
+
+        function openSettingsSheet(options) {
+          const onboarding = !!(options && options.onboarding);
+          setSettingsSheetMode(onboarding);
+          if (!onboarding) {
+            positionSettingsSheet();
+          }
+          settingsSheetEl.hidden = false;
+        }
+
+        function closeSettingsSheet() {
+          if (settingsOnboardingMode) {
+            return;
+          }
+          settingsSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        settingsButtonEl.addEventListener('click', () => openSettingsSheet({ onboarding: false }));
+        closeSettingsEl.addEventListener('click', closeSettingsSheet);
+        settingsSheetEl.addEventListener('click', event => {
+          if (event.target === settingsSheetEl && !settingsOnboardingMode) {
+            closeSettingsSheet();
+          }
+        });
+        experienceLevelEl.addEventListener('input', () => {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const profile = getProfile(Number(experienceLevelEl.value));
+          applyExperienceSettings({
+            ...experienceSettings,
+            ...profile,
+            snowDensityMultiplier: profile.snowDensityMultiplier,
+          });
+          persistExperienceSettings();
+        });
+        function handleExperienceToggleChange() {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const next = normalizeExperienceSettings({
+            level: Number(experienceLevelEl.value),
+            musicEnabled: !!experienceMusicEnabledEl.checked,
+            extraSlotsEnabled: !!experienceExtraSlotsEnabledEl.checked,
+            mapEnabled: !!experienceMapEnabledEl.checked,
+            mapMode: normalizeMapMode(experienceMapModeEl.value),
+            inlineMapHeightRatio: experienceSettings.inlineMapHeightRatio,
+            horrorExtrasEnabled: !!experienceHorrorEnabledEl.checked,
+            imagesEnabled: !!experienceImagesEnabledEl.checked,
+            snowEnabled: experienceSettings.snowEnabled,
+            snowDensityMultiplier: experienceSettings.snowDensityMultiplier,
+          });
+          next.level = inferBestProfileLevel(next);
+          next.snowDensityMultiplier = getProfile(next.level).snowDensityMultiplier;
+          applyExperienceSettings(next);
+          persistExperienceSettings();
+        }
+
+        function handleMapModeChange() {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const next = normalizeExperienceSettings({
+            ...experienceSettings,
+            mapMode: normalizeMapMode(experienceMapModeEl.value),
+          });
+          next.level = inferBestProfileLevel(next);
+          applyExperienceSettings(next);
+          persistExperienceSettings();
+        }
+
+        function handleSnowToggleChange() {
+          if (syncingExperienceUi) {
+            return;
+          }
+          const next = normalizeExperienceSettings({
+            ...experienceSettings,
+            snowEnabled: !!experienceSnowEnabledEl.checked,
+          });
+          next.level = inferBestProfileLevel(next);
+          next.snowDensityMultiplier = getProfile(next.level).snowDensityMultiplier;
+          experienceSettings = next;
+          applySnowSettings(next);
+          syncExperienceControls(next);
+          persistExperienceSettings();
+        }
+
+        experienceMusicEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceExtraSlotsEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceMapEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceMapModeEl.addEventListener('change', handleMapModeChange);
+        experienceHorrorEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceImagesEnabledEl.addEventListener('change', handleExperienceToggleChange);
+        experienceSnowEnabledEl.addEventListener('change', handleSnowToggleChange);
+        experienceContinueEl.addEventListener('click', async () => {
+          experienceSelectionRequired = false;
+          await persistExperienceSettings();
+          settingsSheetEl.hidden = true;
+          setSettingsSheetMode(false);
+          loadBundledStoryAtStartup();
+        });
+        window.addEventListener('resize', () => {
+          if (ambientSnowLayer) {
+            ambientSnowLayer.resize();
+          }
+          updateUiSnowMasks();
+          if (!settingsSheetEl.hidden) {
+            if (!settingsOnboardingMode) {
+              positionSettingsSheet();
+            }
+          }
+          if (horrorVignetteEl && horrorVignetteEl.classList.contains('is-flickering')) {
+            positionHorrorVignetteToImageBounds();
+          }
+          if (isInlineMapActive(experienceSettings)) {
+            applyInlineMapHeight(experienceSettings.inlineMapHeightRatio);
+          }
+        });
+
+        function ensureGameMapRenderer() {
+          if (gameMapRenderer || !gameMapSvgEl || !window.LhMapRenderer) {
+            return gameMapRenderer;
+          }
+          gameMapRenderer = window.LhMapRenderer.create({
+            mode: 'ingame',
+            svg: gameMapSvgEl,
+            data: window.LhMapData,
+            mapSnowLayer: window.MapSnowLayer,
+            floorSelect: gameMapFloorFilterEl,
+            legendParts: { main: true, tile: true },
+            discoveryState: latestMapDiscoveryState,
+          });
+          return gameMapRenderer;
+        }
+
+        function ensureInlineMapRenderer() {
+          if (inlineMapRenderer || !inlineMapSvgEl || !window.LhMapRenderer) {
+            return inlineMapRenderer;
+          }
+          inlineMapRenderer = window.LhMapRenderer.create({
+            mode: 'ingame',
+            svg: inlineMapSvgEl,
+            data: window.LhMapData,
+            mapSnowLayer: window.MapSnowLayer,
+            legendParts: { main: false, tile: false },
+            discoveryState: latestMapDiscoveryState,
+          });
+          return inlineMapRenderer;
+        }
+
+        function syncGameMapState(state) {
+          latestMapDiscoveryState = state || null;
+          if (gameMapRenderer && typeof gameMapRenderer.setDiscoveryState === 'function') {
+            gameMapRenderer.setDiscoveryState(latestMapDiscoveryState);
+          }
+          if (inlineMapRenderer && typeof inlineMapRenderer.setDiscoveryState === 'function') {
+            inlineMapRenderer.setDiscoveryState(latestMapDiscoveryState);
+          } else if (isInlineMapActive(experienceSettings)) {
+            const renderer = ensureInlineMapRenderer();
+            if (renderer && typeof renderer.setDiscoveryState === 'function') {
+              renderer.setDiscoveryState(latestMapDiscoveryState);
+            }
+          }
+        }
+
+        function computeInlineMapResizeBounds() {
+          const stackRect = terminalStackEl ? terminalStackEl.getBoundingClientRect() : { height: 0 };
+          const totalHeight = Number(stackRect.height) || 0;
+          const minPx = 120;
+          const maxPx = Math.max(minPx, Math.min(totalHeight * 0.55, totalHeight - 220));
+          return { totalHeight, minPx, maxPx };
+        }
+
+        function setInlineMapHeightFromClientY(clientY, persist) {
+          if (!inlineMapResizeState || !terminalStackEl) {
+            return;
+          }
+          const bounds = computeInlineMapResizeBounds();
+          if (bounds.totalHeight <= 0) {
+            return;
+          }
+          const delta = Number(clientY) - inlineMapResizeState.startY;
+          const nextPx = Math.max(bounds.minPx, Math.min(bounds.maxPx, inlineMapResizeState.startHeightPx + delta));
+          const nextRatio = clampInlineMapHeightRatio(nextPx / bounds.totalHeight, 0.33);
+          experienceSettings = normalizeExperienceSettings({
+            ...experienceSettings,
+            inlineMapHeightRatio: nextRatio,
+          });
+          applyInlineMapHeight(nextRatio);
+          if (persist) {
+            persistExperienceSettings();
+          }
+        }
+
+        function beginInlineMapResize(event) {
+          if (!isInlineMapActive(experienceSettings) || !inlineMapPanelEl) {
+            return;
+          }
+          const bounds = computeInlineMapResizeBounds();
+          if (bounds.totalHeight <= 0) {
+            return;
+          }
+          event.preventDefault();
+          const panelRect = inlineMapPanelEl.getBoundingClientRect();
+          inlineMapResizeState = {
+            startY: Number(event.clientY),
+            startHeightPx: Math.max(bounds.minPx, Math.min(bounds.maxPx, panelRect.height || bounds.totalHeight * experienceSettings.inlineMapHeightRatio)),
+          };
+          document.body.classList.add('is-resizing-inline-map');
+          window.addEventListener('pointermove', handleInlineMapResizeMove);
+          window.addEventListener('pointerup', endInlineMapResize);
+          window.addEventListener('pointercancel', endInlineMapResize);
+        }
+
+        function handleInlineMapResizeMove(event) {
+          setInlineMapHeightFromClientY(event.clientY, false);
+        }
+
+        function endInlineMapResize(event) {
+          if (event && Number.isFinite(Number(event.clientY))) {
+            setInlineMapHeightFromClientY(event.clientY, true);
+          } else {
+            persistExperienceSettings();
+          }
+          inlineMapResizeState = null;
+          document.body.classList.remove('is-resizing-inline-map');
+          window.removeEventListener('pointermove', handleInlineMapResizeMove);
+          window.removeEventListener('pointerup', endInlineMapResize);
+          window.removeEventListener('pointercancel', endInlineMapResize);
+        }
+
+        function resetInlineMapHeight() {
+          experienceSettings = normalizeExperienceSettings({
+            ...experienceSettings,
+            inlineMapHeightRatio: 0.33,
+          });
+          applyInlineMapHeight(experienceSettings.inlineMapHeightRatio);
+          persistExperienceSettings();
+        }
+
+        function openMapSheet() {
+          mapSheetEl.hidden = false;
+          const renderer = ensureGameMapRenderer();
+          if (renderer && typeof renderer.setDiscoveryState === 'function') {
+            renderer.setDiscoveryState(latestMapDiscoveryState);
+          }
+          if (renderer && typeof renderer.focusCurrentLocation === 'function') {
+            renderer.focusCurrentLocation();
+          }
+        }
+
+        function closeMapSheet() {
+          mapSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('map-button').addEventListener('click', openMapSheet);
+        document.getElementById('close-map').addEventListener('click', closeMapSheet);
+        if (inlineMapResizeEl) {
+          inlineMapResizeEl.addEventListener('pointerdown', beginInlineMapResize);
+          inlineMapResizeEl.addEventListener('dblclick', event => {
+            event.preventDefault();
+            resetInlineMapHeight();
+          });
+        }
+        mapSheetEl.addEventListener('click', event => {
+          if (event.target === mapSheetEl) {
+            closeMapSheet();
+          }
+        });
+
+        function openCreditsSheet() {
+          creditsSheetEl.hidden = false;
+        }
+
+        function closeCreditsSheet() {
+          creditsSheetEl.hidden = true;
+          ui.focusInput();
+        }
+
+        document.getElementById('credits-button').addEventListener('click', openCreditsSheet);
+        document.getElementById('close-credits').addEventListener('click', closeCreditsSheet);
+        creditsSheetEl.addEventListener('click', event => {
+          if (event.target === creditsSheetEl) {
+            closeCreditsSheet();
+          }
+        });
+
+        function resolveConfirmSheet(value) {
+          if (!confirmResolver) {
+            return;
+          }
+          const resolve = confirmResolver;
+          confirmResolver = null;
+          confirmSheetEl.hidden = true;
+          resolve(!!value);
+        }
+
+        function openConfirmSheet(payload) {
+          const info = payload || {};
+          if (confirmResolver) {
+            resolveConfirmSheet(false);
+          }
+          confirmMessageEl.textContent = info.message || 'This action may overwrite better progress. Continue?';
+          confirmSheetEl.hidden = false;
+          return new Promise(resolve => {
+            confirmResolver = resolve;
+          });
+        }
+
+        document.getElementById('confirm-cancel').addEventListener('click', () => {
+          resolveConfirmSheet(false);
+        });
+        document.getElementById('confirm-continue').addEventListener('click', () => {
+          resolveConfirmSheet(true);
+        });
+        confirmSheetEl.addEventListener('click', event => {
+          if (event.target === confirmSheetEl) {
+            resolveConfirmSheet(false);
+          }
+        });
+
+        (async () => {
+          await loadExperienceSettings();
+          await loadAudioSettings();
+          if (experienceSelectionRequired) {
+            setSplashStatus('Choose your experience to begin', false);
+            openSettingsSheet({ onboarding: true });
+          } else {
+            loadBundledStoryAtStartup();
+          }
+        })();
+      })();

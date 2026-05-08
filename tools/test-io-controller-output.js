@@ -50,8 +50,24 @@ function createUi() {
     statuses: [],
     topbarMeta: [],
     handler: null,
-    appendOutput(text) {
+    inputEnabled: true,
+    lineClasses: [],
+    appendOutput(text, cssClass) {
       this.lines.push(text);
+      const line = {
+        textContent: text,
+        classes: [],
+        classList: {
+          add: className => {
+            line.classes.push(className);
+          },
+        },
+      };
+      this.lineClasses.push(line.classes);
+      if (cssClass) {
+        line.classList.add(cssClass);
+      }
+      return line;
     },
     clearOutput() {
       this.lines = [];
@@ -63,6 +79,9 @@ function createUi() {
       this.topbarMeta.push([room, score, moves]);
     },
     focusInput() {},
+    setInputEnabled(enabled) {
+      this.inputEnabled = !!enabled;
+    },
     setCommandHandler(handler) {
       this.handler = handler;
     },
@@ -1222,6 +1241,234 @@ async function testGameOverMusicCanWaitForExternalFade() {
   );
 }
 
+async function testWinGameMusicStartsOnVictoryTextAndSuppressesQuitSplash() {
+  const ui = createUi();
+  const audioBySrc = {};
+  const winEvents = [];
+  const storyQuitEvents = [];
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      volume: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+    onWinGame(payload) {
+      winEvents.push(payload);
+    },
+    onStoryQuit(payload) {
+      storyQuitEvents.push(payload);
+    },
+  });
+
+  controller._appendVmLine('Something rises out of the mud, slowly straightening.');
+  controller._appendVmLine('The hacker, mud-covered and weak, staggers to his feet. "Can I have my key back?" he asks.');
+
+  const winAudio = audioBySrc['./assets/audio/743416_Game-over-victory.mp3'];
+  assert.ok(winAudio, 'victory text should create victory audio');
+  assert.strictEqual(winAudio.playCalls, 1, 'victory text should start victory music');
+  assert.strictEqual(winAudio.loop, false, 'victory music should play as a one-shot track');
+  assert.strictEqual(winEvents.length, 1, 'victory text should emit one victory event');
+
+  controller.vm = {
+    haltReason: 'quit',
+    run() {
+      return { haltReason: 'quit', quit: true };
+    },
+  };
+  await controller.runVm();
+
+  assert.strictEqual(storyQuitEvents.length, 0, 'victory finish should not return to splash through story quit callback');
+  assert.deepStrictEqual(ui.statuses[ui.statuses.length - 1], ['Game completed', 'Victory']);
+}
+
+function testGameMusicDisableStopsWinGameMusic() {
+  const ui = createUi();
+  const audioBySrc = {};
+
+  function makeAudio(src) {
+    const audio = {
+      src,
+      loop: false,
+      paused: true,
+      currentTime: 0,
+      volume: 0,
+      playCalls: 0,
+      pauseCalls: 0,
+      addEventListener() {},
+      play() {
+        this.paused = false;
+        this.playCalls++;
+        return Promise.resolve();
+      },
+      pause() {
+        this.paused = true;
+        this.pauseCalls++;
+      },
+    };
+    audioBySrc[src] = audio;
+    return audio;
+  }
+
+  const controller = new GameIoController(ui, {
+    audioFactory(src) {
+      return makeAudio(src);
+    },
+  });
+
+  controller._appendVmLine('Something rises out of the mud, slowly straightening.');
+  controller._appendVmLine('The hacker, mud-covered and weak, staggers to his feet. "Can I have my key back?" he asks.');
+  const winAudio = audioBySrc['./assets/audio/743416_Game-over-victory.mp3'];
+  controller.setGameMusicEnabled(false);
+
+  assert.strictEqual(winAudio.pauseCalls, 1, 'disabling game music should stop victory music');
+  assert.strictEqual(winAudio.currentTime, 0, 'disabling game music should rewind victory music');
+}
+
+async function testPcPaperDreamParagraphUsesEnochianAndDelaysDreamOutput() {
+  const ui = createUi();
+  const controller = new GameIoController(ui, {
+    pcPaperDreamPhotoHoldMs: 1,
+    pcPaperDreamEnochianHoldMs: 1,
+  });
+
+  controller._appendVmLine(
+    'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?'
+  );
+  controller._appendVmLine('You faint, and when you awaken...');
+  controller._appendVmLine('Place');
+
+  assert.deepStrictEqual(
+    ui.lines,
+    [
+      'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?',
+    ],
+    'dream output should be delayed after the trigger paragraph'
+  );
+  assert.strictEqual(
+    ui.lineClasses[0].includes('story-enochian-reveal'),
+    false,
+    'trigger paragraph should remain normal during the initial photo hold'
+  );
+  assert.strictEqual(ui.inputEnabled, false, 'input should be disabled during the scripted photo hold');
+
+  await new Promise(resolve => setTimeout(resolve, 3));
+
+  assert.strictEqual(
+    ui.lineClasses[0].includes('story-enochian-reveal'),
+    true,
+    'trigger paragraph should become Enochian after the initial photo hold'
+  );
+
+  await new Promise(resolve => setTimeout(resolve, 30));
+
+  assert.deepStrictEqual(
+    ui.lines.slice(-2),
+    ['You faint, and when you awaken...', 'Place'],
+    'delayed dream output should flush after the reveal pause'
+  );
+  assert.strictEqual(ui.inputEnabled, true, 'input should be re-enabled after the scripted reveal completes');
+}
+
+async function testPcPaperDreamOutputResumesAfterScriptedReveal() {
+  const ui = createUi();
+  const controller = new GameIoController(ui, {
+    pcPaperDreamPhotoHoldMs: 1,
+    pcPaperDreamEnochianHoldMs: 1,
+  });
+
+  controller._appendVmLine(
+    'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?'
+  );
+  controller._appendVmLine('You touch the MORE box, and a new page appears.');
+
+  assert.strictEqual(
+    ui.lines.length,
+    1,
+    'output should wait while the scripted reveal is active'
+  );
+
+  await new Promise(resolve => setTimeout(resolve, 30));
+
+  assert.deepStrictEqual(
+    ui.lines.slice(-1),
+    ['You touch the MORE box, and a new page appears.'],
+    'buffered output should flush after the scripted reveal'
+  );
+
+  controller._appendVmLine('You faint, and when you awaken...');
+
+  assert.deepStrictEqual(
+    ui.lines.slice(-2),
+    ['You touch the MORE box, and a new page appears.', 'You faint, and when you awaken...'],
+    'later output should be immediate after the scripted reveal completes'
+  );
+}
+
+function testPcPaperDreamTransitionBlocksCommands() {
+  const ui = createUi();
+  const controller = new GameIoController(ui, {
+    pcPaperDreamPhotoHoldMs: 50,
+    pcPaperDreamEnochianHoldMs: 50,
+  });
+  let providedInput = '';
+  controller.vm = {
+    haltReason: 'input',
+    provideInput(command) {
+      providedInput = command;
+    },
+  };
+
+  controller._appendVmLine(
+    'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?'
+  );
+  controller.submitCommand('click more');
+
+  assert.strictEqual(providedInput, '', 'commands should not be accepted during the scripted reveal transition');
+  assert.deepStrictEqual(ui.statuses[ui.statuses.length - 1], ['Reading screen', 'Transfixed']);
+  controller._clearPcPaperDreamDelay();
+}
+
+function testPcPaperDreamParagraphDoesNotTriggerOnDifferentText() {
+  const ui = createUi();
+  const controller = new GameIoController(ui, {
+    pcPaperDreamPhotoHoldMs: 1,
+    pcPaperDreamEnochianHoldMs: 1,
+  });
+
+  controller._appendVmLine('The third page is in the same script as the first, but laid out like a poem.');
+  controller._appendVmLine('You faint, and when you awaken...');
+
+  assert.deepStrictEqual(
+    ui.lines,
+    ['The third page is in the same script as the first, but laid out like a poem.', 'You faint, and when you awaken...'],
+    'non-trigger output should remain immediate'
+  );
+  assert.deepStrictEqual(ui.lineClasses.map(classes => classes.slice()), [[], []], 'non-trigger output should not receive story Enochian styling');
+}
+
 function testSoundStatsAllPrintsEventBreakdown() {
   const ui = createUi();
   const controller = new GameIoController(ui);
@@ -1896,6 +2143,12 @@ async function run() {
   testGameOverMusicStopsOnRecoveryCommand();
   testGameMusicDisableStopsGameOverMusic();
   await testGameOverMusicCanWaitForExternalFade();
+  await testWinGameMusicStartsOnVictoryTextAndSuppressesQuitSplash();
+  testGameMusicDisableStopsWinGameMusic();
+  await testPcPaperDreamParagraphUsesEnochianAndDelaysDreamOutput();
+  await testPcPaperDreamOutputResumesAfterScriptedReveal();
+  testPcPaperDreamTransitionBlocksCommands();
+  testPcPaperDreamParagraphDoesNotTriggerOnDifferentText();
   testSoundStatsAllPrintsEventBreakdown();
   testSoundEventCommandTriggersSyntheticPlayback();
   await testSaveCommandStoresVmSnapshot();

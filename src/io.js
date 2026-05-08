@@ -11,6 +11,13 @@ const SOUND_EFFECT_FINISH = 4;
 const SOUND_CLASS_SFX = 'sfx';
 const SOUND_CLASS_MUSIC = 'music';
 const GAME_OVER_MUSIC_ID = 'game-over-music';
+const WIN_GAME_MUSIC_ID = 'win-game-music';
+const WIN_GAME_TEXT_MARKER =
+  'something rises out of the mud, slowly straightening. the hacker, mud-covered and weak, staggers to his feet';
+const PC_PAPER_DREAM_TRIGGER_TEXT =
+  'the fourth page is a photograph. you try to recoil from the screen, but cannot. fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?';
+const PC_PAPER_DREAM_PHOTO_HOLD_MS = 2000;
+const PC_PAPER_DREAM_ENOCHIAN_HOLD_MS = 2000;
 const DEFAULT_SAVE_SLOT = 0;
 const DEFAULT_SLOT_MENU_SIZE = 5;
 const ROOM_EXIT_PROPERTY_COMMANDS = [
@@ -45,6 +52,7 @@ const DEFAULT_SOUND_CATALOG = {
   17: { src: './assets/soundfx/blorb/s17.wav', class: SOUND_CLASS_SFX, loop: false },
   18: { src: './assets/soundfx/blorb/s18.wav', class: SOUND_CLASS_SFX, loop: false },
   [GAME_OVER_MUSIC_ID]: { src: './assets/audio/game-over-desmae-877160.mp3', class: SOUND_CLASS_MUSIC },
+  [WIN_GAME_MUSIC_ID]: { src: './assets/audio/743416_Game-over-victory.mp3', class: SOUND_CLASS_MUSIC },
 };
 const TLH_LOOPING_SOUND_IDS = new Set([4, 10, 13, 15, 16, 17, 18]);
 const TLH_QUEUED_SOUND_IDS = new Set([9, 16]);
@@ -75,6 +83,23 @@ class GameIoController {
     this.gameMusicEnabled = true;
     this.gameOverMusicActive = false;
     this.gameOverMusicStartToken = 0;
+    this.winGameMusicActive = false;
+    this.winGameMusicStartToken = 0;
+    this.recentVmTextForEnding = '';
+    this.pcPaperDreamEffectTriggered = false;
+    this.pcPaperDreamTransitionActive = false;
+    this.pcPaperDreamDelayedLines = [];
+    this.pcPaperDreamPhotoTimer = 0;
+    this.pcPaperDreamReleaseTimer = 0;
+    this.pcPaperDreamLineEl = null;
+    this.pcPaperDreamPhotoHoldMs = Number.isFinite(opts.pcPaperDreamPhotoHoldMs)
+      ? Math.max(0, Number(opts.pcPaperDreamPhotoHoldMs))
+      : (Number.isFinite(opts.pcPaperDreamRevealDelayMs)
+        ? Math.max(0, Number(opts.pcPaperDreamRevealDelayMs))
+        : PC_PAPER_DREAM_PHOTO_HOLD_MS);
+    this.pcPaperDreamEnochianHoldMs = Number.isFinite(opts.pcPaperDreamEnochianHoldMs)
+      ? Math.max(0, Number(opts.pcPaperDreamEnochianHoldMs))
+      : PC_PAPER_DREAM_ENOCHIAN_HOLD_MS;
     this.sfxVolume = 1;
     this.gameMusicVolume = 1;
     this.saveSlotCount = this._coerceSaveSlotCount(opts.saveSlotCount);
@@ -122,6 +147,14 @@ class GameIoController {
     this.onGameOver =
       typeof opts.onGameOver === 'function'
         ? opts.onGameOver
+        : function () {};
+    this.onBeforeWinGameMusicStart =
+      typeof opts.onBeforeWinGameMusicStart === 'function'
+        ? opts.onBeforeWinGameMusicStart
+        : function () {};
+    this.onWinGame =
+      typeof opts.onWinGame === 'function'
+        ? opts.onWinGame
         : function () {};
     this.audioFactory = typeof opts.audioFactory === 'function'
       ? opts.audioFactory
@@ -173,6 +206,9 @@ class GameIoController {
     this.sawPitchBlackThisCycle = false;
     this.sawCurrentRoomHeadingThisCycle = false;
     this.previousVmLine = '';
+    this.recentVmTextForEnding = '';
+    this.pcPaperDreamEffectTriggered = false;
+    this._clearPcPaperDreamDelay();
     this.pendingViewReturn = null;
     this.pendingMapCommand = '';
     this.lastVmRestartSerial = 0;
@@ -183,6 +219,9 @@ class GameIoController {
     this.gameOverMusicActive = false;
     this.gameOverMusicStartToken += 1;
     this._stopGameOverMusic();
+    this.winGameMusicActive = false;
+    this.winGameMusicStartToken += 1;
+    this._stopWinGameMusic();
     this.onRoomChanged('', 0, { isDark: false });
     this.vm = new window.Z3VM({
       memory: parsed.memory.bytes,
@@ -272,6 +311,10 @@ class GameIoController {
       this.sawPitchBlackThisCycle = false;
       this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
+      if (this.pcPaperDreamTransitionActive) {
+        this.ui.setStatus('Reading screen', 'Transfixed');
+        return;
+      }
       this.ui.setStatus('Awaiting command', 'Input ready');
       this.ui.focusInput();
       return;
@@ -297,6 +340,10 @@ class GameIoController {
       this.sawPitchBlackThisCycle = false;
       this.sawCurrentRoomHeadingThisCycle = false;
       this.pendingRoomDebugAfterLook = false;
+      if (this.winGameMusicActive) {
+        this.ui.setStatus('Game completed', 'Victory');
+        return;
+      }
       this.ui.setStatus('Game ended', 'Quit');
       try {
         this.onStoryQuit({
@@ -320,6 +367,10 @@ class GameIoController {
 
   submitCommand(command) {
     if (this.acknowledgeViewPreview()) {
+      return;
+    }
+    if (this.pcPaperDreamTransitionActive) {
+      this.ui.setStatus('Reading screen', 'Transfixed');
       return;
     }
     if (this._handleInterpreterCommand(command)) {
@@ -1142,6 +1193,7 @@ class GameIoController {
     this.gameMusicEnabled = nextEnabled;
     if (!this.gameMusicEnabled) {
       this._stopGameOverMusic();
+      this._stopWinGameMusic();
       this._stopAllSoundsByClass(SOUND_CLASS_MUSIC);
     }
     this.onGameMusicPreferenceChanged(this.gameMusicEnabled);
@@ -1192,6 +1244,8 @@ class GameIoController {
     this.currentRoomId = -1;
     this.currentRoomName = '';
     this.lastSceneIsDark = null;
+    this.pcPaperDreamEffectTriggered = false;
+    this._clearPcPaperDreamDelay();
     if (this.mapDiscoveryTracker && typeof this.mapDiscoveryTracker.reset === 'function') {
       this.mapDiscoveryTracker.reset();
       this._notifyMapDiscoveryChanged();
@@ -2074,7 +2128,16 @@ class GameIoController {
   }
 
   _appendVmLine(line) {
-    this.ui.appendOutput(line);
+    if (this.pcPaperDreamTransitionActive) {
+      this.pcPaperDreamDelayedLines.push(line);
+      return;
+    }
+    const isPcPaperDreamTrigger = this._isPcPaperDreamTriggerLine(line);
+    const lineEl = this.ui.appendOutput(line);
+    if (isPcPaperDreamTrigger) {
+      this._startPcPaperDreamTransition(lineEl);
+    }
+    this._recordEndingText(line);
     if (this._isPitchBlackLine(line)) {
       this.lastTurnWasPitchBlack = true;
       this.sawPitchBlackThisCycle = true;
@@ -2091,7 +2154,93 @@ class GameIoController {
     if (this._isDeathBannerLine(line)) {
       this._startGameOverMusic();
     }
+    if (this._isWinGameTextSeen()) {
+      this._startWinGameMusic();
+    }
     this.previousVmLine = line;
+  }
+
+  _isPcPaperDreamTriggerLine(line) {
+    if (this.pcPaperDreamEffectTriggered) {
+      return false;
+    }
+    const normalized = String(line || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    return normalized === PC_PAPER_DREAM_TRIGGER_TEXT;
+  }
+
+  _startPcPaperDreamTransition(lineEl) {
+    this.pcPaperDreamEffectTriggered = true;
+    this.pcPaperDreamTransitionActive = true;
+    this.pcPaperDreamLineEl = lineEl || null;
+    this.ui.setStatus('Reading screen', 'Transfixed');
+    if (typeof this.ui.setInputEnabled === 'function') {
+      this.ui.setInputEnabled(false);
+    }
+    if (this.pcPaperDreamPhotoTimer) {
+      clearTimeout(this.pcPaperDreamPhotoTimer);
+    }
+    if (this.pcPaperDreamReleaseTimer) {
+      clearTimeout(this.pcPaperDreamReleaseTimer);
+    }
+    this.pcPaperDreamPhotoTimer = setTimeout(() => {
+      this.pcPaperDreamPhotoTimer = 0;
+      if (this.pcPaperDreamLineEl && this.pcPaperDreamLineEl.classList) {
+        this.pcPaperDreamLineEl.classList.add('story-enochian-reveal');
+      }
+      this.pcPaperDreamReleaseTimer = setTimeout(() => {
+        this.pcPaperDreamReleaseTimer = 0;
+        this._flushPcPaperDreamDelayedOutput();
+      }, this.pcPaperDreamEnochianHoldMs);
+    }, this.pcPaperDreamPhotoHoldMs);
+  }
+
+  _flushPcPaperDreamDelayedOutput() {
+    const delayed = this.pcPaperDreamDelayedLines.slice();
+    this.pcPaperDreamDelayedLines = [];
+    this.pcPaperDreamTransitionActive = false;
+    this.pcPaperDreamLineEl = null;
+    for (const delayedLine of delayed) {
+      this._appendVmLine(delayedLine);
+    }
+    if (typeof this.ui.setInputEnabled === 'function') {
+      this.ui.setInputEnabled(true);
+    }
+    if (this.vm && this.vm.haltReason === 'input') {
+      this.ui.setStatus('Awaiting command', 'Input ready');
+      this.ui.focusInput();
+    }
+  }
+
+  _clearPcPaperDreamDelay() {
+    if (this.pcPaperDreamPhotoTimer) {
+      clearTimeout(this.pcPaperDreamPhotoTimer);
+      this.pcPaperDreamPhotoTimer = 0;
+    }
+    if (this.pcPaperDreamReleaseTimer) {
+      clearTimeout(this.pcPaperDreamReleaseTimer);
+      this.pcPaperDreamReleaseTimer = 0;
+    }
+    this.pcPaperDreamTransitionActive = false;
+    this.pcPaperDreamDelayedLines = [];
+    this.pcPaperDreamLineEl = null;
+    if (typeof this.ui.setInputEnabled === 'function') {
+      this.ui.setInputEnabled(true);
+    }
+  }
+
+  _recordEndingText(line) {
+    const normalized = String(line || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (!normalized) {
+      return;
+    }
+    this.recentVmTextForEnding = (this.recentVmTextForEnding + ' ' + normalized).slice(-700);
+  }
+
+  _isWinGameTextSeen() {
+    if (this.winGameMusicActive) {
+      return false;
+    }
+    return String(this.recentVmTextForEnding || '').includes(WIN_GAME_TEXT_MARKER);
   }
 
   _isDeathBannerLine(line) {
@@ -2651,6 +2800,7 @@ class GameIoController {
     }
     const soundDef = this.soundCatalog[GAME_OVER_MUSIC_ID];
     this._stopAllSounds();
+    this._stopWinGameMusic();
     this.gameOverMusicActive = true;
     const startToken = ++this.gameOverMusicStartToken;
     const play = () => {
@@ -2694,6 +2844,58 @@ class GameIoController {
     this.gameOverMusicStartToken += 1;
     this._stopSound(GAME_OVER_MUSIC_ID);
     this.gameOverMusicActive = false;
+  }
+
+  _startWinGameMusic() {
+    if (this.winGameMusicActive) {
+      return;
+    }
+    const soundDef = this.soundCatalog[WIN_GAME_MUSIC_ID];
+    this._stopAllSounds();
+    this._stopGameOverMusic();
+    this.winGameMusicActive = true;
+    const startToken = ++this.winGameMusicStartToken;
+    const play = () => {
+      if (
+        startToken !== this.winGameMusicStartToken ||
+        !this.winGameMusicActive
+      ) {
+        return;
+      }
+      this.onWinGame({
+        musicSrc: soundDef && soundDef.src ? soundDef.src : '',
+      });
+      if (!this.gameMusicEnabled || !soundDef || !soundDef.src) {
+        return;
+      }
+      this._playSound(WIN_GAME_MUSIC_ID, soundDef, {
+        gain: 1,
+        restart: true,
+      });
+    };
+    let delayResult = null;
+    try {
+      delayResult = this.onBeforeWinGameMusicStart({
+        src: soundDef && soundDef.src ? soundDef.src : '',
+      });
+    } catch (error) {
+      delayResult = null;
+    }
+    if (delayResult && typeof delayResult.then === 'function') {
+      delayResult.then(play).catch(play);
+      return;
+    }
+    if (Number.isFinite(delayResult) && delayResult > 0) {
+      setTimeout(play, delayResult);
+      return;
+    }
+    play();
+  }
+
+  _stopWinGameMusic() {
+    this.winGameMusicStartToken += 1;
+    this._stopSound(WIN_GAME_MUSIC_ID);
+    this.winGameMusicActive = false;
   }
 
   _finishSound(number) {
@@ -2855,6 +3057,7 @@ class GameIoController {
   _prepareAudioForRestore() {
     this.restoreAudioTransitionActive = true;
     this._stopGameOverMusic();
+    this._stopWinGameMusic();
     this._stopAllSoundsByClass(SOUND_CLASS_SFX);
   }
 }

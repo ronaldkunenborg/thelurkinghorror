@@ -1,0 +1,72 @@
+<div class="shell-frame">
+        <div class="hud-group">
+          <aside class="side-actions" aria-label="Game actions">
+            <span class="side-actions-title">Actions</span>
+            <button id="load-slot" class="icon-btn" type="button" aria-label="Load game" title="Load game">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_load.png" alt="" /></span>
+            </button>
+            <button id="save-slot" class="icon-btn" type="button" aria-label="Save game" title="Save game">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_save.png" alt="" /></span>
+            </button>
+            <button id="map-button" class="icon-btn" type="button" aria-label="Location map" title="Location map">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_map.png" alt="" /></span>
+            </button>
+            <button id="settings-button" class="icon-btn" type="button" aria-label="Settings" title="Settings">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_settings.png" alt="" /></span>
+            </button>
+            <button id="credits-button" class="icon-btn" type="button" aria-label="Credits" title="Credits">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_credits.png" alt="" /></span>
+            </button>
+            <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
+              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_commands.png" alt="" /></span>
+            </button>
+          </aside>
+
+          <div class="terminal-stack">
+            <header class="topbar">
+              <div class="topbar-copy">
+                <h1 class="title">The Lurking Horror</h1>
+                <span id="topbar-room" class="hint"></span>
+              </div>
+              <div class="topbar-meta" aria-label="Game status">
+                <span>Score<strong id="topbar-score">--</strong></span>
+                <span>Moves<strong id="topbar-moves">--</strong></span>
+              </div>
+            </header>
+
+            <section id="inline-map-panel" class="inline-map-panel" aria-label="Inline visited location map" hidden>
+              <svg id="inline-game-map" class="inline-map-svg" viewBox="0 0 1600 980" preserveAspectRatio="xMinYMin meet" aria-label="Inline visited location map"></svg>
+            </section>
+            <button id="inline-map-resize" class="inline-map-resize" type="button" aria-label="Resize inline map" title="Drag to resize inline map. Double-click to reset." hidden></button>
+
+            <section id="output" class="output" aria-live="polite"></section>
+
+            <section class="status" aria-label="Status line">
+              <span id="status-left">Loading shell...</span>
+              <span id="status-right">Ready</span>
+            </section>
+
+            <section class="input-row" aria-label="Command input">
+              <span id="prompt" class="prompt">&gt;</span>
+              <input
+                id="command-input"
+                class="command-input"
+                type="text"
+                autocomplete="off"
+                spellcheck="false"
+                placeholder="Enter command..."
+                aria-label="Command input"
+              />
+            </section>
+          </div>
+        </div>
+
+        <section class="scene-pane" aria-label="Location artwork">
+          <div id="scene-layer-a" class="scene-layer"></div>
+          <div id="scene-layer-b" class="scene-layer"></div>
+          <div id="horror-vignette" class="horror-vignette" aria-hidden="true"></div>
+        </section>
+        <div id="blood-layer" class="blood-layer" aria-hidden="true">
+          <img id="blood-splatter" class="blood-splatter" alt="" />
+        </div>
+      </div>

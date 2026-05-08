@@ -1,0 +1,74 @@
+<section id="settings-sheet" class="settings-sheet" aria-label="Audio settings" hidden>
+        <div class="settings-sheet-panel" role="dialog" aria-modal="false" aria-labelledby="settings-title">
+          <div class="command-sheet-header">
+            <h2 id="settings-title" class="command-sheet-title">Experience & Audio Settings</h2>
+            <button id="close-settings" class="btn" type="button">Close</button>
+          </div>
+          <p id="experience-onboarding-copy" class="settings-copy" hidden>Choose your preferred experience before entering the game.</p>
+          <p class="settings-copy">Set experience level from classic to modern, then fine-tune individual options.</p>
+          <label class="settings-control" for="experience-level">
+            <span class="volume-label">Experience Level</span>
+            <input id="experience-level" class="volume-slider" type="range" min="0" max="3" step="1" value="3" />
+          </label>
+          <p id="experience-level-label" class="settings-copy settings-inline-copy">Profile: Modern</p>
+          <label class="settings-toggle" for="exp-music-enabled">
+            <input id="exp-music-enabled" type="checkbox" />
+            <span>Music enabled</span>
+          </label>
+          <label class="settings-toggle" for="exp-extra-slots-enabled">
+            <input id="exp-extra-slots-enabled" type="checkbox" />
+            <span>More save/load slots</span>
+          </label>
+          <label class="settings-toggle" for="exp-map-enabled">
+            <input id="exp-map-enabled" type="checkbox" />
+            <span>Visited map enabled</span>
+          </label>
+          <label class="settings-control" for="exp-map-mode">
+            <span class="volume-label">Map Display</span>
+            <select id="exp-map-mode" class="settings-select">
+              <option value="modal">Modal only</option>
+              <option value="inline">Inline above text</option>
+            </select>
+          </label>
+          <label class="settings-toggle" for="exp-horror-enabled">
+            <input id="exp-horror-enabled" type="checkbox" />
+            <span>Extra horror effects</span>
+          </label>
+          <label class="settings-toggle" for="exp-images-enabled">
+            <input id="exp-images-enabled" type="checkbox" />
+            <span>Images enabled</span>
+          </label>
+          <label class="settings-toggle" for="exp-snow-enabled">
+            <input id="exp-snow-enabled" type="checkbox" />
+            <span>Snow enabled</span>
+          </label>
+          <div id="audio-settings-group" class="audio-settings-group">
+            <p class="settings-copy settings-section-title">Audio Mix</p>
+            <label class="settings-control" for="music-volume">
+              <span class="volume-label">Game Music</span>
+              <input id="music-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+            </label>
+            <label class="settings-control" for="sfx-volume">
+              <span class="volume-label">Sound Effects</span>
+              <input id="sfx-volume" class="volume-slider" type="range" min="0" max="100" value="100" />
+            </label>
+          </div>
+          <p class="settings-attribution" id="audio-attribution">
+            Splash music: "horror" by Whirlguy (CC BY-ND 3.0),
+            <a href="https://www.newgrounds.com/audio/listen/6630" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+            Game over music: audio by Desmae
+            (<a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 3.0</a>),
+            <a href="https://www.newgrounds.com/audio/listen/877160" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+            Victory music: Newgrounds Audio Portal entry 743416
+            (<a href="https://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-ND 3.0</a>),
+            <a href="https://www.newgrounds.com/audio/listen/743416" target="_blank" rel="noopener noreferrer">Newgrounds Audio Portal</a>.
+            Sound effect 1: <a href="https://pixabay.com/users/freesound_community-46691455/" target="_blank" rel="noopener noreferrer">freesound_community</a>.
+            Sound effect 2: <a href="https://pixabay.com/users/universfield-28281460/" target="_blank" rel="noopener noreferrer">universfield</a>.
+            Enochian font: Digital Type Foundry
+            (<a href="https://www.fontspace.com/enochian-font-f6183" target="_blank" rel="noopener noreferrer">Freeware, Non-Commercial</a>).
+          </p>
+          <div id="experience-onboarding-actions" class="settings-actions" hidden>
+            <button id="experience-continue" class="btn btn-accent" type="button">Enter Game</button>
+          </div>
+        </div>
+      </section>

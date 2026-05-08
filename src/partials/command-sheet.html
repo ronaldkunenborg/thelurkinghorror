@@ -1,0 +1,110 @@
+<section id="command-sheet" class="command-sheet" aria-label="Commands overview" hidden>
+        <div class="command-sheet-panel">
+          <div class="command-sheet-header">
+            <h2 class="command-sheet-title">Commands Overview</h2>
+            <button id="close-commands" class="btn" type="button">Close</button>
+          </div>
+          <div class="command-section">
+            <h3>In-Game Commands</h3>
+            <div class="command-subsection">
+              <h4>Movement</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="north"><strong>north (n)</strong><span>Move north.</span></button>
+                <button class="btn command-chip" type="button" data-command="south"><strong>south (s)</strong><span>Move south.</span></button>
+                <button class="btn command-chip" type="button" data-command="east"><strong>east (e)</strong><span>Move east.</span></button>
+                <button class="btn command-chip" type="button" data-command="west"><strong>west (w)</strong><span>Move west.</span></button>
+                <button class="btn command-chip" type="button" data-command="up"><strong>up (u)</strong><span>Go up a level or ladder.</span></button>
+                <button class="btn command-chip" type="button" data-command="down"><strong>down (d)</strong><span>Go down a level or ladder.</span></button>
+                <button class="btn command-chip" type="button" data-command="enter"><strong>enter</strong><span>Enter a room, vehicle, or area.</span></button>
+                <button class="btn command-chip" type="button" data-command="exit"><strong>exit</strong><span>Leave the current enclosed area.</span></button>
+                <button class="btn command-chip" type="button" data-command="in"><strong>in</strong><span>Go inward, often into the elevator or another enclosed area.</span></button>
+                <button class="btn command-chip" type="button" data-command="out"><strong>out</strong><span>Go outward, often out of the elevator or another enclosed area.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>Observation</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="look"><strong>look (l)</strong><span>Repeat the current room description.</span></button>
+                <button class="btn command-chip" type="button" data-command="examine"><strong>examine (x)</strong><span>Inspect an object in more detail.</span></button>
+                <button class="btn command-chip" type="button" data-command="search <object>"><strong>search &lt;object&gt;</strong><span>Search furniture or containers carefully.</span></button>
+                <button class="btn command-chip" type="button" data-command="read <object>"><strong>read &lt;object&gt;</strong><span>Read writing on an object.</span></button>
+                <button class="btn command-chip" type="button" data-command="listen"><strong>listen</strong><span>Check for ambient sounds or clues.</span></button>
+                <button class="btn command-chip" type="button" data-command="smell"><strong>smell</strong><span>Try for scent-based clues.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>Inventory</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="inventory"><strong>inventory (i)</strong><span>Review what you are carrying.</span></button>
+                <button class="btn command-chip" type="button" data-command="take <object>"><strong>take &lt;object&gt;</strong><span>Pick up an object.</span></button>
+                <button class="btn command-chip" type="button" data-command="drop <object>"><strong>drop &lt;object&gt;</strong><span>Put down an object.</span></button>
+                <button class="btn command-chip" type="button" data-command="wear <object>"><strong>wear &lt;object&gt;</strong><span>Put on something wearable.</span></button>
+                <button class="btn command-chip" type="button" data-command="remove <object>"><strong>remove &lt;object&gt;</strong><span>Take off something worn.</span></button>
+                <button class="btn command-chip" type="button" data-command="open <object>"><strong>open &lt;object&gt;</strong><span>Open a container or door.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>Interaction</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="close <object>"><strong>close &lt;object&gt;</strong><span>Close something open.</span></button>
+                <button class="btn command-chip" type="button" data-command="use <object> on <object>"><strong>use &lt;object&gt; on &lt;object&gt;</strong><span>Use one object on another.</span></button>
+                <button class="btn command-chip" type="button" data-command="push <object>"><strong>push &lt;object&gt;</strong><span>Press or push a control.</span></button>
+                <button class="btn command-chip" type="button" data-command="turn on <object>"><strong>turn on &lt;object&gt;</strong><span>Switch devices on.</span></button>
+                <button class="btn command-chip" type="button" data-command="turn off <object>"><strong>turn off &lt;object&gt;</strong><span>Switch devices off.</span></button>
+                <button class="btn command-chip" type="button" data-command="ask <person> about <topic>"><strong>ask &lt;person&gt; about &lt;topic&gt;</strong><span>Try topic-based conversation.</span></button>
+              </div>
+            </div>
+            <div class="command-subsection">
+              <h4>System And Meta</h4>
+              <div class="command-grid">
+                <button class="btn command-chip" type="button" data-command="score"><strong>score</strong><span>Check score and moves in-story.</span></button>
+                <button class="btn command-chip" type="button" data-command="version"><strong>version</strong><span>Show the story and interpreter version information.</span></button>
+                <button class="btn command-chip" type="button" data-command="save"><strong>save</strong><span>Story save; writes the game-native save to slot 0 only.</span></button>
+                <button class="btn command-chip" type="button" data-command="restore"><strong>restore</strong><span>Story restore; reads the game-native save from slot 0 only.</span></button>
+                <button class="btn command-chip" type="button" data-command="time"><strong>time (t)</strong><span>Ask the game for the current in-world time.</span></button>
+                <button class="btn command-chip" type="button" data-command="wait"><strong>wait (z)</strong><span>Pass one turn.</span></button>
+                <button class="btn command-chip" type="button" data-command="again"><strong>again (g)</strong><span>Repeat the previous command after at least one turn.</span></button>
+                <button class="btn command-chip" type="button" data-command="oops"><strong>oops (o)</strong><span>Correct the last command's typo by following with a replacement word.</span></button>
+                <button class="btn command-chip" type="button" data-command="yes"><strong>yes (y)</strong><span>Answer confirmation prompts affirmatively.</span></button>
+                <button class="btn command-chip" type="button" data-command="brief"><strong>brief</strong><span>Default room text: full descriptions for new locations, names only for visited ones.</span></button>
+                <button class="btn command-chip" type="button" data-command="superbrief"><strong>superbrief</strong><span>Show only the location name when entering any room.</span></button>
+                <button class="btn command-chip" type="button" data-command="verbose"><strong>verbose</strong><span>Always show the full room description when entering a location.</span></button>
+                <button class="btn command-chip" type="button" data-command="restart"><strong>restart</strong><span>Restart the current story session.</span></button>
+                <button class="btn command-chip" type="button" data-command="quit"><strong>quit (q)</strong><span>Quit the story.</span></button>
+              </div>
+            </div>
+          </div>
+          <div class="command-section">
+            <h3>Game Control Commands</h3>
+            <div class="command-grid">
+              <button class="btn command-chip" type="button" data-command="$SAVE"><strong>$SAVE</strong><span>Open the slot picker for interpreter save.</span></button>
+              <button class="btn command-chip" type="button" data-command="$LOAD"><strong>$LOAD</strong><span>Open the slot picker for interpreter load.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SAVE 1"><strong>$SAVE 1</strong><span>Save into a numbered local slot.</span></button>
+              <button class="btn command-chip" type="button" data-command="$LOAD 1"><strong>$LOAD 1</strong><span>Load a numbered local slot.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SAVES"><strong>$SAVES</strong><span>List local save slots for this story.</span></button>
+              <button class="btn command-chip" type="button" data-command="$DELETE 1"><strong>$DELETE 1</strong><span>Delete a numbered local save slot.</span></button>
+              <button class="btn command-chip" type="button" data-command="$EXPORT 1"><strong>$EXPORT 1</strong><span>Download a numbered slot as a `.sav` file.</span></button>
+              <button class="btn command-chip" type="button" data-command="$IMPORT 1"><strong>$IMPORT 1</strong><span>Import a `.sav` file into a numbered slot.</span></button>
+            </div>
+          </div>
+          <div class="command-section">
+            <h3>Meta Commands</h3>
+            <div class="command-grid">
+              <button class="btn command-chip" type="button" data-command="$SOUND"><strong>$SOUND</strong><span>Toggle in-game sound effects only.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SFX 6"><strong>$SFX &lt;1-18&gt;</strong><span>Play a specific The Lurking Horror sound effect.</span></button>
+              <button class="btn command-chip" type="button" data-command="$GAMESOUND"><strong>$GAMESOUND</strong><span>Toggle splash and other game music.</span></button>
+              <button class="btn command-chip" type="button" data-command="$DEBUG"><strong>$DEBUG</strong><span>Toggle debug-only VM and sound diagnostics.</span></button>
+              <button class="btn command-chip" type="button" data-command="$DEBUG CLEAR EXPERIENCE"><strong>$DEBUG CLEAR EXPERIENCE</strong><span>Debug-only: clear saved experience settings (requires restart).</span></button>
+              <button class="btn command-chip" type="button" data-command="$MAP"><strong>$MAP</strong><span>Open the visited-location map.</span></button>
+              <button class="btn command-chip" type="button" data-command="$CREDITS"><strong>$CREDITS</strong><span>Open the credits panel.</span></button>
+              <button class="btn command-chip" type="button" data-command="$BLOOD ON"><strong>$BLOOD ON</strong><span>Debug-only: enable low-frequency random blood spatter.</span></button>
+              <button class="btn command-chip" type="button" data-command="$BLOOD OFF"><strong>$BLOOD OFF</strong><span>Debug-only: disable blood spatter effect.</span></button>
+              <button class="btn command-chip" type="button" data-command="$BLOOD 3"><strong>$BLOOD 1-5</strong><span>Debug-only: force a specific blood splatter variant.</span></button>
+              <button class="btn command-chip" type="button" data-command="$HORROR ON"><strong>$HORROR ON</strong><span>Debug-only: enable ambient horror disturbances.</span></button>
+              <button class="btn command-chip" type="button" data-command="$HORROR NOW RUNES"><strong>$HORROR NOW RUNES</strong><span>Debug-only: force a rune flicker now.</span></button>
+              <button class="btn command-chip" type="button" data-command="$VIEW 176"><strong>$VIEW &lt;id|name&gt;</strong><span>Debug-only: safe room preview. Shows room/image, then press any command to return to exact prior state.</span></button>
+              <button class="btn command-chip" type="button" data-command="$SOUNDSTATS"><strong>$SOUNDSTATS</strong><span>Print captured sound-event statistics.</span></button>
+            </div>
+          </div>
+        </div>
+      </section>

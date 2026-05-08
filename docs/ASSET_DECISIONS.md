@@ -2,6 +2,19 @@
 
 This document records visual/audio/font asset choices that affect the shipped game experience, especially when multiple source assets were considered.
 
+## Victory Ending Assets
+
+- Decision: play `743416_Game-over-victory.mp3` and show `game_over_victory.png` when the story victory text reaches `<FINISH>`.
+- Runtime audio path: `src/assets/audio/743416_Game-over-victory.mp3`.
+- Runtime visual path: `src/assets/gfx/lurkinghorror/game_over_victory.png`.
+- Attribution source: <https://www.newgrounds.com/audio/listen/743416>.
+- License: Creative Commons Attribution-NonCommercial-NoDerivs 3.0.
+
+Rationale:
+
+- The story VM exposes `<FINISH>` through the same quit opcode used by ordinary story quit, so the runtime detects the canonical victory text before the halt and preserves a dedicated completed-game screen instead of returning to splash.
+- The victory music uses the same non-looping `music` sound class as game-over music so the existing music preference and volume controls apply consistently.
+
 ## Enochian Text Flicker Font
 
 - Decision: use `Enochian-BGlG.woff2` for the horror text-flicker effect.
