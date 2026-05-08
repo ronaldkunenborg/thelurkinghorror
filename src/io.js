@@ -16,8 +16,8 @@ const WIN_GAME_TEXT_MARKER =
   'something rises out of the mud, slowly straightening. the hacker, mud-covered and weak, staggers to his feet';
 const PC_PAPER_DREAM_TRIGGER_TEXT =
   'the fourth page is a photograph. you try to recoil from the screen, but cannot. fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?';
-const PC_PAPER_DREAM_PHOTO_HOLD_MS = 2000;
-const PC_PAPER_DREAM_ENOCHIAN_HOLD_MS = 2000;
+const PC_PAPER_DREAM_REVEAL_MS = 2000;
+const PC_PAPER_DREAM_RETURN_MS = 2000;
 const DEFAULT_SAVE_SLOT = 0;
 const DEFAULT_SLOT_MENU_SIZE = 5;
 const ROOM_EXIT_PROPERTY_COMMANDS = [
@@ -87,19 +87,22 @@ class GameIoController {
     this.winGameMusicStartToken = 0;
     this.recentVmTextForEnding = '';
     this.pcPaperDreamEffectTriggered = false;
+    this.pcPaperDreamEffectArmed = false;
     this.pcPaperDreamTransitionActive = false;
     this.pcPaperDreamDelayedLines = [];
-    this.pcPaperDreamPhotoTimer = 0;
-    this.pcPaperDreamReleaseTimer = 0;
+    this.pcPaperDreamRevealTimer = 0;
+    this.pcPaperDreamReturnTimer = 0;
     this.pcPaperDreamLineEl = null;
-    this.pcPaperDreamPhotoHoldMs = Number.isFinite(opts.pcPaperDreamPhotoHoldMs)
-      ? Math.max(0, Number(opts.pcPaperDreamPhotoHoldMs))
-      : (Number.isFinite(opts.pcPaperDreamRevealDelayMs)
-        ? Math.max(0, Number(opts.pcPaperDreamRevealDelayMs))
-        : PC_PAPER_DREAM_PHOTO_HOLD_MS);
-    this.pcPaperDreamEnochianHoldMs = Number.isFinite(opts.pcPaperDreamEnochianHoldMs)
-      ? Math.max(0, Number(opts.pcPaperDreamEnochianHoldMs))
-      : PC_PAPER_DREAM_ENOCHIAN_HOLD_MS;
+    this.pcPaperDreamRevealMs = Number.isFinite(opts.pcPaperDreamRevealMs)
+      ? Math.max(0, Number(opts.pcPaperDreamRevealMs))
+      : (Number.isFinite(opts.pcPaperDreamEnochianHoldMs)
+        ? Math.max(0, Number(opts.pcPaperDreamEnochianHoldMs))
+        : (Number.isFinite(opts.pcPaperDreamPhotoHoldMs)
+          ? Math.max(0, Number(opts.pcPaperDreamPhotoHoldMs))
+          : PC_PAPER_DREAM_REVEAL_MS));
+    this.pcPaperDreamReturnMs = Number.isFinite(opts.pcPaperDreamReturnMs)
+      ? Math.max(0, Number(opts.pcPaperDreamReturnMs))
+      : this.pcPaperDreamRevealMs;
     this.sfxVolume = 1;
     this.gameMusicVolume = 1;
     this.saveSlotCount = this._coerceSaveSlotCount(opts.saveSlotCount);
@@ -208,6 +211,7 @@ class GameIoController {
     this.previousVmLine = '';
     this.recentVmTextForEnding = '';
     this.pcPaperDreamEffectTriggered = false;
+    this.pcPaperDreamEffectArmed = false;
     this._clearPcPaperDreamDelay();
     this.pendingViewReturn = null;
     this.pendingMapCommand = '';
@@ -394,11 +398,15 @@ class GameIoController {
       this.ui.appendOutput('VM is not waiting for input.', 'error');
       return;
     }
+    const shouldStartPcPaperDreamTransition = this._shouldStartPcPaperDreamTransition(normalized);
     this.pendingDarkClearRoomId = this.currentRoomId;
     this.sawPitchBlackThisCycle = false;
     this.sawCurrentRoomHeadingThisCycle = false;
     this.pendingRoomDebugAfterLook = this._isLookCommand(command);
     this.pendingMapCommand = normalized;
+    if (shouldStartPcPaperDreamTransition) {
+      this._startPcPaperDreamTransition();
+    }
     this.vm.provideInput(command);
     this.runVm();
   }
@@ -2127,15 +2135,16 @@ class GameIoController {
     this.outputBuffer = '';
   }
 
-  _appendVmLine(line) {
-    if (this.pcPaperDreamTransitionActive) {
+  _appendVmLine(line, options) {
+    const appendOptions = options || {};
+    if (this.pcPaperDreamTransitionActive && !appendOptions.bypassPcPaperDreamDelay) {
       this.pcPaperDreamDelayedLines.push(line);
       return;
     }
     const isPcPaperDreamTrigger = this._isPcPaperDreamTriggerLine(line);
     const lineEl = this.ui.appendOutput(line);
     if (isPcPaperDreamTrigger) {
-      this._startPcPaperDreamTransition(lineEl);
+      this._armPcPaperDreamTransition(lineEl);
     }
     this._recordEndingText(line);
     if (this._isPitchBlackLine(line)) {
@@ -2168,40 +2177,57 @@ class GameIoController {
     return normalized === PC_PAPER_DREAM_TRIGGER_TEXT;
   }
 
-  _startPcPaperDreamTransition(lineEl) {
+  _shouldStartPcPaperDreamTransition(normalizedCommand) {
+    return this.pcPaperDreamEffectArmed && String(normalizedCommand || '').trim().toLowerCase() === 'click more';
+  }
+
+  _armPcPaperDreamTransition(lineEl) {
     this.pcPaperDreamEffectTriggered = true;
-    this.pcPaperDreamTransitionActive = true;
+    this.pcPaperDreamEffectArmed = true;
     this.pcPaperDreamLineEl = lineEl || null;
+  }
+
+  _startPcPaperDreamTransition() {
+    if (!this.pcPaperDreamEffectArmed || !this.pcPaperDreamLineEl) {
+      return;
+    }
+    this.pcPaperDreamEffectArmed = false;
+    this.pcPaperDreamTransitionActive = true;
     this.ui.setStatus('Reading screen', 'Transfixed');
     if (typeof this.ui.setInputEnabled === 'function') {
       this.ui.setInputEnabled(false);
     }
-    if (this.pcPaperDreamPhotoTimer) {
-      clearTimeout(this.pcPaperDreamPhotoTimer);
+    if (this.pcPaperDreamRevealTimer) {
+      clearTimeout(this.pcPaperDreamRevealTimer);
     }
-    if (this.pcPaperDreamReleaseTimer) {
-      clearTimeout(this.pcPaperDreamReleaseTimer);
+    if (this.pcPaperDreamReturnTimer) {
+      clearTimeout(this.pcPaperDreamReturnTimer);
     }
-    this.pcPaperDreamPhotoTimer = setTimeout(() => {
-      this.pcPaperDreamPhotoTimer = 0;
-      if (this.pcPaperDreamLineEl && this.pcPaperDreamLineEl.classList) {
-        this.pcPaperDreamLineEl.classList.add('story-enochian-reveal');
-      }
-      this.pcPaperDreamReleaseTimer = setTimeout(() => {
-        this.pcPaperDreamReleaseTimer = 0;
-        this._flushPcPaperDreamDelayedOutput();
-      }, this.pcPaperDreamEnochianHoldMs);
-    }, this.pcPaperDreamPhotoHoldMs);
+    this._setPcPaperDreamLineClass('story-enochian-reveal', true);
+    this.pcPaperDreamRevealTimer = setTimeout(() => {
+      this.pcPaperDreamRevealTimer = 0;
+      this._flushPcPaperDreamDelayedOutput();
+      this._setPcPaperDreamLineClass('story-enochian-return', true);
+      this.pcPaperDreamReturnTimer = setTimeout(() => {
+        this.pcPaperDreamReturnTimer = 0;
+        this._finishPcPaperDreamTransition();
+      }, this.pcPaperDreamReturnMs);
+    }, this.pcPaperDreamRevealMs);
   }
 
   _flushPcPaperDreamDelayedOutput() {
     const delayed = this.pcPaperDreamDelayedLines.slice();
     this.pcPaperDreamDelayedLines = [];
+    for (const delayedLine of delayed) {
+      this._appendVmLine(delayedLine, { bypassPcPaperDreamDelay: true });
+    }
+  }
+
+  _finishPcPaperDreamTransition() {
+    this._setPcPaperDreamLineClass('story-enochian-return', false);
+    this._setPcPaperDreamLineClass('story-enochian-reveal', false);
     this.pcPaperDreamTransitionActive = false;
     this.pcPaperDreamLineEl = null;
-    for (const delayedLine of delayed) {
-      this._appendVmLine(delayedLine);
-    }
     if (typeof this.ui.setInputEnabled === 'function') {
       this.ui.setInputEnabled(true);
     }
@@ -2212,19 +2238,33 @@ class GameIoController {
   }
 
   _clearPcPaperDreamDelay() {
-    if (this.pcPaperDreamPhotoTimer) {
-      clearTimeout(this.pcPaperDreamPhotoTimer);
-      this.pcPaperDreamPhotoTimer = 0;
+    if (this.pcPaperDreamRevealTimer) {
+      clearTimeout(this.pcPaperDreamRevealTimer);
+      this.pcPaperDreamRevealTimer = 0;
     }
-    if (this.pcPaperDreamReleaseTimer) {
-      clearTimeout(this.pcPaperDreamReleaseTimer);
-      this.pcPaperDreamReleaseTimer = 0;
+    if (this.pcPaperDreamReturnTimer) {
+      clearTimeout(this.pcPaperDreamReturnTimer);
+      this.pcPaperDreamReturnTimer = 0;
     }
+    this._setPcPaperDreamLineClass('story-enochian-return', false);
+    this._setPcPaperDreamLineClass('story-enochian-reveal', false);
+    this.pcPaperDreamEffectArmed = false;
     this.pcPaperDreamTransitionActive = false;
     this.pcPaperDreamDelayedLines = [];
     this.pcPaperDreamLineEl = null;
     if (typeof this.ui.setInputEnabled === 'function') {
       this.ui.setInputEnabled(true);
+    }
+  }
+
+  _setPcPaperDreamLineClass(className, enabled) {
+    if (!this.pcPaperDreamLineEl || !this.pcPaperDreamLineEl.classList) {
+      return;
+    }
+    if (enabled && typeof this.pcPaperDreamLineEl.classList.add === 'function') {
+      this.pcPaperDreamLineEl.classList.add(className);
+    } else if (!enabled && typeof this.pcPaperDreamLineEl.classList.remove === 'function') {
+      this.pcPaperDreamLineEl.classList.remove(className);
     }
   }
 

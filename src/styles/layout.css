@@ -281,6 +281,7 @@
 }
 
 .output {
+  overflow-x: hidden;
   overflow-y: auto;
   min-height: 0;
   padding: 18px 16px 20px;
@@ -331,7 +332,8 @@
   position: relative;
   display: block;
   width: fit-content;
-  max-width: 100%;
+  max-width: calc(100% - 1.8rem);
+  overflow-wrap: anywhere;
   font-family: "LhEnochian", "Cascadia Code", "Fira Code", "Consolas", "Courier New", monospace;
   letter-spacing: 0.035em;
 }
@@ -343,6 +345,10 @@
 .line.story-enochian-reveal {
   transform-origin: left center;
   animation: story-enochian-reveal-grow 2000ms ease-in-out 1 forwards;
+}
+
+.line.story-enochian-reveal.story-enochian-return {
+  animation: story-enochian-reveal-grow 2000ms ease-in-out 1 reverse forwards;
 }
 
 .line.horror-rune-flicker::after,
@@ -435,13 +441,13 @@
   58% {
     opacity: 1;
     filter: brightness(1.55) blur(0.08px) contrast(1.75);
-    transform: translateX(0) scale(1.04);
+    transform: translateX(0) scale(1.065);
   }
 
   100% {
     opacity: 1;
     filter: brightness(1.35) blur(0) contrast(1.35);
-    transform: translateX(0) scale(1.055);
+    transform: translateX(0) scale(1.09);
   }
 }
 

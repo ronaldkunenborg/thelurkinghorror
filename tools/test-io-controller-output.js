@@ -59,7 +59,18 @@ function createUi() {
         classes: [],
         classList: {
           add: className => {
-            line.classes.push(className);
+            if (!line.classes.includes(className)) {
+              line.classes.push(className);
+            }
+          },
+          remove: className => {
+            const index = line.classes.indexOf(className);
+            if (index !== -1) {
+              line.classes.splice(index, 1);
+            }
+          },
+          contains: className => {
+            return line.classes.includes(className);
           },
         },
       };
@@ -1350,59 +1361,97 @@ function testGameMusicDisableStopsWinGameMusic() {
 async function testPcPaperDreamParagraphUsesEnochianAndDelaysDreamOutput() {
   const ui = createUi();
   const controller = new GameIoController(ui, {
-    pcPaperDreamPhotoHoldMs: 1,
-    pcPaperDreamEnochianHoldMs: 1,
+    pcPaperDreamRevealMs: 1,
+    pcPaperDreamReturnMs: 1,
   });
+  controller.vm = {
+    haltReason: 'input',
+    provideInput(command) {
+      assert.strictEqual(command, 'click more');
+      this.haltReason = 'input';
+    },
+    async run() {
+      controller._appendVmLine('You faint, and when you awaken...');
+      controller._appendVmLine('Place');
+      return { haltReason: 'input' };
+    },
+  };
 
   controller._appendVmLine(
     'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?'
   );
-  controller._appendVmLine('You faint, and when you awaken...');
-  controller._appendVmLine('Place');
 
   assert.deepStrictEqual(
     ui.lines,
     [
       'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?',
     ],
-    'dream output should be delayed after the trigger paragraph'
+    'fourth-page paragraph should be shown normally before the final click more'
   );
   assert.strictEqual(
     ui.lineClasses[0].includes('story-enochian-reveal'),
     false,
-    'trigger paragraph should remain normal during the initial photo hold'
+    'trigger paragraph should remain normal before the final click more'
   );
-  assert.strictEqual(ui.inputEnabled, false, 'input should be disabled during the scripted photo hold');
+  assert.strictEqual(ui.inputEnabled, true, 'input should remain enabled after the fourth-page paragraph');
 
-  await new Promise(resolve => setTimeout(resolve, 3));
+  controller.submitCommand('click more');
 
   assert.strictEqual(
     ui.lineClasses[0].includes('story-enochian-reveal'),
     true,
-    'trigger paragraph should become Enochian after the initial photo hold'
+    'previous paragraph should become Enochian after the final click more'
   );
+  assert.deepStrictEqual(
+    ui.lines,
+    [
+      'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?',
+    ],
+    'dream output should be delayed while the previous paragraph changes to Enochian'
+  );
+  assert.strictEqual(ui.inputEnabled, false, 'input should be disabled during the scripted reveal');
 
-  await new Promise(resolve => setTimeout(resolve, 30));
+  await new Promise(resolve => setTimeout(resolve, 5));
 
   assert.deepStrictEqual(
     ui.lines.slice(-2),
     ['You faint, and when you awaken...', 'Place'],
-    'delayed dream output should flush after the reveal pause'
+    'delayed dream output should flush after the previous paragraph has changed'
   );
+  assert.strictEqual(
+    ui.lineClasses[0].includes('story-enochian-return'),
+    true,
+    'previous paragraph should begin returning to normal after dream output appears'
+  );
+
+  await new Promise(resolve => setTimeout(resolve, 20));
+
+  assert.strictEqual(ui.lineClasses[0].includes('story-enochian-reveal'), false, 'trigger paragraph should return to normal text');
+  assert.strictEqual(ui.lineClasses[0].includes('story-enochian-return'), false, 'return animation class should be removed');
   assert.strictEqual(ui.inputEnabled, true, 'input should be re-enabled after the scripted reveal completes');
 }
 
 async function testPcPaperDreamOutputResumesAfterScriptedReveal() {
   const ui = createUi();
   const controller = new GameIoController(ui, {
-    pcPaperDreamPhotoHoldMs: 1,
-    pcPaperDreamEnochianHoldMs: 1,
+    pcPaperDreamRevealMs: 1,
+    pcPaperDreamReturnMs: 1,
   });
+  controller.vm = {
+    haltReason: 'input',
+    provideInput() {
+      this.haltReason = 'input';
+    },
+    async run() {
+      controller._appendVmLine('You touch the MORE box, and a new page appears.');
+      return { haltReason: 'input' };
+    },
+  };
 
   controller._appendVmLine(
     'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?'
   );
-  controller._appendVmLine('You touch the MORE box, and a new page appears.');
+  controller.submitCommand('click more');
 
   assert.strictEqual(
     ui.lines.length,
@@ -1430,8 +1479,8 @@ async function testPcPaperDreamOutputResumesAfterScriptedReveal() {
 function testPcPaperDreamTransitionBlocksCommands() {
   const ui = createUi();
   const controller = new GameIoController(ui, {
-    pcPaperDreamPhotoHoldMs: 50,
-    pcPaperDreamEnochianHoldMs: 50,
+    pcPaperDreamRevealMs: 50,
+    pcPaperDreamReturnMs: 50,
   });
   let providedInput = '';
   controller.vm = {
@@ -1445,8 +1494,9 @@ function testPcPaperDreamTransitionBlocksCommands() {
     'The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?'
   );
   controller.submitCommand('click more');
+  controller.submitCommand('click more');
 
-  assert.strictEqual(providedInput, '', 'commands should not be accepted during the scripted reveal transition');
+  assert.strictEqual(providedInput, 'click more', 'the first final click more should be accepted and start the reveal');
   assert.deepStrictEqual(ui.statuses[ui.statuses.length - 1], ['Reading screen', 'Transfixed']);
   controller._clearPcPaperDreamDelay();
 }
@@ -1454,8 +1504,8 @@ function testPcPaperDreamTransitionBlocksCommands() {
 function testPcPaperDreamParagraphDoesNotTriggerOnDifferentText() {
   const ui = createUi();
   const controller = new GameIoController(ui, {
-    pcPaperDreamPhotoHoldMs: 1,
-    pcPaperDreamEnochianHoldMs: 1,
+    pcPaperDreamRevealMs: 1,
+    pcPaperDreamReturnMs: 1,
   });
 
   controller._appendVmLine('The third page is in the same script as the first, but laid out like a poem.');

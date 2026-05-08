@@ -430,12 +430,13 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
      `The fourth page is a photograph. You try to recoil from the screen, but cannot. Fascinated and repelled at the same time, you wonder: is that a mouth, and what is in it?`
    - Added deterministic trigger detection in `src/io.js` for the exact fourth-page paragraph.
    - Added `story-enochian-reveal` output styling in `src/modern.css`, reusing the existing `LhEnochian` font and rune flicker visual language.
-   - Split the scripted story reveal from ambient rune flicker: the story animation runs once and then leaves the line settled in Enochian text for the rest of the delay.
+   - Split the scripted story reveal from ambient rune flicker so the story animation is deterministic and independent from random horror scheduling.
    - Updated `src/ui-framework.js` so `appendOutput()` returns the created line element while preserving existing callers.
-   - Revised the reveal timing: after the fourth-page text appears normally, input and subsequent VM output are blocked for 2 seconds; the line then changes into Enochian and grows/brights over 2 seconds; only after that does the prompt return.
-   - The subsequent final `click more` then continues immediately into `You faint...` and the Yuggoth room text.
+   - Revised the reveal timing: the fourth-page text appears normally and input remains available; the final `click more` accepts the command, changes the previous paragraph into larger Enochian text over 2 seconds, then shows `You faint...` and the Yuggoth room text.
+   - After the dream output appears, the previous paragraph returns from Enochian to normal text over the same duration before input is restored.
+   - Hid horizontal overflow in the output pane and constrained the animated line width so the larger Enochian text does not create a horizontal scrollbar.
    - Kept this effect separate from random ambient horror scheduling/cooldowns.
-   - Added controller regression coverage for Enochian styling, immediate delayed-output behavior, next-turn delayed-output behavior, and non-trigger output behavior.
+   - Added controller regression coverage for delayed final-click activation, Enochian styling, delayed dream output, return-to-normal behavior, transition input blocking, and non-trigger output behavior.
    - Verified with a real VM command sequence through the PC/YAK paper flow:
      `turn computer on`, `login 872325412`, `password uhlersoth`, `edit paper`, `click paper`, `read paper`, `click more`, `click more`, `click more`, then final `click more`.
 
