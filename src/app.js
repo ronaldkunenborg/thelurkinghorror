@@ -1732,12 +1732,17 @@
           persistAudioSettings();
         });
 
+        function restoreAwaitingCommandStatus() {
+          ui.setStatus('Awaiting command', 'Input ready');
+        }
+
         function openCommandSheet() {
           commandSheetEl.hidden = false;
         }
 
         function closeCommandSheet() {
           commandSheetEl.hidden = true;
+          restoreAwaitingCommandStatus();
           ui.focusInput();
         }
 
@@ -1855,6 +1860,7 @@
 
         function closeSaveLoadSheet() {
           saveLoadSheetEl.hidden = true;
+          restoreAwaitingCommandStatus();
           ui.focusInput();
         }
 
@@ -1899,6 +1905,7 @@
             return;
           }
           settingsSheetEl.hidden = true;
+          restoreAwaitingCommandStatus();
           ui.focusInput();
         }
 
@@ -2138,6 +2145,7 @@
 
         function closeMapSheet() {
           mapSheetEl.hidden = true;
+          restoreAwaitingCommandStatus();
           ui.focusInput();
         }
 
@@ -2162,6 +2170,7 @@
 
         function closeCreditsSheet() {
           creditsSheetEl.hidden = true;
+          restoreAwaitingCommandStatus();
           ui.focusInput();
         }
 
@@ -2180,6 +2189,7 @@
           const resolve = confirmResolver;
           confirmResolver = null;
           confirmSheetEl.hidden = true;
+          restoreAwaitingCommandStatus();
           resolve(!!value);
         }
 

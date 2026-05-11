@@ -97,6 +97,44 @@
     justify-content: flex-start;
   }
 
+  .command-sheet,
+  .save-load-sheet,
+  .credits-sheet,
+  .confirm-sheet {
+    padding: 8px;
+  }
+
+  .command-sheet-panel,
+  .save-load-sheet-panel,
+  .credits-sheet-panel,
+  .confirm-sheet-panel {
+    width: 100%;
+    max-height: calc(100vh - 16px);
+    padding: 12px;
+  }
+
+  .command-sheet .command-sheet-header,
+  .save-load-sheet .command-sheet-header,
+  .credits-sheet .command-sheet-header,
+  .settings-sheet .command-sheet-header,
+  .confirm-sheet .command-sheet-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .command-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .save-load-slot-row {
+    grid-template-columns: 1fr;
+  }
+
+  .save-load-slot-tools {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
   .ambient-snow-layer {
     opacity: 0.36;
   }
@@ -142,7 +180,8 @@
   }
 
   .settings-sheet {
-    --settings-left: 5px;
-    --settings-width: calc(100% - 10px);
+    --settings-left: 8px;
+    --settings-width: calc(100% - 16px);
+    --settings-edge-margin: 8px;
   }
 }

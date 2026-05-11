@@ -9,14 +9,15 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(2, 4, 8, 0.82);
-  backdrop-filter: blur(8px);
+  background: rgba(4, 8, 14, 0.42);
+  backdrop-filter: blur(5px);
 }
 
 .command-sheet-panel {
   width: min(760px, 100%);
   max-height: min(80vh, 780px);
   overflow: auto;
+  box-sizing: border-box;
   border: 1px solid var(--panel-border-top);
   border-radius: 20px;
   background: rgba(6, 10, 16, 0.96);
@@ -35,14 +36,15 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(2, 4, 8, 0.82);
-  backdrop-filter: blur(8px);
+  background: rgba(4, 8, 14, 0.42);
+  backdrop-filter: blur(5px);
 }
 
 .save-load-sheet-panel {
   width: min(900px, 100%);
   max-height: min(84vh, 860px);
   overflow: auto;
+  box-sizing: border-box;
   border: 1px solid var(--panel-border-top);
   border-radius: 20px;
   background: rgba(6, 10, 16, 0.96);
@@ -304,14 +306,15 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(2, 4, 8, 0.82);
-  backdrop-filter: blur(8px);
+  background: rgba(4, 8, 14, 0.42);
+  backdrop-filter: blur(5px);
 }
 
 .credits-sheet-panel {
   width: min(900px, 100%);
   max-height: min(84vh, 900px);
   overflow: auto;
+  box-sizing: border-box;
   border: 1px solid var(--panel-border-top);
   border-radius: 20px;
   background: rgba(6, 10, 16, 0.96);
@@ -361,6 +364,9 @@
 
 .confirm-sheet-panel {
   width: min(620px, 100%);
+  max-height: min(84vh, 640px);
+  overflow: auto;
+  box-sizing: border-box;
   border: 1px solid var(--panel-border-top);
   border-radius: 22px;
   background:
@@ -383,10 +389,13 @@
   z-index: 6;
   display: block;
   padding: 0;
-  background: transparent;
+  background: rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(3px);
+  overflow: hidden;
   --settings-left: 5px;
   --settings-top: 84px;
   --settings-width: min(420px, calc(100% - 10px));
+  --settings-edge-margin: 5px;
 }
 
 .settings-sheet-panel {
@@ -394,6 +403,9 @@
   left: var(--settings-left);
   top: var(--settings-top);
   width: var(--settings-width);
+  max-height: max(220px, calc(100% - var(--settings-top) - var(--settings-edge-margin)));
+  overflow: auto;
+  box-sizing: border-box;
   border: 1px solid var(--panel-border-top);
   border-radius: 22px;
   background:
@@ -414,6 +426,7 @@
 .settings-sheet.is-onboarding .settings-sheet-panel {
   position: static;
   width: min(640px, calc(100% - 16px));
+  max-height: min(calc(100vh - 32px), 900px);
 }
 
 .settings-copy {
