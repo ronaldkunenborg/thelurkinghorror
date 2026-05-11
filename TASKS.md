@@ -440,15 +440,14 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Verified with a real VM command sequence through the PC/YAK paper flow:
      `turn computer on`, `login 872325412`, `password uhlersoth`, `edit paper`, `click paper`, `read paper`, `click more`, `click more`, `click more`, then final `click more`.
 
-## Pending Tasks
-
 76. [done] When opening the settings in a smaller screen, the bottom of the settings is invisible. This behaviour seems different from the other screens for map or credits.
    - Updated `src/styles/sheets.css` so the gear-anchored settings panel now has viewport-bounded `max-height` and internal scrolling, matching the small-screen behavior of the other overlay sheets.
    - Kept the non-onboarding popup anchored to the settings button while preventing the panel bottom from falling outside the shell on shorter viewports.
    - Extended the small-screen overlay pass across the other sheets in `src/styles/responsive.css` and `src/styles/sheets.css` so commands, save/load, credits, and confirm dialogs also use consistent viewport padding, full-width panel sizing, and internal scrolling on narrow screens.
 
-77. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
+## Pending Tasks
 
+77. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
 
 ## Future Tasks
 
