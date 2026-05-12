@@ -445,12 +445,17 @@ Ideas for expansion and new capabilities go under ## Future tasks with status [f
    - Kept the non-onboarding popup anchored to the settings button while preventing the panel bottom from falling outside the shell on shorter viewports.
    - Extended the small-screen overlay pass across the other sheets in `src/styles/responsive.css` and `src/styles/sheets.css` so commands, save/load, credits, and confirm dialogs also use consistent viewport padding, full-width panel sizing, and internal scrolling on narrow screens.
 
-## Pending Tasks
+78. [done] When pushing to Github we also push to the website where this game will live: https://games.grundsatzlich-it.nl. This doesn't yet exist. The main website runs on a local internet provider, who provides wordpress, database and Apache. The website DNS points to Cloudflare as CDN.
+   - Added `.github/workflows/deploy-ftp.yml` so pushes to `main` deploy the static `src/` website over FTP.
+   - Uses GitHub secrets `FTP_SERVER`, `FTP_USERNAME`, and `FTP_PASSWORD` for deployment credentials.
+   - Runs `tools/sync-html-partials.js` before deploy so generated partial JavaScript files are up to date.
 
-77. [pending] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
+## Pending Tasks
 
 ## Future Tasks
 
 64. [future] Consider hints-booklet foundation from `docs/BOOKLET_HINTS_IMPLEMENTATION_PLAN.md` later.
    - Parked for now because the in-game visited-location map covers the immediate player-support need.
    - If revived later, likely scope includes booklet page 1-4 dataset scaffolding, `hints-booklet` command plumbing, safe-location gating, and minimal consultation state.
+
+77. [future] There should be achievements. Like "You brighten my day!" for finding the flaslight. Or getting killed in the dark ("something bumped you in the dark")
