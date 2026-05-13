@@ -128,6 +128,37 @@
   color: var(--danger);
 }
 
+.splash-action {
+  margin-top: 16px;
+  min-height: 44px;
+  min-width: 124px;
+  padding: 10px 18px;
+  border: 1px solid rgba(177, 18, 18, 0.82);
+  border-radius: 6px;
+  background: rgba(18, 0, 0, 0.72);
+  color: #f1d7d7;
+  font: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  box-shadow:
+    0 10px 26px rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.95);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.splash-action:hover,
+.splash-action:focus-visible {
+  background: rgba(45, 2, 2, 0.86);
+  border-color: rgba(218, 38, 38, 0.92);
+  outline: none;
+}
+
+.splash-action:active {
+  transform: translateY(1px);
+}
+
 .splash-actions {
   display: flex;
   gap: 10px;

@@ -17,6 +17,7 @@
             : null;
         const splashEl = document.getElementById('splash');
         const splashStatusEl = document.getElementById('splash-status');
+        const splashActionEl = document.getElementById('splash-action');
         const sceneLayerA = document.getElementById('scene-layer-a');
         const sceneLayerB = document.getElementById('scene-layer-b');
         const sceneLayers = [sceneLayerA, sceneLayerB];
@@ -1499,8 +1500,12 @@
 
         function setSplashStatus(message, isError) {
           splashStatusEl.textContent = message;
-          const isReadyPrompt = !isError && /^Press any key to /i.test(String(message || ''));
+          const isReadyPrompt = !isError && /^Press any key or tap to /i.test(String(message || ''));
           splashStatusEl.className = isError ? 'splash-status error' : isReadyPrompt ? 'splash-status ready' : 'splash-status';
+          if (splashActionEl) {
+            splashActionEl.hidden = !isReadyPrompt;
+            splashActionEl.textContent = experienceSelectionRequired ? 'Choose Experience' : 'Enter';
+          }
         }
 
         let splashDismissReady = false;
@@ -1631,6 +1636,10 @@
           }
           scheduleHorrorIdleRoll();
           window.removeEventListener('keydown', handleSplashDismiss);
+          if (splashActionEl) {
+            splashActionEl.removeEventListener('pointerdown', handleSplashDismiss);
+            splashActionEl.removeEventListener('click', handleSplashDismiss);
+          }
         }
 
         function handleSplashDismiss(event) {
@@ -1640,9 +1649,17 @@
           if (event.type === 'keydown' && event.key === 'Tab') {
             return;
           }
+          if (event.type === 'pointerdown' || event.type === 'click') {
+            event.preventDefault();
+          }
           if (experienceSelectionRequired) {
             splashDismissReady = false;
             window.removeEventListener('keydown', handleSplashDismiss);
+            if (splashActionEl) {
+              splashActionEl.removeEventListener('pointerdown', handleSplashDismiss);
+              splashActionEl.removeEventListener('click', handleSplashDismiss);
+              splashActionEl.hidden = true;
+            }
             openSettingsSheet({ onboarding: true });
             return;
           }
@@ -1656,11 +1673,15 @@
           }
           splashDismissReady = true;
           if (experienceSelectionRequired) {
-            setSplashStatus('Press any key to choose experience', false);
+            setSplashStatus('Press any key or tap to choose experience', false);
           } else {
-            setSplashStatus('Press any key to enter', false);
+            setSplashStatus('Press any key or tap to enter', false);
           }
           window.addEventListener('keydown', handleSplashDismiss);
+          if (splashActionEl) {
+            splashActionEl.addEventListener('pointerdown', handleSplashDismiss);
+            splashActionEl.addEventListener('click', handleSplashDismiss);
+          }
         }
 
         async function loadBundledStoryAtStartup() {
