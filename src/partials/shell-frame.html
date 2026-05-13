@@ -1,36 +1,48 @@
 <div class="shell-frame">
-        <div class="hud-group">
-          <aside class="side-actions" aria-label="Game actions">
-            <span class="side-actions-title">Actions</span>
-            <button id="load-slot" class="icon-btn" type="button" aria-label="Load game" title="Load game">
-              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_load.png" alt="" /></span>
-            </button>
-            <button id="save-slot" class="icon-btn" type="button" aria-label="Save game" title="Save game">
-              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_save.png" alt="" /></span>
-            </button>
-            <button id="map-button" class="icon-btn" type="button" aria-label="Location map" title="Location map">
-              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_map.png" alt="" /></span>
-            </button>
-            <button id="settings-button" class="icon-btn" type="button" aria-label="Settings" title="Settings">
-              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_settings.png" alt="" /></span>
-            </button>
-            <button id="credits-button" class="icon-btn" type="button" aria-label="Credits" title="Credits">
-              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_credits.png" alt="" /></span>
-            </button>
-            <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
-              <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_commands.png" alt="" /></span>
-            </button>
-          </aside>
+        <aside class="side-actions" aria-label="Game actions">
+          <span class="side-actions-title">Actions</span>
+          <button id="load-slot" class="icon-btn" type="button" aria-label="Load game" title="Load game">
+            <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_load.png" alt="" /></span>
+          </button>
+          <button id="save-slot" class="icon-btn" type="button" aria-label="Save game" title="Save game">
+            <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_save.png" alt="" /></span>
+          </button>
+          <button id="map-button" class="icon-btn" type="button" aria-label="Location map" title="Location map">
+            <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_map.png" alt="" /></span>
+          </button>
+          <button id="settings-button" class="icon-btn" type="button" aria-label="Settings" title="Settings">
+            <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_settings.png" alt="" /></span>
+          </button>
+          <button id="credits-button" class="icon-btn" type="button" aria-label="Credits" title="Credits">
+            <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_credits.png" alt="" /></span>
+          </button>
+          <button id="commands-button" class="icon-btn icon-btn-command" type="button" aria-label="Commands overview" title="Commands overview">
+            <span class="icon-etch icon-action" aria-hidden="true"><img class="action-icon-img" src="./assets/gfx/glyphs/button_commands.png" alt="" /></span>
+          </button>
+        </aside>
 
+        <div class="hud-group">
           <div class="terminal-stack">
             <header class="topbar">
-              <div class="topbar-copy">
-                <h1 class="title">The Lurking Horror</h1>
-                <span id="topbar-room" class="hint"></span>
+              <div class="topbar-desktop">
+                <div class="topbar-copy">
+                  <h1 class="title">The Lurking Horror</h1>
+                  <span class="hint" data-topbar-room></span>
+                </div>
+                <div class="topbar-meta" aria-label="Game status">
+                  <span>Score<strong data-topbar-score>--</strong></span>
+                  <span>Moves<strong data-topbar-moves>--</strong></span>
+                </div>
               </div>
-              <div class="topbar-meta" aria-label="Game status">
-                <span>Score<strong id="topbar-score">--</strong></span>
-                <span>Moves<strong id="topbar-moves">--</strong></span>
+              <div class="topbar-mobile">
+                <h1 class="title">The Lurking Horror</h1>
+                <div class="topbar-mobile-detail-row">
+                  <span class="hint" data-topbar-room></span>
+                  <div class="topbar-meta" aria-label="Game status">
+                    <span>Score<strong data-topbar-score>--</strong></span>
+                    <span>Moves<strong data-topbar-moves>--</strong></span>
+                  </div>
+                </div>
               </div>
             </header>
 

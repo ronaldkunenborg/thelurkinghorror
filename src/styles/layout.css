@@ -214,6 +214,29 @@
   -webkit-backdrop-filter: blur(8px);
 }
 
+.topbar-desktop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  width: 100%;
+}
+
+.topbar-mobile {
+  display: none;
+  width: 100%;
+}
+
+.topbar-mobile-detail-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  width: 100%;
+}
+
 .topbar-copy {
   display: flex;
   align-items: baseline;

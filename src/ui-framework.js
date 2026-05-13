@@ -8,9 +8,9 @@ class UiFramework {
     this.promptEl = opts.promptEl;
     this.statusLeftEl = opts.statusLeftEl;
     this.statusRightEl = opts.statusRightEl;
-    this.topbarRoomEl = opts.topbarRoomEl || null;
-    this.topbarScoreEl = opts.topbarScoreEl || null;
-    this.topbarMovesEl = opts.topbarMovesEl || null;
+    this.topbarRoomEls = normalizeElements(opts.topbarRoomEls || opts.topbarRoomEl);
+    this.topbarScoreEls = normalizeElements(opts.topbarScoreEls || opts.topbarScoreEl);
+    this.topbarMovesEls = normalizeElements(opts.topbarMovesEls || opts.topbarMovesEl);
 
     if (!this.outputEl || !this.inputEl || !this.statusLeftEl || !this.statusRightEl) {
       throw new Error('UiFramework requires output, input, and status elements');
@@ -38,14 +38,14 @@ class UiFramework {
   }
 
   setTopbarMeta(roomName, score, moves) {
-    if (this.topbarRoomEl) {
-      this.topbarRoomEl.textContent = roomName || '';
+    for (const element of this.topbarRoomEls) {
+      element.textContent = roomName || '';
     }
-    if (this.topbarScoreEl) {
-      this.topbarScoreEl.textContent = score === '' ? '--' : String(score);
+    for (const element of this.topbarScoreEls) {
+      element.textContent = score === '' ? '--' : String(score);
     }
-    if (this.topbarMovesEl) {
-      this.topbarMovesEl.textContent = moves === '' ? '--' : String(moves);
+    for (const element of this.topbarMovesEls) {
+      element.textContent = moves === '' ? '--' : String(moves);
     }
   }
 
@@ -145,6 +145,19 @@ class UiFramework {
       }
     });
   }
+}
+
+function normalizeElements(input) {
+  if (!input) {
+    return [];
+  }
+  if (Array.isArray(input)) {
+    return input.filter(Boolean);
+  }
+  if (typeof input.length === 'number' && typeof input !== 'string' && !input.nodeType) {
+    return Array.from(input).filter(Boolean);
+  }
+  return [input];
 }
 
 window.UiFramework = UiFramework;

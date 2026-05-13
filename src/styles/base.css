@@ -103,7 +103,6 @@ body.is-resizing-inline-map {
   flex: 0 0 48%;
   max-width: 48%;
   min-width: 0;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
 }

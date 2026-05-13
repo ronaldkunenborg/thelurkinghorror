@@ -60,6 +60,7 @@
         const experienceExtraSlotsEnabledEl = document.getElementById('exp-extra-slots-enabled');
         const experienceMapEnabledEl = document.getElementById('exp-map-enabled');
         const experienceMapModeEl = document.getElementById('exp-map-mode');
+        const experienceMapModeControlEl = experienceMapModeEl ? experienceMapModeEl.closest('label') : null;
         const experienceHorrorEnabledEl = document.getElementById('exp-horror-enabled');
         const experienceImagesEnabledEl = document.getElementById('exp-images-enabled');
         const experienceSnowEnabledEl = document.getElementById('exp-snow-enabled');
@@ -164,9 +165,9 @@
           promptEl: document.getElementById('prompt'),
           statusLeftEl: document.getElementById('status-left'),
           statusRightEl: document.getElementById('status-right'),
-          topbarRoomEl: document.getElementById('topbar-room'),
-          topbarScoreEl: document.getElementById('topbar-score'),
-          topbarMovesEl: document.getElementById('topbar-moves'),
+          topbarRoomEls: document.querySelectorAll('[data-topbar-room]'),
+          topbarScoreEls: document.querySelectorAll('[data-topbar-score]'),
+          topbarMovesEls: document.querySelectorAll('[data-topbar-moves]'),
           prompt: '>',
         });
         let saveLoadSheetMode = 'save';
@@ -1198,6 +1199,13 @@
           return String(value || '').toLowerCase() === 'inline' ? 'inline' : 'modal';
         }
 
+        function isMobileViewport() {
+          if (window.matchMedia) {
+            return window.matchMedia('(max-width: 700px)').matches;
+          }
+          return window.innerWidth <= 700;
+        }
+
         function clampInlineMapHeightRatio(value, fallback) {
           const numeric = Number(value);
           const base = Number.isFinite(Number(fallback)) ? Number(fallback) : 0.33;
@@ -1217,12 +1225,15 @@
           const level = clampProfileLevel(input && input.level, fallback.level);
           const profile = getProfile(level);
           const source = input || {};
+          const mapMode = isMobileViewport()
+            ? 'modal'
+            : normalizeMapMode(source.mapMode || profile.mapMode);
           return {
             level,
             musicEnabled: typeof source.musicEnabled === 'boolean' ? source.musicEnabled : profile.musicEnabled,
             extraSlotsEnabled: typeof source.extraSlotsEnabled === 'boolean' ? source.extraSlotsEnabled : profile.extraSlotsEnabled,
             mapEnabled: typeof source.mapEnabled === 'boolean' ? source.mapEnabled : profile.mapEnabled,
-            mapMode: normalizeMapMode(source.mapMode || profile.mapMode),
+            mapMode,
             inlineMapHeightRatio: clampInlineMapHeightRatio(source.inlineMapHeightRatio, 0.33),
             horrorExtrasEnabled: typeof source.horrorExtrasEnabled === 'boolean' ? source.horrorExtrasEnabled : profile.horrorExtrasEnabled,
             imagesEnabled: typeof source.imagesEnabled === 'boolean' ? source.imagesEnabled : profile.imagesEnabled,
@@ -1284,7 +1295,10 @@
           experienceExtraSlotsEnabledEl.checked = !!normalized.extraSlotsEnabled;
           experienceMapEnabledEl.checked = !!normalized.mapEnabled;
           experienceMapModeEl.value = normalized.mapMode;
-          experienceMapModeEl.disabled = !normalized.mapEnabled;
+          experienceMapModeEl.disabled = !normalized.mapEnabled || isMobileViewport();
+          if (experienceMapModeControlEl) {
+            experienceMapModeControlEl.hidden = isMobileViewport();
+          }
           experienceHorrorEnabledEl.checked = !!normalized.horrorExtrasEnabled;
           experienceImagesEnabledEl.checked = !!normalized.imagesEnabled;
           experienceSnowEnabledEl.checked = !!normalized.snowEnabled;
@@ -2017,6 +2031,12 @@
         window.addEventListener('resize', () => {
           if (ambientSnowLayer) {
             ambientSnowLayer.resize();
+          }
+          const normalizedOnResize = normalizeExperienceSettings(experienceSettings);
+          if (normalizedOnResize.mapMode !== experienceSettings.mapMode) {
+            experienceSettings = normalizedOnResize;
+            syncExperienceControls(normalizedOnResize);
+            syncInlineMapVisibility(normalizedOnResize);
           }
           updateUiSnowMasks();
           if (!settingsSheetEl.hidden) {
